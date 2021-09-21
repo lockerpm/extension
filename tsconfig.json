@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
@@ -11,12 +11,26 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "firefox-webext-browser",
+      "node",
+      "chrome",
+      "jasmine",
+      "mousetrap"
     ],
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
+      ],
+      "jslib-common/*": [
+        "./jslib/common/src/*"
+      ],
+      "jslib-angular/*": [
+        "./jslib/angular/src/*"
       ]
     },
     "lib": [
@@ -27,13 +41,11 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "jslib",
+    "dist",
   ]
 }

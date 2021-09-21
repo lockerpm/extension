@@ -1,0 +1,6 @@
+jslib
+src/background
+src/browser
+src/services
+src/popup/services
+src/content-scripts
