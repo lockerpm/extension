@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "sub:init": "git submodule update --init --recursive",
+    "sub:update": "git submodule update --remote",
+    "sub:pull": "git submodule foreach git pull origin master",
     "serve": "vue-cli-service build --mode development --watch",
     "build": "vue-cli-service build NODE_OPTIONS=--max_old_space_size=10000",
     "lint": "vue-cli-service lint"
