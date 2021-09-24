@@ -174,6 +174,17 @@ export default class RuntimeBackground {
                 }
                 catch { }
                 break;
+            case 'cs-authResult':
+                console.log(msg.referrer)
+                // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
+                //     return;
+                // }
+
+                try {
+                    BrowserApi.createNewTab('popup.html?uilocation=popout#/sso?token=' + msg.token);
+                }
+                catch { }
+                break;
             case 'webAuthnResult':
                 const vaultUrl2 = this.environmentService.getWebVaultUrl();
 

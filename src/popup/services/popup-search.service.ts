@@ -1,7 +1,7 @@
 import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { I18nService } from 'jslib-common/abstractions/i18n.service';
 
-import { ConsoleLogService } from 'jslib-common/services/consoleLog.service';
+import { ConsoleLogService } from '@/services/consoleLog.service';
 import { SearchService } from 'jslib-common/services/search.service';
 
 export class PopupSearchService extends SearchService {

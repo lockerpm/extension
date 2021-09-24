@@ -1,6 +1,8 @@
 /* eslint-disable */
 var path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const os=require('os');
 module.exports = {
   pages: {
     popup: {
@@ -25,6 +27,13 @@ module.exports = {
             'content/message_handler': 'src/content/message_handler.ts'
           },
         },
+      },
+      manifestTransformer: (manifest) => {
+        if (process.env.NODE_ENV === 'development') {
+          manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
+        }
+
+        return manifest;
       }
     }
   },
@@ -46,5 +55,16 @@ module.exports = {
         cache: false, // Remove after upgrading to Webpack 5
       }),
     ]
-  }
+  },
+  chainWebpack: config => {
+    config
+        .plugin('fork-ts-checker')
+        .tap(args => {
+          let totalmem=Math.floor(os.totalmem()/1024/1024); //get OS mem size
+          let allowUseMem= totalmem>2500? 8192:2048;
+          // in vue-cli shuld args[0]['typescript'].memoryLimit
+          args[0].memoryLimit = allowUseMem;
+          return args
+        })
+  },
 }

@@ -1,8 +1,4 @@
 /* eslint-disabled */
-import { AuthGuardService } from 'jslib-angular/services/auth-guard.service';
-import { BroadcasterService } from 'jslib-angular/services/broadcaster.service';
-import { ModalService } from 'jslib-angular/services/modal.service';
-import { ValidationService } from 'jslib-angular/services/validation.service';
 
 import { BrowserApi } from '@/browser/browserApi';
 
@@ -42,7 +38,7 @@ import { AutofillService } from '@/services/abstractions/autofill.service';
 import BrowserMessagingService from '@/services/browserMessaging.service';
 
 import { AuthService } from 'jslib-common/services/auth.service';
-import { ConsoleLogService } from 'jslib-common/services/consoleLog.service';
+import { ConsoleLogService } from '@/services/consoleLog.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { SearchService } from 'jslib-common/services/search.service';
 import { StateService } from 'jslib-common/services/state.service';
