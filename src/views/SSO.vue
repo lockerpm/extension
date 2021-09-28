@@ -13,8 +13,8 @@ export default Vue.extend({
   components: {
   },
   mounted() {
-    this.$store.commit('UPDATE_TOKEN', {token: this.$route.query.token, force: true})
-    this.$storageService.save('cs-token', this.$route.query.token)
+    // this.$store.commit('UPDATE_TOKEN', {token: this.$route.query.token, force: true})
+    this.$storageService.save('cs_token', this.$route.query.token)
     // BrowserApi.reloadOpenWindows();
     // const thisWindow = window.open('', '_self');
     // thisWindow.close();

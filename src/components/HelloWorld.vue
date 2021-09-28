@@ -45,7 +45,7 @@ export default Vue.extend({
   },
   methods: {
    async getToken () {
-     this.token = await this.$storageService.get('cs-token')
+     this.token = await this.$storageService.get('cs_token')
     },
     async setToken () {
       this.$store.commit('UPDATE_TEST', new Date())

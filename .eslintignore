@@ -4,3 +4,4 @@ src/browser
 src/services
 src/popup/services
 src/content-scripts
+tailwind.config.js

@@ -14,14 +14,6 @@
     "noEmit": true,
     "experimentalDecorators": true,
     "noImplicitAny": false,
-    "types": [
-      "webpack-env",
-      "firefox-webext-browser",
-      "node",
-      "chrome",
-      "jasmine",
-      "mousetrap"
-    ],
     "paths": {
       "@/*": [
         "./src/*"
@@ -38,6 +30,9 @@
       "dom",
       "dom.iterable",
       "scripthost"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
     ]
   },
   "include": [

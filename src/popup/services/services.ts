@@ -76,7 +76,7 @@ export default {
         Vue.prototype.$syncService =  getBgService<SyncService>('syncService')()
         Vue.prototype.$tokenService =  getBgService<SyncService>('tokenService')()
         Vue.prototype.$searchService =  getBgService<SearchService>('searchService')()
-        Vue.prototype.$platformUtilsServicee =  platformUtilsService
+        Vue.prototype.$platformUtilsService =  platformUtilsService
         Vue.prototype.$messagingService =  getBgService<MessagingService>('messagingService')()
         Vue.prototype.$folderService =  getBgService<FolderService>('folderService')()
         Vue.prototype.$collectionService =  getBgService<CollectionService>('collectionService')()
@@ -112,5 +112,6 @@ export default {
             window.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
             window.document.documentElement.classList.add('theme_' + theme);
         }
-    }
+    },
+    getBgService
 }

@@ -1,0 +1,103 @@
+.invalid-feedback {
+  display: none;
+  text-align: left;
+  width: 100%;
+  margin-top: .25rem;
+  @apply text-danger
+}
+
+.form-group {
+  label {
+    @apply mb-1.5 block font-semibold text-black
+  }
+  input {
+    @apply focus-visible:ring-0 focus-visible:outline-none
+  }
+  &:not(:last-child) {
+    @apply mb-5
+  }
+  .form-control {
+    @apply focus:ring-0 focus:border-primary block w-full text-sm border-black-200 rounded text-black-700 placeholder-black-500 border px-4 py-3;
+    line-height: 1.315rem;
+    letter-spacing: -0.01em;
+    height: 40px;
+    &.form-control-sm {
+      height: 36px;
+      line-height: 36px;
+      @apply pl-7 pr-12  py-1.5;
+    }
+    &.form-control-lg {
+    }
+    &.form-control-solid {
+      @apply bg-black-50
+    }
+    &:disabled {
+      background-color: #F5F7FA;
+      border-color: #E4E7ED;
+      color: #C0C4CC;
+      cursor: not-allowed;
+    }
+    &~.input-group-append {
+      background-color: #F5F7FA;
+    }
+  }
+  .form-control.is-invalid {
+    @apply border-danger
+  }
+  .invalid-feedback, .valid-feedback {
+    @apply text-xs
+  }
+  .is-invalid~.invalid-feedback, .is-invalid~.invalid-tooltip, .was-validated :invalid~.invalid-feedback, .was-validated :invalid~.invalid-tooltip {
+    display: block;
+  }
+  .input-group {
+    @apply relative flex flex-wrap items-stretch w-full border border-black-200 rounded focus:ring-0 focus-within:border-primary focus:outline-none;
+    .form-control {
+      width: 1%;
+      min-width: 0;
+      margin-bottom: 0;
+      @apply relative flex-grow border-0;
+    }
+    .form-control:not(:last-child) {
+    }
+    .input-group-append, .input-group-prepend {
+      display: flex;
+      border-radius: 5px;
+    }
+    .input-group-append, .input-group-prepend {
+      margin-left: -1px;
+      @apply px-3;
+      .btn {
+        @apply px-0 py-0;
+      }
+      .input-group-text {
+        @apply flex items-center text-center whitespace-nowrap text-xs;
+      }
+    }
+    .input-group-separator {
+      align-self: stretch;
+      margin-bottom: 8px;
+      margin-top: 8px;
+      width: 1px;
+      box-sizing: border-box;
+      @apply bg-black-300
+    }
+    &.is-invalid {
+      @apply border-danger;
+    }
+  }
+  &.material-input {
+    @apply relative;
+    label {
+      position: absolute;
+      z-index: 2;
+      left: 14px;
+      top: -8px;
+      background: white;
+      padding: 0 5px;
+      margin: 0;
+      line-height: 1;
+    }
+  }
+}
+
