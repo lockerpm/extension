@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="71px" height="71px" viewBox="0 0 71 71" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient x1="0.5" y1="0" x2="0.5" y2="1" id="gradient_1">
+            <stop offset="0" stop-color="#F9B439" />
+            <stop offset="1" stop-color="#FF9B38" />
+        </linearGradient>
+        <linearGradient x1="0.5" y1="0" x2="0.5" y2="1" id="gradient_2">
+            <stop offset="0" stop-color="#F8A600" />
+            <stop offset="1" stop-color="#FE8D00" />
+        </linearGradient>
+    </defs>
+    <g id="Group-5" transform="translate(0.5 0.5)">
+        <path d="M35 70C54.33 70 70 54.33 70 35C70 15.67 54.33 0 35 0C15.67 0 0 15.67 0 35C0 54.33 15.67 70 35 70Z" id="Oval" fill="#129295" fill-rule="evenodd" stroke="none" />
+        <g id="Group-4" transform="translate(17 21)">
+            <path d="M18.174 27.4862L18.174 0L9.09096 9.70404L2.01772e-15 0L0 27.4862L18.174 27.4862Z" transform="matrix(1 0 0 1 1.7763568E-15 -1.7763568E-15)" id="Path-5" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+            <path d="M18.174 27.4862L18.174 0L9.09096 9.70404L2.01772e-15 0L0 27.4862L18.174 27.4862Z" transform="translate(18 -1.7763568E-15)" id="Path-5-Copy" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+        </g>
+    </g>
+</svg>

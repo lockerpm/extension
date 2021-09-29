@@ -11,14 +11,3 @@ declare module 'axios' {
     patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
   }
 }
-
-import { StorageService } from 'jslib-common/abstractions/storage.service';
-declare module "vue/types/vue" {
-  interface Vue {
-    $storageService: StorageService;
-  }
-
-  interface VueConstructor {
-    $storageService: StorageService;
-  }
-}

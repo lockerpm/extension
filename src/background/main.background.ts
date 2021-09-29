@@ -16,7 +16,7 @@ import { ExportService } from 'jslib-common/services/export.service';
 import { FileUploadService } from 'jslib-common/services/fileUpload.service';
 import { FolderService } from 'jslib-common/services/folder.service';
 import { NotificationsService } from 'jslib-common/services/notifications.service';
-import { PasswordGenerationService } from 'jslib-common/services/passwordGeneration.service';
+import { PasswordGenerationService } from '@/services/passwordGeneration.service';
 import { PolicyService } from 'jslib-common/services/policy.service';
 import { SearchService } from 'jslib-common/services/search.service';
 import { SendService } from 'jslib-common/services/send.service';
@@ -84,7 +84,7 @@ import BrowserPlatformUtilsService from '@/services/browserPlatformUtils.service
 import BrowserStorageService from '@/services/browserStorage.service';
 import I18nService from '@/services/i18n.service';
 import VaultTimeoutService from '@/services/vaultTimeout.service';
-
+import { BroadcasterService } from 'jslib-common/services/broadcaster.service'
 export default class MainBackground {
     messagingService: MessagingServiceAbstraction;
     storageService: StorageServiceAbstraction;
@@ -122,6 +122,7 @@ export default class MainBackground {
     popupUtilsService: PopupUtilsService;
     sendService: SendServiceAbstraction;
     fileUploadService: FileUploadServiceAbstraction;
+    broadcasterService: BroadcasterService;
 
     onUpdatedRan: boolean;
     onReplacedRan: boolean;
@@ -145,6 +146,7 @@ export default class MainBackground {
 
     constructor() {
         // Services
+        this.broadcasterService = new BroadcasterService()
         this.messagingService = new BrowserMessagingService();
         this.platformUtilsService = new BrowserPlatformUtilsService(this.messagingService,
             (clipboardValue, clearMs) => {

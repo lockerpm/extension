@@ -33,6 +33,7 @@ import { TokenService } from 'jslib-common/abstractions/token.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
+import { BroadcasterService } from 'jslib-common/abstractions/broadcaster.service';
 
 import { AutofillService } from '@/services/abstractions/autofill.service';
 import BrowserMessagingService from '@/services/browserMessaging.service';
@@ -75,7 +76,7 @@ export default {
         Vue.prototype.$userService =  getBgService<UserService>('userService')()
         Vue.prototype.$syncService =  getBgService<SyncService>('syncService')()
         Vue.prototype.$tokenService =  getBgService<SyncService>('tokenService')()
-        Vue.prototype.$searchService =  getBgService<SearchService>('searchService')()
+        Vue.prototype.$searchService =  searchService
         Vue.prototype.$platformUtilsService =  platformUtilsService
         Vue.prototype.$messagingService =  getBgService<MessagingService>('messagingService')()
         Vue.prototype.$folderService =  getBgService<FolderService>('folderService')()
@@ -84,6 +85,8 @@ export default {
         Vue.prototype.$storageService =  storageService
         Vue.prototype.$exportService =  getBgService<ExportService>('exportService')()
         Vue.prototype.$auditService =  getBgService<AuditService>('auditService')()
+        Vue.prototype.$vaultTimeoutService =  getBgService<VaultTimeoutService>('vaultTimeoutService')()
+        Vue.prototype.$broadcasterService =  getBgService<BroadcasterService>('broadcasterService')()
 
         if (!popupUtilsService.inPopup(window)) {
             window.document.body.classList.add('body-full');

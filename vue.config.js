@@ -1,7 +1,8 @@
 /* eslint-disable */
 var path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+
 const os=require('os');
 module.exports = {
   pages: {
@@ -54,17 +55,17 @@ module.exports = {
         chunks: ['notification/bar'],
         cache: false, // Remove after upgrading to Webpack 5
       }),
+      new MomentLocalesPlugin({
+        localesToKeep: ['vi'],
+      }),
     ]
   },
   chainWebpack: config => {
-    config
-        .plugin('fork-ts-checker')
-        .tap(args => {
-          let totalmem=Math.floor(os.totalmem()/1024/1024); //get OS mem size
-          let allowUseMem= totalmem>2500? 8192:2048;
-          // in vue-cli shuld args[0]['typescript'].memoryLimit
-          args[0].memoryLimit = allowUseMem;
-          return args
-        })
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap(args => {
+        args.compilerOptions.whitespace = 'preserve'
+      })
   },
 }

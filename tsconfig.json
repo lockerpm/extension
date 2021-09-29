@@ -32,7 +32,9 @@
       "scripthost"
     ],
     "typeRoots": [
-      "./node_modules/@types"
+      "./node_modules/@types",
+      "./node_modules/vue-i18n",
+
     ]
   },
   "include": [
@@ -41,6 +43,6 @@
   "exclude": [
     "node_modules",
     "jslib",
-    "dist",
+    "dist"
   ]
 }

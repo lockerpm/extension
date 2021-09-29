@@ -181,7 +181,7 @@ export default class RuntimeBackground {
                 // }
 
                 try {
-                    BrowserApi.createNewTab('popup.html?uilocation=popout#/sso?token=' + msg.token);
+                    BrowserApi.createNewTab('popup.html?uilocation=popout#/authenticate?token=' + msg.token);
                 }
                 catch { }
                 break;

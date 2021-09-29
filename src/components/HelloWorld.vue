@@ -1,64 +1,64 @@
 <template>
   <div>
-    <p>{{ defaultText }}</p>
-    <p>token: {{ token }}</p>
-    <p>tokenStorage: {{ tokenStorage }}</p>
-    <p>test: {{ test }}</p>
-    <button class="btn" @click="$router.push({name: 'About'})">About</button>
-    <button class="btn" @click="getToken">GetToken</button>
-    <button class="btn" @click="setToken">SetToken</button>
-    <button class="btn" @click="testBtn">Gett test</button>
-    {{ token }}
-    <table class="outter-table">
-      <tbody>
-      <tr>
-        <td>haha</td>
-      </tr>
-      </tbody>
-    </table>
+    <ValidationObserver ref="form" v-slot="{ validate }">
+      <h2>Integrating i18n with VeeValidate: vue-i18n {{validate}}</h2>
+      <ValidationProvider name="email" rules="required|email" v-slot="{ errors }">
+        <input type="text" v-model="email" placeholder="type some email">
+        <span>{{ errors[0] }}</span>
+      </ValidationProvider>
+
+      <ValidationProvider name="password" rules="required|min:6" v-slot="{ errors }">
+        <input type="password" v-model="password" placeholder="type something">
+        <span>{{ errors[0] }}</span>
+      </ValidationProvider>
+    </ValidationObserver>
+
+    <button @click="switchLoc" class="btn btn-primary">Switch Locale</button>
   </div>
 </template>
 
-<script lang="ts">
+<script>
+import {
+  ValidationProvider,
+  ValidationObserver
+} from "vee-validate";
+
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'HelloWorld',
-  mounted () {
-    browser.runtime.sendMessage({})
+  name: "Example",
+  components: {
+    ValidationProvider,
+    ValidationObserver
   },
-  data () {
-    return {
-      token: ''
-    }
-  },
-  computed: {
-    defaultText () {
-      return browser.i18n.getMessage('extName')
-    },
-    tokenStorage () {
-      return this.$store.state.token
-    },
-    test () {
-      return this.$store.state.token
-    }
-  },
+  data: () => ({
+    email: "",
+    password: ''
+  }),
   methods: {
-   async getToken () {
-     this.token = await this.$storageService.get('cs_token')
+    async submit() {
+      console.log("email submitted!");
     },
-    async setToken () {
-      this.$store.commit('UPDATE_TEST', new Date())
-    },
-    testBtn () {
-     console.log(this.$store.state)
+    switchLoc () {
+      // switch the locale.
+      this.$i18n.locale = this.$i18n.locale === 'en' ? 'vi' : 'en';
+
+      // re-validate to re-generate messages.
+      this.$refs.form.validate();
     }
   }
-})
+}
+)
 </script>
 
-<style scoped>
-p {
-  font-size: 20px;
+
+<style>
+span {
+  display: block;
+  margin-top: 20px;
+}
+
+input + span {
+  margin-top: 3px;
 }
 </style>

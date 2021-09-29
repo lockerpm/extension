@@ -1,7 +1,6 @@
 <template>
   <div class="home">
     <h1>This is SSO page</h1>
-    {{ $route.query }}
   </div>
 </template>
 
@@ -13,7 +12,6 @@ export default Vue.extend({
   components: {
   },
   mounted() {
-    // this.$store.commit('UPDATE_TOKEN', {token: this.$route.query.token, force: true})
     this.$storageService.save('cs_token', this.$route.query.token)
     // BrowserApi.reloadOpenWindows();
     // const thisWindow = window.open('', '_self');

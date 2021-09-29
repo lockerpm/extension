@@ -3,5 +3,7 @@ src/background
 src/browser
 src/services
 src/popup/services
-src/content-scripts
+src/content
+src/models
+src/notification
 tailwind.config.js
