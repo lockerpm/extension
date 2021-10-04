@@ -1,6 +1,7 @@
 <template>
   <div class="absolute w-full h-full z-[2001]">
     <div class="h-full">
+      {{ previousPath }}
       <router-view></router-view>
     </div>
   </div>
@@ -15,6 +16,16 @@ export default Vue.extend({
     }
   },
   computed: {
+    previousPath () {
+      return this.$store.state.previousPath
+    }
+  },
+  created () {
+    (window as any).bitwardenPopupMainMessageListener = async (msg: any, sender: any, sendResponse: any) => {
+      console.log(msg)
+      console.log(sender)
+      console.log(sendResponse)
+    }
   },
   methods: {
   }
