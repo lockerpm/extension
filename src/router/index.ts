@@ -12,11 +12,6 @@ const routes: Array<RouteConfig> = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },
-  {
     path: '/authenticate',
     name: 'authenticate',
     component: () => import(/* webpackChunkName: "authenticate" */ '../views/authenticate.vue')
@@ -45,6 +40,23 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: 'vault',
         component: () => import(/* webpackChunkName: "vault" */ '../views/vault/index.vue')
+      }
+    ]
+  },
+  {
+    path: '/passwords',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'passwords',
+        component: () => import(/* webpackChunkName: "passwords" */ '../views/passwords/index.vue')
+      },
+      {
+        path: "/passwords/:id",
+        name: 'passwords-id',
+        component: () => import(/* webpackChunkName: "passwords" */ '../views/passwords/index.vue')
       }
     ]
   },

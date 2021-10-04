@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="dialogVisible"
-    fullscreen
+    width="435px"
     destroy-on-close
     top="5vh"
     custom-class="locker-dialog"

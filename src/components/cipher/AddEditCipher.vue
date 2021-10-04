@@ -3,12 +3,11 @@
     <component
       :is="currentComponent"
       :visible.sync="dialogVisible"
-      :fullscreen="true"
+      width="435px"
       destroy-on-close
       top="5vh"
       custom-class="locker-dialog"
       :close-on-click-modal="false"
-      :modal="false"
     >
       <div slot="title">
         <div class="text-head-5 text-black-700 font-semibold truncate">

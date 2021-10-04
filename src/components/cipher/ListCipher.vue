@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col flex-column-fluid relative">
     <NoCipher
       v-if="shouldRenderNoCipher"
       :type="type"

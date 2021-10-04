@@ -126,7 +126,7 @@ module.exports = {
     re_password: 'Re-Enter new Master Password',
     change_btn: 'Change password',
     enter_password: 'Enter Master Password',
-    enter_password_desc: 'Enter your Master Password to unlock',
+    enter_password_desc: 'Enter your Master Password',
     enter_password_title: 'Login',
     get_hint: 'Get master password hint',
     continue: 'Continue',

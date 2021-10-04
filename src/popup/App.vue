@@ -1,7 +1,6 @@
 <template>
-  <div class="absolute w-full h-full z-[2001]">
-    <div class="h-full">
-      {{ previousPath }}
+  <div class="h-full">
+    <div class="flex flex-col h-full">
       <router-view></router-view>
     </div>
   </div>

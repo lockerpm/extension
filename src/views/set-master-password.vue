@@ -1,14 +1,14 @@
 <template>
-  <div class="fixed w-full h-full">
-    <div class="flex flex-grow flex-col flex-grow items-center p-6 h-full">
-      <div class="mb-5">
+  <BlankLayout>
+    <div class="flex flex-grow flex-col items-center">
+      <div class="mt-[5.625rem] mb-5">
         <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
       </div>
       <div class="w-full max-w-[500px] text-center">
         <div class="text-head-4 font-semibold mb-2.5">Tạo Master Password</div>
-<!--        <div class="text-base text-black-600 mb-4">-->
-<!--          Master Password là mật khẩu mở khóa Locker của bạn-->
-<!--        </div>-->
+        <!--        <div class="text-base text-black-600 mb-4">-->
+        <!--          Master Password là mật khẩu mở khóa Locker của bạn-->
+        <!--        </div>-->
         <div class="inline-block mb-8 select-none">
           <div class="flex items-center">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
@@ -90,14 +90,15 @@
         </div>
       </div>
     </div>
-  </div>
+  </BlankLayout>
 </template>
 
 <script>
 import Vue from 'vue'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
+import BlankLayout from '@/components/layout/blank'
 export default Vue.extend({
-  components: { PasswordStrengthBar },
+  components: { BlankLayout, PasswordStrengthBar },
   layout: 'blank',
   middleware: ['HaveAccountService'],
   data () {

@@ -3,6 +3,10 @@
 @import "./components/form";
 @import "./components/label";
 
+.bg-aside {
+  background: #161922
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -16,9 +20,16 @@ html {
 }
 
 body {
-  width: 375px;
-  height: 600px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  @apply text-base;
+  @apply text-black-700;
+  @apply lg:text-base;
+  @apply md:text-base;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   &.body-full {
     @apply w-full h-full;
@@ -50,7 +61,7 @@ body {
 }
 
 [type='text']:focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus {
-  @apply ring-0 outline-none
+  @apply ring-0 outline-none #{!important}
 }
 
 .el-dialog.locker-dialog {

@@ -1,17 +1,17 @@
 <template>
-  <div class="fixed w-full h-full">
-    <div class="flex flex-grow flex-col flex-grow items-center p-6 h-full">
-      <div class="mb-5">
+  <BlankLayout>
+    <div class="flex flex-grow flex-col items-center">
+      <div class="mt-[3rem] mb-5">
         <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
       </div>
-      <div class="w-full max-w-[500px] text-center">
+      <div class="md:w-[410px] md:mx-0 mx-5 border border-black-200 rounded py-[2.8125rem] px-6 text-center">
         <template v-if="step===1">
-<!--          <div class="text-head-4 font-semibold mb-2.5">-->
-<!--            {{ $t('master_password.enter_password_desc') }}-->
-<!--          </div>-->
-<!--          <div class="text-base mb-4">-->
-<!--            {{ $t('master_password.enter_password_desc') }}-->
-<!--          </div>-->
+          <div class="text-head-4 font-semibold mb-2.5">
+            {{ $t('master_password.enter_password_desc') }}
+          </div>
+          <div class="text-base mb-4">
+            {{ $t('master_password.enter_password_desc') }}
+          </div>
           <div class="inline-block mb-8 select-none">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
               <img :src="currentUser.avatar" alt="" class="w-[28px] h-[28px] rounded-full mr-2">
@@ -113,14 +113,18 @@
         </button>
       </div>
     </div>
-  </div>
+  </BlankLayout>
 </template>
 
 <script>
 import Vue from 'vue'
+import BlankLayout from '@/components/layout/blank'
 export default Vue.extend({
   layout: 'blank',
   middleware: ['NotHaveAccountService'],
+  components: {
+    BlankLayout
+  },
   data () {
     return {
       invalidPinAttempts: 0,

@@ -1,11 +1,109 @@
 <template>
-  <div class="tab-page">
+  <div class="flex flex-col sm:flex-row flex-1">
     <template v-if="!locked">
-      <Header />
-      <div class="cs-content">
+      <div class="w-60 h-screen bg-aside min-h-500px min-w-60 fixed flex flex-col justify-between">
+        <div>
+          <div class="mt-7 px-6">
+            <img class="h-[32px]" src="@/assets/images/logo/logo_white.svg" alt="Logo">
+          </div>
+          <nav class="mt-7">
+            <router-link
+              v-for="(item, index) in menu"
+              :key="index"
+              :to="{name: item.routeName}"
+              class="flex items-center py-2 px-6 hover:text-white hover:bg-white hover:bg-opacity-20 text-black-400 font-semibold hover:no-underline"
+              active-class="bg-white bg-opacity-20 text-white"
+            >
+              <div class="mr-2 w-[22px] h-[22px] flex items-center">
+                <img :src="require(`@/assets/images/icons/${item.icon}.svg`)" alt="">
+              </div>
+              <span class="text-sm font-medium">{{ $t(`sidebar.${item.label}`) }}</span>
+            </router-link>
+          </nav>
+        </div>
+        <div>
+          <nav class="mb-10">
+            <router-link
+              v-for="(item, index) in bottomMenu"
+              :key="index"
+              :to="{name: item.routeName, params: item.params}"
+              class="flex items-center py-2 px-6 hover:text-white hover:bg-white hover:bg-opacity-20 text-black-400 font-semibold hover:no-underline"
+              active-class="bg-white bg-opacity-20 text-white"
+            >
+              <div class="mr-2 w-[22px] h-[22px] flex items-center">
+                <img :src="require(`@/assets/images/icons/${item.icon}.svg`)" alt="">
+              </div>
+              <span class="text-sm font-medium">{{ $t(`sidebar.${item.label}`) }}</span>
+            </router-link>
+          </nav>
+        </div>
+      </div>
+      <div class="pl-60 flex flex-col flex-row-fluid">
+        <Header />
+        <div v-if="shouldWelcome !=='false'" class="flex-column-fluid lg:px-28 py-10 px-10">
+          <div class="border border-black-200 rounded p-5 md:p-8 relative">
+            <div class="flex items-center justify-between">
+              <div class="">
+                <div class="text-lg font-semibold mb-2">
+                  Chào mừng bạn đến với CyStack Locker
+                </div>
+                <div class="text-black-600 mb-5">
+                  Bạn có thể lưu trữ mật khẩu, ghi chú, hồ sơ để mua sắm trực tuyến và thậm chí cả tài liệu một cách an toàn.
+                  <br>
+                  Và bất kể bạn làm việc ở đâu, kho tiền của bạn luôn đồng bộ hóa mọi thứ, vì vậy bạn có thể luôn ngăn nắp và tiết kiệm thời gian.
+                </div>
+              </div>
+              <div>
+                <img src="@/assets/images/icons/welcome.svg" alt="">
+              </div>
+              <button
+                class="btn btn-clean absolute top-2 -right-2"
+                @click="offWelcome"
+              >
+                <i class="el-icon-close text-lg" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-if="invitations.length" class="flex-column-fluid lg:px-28 py-10 px-10">
+          <div
+            v-for="invitation in invitations.slice(0, 1)"
+            :key="invitation.id"
+            class="banner-invitation border border-black-200 rounded p-5 md:p-8"
+          >
+            <div class="flex items-center justify-between">
+              <div class="">
+                <div class="text-lg font-semibold mb-2">
+                  Invitation to join {{ invitation.team && invitation.team.name }}
+                </div>
+                <div class="text-black-600 mb-5">
+                  You’ve been invited to the {{ invitation.team && invitation.team.name }} organization! Join now and start collaborating with your teammates.
+                </div>
+                <div>
+                  <button
+                    class="btn btn-default"
+                    :disabled="loading"
+                    @click="putInvitation(invitation.id, 'reject')"
+                  >
+                    Từ chối
+                  </button>
+                  <button
+                    class="btn btn-primary"
+                    :disabled="loading"
+                    @click="putInvitation(invitation.id, 'accept')"
+                  >
+                    Đồng ý
+                  </button>
+                </div>
+              </div>
+              <div>
+                <img src="@/assets/images/icons/invitaion.svg" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
         <router-view />
       </div>
-      <Footer />
     </template>
   </div>
 </template>
@@ -13,17 +111,15 @@
 <script>
 import Vue from 'vue'
 import Header from './parts/Header'
-import Footer from './parts/Footer'
 const BroadcasterSubscriptionId = 'AppComponent'
 const IdleTimeout = 60000 * 10 // 10 minutes
 
 export default Vue.extend({
   components: {
-    Header, Footer
+    Header
   },
   data () {
     return {
-      externalContent: '',
       menu: [
         {
           label: 'all',
