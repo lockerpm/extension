@@ -119,7 +119,7 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         name: 'shares',
-        component: () => import(/* webpackChunkName: "shares" */ '../views/identities/index.vue')
+        component: () => import(/* webpackChunkName: "shares" */ '../views/shares/index.vue')
       }
     ]
   },
@@ -131,7 +131,7 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         name: 'trash',
-        component: () => import(/* webpackChunkName: "shares" */ '../views/trash/index.vue')
+        component: () => import(/* webpackChunkName: "trash" */ '../views/trash/index.vue')
       }
     ]
   },
