@@ -56,7 +56,82 @@ const routes: Array<RouteConfig> = [
       {
         path: "/passwords/:id",
         name: 'passwords-id',
-        component: () => import(/* webpackChunkName: "passwords" */ '../views/passwords/index.vue')
+        component: () => import(/* webpackChunkName: "passwords" */ '../views/passwords/_id.vue')
+      }
+    ]
+  },
+  {
+    path: '/notes',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'notes',
+        component: () => import(/* webpackChunkName: "notes" */ '../views/notes/index.vue')
+      },
+      {
+        path: "/notes/:id",
+        name: 'notes-id',
+        component: () => import(/* webpackChunkName: "notes" */ '../views/notes/_id.vue')
+      }
+    ]
+  },
+  {
+    path: '/cards',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'cards',
+        component: () => import(/* webpackChunkName: "cards" */ '../views/cards/index.vue')
+      },
+      {
+        path: "/cards/:id",
+        name: 'cards-id',
+        component: () => import(/* webpackChunkName: "cards" */ '../views/cards/_id.vue')
+      }
+    ]
+  },
+  {
+    path: '/identities',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'identities',
+        component: () => import(/* webpackChunkName: "identities" */ '../views/identities/index.vue')
+      },
+      {
+        path: "/identities/:id",
+        name: 'identities-id',
+        component: () => import(/* webpackChunkName: "identities" */ '../views/identities/_id.vue')
+      }
+    ]
+  },
+  {
+    path: '/shares',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'shares',
+        component: () => import(/* webpackChunkName: "shares" */ '../views/identities/index.vue')
+      }
+    ]
+  },
+  {
+    path: '/trash',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'trash',
+        component: () => import(/* webpackChunkName: "shares" */ '../views/trash/index.vue')
       }
     ]
   },
