@@ -97,7 +97,7 @@
                 </div>
               </div>
               <div>
-                <img src="@/assets/images/icons/invitaion.svg" alt="">
+                <img src="@/assets/images/icons/invitation.svg" alt="">
               </div>
             </div>
           </div>
