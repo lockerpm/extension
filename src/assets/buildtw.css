@@ -1565,12 +1565,12 @@ select {
   padding: 0px;
 }
 
-.p-8 {
-  padding: 2rem;
-}
-
 .p-4 {
   padding: 1rem;
+}
+
+.p-8 {
+  padding: 2rem;
 }
 
 .py-\[2\.8125rem\] {
@@ -1638,6 +1638,11 @@ select {
   padding-bottom: 0.25rem;
 }
 
+.\!py-\[10px\] {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
 .py-5 {
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
@@ -1666,11 +1671,6 @@ select {
 .px-7 {
   padding-left: 1.75rem;
   padding-right: 1.75rem;
-}
-
-.\!py-\[10px\] {
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
 }
 
 .\!pb-0 {
