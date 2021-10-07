@@ -21,16 +21,6 @@
         >
           Vault
         </button>
-        <button class="btn btn-default w-full mb-4"
-                @click="openLock"
-        >
-          Lock
-        </button>
-        <button class="btn btn-default w-full mb-4"
-                @click="openSet"
-        >
-          Set master
-        </button>
       </div>
     </div>
   </div>
@@ -38,19 +28,25 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { BrowserApi } from '@/browser/browserApi'
+
 export default Vue.extend({
   name: 'Home',
   methods: {
     openLogin () {
       const url = `${process.env.VUE_APP_ID_URL}/login?SERVICE_URL=${encodeURIComponent('/sso')}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`
+
       this.$platformUtilsService.launchUri(url)
+      BrowserApi.reloadOpenWindows();
+      const thisWindow = window.open('', '_self');
+      thisWindow.close();
     },
     openRegister () {
       const url = `${process.env.VUE_APP_ID_URL}/register?SERVICE_URL=${encodeURIComponent('/sso')}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`
       this.$platformUtilsService.launchUri(url)
     },
     openVault () {
-      this.$router.push({name: 'vault'})
+      this.$platformUtilsService.launchUri('/web.html#/vault')
     },
     openLock () {
       this.$router.push({name: 'lock'})

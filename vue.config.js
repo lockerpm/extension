@@ -6,6 +6,11 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const os=require('os');
 module.exports = {
   pages: {
+    web: {
+      template: 'public/web.html',
+      entry: './src/web/main.ts',
+      title: 'Web'
+    },
     popup: {
       template: 'public/browser-extension.html',
       entry: './src/popup/main.ts',

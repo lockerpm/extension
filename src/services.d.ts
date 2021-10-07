@@ -3,6 +3,7 @@ import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { CollectionService } from 'jslib-common/abstractions/collection.service';
 import { CryptoService } from 'jslib-common/abstractions/crypto.service';
 import { ExportService } from 'jslib-common/abstractions/export.service';
+import { ImportService } from 'jslib-common/abstractions/import.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { MessagingService } from 'jslib-common/abstractions/messaging.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
@@ -27,6 +28,7 @@ declare module "vue/types/vue" {
     $collectionService: CollectionService;
     $cryptoService: CryptoService;
     $exportService: ExportService;
+    $importService: ImportService;
     $folderService: FolderService;
     $messagingService: MessagingService;
     $passwordGenerationService: PasswordGenerationService;
@@ -51,6 +53,7 @@ declare module "vue/types/vue" {
     $collectionService: CollectionService;
     $cryptoService: CryptoService;
     $exportService: ExportService;
+    $importService: ImportService;
     $folderService: FolderService;
     $messagingService: MessagingService;
     $passwordGenerationService: PasswordGenerationService;

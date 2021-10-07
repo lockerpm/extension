@@ -1,9 +1,9 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "CyStack Locker"
   },
   "extName": {
-    "message": "Bitwarden - Gestore di password gratuito",
+    "message": "CyStack Locker - Gestore di password gratuito",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -194,7 +194,7 @@
     "message": "Genera automaticamente password complesse e uniche per i tuoi login."
   },
   "bitWebVault": {
-    "message": "Cassaforte web di Bitwarden"
+    "message": "Cassaforte web di CyStack Locker"
   },
   "importItems": {
     "message": "Importa elementi"
@@ -552,7 +552,7 @@
     "description": "Clipboard is the operating system thing where you copy/paste data to on your device."
   },
   "notificationAddDesc": {
-    "message": "Vuoi che Bitwarden ricordi questa password per te?"
+    "message": "Vuoi che CyStack Locker ricordi questa password per te?"
   },
   "notificationAddSave": {
     "message": "Sì, salva ora"
@@ -567,7 +567,7 @@
     "message": "La \"notifica di cambio password\" chiede automaticamente di aggiornare la password di un account della cassaforte ogni qualvolta viene rilevata una modifica su un sito web."
   },
   "notificationChangeDesc": {
-    "message": "Vuoi aggiornare questa password in Bitwarden?"
+    "message": "Vuoi aggiornare questa password in CyStack Locker?"
   },
   "notificationChangeSave": {
     "message": "Sì, aggiorna ora"
@@ -623,7 +623,7 @@
     "message": "Questa esportazione cifra i tuoi dati utilizzando la chiave di cifratura del tuo account. Se cambi la chiave di cifratura del tuo account, non sarai più in grado di decifrare il file esportato e sarà necessario eseguire una nuova esportazione."
   },
   "encExportAccountWarningDesc": {
-    "message": "Le chiavi di cifratura dell'account sono uniche per ogni account utente Bitwarden, quindi non è possibile importare un'esportazione cifrata in un account diverso."
+    "message": "Le chiavi di cifratura dell'account sono uniche per ogni account utente CyStack Locker, quindi non è possibile importare un'esportazione cifrata in un account diverso."
   },
   "exportMasterPassword": {
     "message": "Inserisci la tua password principale per esportare i dati della tua cassaforte."
@@ -635,7 +635,7 @@
     "message": "Scopri le organizzazioni"
   },
   "learnOrgConfirmation": {
-    "message": "Bitwarden ti permette di condividere gli elementi della tua cassaforte con altri usando un'organizzazione. Vuoi visitare il sito bitwarden.com per saperne di più?"
+    "message": "CyStack Locker ti permette di condividere gli elementi della tua cassaforte con altri usando un'organizzazione. Vuoi visitare il sito bitwarden.com per saperne di più?"
   },
   "moveToOrganization": {
     "message": "Sposta in organizzazione"
@@ -753,7 +753,7 @@
     "message": "Sei un membro premium!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Grazie per il tuo supporto a Bitwarden."
+    "message": "Grazie per il tuo supporto a CyStack Locker."
   },
   "premiumPrice": {
     "message": "Il tutto per soli $PRICE$ all'anno!",
@@ -879,7 +879,7 @@
     "message": "Ambiente self-hosted"
   },
   "selfHostedEnvironmentFooter": {
-    "message": "Specifica l'URL principale della tua installazione Bitwarden self-hosted."
+    "message": "Specifica l'URL principale della tua installazione CyStack Locker self-hosted."
   },
   "customEnvironment": {
     "message": "Ambiente personalizzato"
@@ -1285,7 +1285,7 @@
     "message": "Password principale debole"
   },
   "weakMasterPasswordDesc": {
-    "message": "La password principale che hai scelto è debole. È necessario utilizzare una password principale forte (o una frase segreta) per proteggere adeguatamente il tuo account Bitwarden. Sei sicuro di voler utilizzare questa password principale?"
+    "message": "La password principale che hai scelto è debole. È necessario utilizzare una password principale forte (o una frase segreta) per proteggere adeguatamente il tuo account CyStack Locker. Sei sicuro di voler utilizzare questa password principale?"
   },
   "pin": {
     "message": "PIN",
@@ -1295,7 +1295,7 @@
     "message": "Sblocca con PIN"
   },
   "setYourPinCode": {
-    "message": "Imposta il tuo codice PIN per sbloccare Bitwarden. Le impostazioni PIN saranno reimpostate se eseguirai una disconnessione completa dall'applicazione."
+    "message": "Imposta il tuo codice PIN per sbloccare CyStack Locker. Le impostazioni PIN saranno reimpostate se eseguirai una disconnessione completa dall'applicazione."
   },
   "pinRequired": {
     "message": "È richiesto il PIN."
@@ -1316,7 +1316,7 @@
     "message": "In attesa di conferma dal desktop"
   },
   "awaitDesktopDesc": {
-    "message": "Conferma utilizzando l'autenticazione biometrica nell'applicazione Bitwarden Desktop per abilitare l'autenticazione biometrica per il browser."
+    "message": "Conferma utilizzando l'autenticazione biometrica nell'applicazione CyStack Locker Desktop per abilitare l'autenticazione biometrica per il browser."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Blocca con la password principale al riavvio del browser"
@@ -1453,13 +1453,13 @@
     "message": "L'integrazione del browser non è abilitata"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "L'integrazione del browser non è abilitata nell'applicazione Bitwarden Desktop. Attivala nelle impostazioni all'interno dell'applicazione desktop."
+    "message": "L'integrazione del browser non è abilitata nell'applicazione CyStack Locker Desktop. Attivala nelle impostazioni all'interno dell'applicazione desktop."
   },
   "startDesktopTitle": {
-    "message": "Avvia l'applicazione desktop Bitwarden"
+    "message": "Avvia l'applicazione desktop CyStack Locker"
   },
   "startDesktopDesc": {
-    "message": "L'applicazione Bitwarden Desktop deve essere avviata prima che questa funzione possa essere utilizzata."
+    "message": "L'applicazione CyStack Locker Desktop deve essere avviata prima che questa funzione possa essere utilizzata."
   },
   "errorEnableBiometricTitle": {
     "message": "Impossibile abilitare l'autenticazione biometrica"
@@ -1495,7 +1495,7 @@
     "message": "Permesso non fornito"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Senza l'autorizzazione per comunicare con l'applicazione Bitwarden Desktop non è possibile fornire l'autenticazione biometrica nell'estensione del browser. Riprova di nuovo."
+    "message": "Senza l'autorizzazione per comunicare con l'applicazione CyStack Locker Desktop non è possibile fornire l'autenticazione biometrica nell'estensione del browser. Riprova di nuovo."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Errore richiesta di autorizzazione"
@@ -1513,7 +1513,7 @@
     "message": "Domini esclusi"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden non chiederà di salvare i dettagli di accesso per questi domini. È necessario aggiornare la pagina perché le modifiche abbiano effetto."
+    "message": "CyStack Locker non chiederà di salvare i dettagli di accesso per questi domini. È necessario aggiornare la pagina perché le modifiche abbiano effetto."
   },
   "excludedDomainsInvalidDomain": {
     "message": "$DOMAIN$ non è un dominio valido",
@@ -1526,15 +1526,15 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "searchSends": {
     "message": "Cerca Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "addSend": {
     "message": "Aggiungi Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Testo"
@@ -1544,7 +1544,7 @@
   },
   "allSends": {
     "message": "Tutti i Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Numero massimo di accessi raggiunto"
@@ -1560,7 +1560,7 @@
   },
   "copySendLink": {
     "message": "Copia collegamento del Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Rimuovi password"
@@ -1573,11 +1573,11 @@
   },
   "deletedSend": {
     "message": "Send eliminato",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Collegamento del Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "disabled": {
     "message": "Disabilitato"
@@ -1587,23 +1587,23 @@
   },
   "deleteSend": {
     "message": "Elimina Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Sei sicuro di voler eliminare questo Send?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "editSend": {
     "message": "Modifica Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTypeHeader": {
     "message": "Di quale tipo di Send si tratta?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendNameDesc": {
     "message": "Un nome intuitivo per descrivere questo Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendFileDesc": {
     "message": "Il file da inviare."
@@ -1613,14 +1613,14 @@
   },
   "deletionDateDesc": {
     "message": "Il Send sarà definitivamente eliminato alla data e ora specificate.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Data di scadenza"
   },
   "expirationDateDesc": {
     "message": "Se impostato, l'accesso a questo Send scadrà alla data e all'ora specificate.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "oneDay": {
     "message": "1 giorno"
@@ -1642,56 +1642,56 @@
   },
   "maximumAccessCountDesc": {
     "message": "Se impostata, gli utenti non saranno più in grado di accedere a questo Send una volta raggiunto il numero massimo di accessi.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendPasswordDesc": {
     "message": "Facoltativamente, richiedi una password agli utenti per accedere al Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendNotesDesc": {
     "message": "Note private sul Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendDisableDesc": {
     "message": "Disabilita il Send per renderlo inaccessibile.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendShareDesc": {
     "message": "Copia il collegamento del Send negli appunti dopo aver salvato.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTextDesc": {
     "message": "Il testo che vuoi inviare."
   },
   "sendHideText": {
     "message": "Nascondi il testo di questo Send in modo predefinito.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "currentAccessCount": {
     "message": "Numero di accessi attuale"
   },
   "createSend": {
     "message": "Crea nuovo Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Nuova password"
   },
   "sendDisabled": {
     "message": "Send disabilitato",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "A causa di una policy aziendale, è possibile eliminare solo un Send esistente.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send creato",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send modificato",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendLinuxChromiumFileWarning": {
     "message": "Per scegliere un file, apri l'estensione nella barra laterale (se possibile) o apri una nuova finestra facendo clic su questo banner."

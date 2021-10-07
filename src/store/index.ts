@@ -6,7 +6,7 @@ import {StorageService} from "jslib-common/abstractions/storage.service";
 Vue.use(Vuex)
 
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
-const STORAGE_KEY = 'cs-store'
+const STORAGE_KEY = 'cs_popup_store'
 
 // export default new Vuex.Store({
 //   state: {
@@ -206,11 +206,14 @@ const STORAGE_KEY = 'cs-store'
 //     }
 //   ]
 // })
-export default browserStorageService.get('cs-store').then(oldStore => {
+export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   let oldStoreParsed = {}
-  if (typeof oldStore === "string") {
-    oldStoreParsed = JSON.parse(oldStore) || {}
+  if (typeof oldStore === 'object') {
+    oldStoreParsed = oldStore
   }
+
+  console.log('oldStoreParsed', oldStoreParsed)
+
   return new Vuex.Store({
     state: {
       init: false,
@@ -396,7 +399,7 @@ export default browserStorageService.get('cs-store').then(oldStore => {
           delete clonedState.notifications
           delete clonedState.userIntercom
           delete clonedState.currentPlan
-          await browserStorageService.save(STORAGE_KEY, JSON.stringify(state))
+          await browserStorageService.save(STORAGE_KEY, state)
 
           if (mutation.type === 'CLEAR_ALL_DATA') {
             browserStorageService.remove(STORAGE_KEY)

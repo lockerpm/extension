@@ -506,7 +506,7 @@ export default Vue.extend({
         this.errors = {}
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
-        await this.$axios.$post('cystack_platform/pm/ciphers/vaults', {
+        await this.axios.post('cystack_platform/pm/ciphers/vaults', {
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds
@@ -516,7 +516,6 @@ export default Vue.extend({
       } catch (e) {
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.type}`, 1) }), 'warning')
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
-        console.log(e)
       } finally {
         this.loading = false
       }
@@ -525,7 +524,7 @@ export default Vue.extend({
       try {
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
-        await this.$axios.$put(`cystack_platform/pm/ciphers/${cipher.id}`, {
+        await this.axios.put(`cystack_platform/pm/ciphers/${cipher.id}`, {
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds
@@ -535,7 +534,6 @@ export default Vue.extend({
         this.$emit('updated-cipher')
       } catch (e) {
         this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'warning')
-        console.log(e)
       } finally {
         this.loading = false
       }
@@ -548,7 +546,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.$axios.$put('cystack_platform/pm/ciphers/permanent_delete', { ids })
+          await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.closeDialog()
           this.$emit('reset-selection')
@@ -568,7 +566,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.$axios.$put('cystack_platform/pm/ciphers/delete', { ids })
+          await this.axios.put('cystack_platform/pm/ciphers/delete', { ids })
           this.notify(this.$tc('data.notifications.trash_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.$emit('trashed-cipher')
         } catch (e) {
@@ -587,7 +585,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.$axios.$put('cystack_platform/pm/ciphers/restore', { ids })
+          await this.axios.put('cystack_platform/pm/ciphers/restore', { ids })
           this.notify(this.$tc('data.notifications.restore_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.$emit('reset-selection')
         } catch (e) {
@@ -618,8 +616,6 @@ export default Vue.extend({
       this.cipher.folderId = this.$route.params.folderId || null
       this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
       this.handleChangeOrg(this.cipher.organizationId)
-      console.log(this.cipher)
-      console.log(this.type)
     },
     handleChangeType (type) {
       this.newCipher(type)

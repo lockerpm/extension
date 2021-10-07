@@ -1,9 +1,9 @@
 {
   "appName": {
-    "message": "Bitwarden"
+    "message": "CyStack Locker"
   },
   "extName": {
-    "message": "Bitwarden - Manager de parole gratuit",
+    "message": "CyStack Locker - Manager de parole gratuit",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
@@ -194,7 +194,7 @@
     "message": "Generează automat parole unice și puternice pentru autentificările dvs."
   },
   "bitWebVault": {
-    "message": "Seif web Bitwarden"
+    "message": "Seif web CyStack Locker"
   },
   "importItems": {
     "message": "Import elemente"
@@ -552,7 +552,7 @@
     "description": "Clipboard is the operating system thing where you copy/paste data to on your device."
   },
   "notificationAddDesc": {
-    "message": "Ar trebui ca Bitwarden să memoreze această parolă pentru dvs.?"
+    "message": "Ar trebui ca CyStack Locker să memoreze această parolă pentru dvs.?"
   },
   "notificationAddSave": {
     "message": "Da, salvează acum"
@@ -567,7 +567,7 @@
     "message": "\"Notificarea de modificare a parolei\" vă propune automat să actualizați o parolă din seif oricând se detectează că ați modificat-o pe un sait."
   },
   "notificationChangeDesc": {
-    "message": "Doriți să actualizați această parolă în Bitwarden?"
+    "message": "Doriți să actualizați această parolă în CyStack Locker?"
   },
   "notificationChangeSave": {
     "message": "Da, actualizează acum"
@@ -623,7 +623,7 @@
     "message": "Acest export criptează datele, utilizând cheia de criptare a contului. Dacă revocați vreodată cheia de criptare a contului dvs., ar trebui să exportați din nou, deoarece nu veți putea decripta acest fișier de export."
   },
   "encExportAccountWarningDesc": {
-    "message": "Cheile de criptare a contului sunt unice fiecărui cont de utilizator Bitwarden, astfel încât nu puteți importa un export criptat într-un cont diferit."
+    "message": "Cheile de criptare a contului sunt unice fiecărui cont de utilizator CyStack Locker, astfel încât nu puteți importa un export criptat într-un cont diferit."
   },
   "exportMasterPassword": {
     "message": "Introduceți parola principală pentru a exporta datele din seif."
@@ -635,7 +635,7 @@
     "message": "Aflați despre organizații"
   },
   "learnOrgConfirmation": {
-    "message": "Bitwarden vă permite să vă partajați articolele seifului cu alte persoane utilizând o organizație. Doriți să vizitați site-ul bitwarden.com pentru a afla mai multe?"
+    "message": "CyStack Locker vă permite să vă partajați articolele seifului cu alte persoane utilizând o organizație. Doriți să vizitați site-ul bitwarden.com pentru a afla mai multe?"
   },
   "moveToOrganization": {
     "message": "Mutare la organizație"
@@ -753,7 +753,7 @@
     "message": "Sunteți un membru Premium!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Vă mulțumim pentru susținerea Bitwarden."
+    "message": "Vă mulțumim pentru susținerea CyStack Locker."
   },
   "premiumPrice": {
     "message": "Totul pentru doar %price% /an!",
@@ -879,7 +879,7 @@
     "message": "Mediu de găzduire personal"
   },
   "selfHostedEnvironmentFooter": {
-    "message": "Specificați URL-ul de bază al implementări Bitwarden găzduită local."
+    "message": "Specificați URL-ul de bază al implementări CyStack Locker găzduită local."
   },
   "customEnvironment": {
     "message": "Mediu personalizat"
@@ -1285,7 +1285,7 @@
     "message": "Parolă principală slabă"
   },
   "weakMasterPasswordDesc": {
-    "message": "Parola principală aleasă este slabă. Ar trebui să folosiți o parolă principală (sau o frază de acces) puternică pentru a vă proteja corespunzător contul Bitwarden. Sigur doriți să folosiți această parolă principală?"
+    "message": "Parola principală aleasă este slabă. Ar trebui să folosiți o parolă principală (sau o frază de acces) puternică pentru a vă proteja corespunzător contul CyStack Locker. Sigur doriți să folosiți această parolă principală?"
   },
   "pin": {
     "message": "PIN",
@@ -1295,7 +1295,7 @@
     "message": "Deblocare cu codul PIN"
   },
   "setYourPinCode": {
-    "message": "Stabiliți codul PIN de deblocare Bitwarden. Setările codului PIN vor fi reinițializate dacă vă deconectați vreodată din aplicație."
+    "message": "Stabiliți codul PIN de deblocare CyStack Locker. Setările codului PIN vor fi reinițializate dacă vă deconectați vreodată din aplicație."
   },
   "pinRequired": {
     "message": "Codul PIN este necesar."
@@ -1316,7 +1316,7 @@
     "message": "Se așteaptă confirmarea de la desktop"
   },
   "awaitDesktopDesc": {
-    "message": "Vă rugăm să confirmați utilizarea biometriei în aplicația Bitwarden Desktop pentru a activa biometria pentru browser."
+    "message": "Vă rugăm să confirmați utilizarea biometriei în aplicația CyStack Locker Desktop pentru a activa biometria pentru browser."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Blocare cu parola principală la repornirea browserului"
@@ -1453,13 +1453,13 @@
     "message": "Integrarea browserului nu este activată"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Integrarea browserului nu este activată în aplicația Bitwarden Desktop. Vă rugăm să o activați în setările din aplicația desktop."
+    "message": "Integrarea browserului nu este activată în aplicația CyStack Locker Desktop. Vă rugăm să o activați în setările din aplicația desktop."
   },
   "startDesktopTitle": {
-    "message": "Porniți aplicația Bitwarden Desktop"
+    "message": "Porniți aplicația CyStack Locker Desktop"
   },
   "startDesktopDesc": {
-    "message": "Aplicația Bitwarden Desktop trebuie pornită înainte de a putea utiliza această funcție."
+    "message": "Aplicația CyStack Locker Desktop trebuie pornită înainte de a putea utiliza această funcție."
   },
   "errorEnableBiometricTitle": {
     "message": "Nu se poate activa biometria"
@@ -1495,7 +1495,7 @@
     "message": "Permisiunea nu a fost furnizată"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Fără permisiunea de comunicare cu aplicația Bitwarden Desktop nu putem furniza date biometrice în extensia browserului. Încercați din nou."
+    "message": "Fără permisiunea de comunicare cu aplicația CyStack Locker Desktop nu putem furniza date biometrice în extensia browserului. Încercați din nou."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Eroare solicitare permisiune"
@@ -1513,7 +1513,7 @@
     "message": "Domenii excluse"
   },
   "excludedDomainsDesc": {
-    "message": "Bitwarden nu va cere să salveze detaliile de conectare pentru aceste domenii. Trebuie să reîmprospătați pagina pentru ca modificările să intre în vigoare."
+    "message": "CyStack Locker nu va cere să salveze detaliile de conectare pentru aceste domenii. Trebuie să reîmprospătați pagina pentru ca modificările să intre în vigoare."
   },
   "excludedDomainsInvalidDomain": {
     "message": "$DOMAIN$ nu este un domeniu valid",
@@ -1526,15 +1526,15 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "searchSends": {
     "message": "Căutare Send-uri",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "addSend": {
     "message": "Adăugare Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Text"
@@ -1544,7 +1544,7 @@
   },
   "allSends": {
     "message": "Toate Send-urile",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "S-a atins numărul maxim de accesări"
@@ -1560,7 +1560,7 @@
   },
   "copySendLink": {
     "message": "Copiere link Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Eliminare parolă"
@@ -1573,11 +1573,11 @@
   },
   "deletedSend": {
     "message": "Send-ul a fost șters",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Link Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "disabled": {
     "message": "Dezactivat"
@@ -1587,23 +1587,23 @@
   },
   "deleteSend": {
     "message": "Ștergere Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Sigur doriți să ștergeți acest Send?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "editSend": {
     "message": "Editare Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTypeHeader": {
     "message": "Ce fel de Send este acesta?",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendNameDesc": {
     "message": "Un nume prietenos pentru a descrie acest Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendFileDesc": {
     "message": "Fișierul pe care doriți să-l trimiteți."
@@ -1613,14 +1613,14 @@
   },
   "deletionDateDesc": {
     "message": "Send-ul va fi șters definitiv la data și ora specificate.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Data expirării"
   },
   "expirationDateDesc": {
     "message": "Dacă este setat, accesul la acest Send va expira la data și ora specificate.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "oneDay": {
     "message": "1 zi"
@@ -1642,56 +1642,56 @@
   },
   "maximumAccessCountDesc": {
     "message": "Dacă este setată, utilizatorii nu vor mai putea accesa acest Send după atingerea numărului maxim de accesării.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendPasswordDesc": {
     "message": "Opțional, este necesară o parolă pentru ca utilizatorii să acceseze acest Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendNotesDesc": {
     "message": "Note private despre acest Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendDisableDesc": {
     "message": "Dezactivează acest Send astfel încât nimeni să nu-l poată accesa.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendShareDesc": {
     "message": "Copiază acest link de Send în clipboard la salvare.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendTextDesc": {
     "message": "Textul pe care doriți să-l trimiteți."
   },
   "sendHideText": {
     "message": "Ascunde în mod implicit textul acestui Send.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "currentAccessCount": {
     "message": "Număr actual de accesări"
   },
   "createSend": {
     "message": "Creare de nou Send",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "newPassword": {
     "message": "Parolă nouă"
   },
   "sendDisabled": {
     "message": "Send dezactivat",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Datorită unei politici de întreprindere, puteți șterge numai un Send existent.",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Send creat",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Send editat",
-    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
   },
   "sendLinuxChromiumFileWarning": {
     "message": "Pentru a alege un fișier, deschideți extensia în bara laterală (dacă este posibil) sau deschideți-o într-o fereastră nouă, făcând clic pe acest banner."

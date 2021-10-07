@@ -16,10 +16,10 @@ import { SystemService } from 'jslib-common/abstractions/system.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
-import { AutofillService } from '../services/abstractions/autofill.service';
+import { AutofillService } from '@/services/abstractions/autofill.service';
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 
-import { BrowserApi } from '../browser/browserApi';
+import { BrowserApi } from '@/browser/browserApi';
 
 import MainBackground from './main.background';
 
@@ -181,7 +181,17 @@ export default class RuntimeBackground {
                 // }
 
                 try {
-                    BrowserApi.createNewTab('popup.html?uilocation=popout#/authenticate?token=' + msg.token);
+                    await this.storageService.save('cs_token', msg.token)
+                    const store = await this.storageService.get('cs_store')
+                    let oldStoreParsed = {}
+                    if (typeof store === "string") {
+                      oldStoreParsed = JSON.parse(store) || {}
+                    }
+                    await this.storageService.save('cs_store', {
+                      ...oldStoreParsed,
+                      isLoggedIn: true,
+                    })
+                    BrowserApi.createNewTab('web.html#/vault');
                 }
                 catch { }
                 break;
@@ -424,7 +434,7 @@ export default class RuntimeBackground {
         setTimeout(async () => {
             if (this.onInstalledReason != null) {
                 if (this.onInstalledReason === 'install') {
-                    BrowserApi.createNewTab('https://bitwarden.com/browser-start/');
+                    BrowserApi.createNewTab('https://cystack.net/');
                     await this.setDefaultSettings();
                 }
 

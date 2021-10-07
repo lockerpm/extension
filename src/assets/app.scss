@@ -31,7 +31,8 @@ body {
   -ms-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
+  min-width: 400px;
+  min-height: 600px;
   &.body-full {
     @apply w-full h-full;
   }

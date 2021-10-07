@@ -28,6 +28,7 @@ import { TokenService } from 'jslib-common/services/token.service';
 import { TotpService } from 'jslib-common/services/totp.service';
 import { UserService } from 'jslib-common/services/user.service';
 import { WebCryptoFunctionService } from 'jslib-common/services/webCryptoFunction.service';
+import { ImportService } from 'jslib-common/services/import.service';
 
 import { ApiService as ApiServiceAbstraction } from 'jslib-common/abstractions/api.service';
 import { AppIdService as AppIdServiceAbstraction } from 'jslib-common/abstractions/appId.service';
@@ -40,6 +41,7 @@ import { CryptoFunctionService as CryptoFunctionServiceAbstraction } from 'jslib
 import { EnvironmentService as EnvironmentServiceAbstraction } from 'jslib-common/abstractions/environment.service';
 import { EventService as EventServiceAbstraction } from 'jslib-common/abstractions/event.service';
 import { ExportService as ExportServiceAbstraction } from 'jslib-common/abstractions/export.service';
+import { ImportService as ImportServiceAbstraction } from 'jslib-common/abstractions/import.service';
 import { FileUploadService as FileUploadServiceAbstraction } from 'jslib-common/abstractions/fileUpload.service';
 import { FolderService as FolderServiceAbstraction } from 'jslib-common/abstractions/folder.service';
 import { I18nService as I18nServiceAbstraction } from 'jslib-common/abstractions/i18n.service';
@@ -113,6 +115,7 @@ export default class MainBackground {
     auditService: AuditServiceAbstraction;
     authService: AuthServiceAbstraction;
     exportService: ExportServiceAbstraction;
+    importService: ImportServiceAbstraction;
     searchService: SearchServiceAbstraction;
     notificationsService: NotificationsServiceAbstraction;
     stateService: StateServiceAbstraction;
@@ -222,6 +225,7 @@ export default class MainBackground {
         this.auditService = new AuditService(this.cryptoFunctionService, this.apiService);
         this.exportService = new ExportService(this.folderService, this.cipherService, this.apiService,
             this.cryptoService);
+        this.importService = new ImportService(this.cipherService, this.folderService, this.apiService, this.i18nService, this.collectionService, this.platformUtilsService, this.cryptoService);
         this.notificationsService = new NotificationsService(this.userService, this.syncService, this.appIdService,
             this.apiService, this.vaultTimeoutService, this.environmentService, () => this.logout(true), this.logService);
         this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
@@ -460,7 +464,7 @@ export default class MainBackground {
             type: 'normal',
             id: 'root',
             contexts: ['all'],
-            title: 'Bitwarden',
+            title: 'Cystack Locker',
         });
 
         await this.contextMenusCreate({
@@ -795,7 +799,7 @@ export default class MainBackground {
                 tabId: tabId,
             });
         } else if (this.sidebarAction.setTitle) {
-            let title = 'Bitwarden';
+            let title = 'CyStack Locker';
             if (text && text !== '') {
                 title += (' [' + text + ']');
             }

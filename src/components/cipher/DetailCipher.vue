@@ -266,7 +266,7 @@ export default Vue.extend({
     },
     async getCipher () {
       // this.folders = await this.getFolders()
-      // this.$axios.$get(`cystack_platform/pm/ciphers/${this.$route.params.id}`)
+      // this.axios.get(`cystack_platform/pm/ciphers/${this.$route.params.id}`)
       //   .then(async res => {
       //     res = new CipherResponse(res)
       //     const cipher = new Cipher(res, false)

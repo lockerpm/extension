@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_extName__",
   "homepage_url": "http://localhost:8080/",
-  "description": "A Vue Browser Extension",
+  "description": "A Browser Extension",
   "default_locale": "en",
   "permissions": [
     "tabs",
@@ -93,7 +93,7 @@
     }
   },
   "sidebar_action": {
-    "default_popup": "popup.html",
+    "default_panel": "popup.html",
     "default_title": "__MSG_extName__",
     "default_icon": {
       "19": "icons/19.png",

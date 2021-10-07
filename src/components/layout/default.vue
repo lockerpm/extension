@@ -102,7 +102,8 @@
             </div>
           </div>
         </div>
-        <router-view />
+        <router-view v-if="wrapperType === 'component'" />
+        <slot v-if="wrapperType === 'wrapper'"></slot>
       </div>
     </template>
   </div>
@@ -117,6 +118,12 @@ const IdleTimeout = 60000 * 10 // 10 minutes
 export default Vue.extend({
   components: {
     Header
+  },
+  props: {
+    wrapperType: {
+      type: String,
+      default: 'component'
+    }
   },
   data () {
     return {

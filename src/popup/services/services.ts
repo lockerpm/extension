@@ -47,6 +47,7 @@ import { StateService } from 'jslib-common/services/state.service';
 import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import {ContainerService} from "jslib-common/services/container.service";
+import {ImportService} from "jslib-common/abstractions/import.service";
 
 function getBgService<T>(service: string) {
     return (): T => {
@@ -84,6 +85,7 @@ export default {
         Vue.prototype.$passwordGenerationService =  getBgService<PasswordGenerationService>('passwordGenerationService')()
         Vue.prototype.$storageService =  storageService
         Vue.prototype.$exportService =  getBgService<ExportService>('exportService')()
+        Vue.prototype.$importService =  getBgService<ImportService>('importService')()
         Vue.prototype.$auditService =  getBgService<AuditService>('auditService')()
         Vue.prototype.$vaultTimeoutService =  getBgService<VaultTimeoutService>('vaultTimeoutService')()
         Vue.prototype.$broadcasterService =  getBgService<BroadcasterService>('broadcasterService')()

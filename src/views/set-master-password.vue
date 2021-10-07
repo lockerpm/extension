@@ -149,7 +149,7 @@ export default Vue.extend({
         // const orgKey = shareKey[0].encryptedString
         // const collection = await this.$cryptoService.encrypt('defaultCollection', shareKey[1])
         // const collectionName = collection.encryptedString
-        await this.$axios.$post('cystack_platform/pm/users/register', {
+        await this.axios.post('cystack_platform/pm/users/register', {
           name: this.currentUser.full_name,
           email: this.currentUser.email,
           master_password_hash: hashedPassword,

@@ -104,7 +104,7 @@ export default Vue.extend({
         this.$emit('created-folder', { id: res.id, name: folder.name })
         this.closeDialog()
         if (this.shouldRedirect) {
-          this.$router.push(this.localeRoute({ name: 'vault-folders-folderId', params: { folderId: res.id } }))
+          this.$router.push({ name: 'vault-folders-folderId', params: { folderId: res.id } })
         }
       } catch (e) {
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
