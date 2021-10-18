@@ -1,17 +1,17 @@
-Index: common/src/services/consoleLog.service.ts
+Index: jslib/common/src/services/consoleLog.service.ts
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/common/src/services/consoleLog.service.ts b/common/src/services/consoleLog.service.ts
---- a/common/src/services/consoleLog.service.ts	(revision 91b73fa77727a12c788c00eef4f32065c23b6314)
-+++ b/common/src/services/consoleLog.service.ts	(date 1633513390898)
+diff --git a/jslib/common/src/services/consoleLog.service.ts b/jslib/common/src/services/consoleLog.service.ts
+--- a/jslib/common/src/services/consoleLog.service.ts	(revision 91b73fa77727a12c788c00eef4f32065c23b6314)
++++ b/jslib/common/src/services/consoleLog.service.ts	(date 1633513390898)
 @@ -2,7 +2,7 @@
- 
+
  import { LogService as LogServiceAbstraction } from '../abstractions/log.service';
- 
+
 -import * as hrtime from 'browser-hrtime';
 +import hrtime from 'browser-hrtime';
- 
+
  export class ConsoleLogService implements LogServiceAbstraction {
      protected timersMap: Map<string, [number, number]> = new Map();

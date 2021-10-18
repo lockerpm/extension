@@ -615,7 +615,9 @@ export default Vue.extend({
       this.cipher.secureNote.type = SecureNoteType.Generic
       this.cipher.folderId = this.$route.params.folderId || null
       this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
-      this.handleChangeOrg(this.cipher.organizationId)
+      if (this.cipher.organizationId) {
+        this.handleChangeOrg(this.cipher.organizationId)
+      }
     },
     handleChangeType (type) {
       this.newCipher(type)

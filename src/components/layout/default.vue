@@ -365,11 +365,11 @@ export default Vue.extend({
       window.onkeypress = () => this.noop()
     },
     checkWelcome () {
-      const deviceId = this.$cookies.get('device_id')
+      const deviceId = 1 || this.$cookies.get('device_id')
       return localStorage.getItem(`${deviceId}_welcome`)
     },
     offWelcome () {
-      const deviceId = this.$cookies.get('device_id')
+      const deviceId = 1 || this.$cookies.get('device_id')
       localStorage.setItem(`${deviceId}_welcome`, 'false')
       this.shouldWelcome = 'false'
     },

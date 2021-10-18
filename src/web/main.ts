@@ -158,7 +158,7 @@ Vue.mixin({
           password: hashedPassword,
           device_name: this.$platformUtilsService.getDeviceString(),
           device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: this.$cookies.get('device_id') || this.randomString()
+          device_identifier: this.randomString()
         })
         this.$messagingService.send('loggedIn')
         console.log(res)

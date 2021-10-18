@@ -4,18 +4,15 @@ import Vue from 'vue'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import VueCookies from 'vue-cookies'
 import AsyncComputed from 'vue-async-computed'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
 import moment from "moment";
-import numeral from "numeral";
 import VueMomentJS from "vue-momentjs";
-import VueNativeSock from 'vue-native-websocket'
 
 import App from '@/popup/App.vue'
-import router from '@/router'
+import router from '@/router/popup'
 import storePromise from '@/store'
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
@@ -25,14 +22,10 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 
 Vue.config.productionTip = false
 Vue.use(JSLib)
-Vue.use(VueCookies)
 Vue.use(AsyncComputed)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
-Vue.use(VueNativeSock, 'ws://192.168.0.186:8000', {
-  connectManually: true
-})
 
 if (process.env.NODE_ENV==='development') {
   require('@/assets/buildtw.css')
@@ -158,7 +151,7 @@ Vue.mixin({
           password: hashedPassword,
           device_name: this.$platformUtilsService.getDeviceString(),
           device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: this.$cookies.get('device_id') || this.randomString()
+          device_identifier: this.randomString()
         })
         this.$messagingService.send('loggedIn')
         console.log(res)
@@ -351,40 +344,7 @@ Vue.filter('filterString', function (value) {
   return value
 })
 
-Vue.filter('formatPercentage', function (value) {
-  if (!Number.isNaN(value)) {
-    return numeral(value).format('0.[00]')
-  }
-  return 0
-})
-
-Vue.filter('formatNumber', function (value) {
-  if (!Number.isNaN(value)) {
-    return numeral(value).format('0,0.[00]')
-  }
-  return 0
-})
-
 storePromise.then((store) => {
-  router.beforeEach(async (toRoute, fromRoute, next) => {
-    console.log('vao Before Each')
-    if (fromRoute && toRoute && fromRoute.path && toRoute.path
-      && !fromRoute.path.includes('/login')
-      && !toRoute.path.includes('/login')
-      && !fromRoute.path.includes('/lock')
-      && !toRoute.path.includes('/lock')
-      && !fromRoute.path.includes('/set-master-password')
-      && !toRoute.path.includes('/set-master-password')
-    ) {
-      store.commit('UPDATE_PATH', toRoute.fullPath)
-      store.commit('UPDATE_PREVIOUS_PATH', fromRoute.fullPath)
-    }
-    // if (store.state.isLoggedIn) {
-    //   await store.dispatch('LoadCurrentUser')
-    //   await store.dispatch('LoadCurrentUserPw')
-    // }
-    next()
-  })
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
   axios.interceptors.request.use(
     async (config) => {
@@ -411,7 +371,7 @@ storePromise.then((store) => {
         if (error.response.status === 401) {
           browserStorageService.remove('cs_token')
           store.commit('UPDATE_IS_LOGGEDIN', false)
-          router.push({name: 'login'})
+          router.push({name: 'home'})
         }
       }
       return Promise.reject(error)

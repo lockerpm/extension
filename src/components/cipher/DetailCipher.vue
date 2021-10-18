@@ -142,11 +142,19 @@
         </div>
         <div class="grid md:grid-cols-6 cipher-item">
           <div class="">{{ $t('data.ciphers.folder') }}</div>
-          <div v-if="cipher.organizationId" class="col-span-4 font-semibold flex items-center">
-            <img :src="collection.id === 'unassigned' ? require('@/assets/images/icons/folderSolid.svg') : require('@/assets/images/icons/folderSolidShare.svg')" alt="" class="mr-3"> {{ collection.name }}
-          </div>
-          <div v-else class="col-span-4 font-semibold flex items-center">
-            <img src="@/assets/images/icons/folderSolid.svg" alt="" class="mr-3"> {{ folder.name || $t('data.folders.no_folder') }}
+          <div class="col-span-4">
+            <template v-if="cipher.collectionIds && cipher.collectionIds.length">
+              <div
+                v-for="item in cipher.collectionIds"
+                :key="item"
+                class="font-semibold flex items-center"
+              >
+                <img :src="item.id === 'unassigned' ? require('@/assets/images/icons/folderSolid.svg') : require('@/assets/images/icons/folderSolidShare.svg')" alt="" class="mr-3"> {{ findFolder(collections, item).name }}
+              </div>
+            </template>
+            <div v-if="cipher.folderId" class="font-semibold flex items-center">
+              <img src="@/assets/images/icons/folderSolid.svg" alt="" class="mr-3"> {{ findFolder(folders, cipher.folderId).name }}
+            </div>
           </div>
         </div>
       </div>
@@ -282,7 +290,13 @@ export default Vue.extend({
     },
     checkPassword: debounce(function (password) {
       return this.$passwordGenerationService.passwordStrength(String(password), ['cystack']) || {}
-    }, 600)
+    }, 600),
+    findCollection (collections, id) {
+      return find(collections, e => e.id === id) || { name: 'Unassigned Folder', id: 'unassigned' }
+    },
+    findFolder (folders, id) {
+      return find(folders, e => e.id === id) || { name: this.$t('data.folders.no_folder'), id: 'unassigned' }
+    }
   }
 })
 </script>

@@ -1,8 +1,6 @@
 <template>
-  <div class="h-full">
-    <div class="flex flex-col h-full">
-      <router-view></router-view>
-    </div>
+  <div class="">
+    <router-view></router-view>
   </div>
 </template>
 

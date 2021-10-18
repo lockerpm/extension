@@ -150,8 +150,8 @@ export default Vue.extend({
   computed: {
     cystackOptions () {
       return [
-        { name: 'CyStack (csv)', id: 'cystackjson' },
-        { name: 'CyStack (json)', id: 'cystackcsv' }
+        { name: 'CyStack (json)', id: 'cystackjson' },
+        { name: 'CyStack (csv)', id: 'cystackcsv' }
       ]
     },
     featuredImportOptions () {
