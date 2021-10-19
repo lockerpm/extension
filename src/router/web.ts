@@ -24,7 +24,6 @@ const routes: Array<RouteConfig> = [
   {
     path: '/set-master-password',
     name: 'set-master-password',
-    beforeEnter: VaultGuard,
     component: () => import(/* webpackChunkName: "set-master-password" */ '../views/set-master-password.vue')
   },
   {

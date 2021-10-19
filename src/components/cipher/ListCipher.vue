@@ -493,7 +493,6 @@ export default Vue.extend({
   },
   data () {
     return {
-      cryptoService: null,
       data: {},
       CipherType,
       multipleSelection: [],
@@ -526,22 +525,22 @@ export default Vue.extend({
     },
     type () {
       switch (this.routeName) {
-      case 'passwords':
-        return 'Login'
-      case 'notes':
-        return 'SecureNote'
-      case 'cards':
-        return 'Card'
-      case 'identities':
-        return 'Identity'
-      case 'vault':
-        return 'Vault'
-      case 'shares':
-        return 'Shares'
-      case 'trash':
-        return 'Trash'
-      default:
-        return null
+        case 'passwords':
+          return 'Login'
+        case 'notes':
+          return 'SecureNote'
+        case 'cards':
+          return 'Card'
+        case 'identities':
+          return 'Identity'
+        case 'vault':
+          return 'Vault'
+        case 'shares':
+          return 'Shares'
+        case 'trash':
+          return 'Trash'
+        default:
+          return null
       }
     },
     filteredCiphers () {

@@ -1,10 +1,10 @@
 <template>
-  <ListCipher route-name="notes" :filter="c => c.type === CipherType['SecureNote']" />
+  <ListCipher :filter="c => c.type === CipherType['Card']" />
 </template>
 
 <script>
 import Vue from 'vue'
-import ListCipher from '@/components/cipher/ListCipher'
+import ListCipher from "@/popup/components/ciphers/ListCipher";
 import {CipherType} from "jslib-common/enums/cipherType";
 export default Vue.extend({
   components: {

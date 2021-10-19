@@ -895,12 +895,12 @@ select {
   margin-bottom: 1rem;
 }
 
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
 .mt-\[-50px\] {
   margin-top: -50px;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
 .mt-\[3rem\] {
@@ -1023,6 +1023,10 @@ select {
   margin-bottom: -0.5rem;
 }
 
+.mr-4 {
+  margin-right: 1rem;
+}
+
 .mb-6 {
   margin-bottom: 1.5rem;
 }
@@ -1053,10 +1057,6 @@ select {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mr-4 {
-  margin-right: 1rem;
 }
 
 .mr-0\.5 {
@@ -1091,20 +1091,16 @@ select {
   display: none;
 }
 
-.h-\[50px\] {
-  height: 50px;
-}
-
-.h-10 {
-  height: 2.5rem;
-}
-
 .h-full {
   height: 100%;
 }
 
 .h-\[calc\(100\%\+50px\)\] {
   height: calc(100% + 50px);
+}
+
+.h-\[50px\] {
+  height: 50px;
 }
 
 .h-\[36px\] {
@@ -1135,8 +1131,16 @@ select {
   height: 40px;
 }
 
+.h-\[44px\] {
+  height: 44px;
+}
+
 .h-\[48px\] {
   height: 48px;
+}
+
+.h-10 {
+  height: 2.5rem;
 }
 
 .h-\[4px\] {
@@ -1155,8 +1159,12 @@ select {
   height: 60px;
 }
 
-.h-\[44px\] {
-  height: 44px;
+.h-\[62px\] {
+  height: 62px;
+}
+
+.max-h-\[500px\] {
+  max-height: 500px;
 }
 
 .min-h-\[500px\] {
@@ -1366,6 +1374,10 @@ select {
   overflow: hidden;
 }
 
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1425,16 +1437,16 @@ select {
   border-width: 0px;
 }
 
+.border-t {
+  border-top-width: 1px;
+}
+
 .\!border-b {
   border-bottom-width: 1px !important;
 }
 
 .border-b {
   border-bottom-width: 1px;
-}
-
-.border-t {
-  border-top-width: 1px;
 }
 
 .border-black-200 {
@@ -1455,16 +1467,6 @@ select {
 .border-danger {
   --tw-border-opacity: 1;
   border-color: rgba(245, 79, 100, var(--tw-border-opacity));
-}
-
-.border-black-500 {
-  --tw-border-opacity: 1;
-  border-color: rgba(113, 124, 141, var(--tw-border-opacity));
-}
-
-.border-black-300 {
-  --tw-border-opacity: 1;
-  border-color: rgba(243, 245, 248, var(--tw-border-opacity));
 }
 
 .border-black-400 {
@@ -1842,6 +1844,10 @@ select {
   line-height: 44px;
 }
 
+.leading-\[62px\] {
+  line-height: 62px;
+}
+
 .tracking-\[1px\] {
   letter-spacing: 1px;
 }
@@ -1979,11 +1985,6 @@ select {
   border-color: rgba(38, 131, 52, var(--tw-border-opacity));
 }
 
-.hover\:bg-black-500:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgba(113, 124, 141, var(--tw-bg-opacity));
-}
-
 .hover\:bg-black-400:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(207, 214, 228, var(--tw-bg-opacity));
@@ -1992,11 +1993,6 @@ select {
 .hover\:bg-white:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(255, 255, 255, var(--tw-bg-opacity));
-}
-
-.hover\:bg-\[\#e7e8ea\]:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgba(231, 232, 234, var(--tw-bg-opacity));
 }
 
 .hover\:bg-opacity-20:hover {

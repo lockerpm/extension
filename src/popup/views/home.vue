@@ -45,7 +45,9 @@
             Open my Vault
           </div>
         </li>
-        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5">
+        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+            @click="openRoute({routeName: 'vault'})"
+        >
           <div class="menu-icon mr-4">
             <i class="fas fa-home text-[20px]"></i>
           </div>
@@ -136,6 +138,13 @@ export default Vue.extend({
     openSet () {
       this.$router.push({name: 'set-master-password'})
     },
+    openRoute (item) {
+      if (item.externalUrl) {
+        this.$platformUtilsService.launchUri(item.externalUrl)
+      } else {
+        this.$router.push({name: item.routeName})
+      }
+    }
   }
 });
 </script>
