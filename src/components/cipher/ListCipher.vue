@@ -143,7 +143,7 @@
               :title="`${item.name} (${item.ciphersCount})`"
               @click="selectedFolder = item"
               @dblclick="routerCollection(item)"
-              @contextmenu.prevent="canManageItem(teams, item) ? $refs.menuTeam.open($event, item) : null"
+              @contextmenu.prevent="canManageFolder(teams, item) ? $refs.menuTeam.open($event, item) : null"
             >
               <div class="flex items-center">
                 <img src="@/assets/images/icons/folderSolidShare.svg" alt="" class="select-none mr-2">
@@ -350,7 +350,7 @@
                       {{ $t('common.clone') }}
                     </el-dropdown-item>
                     <el-dropdown-item
-                      v-if="!scope.row.organizationId"
+                      v-if="!scope.row.organizationId && canManageTeamFolder"
                       @click.native="shareItem(scope.row)"
                     >
                       {{ $t('common.share') }}
@@ -359,7 +359,7 @@
                       {{ $t('common.move_folder') }}
                     </el-dropdown-item>
                     <el-dropdown-item
-                      v-if="canManageTeamFolder"
+                      v-if="scope.row.organizationId && canManageTeamFolder"
                       divided
                       @click.native="shareItem(scope.row)"
                     >
@@ -413,7 +413,7 @@
               {{ $t('data.folders.add_folder') }}
             </li>
             <li
-              v-if="$route.name ==='vault' && canManageTeamFolder"
+              v-if="$route.name ==='vault' && canCreateTeamFolder"
               class="el-dropdown-menu__item font-semibold !text-black"
               @click="addEditTeamFolder({})"
             >
@@ -525,22 +525,22 @@ export default Vue.extend({
     },
     type () {
       switch (this.routeName) {
-        case 'passwords':
-          return 'Login'
-        case 'notes':
-          return 'SecureNote'
-        case 'cards':
-          return 'Card'
-        case 'identities':
-          return 'Identity'
-        case 'vault':
-          return 'Vault'
-        case 'shares':
-          return 'Shares'
-        case 'trash':
-          return 'Trash'
-        default:
-          return null
+      case 'passwords':
+        return 'Login'
+      case 'notes':
+        return 'SecureNote'
+      case 'cards':
+        return 'Card'
+      case 'identities':
+        return 'Identity'
+      case 'vault':
+        return 'Vault'
+      case 'shares':
+        return 'Shares'
+      case 'trash':
+        return 'Trash'
+      default:
+        return null
       }
     },
     filteredCiphers () {
@@ -570,6 +570,9 @@ export default Vue.extend({
       return (this.$route.name === 'shares')
     },
     canManageTeamFolder () {
+      return this.teams.some(e => ['owner', 'admin', 'manager'].includes(e.role))
+    },
+    canCreateTeamFolder () {
       return this.teams.some(e => ['owner', 'admin'].includes(e.role))
     }
   },

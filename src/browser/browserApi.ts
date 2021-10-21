@@ -11,27 +11,27 @@ export class BrowserApi {
     static isFirefoxOnAndroid: boolean = navigator.userAgent.indexOf('Firefox/') !== -1 &&
         navigator.userAgent.indexOf('Android') !== -1;
 
-    static async getTabFromCurrentWindowId(): Promise<any> {
+    static async getTabFromCurrentWindowId(): Promise<chrome.tabs.Tab> | null {
         return await BrowserApi.tabsQueryFirst({
             active: true,
             windowId: chrome.windows.WINDOW_ID_CURRENT,
         });
     }
 
-    static async getTabFromCurrentWindow(): Promise<any> {
+    static async getTabFromCurrentWindow(): Promise<chrome.tabs.Tab> | null {
         return await BrowserApi.tabsQueryFirst({
             active: true,
             currentWindow: true,
         });
     }
 
-    static async getActiveTabs(): Promise<any[]> {
+    static async getActiveTabs(): Promise<chrome.tabs.Tab[]> {
         return await BrowserApi.tabsQuery({
             active: true,
         });
     }
 
-    static async tabsQuery(options: any): Promise<any[]> {
+    static async tabsQuery(options: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab[]> {
         return new Promise(resolve => {
             chrome.tabs.query(options, (tabs: any[]) => {
                 resolve(tabs);
@@ -39,7 +39,7 @@ export class BrowserApi {
         });
     }
 
-    static async tabsQueryFirst(options: any): Promise<any> {
+    static async tabsQueryFirst(options: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab> | null {
         const tabs = await BrowserApi.tabsQuery(options);
         if (tabs.length > 0) {
             return tabs[0];
@@ -48,7 +48,7 @@ export class BrowserApi {
         return null;
     }
 
-    static tabSendMessageData(tab: any, command: string, data: any = null): Promise<any[]> {
+    static tabSendMessageData(tab: chrome.tabs.Tab, command: string, data: any = null): Promise<any[]> {
         const obj: any = {
             command: command,
         };
@@ -60,7 +60,7 @@ export class BrowserApi {
         return BrowserApi.tabSendMessage(tab, obj);
     }
 
-    static async tabSendMessage(tab: any, obj: any, options: any = null): Promise<any> {
+    static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
         if (!tab || !tab.id) {
             return;
         }
@@ -91,10 +91,30 @@ export class BrowserApi {
         chrome.tabs.create({ url: url, active: active });
     }
 
-    static messageListener(name: string, callback: (message: any, sender: any, response: any) => void) {
-        chrome.runtime.onMessage.addListener((msg: any, sender: any, response: any) => {
+    static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
+        chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
             callback(msg, sender, response);
         });
+    }
+
+    static async closeLoginTab() {
+        const tabs = await BrowserApi.tabsQuery({
+            active: true,
+            title: 'Bitwarden',
+            windowType: 'normal',
+            currentWindow: true,
+        });
+
+        if (tabs.length === 0) {
+            return;
+        }
+
+        const tabToClose = tabs[tabs.length - 1].id;
+        chrome.tabs.remove(tabToClose);
+    }
+
+    static async focusSpecifiedTab(tabId: number) {
+        chrome.tabs.update(tabId, { active: true, highlighted: true });
     }
 
     static closePopup(win: Window) {

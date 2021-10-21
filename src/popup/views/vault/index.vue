@@ -12,6 +12,7 @@
         </div>
       </div>
     </div>
+    <button class="btn btn-primary" @click="test">Test</button>
     <ul class="">
       <li v-for="(item, index) in menu" :key="index"
         class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5" :class="[item.divided ? 'border-t border-black-400' : '']"
@@ -30,6 +31,7 @@
 
 <script>
 import Vue from 'vue'
+import { BrowserApi } from '@/browser/browserApi';
 export default Vue.extend({
   data () {
     return {
@@ -61,13 +63,6 @@ export default Vue.extend({
           externalUrl: '',
           divided: true,
           name: 'identities'
-        },
-        {
-          icon: 'fa-home',
-          routeName: 'vault-shares',
-          externalUrl: '',
-          divided: false,
-          name: 'shares'
         }
       ]
     }
@@ -79,6 +74,10 @@ export default Vue.extend({
       } else {
         this.$router.push({name: item.routeName})
       }
+    },
+    async test () {
+      const test = await BrowserApi.getTabFromCurrentWindow()
+      console.log(test)
     }
   }
 })

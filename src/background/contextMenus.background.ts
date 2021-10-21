@@ -10,6 +10,7 @@ import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 
 import { EventType } from 'jslib-common/enums/eventType';
+import { CipherView } from 'jslib-common/models/view/cipherView';
 
 export default class ContextMenusBackground {
     private contextMenus: any;
@@ -30,7 +31,7 @@ export default class ContextMenusBackground {
             if (info.menuItemId === 'generate-password') {
                 await this.generatePasswordToClipboard();
             } else if (info.menuItemId === 'copy-identifier') {
-                await this.getClickedElement();
+                await this.getClickedElement(info.frameId);
             } else if (info.parentMenuItemId === 'autofill' ||
                 info.parentMenuItemId === 'copy-username' ||
                 info.parentMenuItemId === 'copy-password' ||
@@ -47,13 +48,13 @@ export default class ContextMenusBackground {
         this.passwordGenerationService.addHistory(password);
     }
 
-    private async getClickedElement() {
+    private async getClickedElement(frameId: number) {
         const tab = await BrowserApi.getTabFromCurrentWindow();
         if (tab == null) {
             return;
         }
 
-        BrowserApi.tabSendMessageData(tab, 'getClickedElement');
+        BrowserApi.tabSendMessage(tab, { command: 'getClickedElement' }, { frameId: frameId });
     }
 
     private async cipherAction(info: any) {
@@ -88,7 +89,7 @@ export default class ContextMenusBackground {
         }
     }
 
-    private async startAutofillPage(cipher: any) {
+    private async startAutofillPage(cipher: CipherView) {
         this.main.loginToAutoFill = cipher;
         const tab = await BrowserApi.getTabFromCurrentWindow();
         if (tab == null) {

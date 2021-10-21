@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', event => {
     }
 
     // @ts-ignore
-    Mousetrap.prototype.stopCallback = () => {
+  Mousetrap.prototype.stopCallback = () => {
         return false;
     };
 

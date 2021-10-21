@@ -315,6 +315,13 @@ Vue.mixin({
       }
       return true
     },
+    canManageFolder (teams, item) {
+      const team = this.getTeam(teams, item.organizationId)
+      if (team.organization_id) {
+        return ['owner', 'admin'].includes(team.role)
+      }
+      return true
+    },
     openNewTab (link) {
       window.open(link, '_blank')
     },
