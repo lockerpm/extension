@@ -1,4 +1,4 @@
-# browser-vue
+# locker-extension
 
 ## Project setup
 ```
@@ -6,8 +6,13 @@ npm install
 ```
 
 ### Compiles and hot-reloads for development
+Start tailwindcss
 ```
-npm run serve
+npm run style
+```
+Start dev server
+```
+npm run dev
 ```
 
 ### Compiles and minifies for production
