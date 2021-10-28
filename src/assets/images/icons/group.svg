@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <path d="M0 0L22.7857 0L22.7857 22.7857L0 22.7857L0 0Z" id="path_1" />
+        <clipPath id="mask_1">
+            <use xlink:href="#path_1" />
+        </clipPath>
+    </defs>
+    <g id="Group-8" transform="translate(0.64990234 0.64990234)">
+        <path d="M16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32Z" id="Oval" fill="#CFD6E4" fill-rule="evenodd" stroke="none" />
+        <g id="󰀏" transform="translate(5 5)">
+            <path d="M0 0L22.7857 0L22.7857 22.7857L0 22.7857L0 0Z" id="Mask" fill="none" fill-rule="evenodd" stroke="none" />
+            <g clip-path="url(#mask_1)">
+                <g id="Group" transform="translate(1.7722222 5.3166666)">
+                    <path d="M9.72507 4.50074C9.72507 4.70336 9.58164 4.86253 9.39905 4.86253L0.326018 4.86253C0.146692 4.86253 0 4.70336 0 4.50074C0 2.07375 1.7576 0 4.05891 0L5.66615 0C7.91554 0 9.72507 2.02325 9.72507 4.50074Z" transform="translate(4.8625326 6.8075457)" id="Path" fill="none" stroke="#072245" stroke-width="1.3" />
+                    <path d="M5.10566 2.15602C5.10566 3.38187 3.96666 4.86253 2.55437 4.86253C1.139 4.86253 0 3.38187 0 2.15602C0 0.968413 1.14515 0 2.55437 0C3.96051 -4.52705e-16 5.10566 0.968413 5.10566 2.15602Z" transform="translate(7.1722355 0)" id="Path" fill="none" stroke="#072245" stroke-width="1.3" />
+                    <path d="M3.40377 1.5209C3.40377 2.37455 2.6433 3.40377 1.70188 3.40377C0.760467 3.40377 0 2.37455 0 1.5209C0 0.680759 0.76354 0 1.70189 0C2.64024 0 3.40377 0.680759 3.40377 1.5209Z" transform="translate(1.945013 2.4312663)" id="Path" fill="none" stroke="#072245" stroke-width="1.1" />
+                    <path d="M3.40377 1.5209C3.40377 2.37455 2.64636 3.40377 1.70185 3.40377C0.760487 3.40377 0 2.37455 0 1.5209C0 0.680759 0.763483 0 1.70185 0C2.64021 0 3.40377 0.680759 3.40377 1.5209Z" transform="translate(14.101345 2.4312663)" id="Path" fill="none" stroke="#072245" stroke-width="1.1" />
+                    <path d="M2.63375 0L3.54439 0C2.75384 1.07208 2.59896 1.75315 2.51859 2.91752L0.356232 2.91752C0.160286 2.91752 0 2.77342 0 2.59726C0 1.16573 1.03784 0 2.63375 0Z" transform="translate(2.6215095E-13 7.780052)" id="Path" fill="none" stroke="#072245" stroke-width="1.1" />
+                    <path d="M2.63375 0L3.54439 0C2.75384 1.07208 2.59896 1.75315 2.51859 2.91752L0.356232 2.91752C0.160286 2.91752 0 2.77342 0 2.59726C0 1.16573 1.03784 0 2.63375 0Z" transform="matrix(-1 0 0 1 19.396244 7.780052)" id="Path-Copy" fill="none" stroke="#072245" stroke-width="1.1" />
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

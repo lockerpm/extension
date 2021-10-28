@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="22px" height="22px" viewbox="0 0 22 22" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <path d="M0 0L22 0L22 22L0 22L0 0Z" id="path_1" />
+        <clipPath id="mask_1">
+            <use xlink:href="#path_1" />
+        </clipPath>
+    </defs>
+    <g id="󰈤">
+        <path d="M0 0L22 0L22 22L0 22L0 0Z" id="Mask" fill="none" fill-rule="evenodd" stroke="none" />
+        <g clip-path="url(#mask_1)">
+            <path d="M10.802 15.3901C11.2355 15.3901 11.6028 15.2396 11.9039 14.9386C12.2049 14.6375 12.3555 14.2822 12.3555 13.8728L12.3555 4.62427L7.7312 0L1.55347 0C1.11994 0 0.752648 0.15053 0.451589 0.451589C0.15053 0.752648 0 1.1079 0 1.51734L0 13.8728C0 14.2822 0.15053 14.6375 0.451589 14.9386C0.752648 15.2396 1.11994 15.3901 1.55347 15.3901L10.802 15.3901ZM10.802 13.8728L1.55347 13.8728L1.55347 1.51734L6.9364 1.51734L6.9364 5.38294L10.802 5.38294L10.802 13.8728Z" transform="translate(5 3)" id="󰈤" fill="#9FA9B3" stroke="none" />
+        </g>
+    </g>
+</svg>

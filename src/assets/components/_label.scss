@@ -1,0 +1,28 @@
+.label {
+  padding: 0.15rem 0.75rem;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  width: auto;
+  border-radius: 2px;
+  background-color: #EBEDF3;
+  color: #3F4254;
+  font-weight: 600;
+  font-size: 0.875rem;
+  &.label-primary-light {
+    @apply bg-opacity-15 bg-primary text-primary;
+  }
+  &.label-warning-light {
+    @apply bg-opacity-15 bg-warning text-warning;
+  }
+  &.label-danger-light {
+    @apply bg-opacity-15 bg-danger text-danger;
+  }
+  &.label-success-light {
+    @apply bg-opacity-15 bg-success text-success;
+  }
+  &.label-black {
+    @apply bg-black text-white;
+  }
+}

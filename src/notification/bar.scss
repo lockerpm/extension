@@ -1,0 +1,99 @@
+﻿body {
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    font-size: 14px;
+    line-height: 16px;
+    color: #333333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+table {
+    width: 100%;
+}
+
+.outter-table > tbody > tr > td {
+    padding: 0 0 0 10px;
+    border-bottom: 2px solid #175DDC;
+    height: 40px;
+}
+
+    .outter-table > tbody > tr > td:last-child {
+        padding-right: 10px;
+    }
+
+.inner-table td {
+    padding: 0 10px 0 0;
+}
+
+    .inner-table td:last-child {
+        padding: 0;
+    }
+
+    .inner-table td button {
+        margin-left: 5px;
+    }
+
+img {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#logo {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+#close {
+    width: 15px;
+    height: 15px;
+    display: block;
+    padding: 5px 0;
+    margin-right: 10px;
+}
+
+button:not(.link) {
+    background-color: #175DDC;
+    padding: 5px 15px;
+    border-radius: 3px;
+    color: #ffffff;
+    border: 0;
+}
+
+    button:not(.link):hover {
+        cursor: pointer;
+        background-color: #1751bd;
+    }
+
+button.link {
+    background: none;
+    padding: 5px 15px;
+    color: #175DDC;
+    border: 0;
+}
+
+    button.link:hover {
+        cursor: pointer;
+        background: none;
+        text-decoration: underline;
+    }
+
+body[class*='lang-en'] .add-buttons {
+    width: 50px;
+}
+
+@media (min-width: 768px) {
+    body[class*='lang-en'] .add-buttons {
+        width: 320px;
+    }
+}
+
+@media (print) {
+    body {
+        display: none;
+    }
+}
+
