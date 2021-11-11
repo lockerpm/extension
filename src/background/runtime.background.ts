@@ -156,9 +156,15 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true,
           })
+          console.log({
+            ...oldStoreParsed,
+            isLoggedIn: true,
+          })
           BrowserApi.createNewTab('web.html#/vault');
         }
-        catch { }
+        catch (e) {
+          console.log(e)
+        }
         break;
       case 'webAuthnResult':
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
