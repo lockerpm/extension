@@ -34,6 +34,14 @@
             <!--            >-->
             <!--              <i class="fas fa-external-link-square-alt" />-->
             <!--            </button>-->
+            <button
+              v-if="item.login.canLaunch"
+              class="btn btn-icon btn-xs hover:bg-black-400"
+              :title="`Launch ${item.login.uri}`"
+              @click="openNewTab(item.login.uri)"
+              >
+                <i class="fas fa-external-link-square-alt" />
+            </button>
             <el-dropdown v-if="!item.isDeleted" trigger="click" :hide-on-click="false">
               <button class="btn btn-icon btn-xs hover:bg-black-400">
                 <i class="fas fa-clone" />

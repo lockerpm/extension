@@ -33,6 +33,16 @@ const routes: Array<RouteConfig> = [
     path: '/vault/identities',
     name: 'vault-identities',
     component: () => import(/* webpackChunkName: "vault" */ '../popup/views/vault/identities.vue')
+  },
+  {
+    path: '/add_item',
+    name: 'add_item',
+    component: () => import(/* webpackChunkName: "vault" */ '../popup/views/add_item/index.vue')
+  },
+  {
+    path: '/generator',
+    name: 'generator',
+    component: () => import(/* webpackChunkName: "vault" */ '../popup/views/generator.vue')
   }
 ]
 
