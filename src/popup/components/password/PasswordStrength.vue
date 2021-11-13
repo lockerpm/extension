@@ -50,6 +50,7 @@ export default {
     }
   },
   mounted () {
+    return
   }
 }
 </script>

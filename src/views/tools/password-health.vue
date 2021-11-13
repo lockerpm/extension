@@ -14,26 +14,26 @@
             Password Health
           </el-breadcrumb-item>
           <el-breadcrumb-item
-            v-if="$route.params === 'tools-password-health-weak'"
+            v-if="$route.path === '/tools/password-health/weak'"
             :to="{name: 'tools-password-health-weak'}"
           >
             Weak Passwords
           </el-breadcrumb-item>
           <el-breadcrumb-item
-            v-if="$route.params === 'tools-password-health-reused'"
+            v-if="$route.path === '/tools/password-health/reused'"
             :to="{name: 'tools-password-health-reused'}"
           >
             Reused Passwords
           </el-breadcrumb-item>
           <el-breadcrumb-item
-            v-if="$route.params === 'tools-password-health-exposed'"
+            v-if="$route.path === '/tools/password-health/exposed'"
             :to="{name: 'tools-password-health-exposed'}"
           >
             Exposed Passwords
           </el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <div v-if="$route.params === 'tools-password-health'" class="setting-wrapper">
+      <div v-if="$route.path === '/tools/password-health'" class="setting-wrapper">
         <div
           class="setting-section setting-section--hover"
           @click="go({name: 'tools-password-health-weak'})"

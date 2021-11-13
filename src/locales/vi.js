@@ -69,7 +69,11 @@ module.exports = {
     monthly: 'Gói 1 tháng',
     half_yearly: 'Gói 6 tháng',
     created_date: 'Ngày tạo',
-    plan: 'Gói'
+    plan: 'Gói',
+    go_to_website: 'Đi tới trang web',
+    accept: 'Đồng ý',
+    reject: 'Từ chối',
+    shared_with_you: 'Được chia sẻ với bạn trong CyStack'
   },
   sidebar: {
     all: 'Tất cả',

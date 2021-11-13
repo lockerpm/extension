@@ -70,7 +70,11 @@ module.exports = {
     monthly: '1 month plan',
     half_yearly: '6 months plan',
     created_date: 'Created date',
-    plan: 'Plan'
+    plan: 'Plan',
+    go_to_website: 'Go to website',
+    accept: 'Accept',
+    reject: 'Reject',
+    shared_with_you: 'Shared with you in CyStack'
   },
   sidebar: {
     all: 'All',

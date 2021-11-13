@@ -135,22 +135,22 @@ const routes: Array<RouteConfig> = [
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/index.vue')
       },
       {
-        path: "/download",
+        path: "download",
         name: 'settings-download',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/download.vue')
       },
       {
-        path: "/excluded-domains",
+        path: "excluded-domains",
         name: 'settings-excluded-domains',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/excluded-domains.vue')
       },
       {
-        path: "/family-members",
+        path: "family-members",
         name: 'settings-family-members',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/family-members.vue')
       },
       {
-        path: "/import-export",
+        path: "import-export",
         name: 'settings-import-export',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/import-export.vue')
       }
@@ -251,6 +251,23 @@ const routes: Array<RouteConfig> = [
         path: "billing",
         name: 'upgrade-billing',
         component: () => import(/* webpackChunkName: "upgrade" */ '../views/upgrade/billing.vue')
+      }
+    ]
+  },
+  {
+    path: '/admin',
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: 'admin',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/index.vue')
+      },
+      {
+        path: ":teamId",
+        name: 'admin-teamId',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/index.vue')
       }
     ]
   },

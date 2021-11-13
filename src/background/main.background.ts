@@ -19,6 +19,7 @@ import { FileUploadService } from 'jslib-common/services/fileUpload.service';
 import { FolderService } from 'jslib-common/services/folder.service';
 import { NotificationsService } from 'jslib-common/services/notifications.service';
 import { PasswordGenerationService } from '@/services/passwordGeneration.service';
+import { ImportService } from 'jslib-common/services/import.service';
 import { PolicyService } from 'jslib-common/services/policy.service';
 import { SearchService } from 'jslib-common/services/search.service';
 import { SendService } from 'jslib-common/services/send.service';
@@ -49,6 +50,7 @@ import { LogService as LogServiceAbstraction } from 'jslib-common/abstractions/l
 import { MessagingService as MessagingServiceAbstraction } from 'jslib-common/abstractions/messaging.service';
 import { NotificationsService as NotificationsServiceAbstraction } from 'jslib-common/abstractions/notifications.service';
 import { PasswordGenerationService as PasswordGenerationServiceAbstraction } from 'jslib-common/abstractions/passwordGeneration.service';
+import { ImportService as ImportServiceAbstraction } from 'jslib-common/abstractions/import.service';
 import { PlatformUtilsService as PlatformUtilsServiceAbstraction } from 'jslib-common/abstractions/platformUtils.service';
 import { PolicyService as PolicyServiceAbstraction } from 'jslib-common/abstractions/policy.service';
 import { SearchService as SearchServiceAbstraction } from 'jslib-common/abstractions/search.service';
@@ -110,6 +112,7 @@ export default class MainBackground {
     vaultTimeoutService: VaultTimeoutServiceAbstraction;
     syncService: SyncServiceAbstraction;
     passwordGenerationService: PasswordGenerationServiceAbstraction;
+    importService: ImportServiceAbstraction;
     totpService: TotpServiceAbstraction;
     autofillService: AutofillServiceAbstraction;
     containerService: ContainerService;
@@ -224,6 +227,8 @@ export default class MainBackground {
         this.auditService = new AuditService(this.cryptoFunctionService, this.apiService);
         this.exportService = new ExportService(this.folderService, this.cipherService, this.apiService,
             this.cryptoService);
+        this.importService = new ImportService(this.cipherService, this.folderService, this.apiService, this.i18nService, this.collectionService,
+              this.platformUtilsService, this.cryptoService);
         this.notificationsService = new NotificationsService(this.userService, this.syncService, this.appIdService,
             this.apiService, this.vaultTimeoutService, this.environmentService, () => this.logout(true), this.logService);
         this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);

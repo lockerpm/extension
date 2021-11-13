@@ -95,9 +95,11 @@
             <i class="fas fa-chevron-right"></i>
           </div>
         </li>
-        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5">
+        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+            @click="logout"
+        >
           <div class="menu-icon mr-4">
-            <i class="fas fa-home text-[20px]"></i>
+            <i class="fas fa-sign-out-alt text-[20px]"></i>
           </div>
           <div class="flex-grow">
             Log Out

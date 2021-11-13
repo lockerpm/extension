@@ -47,7 +47,7 @@
 
         <div
           class="setting-section setting-section--hover"
-          @click="currentPlan.alias === 'pm_free' ? () => {} : go('tools-password-health')"
+          @click="currentPlan.alias === 'pm_free' ? () => {} : go('/tools/password-health')"
         >
           <div class="setting-section-header">
             <div class="flex items-center">
@@ -69,7 +69,7 @@
             <div>
               <button
                 class="btn btn-icon !text-black-600"
-                @click="go({name: 'tools-password-health'})"
+                @click="go({name: '/tools/password-health'})"
               >
                 <i class="fa fa-chevron-right" />
               </button>
@@ -78,7 +78,7 @@
         </div>
         <div
           class="setting-section setting-section--hover"
-          @click="currentPlan.alias === 'pm_free' ? () => {} : go('tools-breach')"
+          @click="currentPlan.alias === 'pm_free' ? () => {} : go('/tools/breach')"
         >
           <div class="setting-section-header">
             <div class="flex items-center">
@@ -100,7 +100,7 @@
             <div>
               <button
                 class="btn btn-icon !text-black-600"
-                @click="currentPlan.alias === 'pm_free' ? () => {} : go('tools-breach')"
+                @click="currentPlan.alias === 'pm_free' ? () => {} : go('/tools/breach')"
               >
                 <i class="fa fa-chevron-right" />
               </button>
