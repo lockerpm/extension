@@ -259,11 +259,11 @@ const routes: Array<RouteConfig> = [
     component: Layout,
     beforeEnter: VaultGuard,
     children: [
-      {
-        path: "",
-        name: 'admin',
-        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/index.vue')
-      },
+      // {
+      //   path: "",
+      //   name: 'admin',
+      //   component: () => import(/* webpackChunkName: "vault" */ '../views/admin/index.vue')
+      // },
       {
         path: ":teamId",
         name: 'admin-teamId',
