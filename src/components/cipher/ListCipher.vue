@@ -309,6 +309,7 @@
               <button
                 v-if="scope.row.login.canLaunch"
                 class="btn btn-icon btn-xs hover:bg-black-400"
+                :title="$t('common.go_to_website')"
                 @click="openNewTab(scope.row.login.uri)"
               >
                 <i class="fas fa-external-link-square-alt" />

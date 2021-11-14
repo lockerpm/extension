@@ -506,7 +506,8 @@ module.exports = {
       all_items: 'Tất cả mục',
       add_item: 'Thêm mục',
       selected_items: 'Các mục đã chọn',
-      generate_random_password: 'Tạo mật khẩu ngẫu nhiên'
+      generate_random_password: 'Tạo mật khẩu ngẫu nhiên',
+      show_password: 'HIện mật khẩu'
     },
     settings: {
       account: 'Tài khoản',

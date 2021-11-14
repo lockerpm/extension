@@ -83,6 +83,7 @@
           <TextHaveCopy
             :label="$t('data.ciphers.password')"
             :text="cipher.login.password"
+            :view-password="cipher.viewPassword"
             should-hide
           />
           <div class="grid md:grid-cols-6 cipher-item">

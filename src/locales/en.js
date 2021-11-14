@@ -510,7 +510,8 @@ module.exports = {
       all_items: 'All items',
       add_item: 'Add item',
       selected_items: 'selected items',
-      generate_random_password: 'Generate random password'
+      generate_random_password: 'Generate random password',
+      show_password: 'Show password'
     },
     settings: {
       account: 'Account',

@@ -6,7 +6,7 @@
     </div>
     <div v-if="text" class="text-right">
       <button
-        v-if="shouldHide"
+        v-if="shouldHide&&viewPassword===true"
         class="btn btn-icon btn-xs btn-action"
         @click="showPassword = !showPassword"
       >
@@ -41,6 +41,10 @@ export default Vue.extend({
     shouldHide: {
       type: Boolean,
       default: false
+    },
+    viewPassword: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
