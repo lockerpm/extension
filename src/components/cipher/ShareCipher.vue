@@ -43,7 +43,7 @@
         </el-checkbox-group>
       </div>
       <div v-if="cipher.type===CipherType.Login">
-        <label class="font-semibold">{{ $t('data.ciphers.show_password') }}/label>
+        <label class="font-semibold">{{ $t('data.ciphers.show_password') }}</label>
         <el-checkbox
           v-model="cipher.viewPassword"
         >

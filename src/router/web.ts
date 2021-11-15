@@ -3,6 +3,7 @@ import VueRouter, {RouteConfig} from 'vue-router'
 import HomeWeb from '../views/homeWeb.vue'
 import storePromise from "../store/web";
 import Layout from '@/components/layout/default.vue'
+import AdminLayout from '@/components/layout/admin.vue'
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -256,18 +257,50 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/admin',
-    component: Layout,
+    component: AdminLayout,
     beforeEnter: VaultGuard,
     children: [
-      // {
-      //   path: "",
-      //   name: 'admin',
-      //   component: () => import(/* webpackChunkName: "vault" */ '../views/admin/index.vue')
-      // },
       {
         path: ":teamId",
         name: 'admin-teamId',
         component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/index.vue')
+      },
+      {
+        path: ":teamId/activity-logs",
+        name: 'admin-teamId-activity-logs',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/activity-logs.vue')
+      },
+      {
+        path: ":teamId/groups",
+        name: 'admin-teamId-groups',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/groups.vue')
+      },
+      {
+        path: ":teamId/settings",
+        name: 'admin-teamId-settings',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings.vue'),
+        children: [
+          {
+            path: "",
+            name: 'admin-teamId-settings',
+            component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings/index.vue')
+          },
+          {
+            path: "import-export",
+            name: 'admin-teamId-settings-import-export',
+            component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings/import-export.vue')
+          },
+        ]
+      },
+      {
+        path: ":teamId/shared-folders",
+        name: 'admin-teamId-shared-folders',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/shared-folders.vue')
+      },
+      {
+        path: ":teamId/users",
+        name: 'admin-teamId-users',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/users.vue')
       }
     ]
   },
