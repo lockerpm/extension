@@ -79,7 +79,6 @@
         </template>
       </el-table-column>
     </el-table>
-    </client-only>
     <AddFamily
       ref="addEditUser"
       @done="getUsers"

@@ -92,6 +92,9 @@
       "38": "icons/38.png"
     }
   },
+  "web_accessible_resources": [
+    "notification/bar.html"
+  ],
   "sidebar_action": {
     "default_panel": "popup.html",
     "default_title": "__MSG_extName__",

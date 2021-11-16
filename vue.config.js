@@ -1,9 +1,10 @@
 /* eslint-disable */
 var path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
-const os=require('os');
+const os = require('os');
 module.exports = {
   pages: {
     web: {
@@ -30,7 +31,8 @@ module.exports = {
             'content/notificationBar': 'src/content/notificationBar.ts',
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',
             'content/shortcuts': 'src/content/shortcuts.ts',
-            'content/message_handler': 'src/content/message_handler.ts'
+            'content/message_handler': 'src/content/message_handler.ts',
+            'notification/bar': './src/notification/bar.js',
           },
         },
       },
@@ -53,6 +55,23 @@ module.exports = {
     entry: {
       'notification/bar': './src/notification/bar.js'
     },
+    module: {
+      rules: [
+        {
+          test: /bar\.scss$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: '../',
+              }
+            },
+            'css-loader',
+            'sass-loader',
+          ],
+        }
+      ]
+    },
     plugins: [
       new HtmlWebpackPlugin({
         template: './src/notification/bar.html',
@@ -62,6 +81,9 @@ module.exports = {
       }),
       new MomentLocalesPlugin({
         localesToKeep: ['vi'],
+      }),
+      new MiniCssExtractPlugin({
+        filename: '[name].css'
       }),
     ]
   },
