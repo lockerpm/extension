@@ -84,12 +84,14 @@
             <i class="fas fa-chevron-right"></i>
           </div>
         </li>
-        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5 border-t border-black-400">
+        <li class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5 border-t border-black-400"
+          @click="openRoute({routeName: 'settings'})"
+        >
           <div class="menu-icon mr-4">
             <i class="fas fa-home text-[20px]"></i>
           </div>
           <div class="flex-grow">
-            Account options
+            Settings
           </div>
           <div>
             <i class="fas fa-chevron-right"></i>

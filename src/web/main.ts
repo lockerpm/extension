@@ -114,6 +114,7 @@ Vue.mixin({
       this.$router.push({ name: 'home' })
     },
     async lock () {
+      console.log('##### LOCK')
       await Promise.all([
         this.$cryptoService.clearKey(),
         this.$cryptoService.clearOrgKeys(true),
@@ -124,7 +125,7 @@ Vue.mixin({
       this.$folderService.clearCache()
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
-      this.$searchService.clearIndex()
+      // this.$searchService.clearIndex()
       this.$router.push({ name: 'lock' })
     },
     randomString () {

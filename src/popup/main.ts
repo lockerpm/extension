@@ -117,8 +117,9 @@ Vue.mixin({
       this.$folderService.clearCache()
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
-      this.$searchService.clearIndex()
-      this.$router.push({ name: 'lock' })
+      // this.$searchService.clearIndex()
+      // this.$router.push({ name: 'lock' })
+      this.$platformUtilsService.launchUri("/web.html#/lock");
     },
     randomString () {
       return nanoid()
