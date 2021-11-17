@@ -26,7 +26,8 @@ import AddLoginRuntimeMessage from './models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from './models/changePasswordRuntimeMessage';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 import { NotificationQueueMessageType } from './models/notificationQueueMessageType';
-
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import axios from 'axios';
 export default class NotificationBackground {
 
     private notificationQueue: (AddLoginQueueMessage | AddChangePasswordQueueMessage)[] = [];
@@ -349,7 +350,15 @@ export default class NotificationBackground {
         }
 
         const cipher = await this.cipherService.encrypt(model);
-        await this.cipherService.saveWithServer(cipher);
+        console.log("notificationBar createNewCipher");
+        // await this.cipherService.saveWithServer(cipher);
+        const csToken = await this.main.storageService.get<string>("cs_token");
+        const headers = {
+          "Authorization": "Bearer " + csToken,
+          "Content-Type": "application/json; charset=utf-8"
+        };
+        const data = new CipherRequest(cipher)
+        await axios.post('https://api.cystack.net/v3/cystack_platform/pm/ciphers/vaults', data, {headers: headers})
     }
 
     private async getDecryptedCipherById(cipherId: string) {
@@ -364,7 +373,15 @@ export default class NotificationBackground {
         if (cipher != null && cipher.type === CipherType.Login) {
             cipher.login.password = newPassword;
             const newCipher = await this.cipherService.encrypt(cipher);
-            await this.cipherService.saveWithServer(newCipher);
+            // await this.cipherService.saveWithServer(newCipher);
+            console.log('notificationBar updateCipher')
+            const csToken = await this.main.storageService.get<string>("cs_token");
+            const headers = {
+              "Authorization": "Bearer " + csToken,
+              "Content-Type": "application/json; charset=utf-8"
+            };
+            const data = new CipherRequest(newCipher)
+            await axios.put(`https://api.cystack.net/v3/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
         }
     }
 
