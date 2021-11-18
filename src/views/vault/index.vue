@@ -31,6 +31,9 @@ export default Vue.extend({
         this.$refs.listCipher.$refs.chooseCipherType.confirmDialog(type)
       }
     }
+    if(this.$route.query.dialog==='folder'){
+      this.$refs.listCipher.$refs.addEditFolder.openDialog()
+    }
   }
 })
 </script>

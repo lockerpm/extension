@@ -60,7 +60,7 @@ export class BrowserApi {
         return BrowserApi.tabSendMessage(tab, obj);
     }
 
-    static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
+  static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
         if (!tab || !tab.id) {
             return;
         }

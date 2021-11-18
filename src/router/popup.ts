@@ -44,8 +44,24 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
+    path: "vault/folders/:folderId",
+    name: "vault-folders-folderId",
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/vault/folders/_folderId/index.vue"
+      )
+  },
+  {
+    path: "vault/teams/:teamId?/tfolders/:tfolderId",
+    name: "vault-teams-teamId-tfolders-tfolderId",
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
+      )
+  },
+  {
     path: "/add_item",
-    name: "add_item",
+    name: "add-item",
     component: () =>
       import(
         /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
@@ -61,7 +77,9 @@ const routes: Array<RouteConfig> = [
     path: "/settings",
     name: "settings",
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/settings/index.vue")
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
+      )
   }
 ];
 

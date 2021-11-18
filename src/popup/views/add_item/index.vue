@@ -38,41 +38,43 @@ export default Vue.extend({
       menu: [
         {
           icon: 'fa-home',
-          routeName: 'vault-passwords',
-          externalUrl: '',
-          divided: false,
-          name: 'passwords'
-        },
-        {
-          icon: 'fa-home',
-          routeName: 'vault-notes',
-          externalUrl: '',
-          divided: false,
-          name: 'notes'
-        },
-        {
-          icon: 'fa-home',
-          routeName: 'vault-cards',
-          externalUrl: '',
-          divided: false,
-          name: 'cards'
-        },
-        {
-          icon: 'fa-home',
-          routeName: 'vault-identities',
-          externalUrl: '',
+          queryParam: 'folder',
           divided: true,
-          name: 'identities'
+          name: 'Add Folder'
+        },
+        {
+          icon: 'fa-home',
+          queryParam: 'passwords',
+          divided: false,
+          name: 'Add Password'
+        },
+        {
+          icon: 'fa-home',
+          queryParam: 'notes',
+          divided: false,
+          name: 'Add Note'
+        },
+        {
+          icon: 'fa-home',
+          queryParam: 'card',
+          divided: false,
+          name: 'Add Card'
+        },
+        {
+          icon: 'fa-home',
+          queryParam: 'indentities',
+          divided: true,
+          name: 'Add Identity'
         }
       ]
     }
   },
   methods: {
     openRoute (item) {
-      if (item.externalUrl) {
-        this.$platformUtilsService.launchUri(item.externalUrl)
+      if (item.queryParam==='folder') {
+        this.$platformUtilsService.launchUri(`/web.html#/vault?dialog=${item.queryParam}`)
       } else {
-        this.$platformUtilsService.launchUri(`/web.html#/vault?add_item=${item.name}`)
+        this.$platformUtilsService.launchUri(`/web.html#/vault?add_item=${item.queryParam}`)
       }
     },
     async test () {
