@@ -33,9 +33,9 @@ import { TokenService } from 'jslib-common/abstractions/token.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
-import { BroadcasterService } from 'jslib-common/abstractions/broadcaster.service';
+import { BroadcasterService as BroadcasterServiceAbstraction} from 'jslib-common/abstractions/broadcaster.service';
 
-import { AutofillService } from '@/services/abstractions/autofill.service';
+import { AutofillService as AutofillServiceAbstraction } from '@/services/abstractions/autofill.service';
 import BrowserMessagingService from '@/services/browserMessaging.service';
 
 import { AuthService } from 'jslib-common/services/auth.service';
@@ -48,7 +48,8 @@ import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import {ContainerService} from "jslib-common/services/container.service";
 import {ImportService} from "jslib-common/abstractions/import.service";
-
+import AutofillService from '@/services/autofill.service'
+import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
 function getBgService<T>(service: string) {
     return (): T => {
         const page = BrowserApi.getBackgroundPage();
@@ -89,7 +90,8 @@ export default {
         Vue.prototype.$auditService =  getBgService<AuditService>('auditService')()
         Vue.prototype.$vaultTimeoutService =  getBgService<VaultTimeoutService>('vaultTimeoutService')()
         Vue.prototype.$broadcasterService =  getBgService<BroadcasterService>('broadcasterService')()
-
+        Vue.prototype.$autofillService = getBgService<AutofillService>('autofillService')()
+        Vue.prototype.$popupUtilsService = getBgService<PopupUtilsService>("popupUtilsService")();
         if (!popupUtilsService.inPopup(window)) {
             window.document.body.classList.add('body-full');
         } else if (window.screen.availHeight < 600) {

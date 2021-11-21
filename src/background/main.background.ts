@@ -388,7 +388,6 @@ export default class MainBackground {
         if (frameId != null) {
             options.frameId = frameId;
         }
-
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,

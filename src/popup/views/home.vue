@@ -42,6 +42,7 @@
           <el-input
             v-model="searchText"
             placeholder="Search vault"
+            id="search"
           >
           </el-input>
         </div>
@@ -117,6 +118,7 @@
           v-for="item in loginCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          @click="fillCipher(item)"
         >
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
@@ -345,8 +347,29 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    // this.storageService = new BrowserStorageService();
-    await this.load();
+    // BrowserApi.messageListener('home.popup', async (msg: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
+    //   await this.processMessage(msg, sender, sendResponse);
+    // });
+    chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      this.processMessage(msg, sender, response);
+    });
+    // await this.load();
+    if (!this.$syncService.syncInProgress) {
+      await this.load();
+    } else {
+      this.loadedTimeout = window.setTimeout(async () => {
+        if (!this.loaded) {
+          await this.load();
+        }
+      }, 5000);
+    }
+
+    window.setTimeout(() => {
+      document.getElementById('search').focus();
+    }, 100);
+  },
+  destroyed() {
+    window.clearTimeout(this.loadedTimeout)
   },
   asyncComputed: {
     ciphers: {
@@ -410,6 +433,7 @@ export default Vue.extend({
 
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
+      console.log('popup send cmd: collectPageDetails')
       BrowserApi.tabSendMessage(tab, {
         command: "collectPageDetails",
         tab: tab,
@@ -458,57 +482,81 @@ export default Vue.extend({
       this.loginCiphers = this.loginCiphers.sort((a, b) =>
         this.$cipherService.sortCiphersByLastUsedThenName(a, b)
       );
-      // this.loaded = true;
+      this.loaded = true;
     },
     addEdit(item) {
       this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
     },
-    test(cipher: CipherView) {
-      window.alert(cipher.id);
+    async fillCipher(cipher: CipherView) {
+      console.log(this.pageDetails.length)
+      if (cipher.reprompt !== CipherRepromptType.None && !await this.$passwordRepromptService.showPasswordPrompt()) {
+        return;
+      }
+
+      this.totpCode = null;
+      if (this.totpTimeout != null) {
+        window.clearTimeout(this.totpTimeout);
+      }
+
+      if (this.pageDetails == null || this.pageDetails.length === 0) {
+        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
+        this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
+        return;
+      }
+
+      try {
+        this.totpCode = await this.$autofillService.doAutoFill({
+          cipher: cipher,
+          pageDetails: this.pageDetails,
+          doc: window.document,
+          fillNewPassword: true,
+        });
+        if (this.totpCode != null) {
+          this.$platformUtilsService.copyToClipboard(this.totpCode, { window: window });
+        }
+        if (this.$popupUtilsService.inPopup(window)) {
+          if (this.$platformUtilsService.isFirefox() || this.$platformUtilsService.isSafari()) {
+            BrowserApi.closePopup(window);
+          } else {
+            // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
+            setTimeout(() => BrowserApi.closePopup(window), 50);
+          }
+        }
+      } catch (e) {
+        // this.ngZone.run(() => {
+        //   this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
+        //   this.changeDetectorRef.detectChanges();
+        // });
+        // this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
+        this.notify(e, 'warning')
+      }
     },
-    // async fillCipher(cipher: CipherView) {
-    //   window.alert(cipher.id)
-    //   if (cipher.reprompt !== CipherRepromptType.None && !await this.$passwordRepromptService.showPasswordPrompt()) {
-    //     return;
-    //   }
-
-    //   this.totpCode = null;
-    //   if (this.totpTimeout != null) {
-    //     window.clearTimeout(this.totpTimeout);
-    //   }
-
-    //   if (this.pageDetails == null || this.pageDetails.length === 0) {
-    //     // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-    //     window.alert('autofillError')
-    //     return;
-    //   }
-
-    //   try {
-    //     this.totpCode = await this.$autofillService.doAutoFill({
-    //       cipher: cipher,
-    //       pageDetails: this.pageDetails,
-    //       doc: window.document,
-    //       fillNewPassword: true,
-    //     });
-    //     if (this.totpCode != null) {
-    //       this.$platformUtilsService.copyToClipboard(this.totpCode, { window: window });
-    //     }
-    //     if (this.$popupUtilsService.inPopup(window)) {
-    //       if (this.$platformUtilsService.isFirefox() || this.$platformUtilsService.isSafari()) {
-    //         BrowserApi.closePopup(window);
-    //       } else {
-    //         // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
-    //         setTimeout(() => BrowserApi.closePopup(window), 50);
-    //       }
-    //     }
-    //   } catch (e) {
-    //     // this.ngZone.run(() => {
-    //     //   this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-    //     //   this.changeDetectorRef.detectChanges();
-    //     // });
-    //     window.alert(e)
-    //   }
-    // },
+    async processMessage(msg: any, sender: any, sendResponse: any) {
+      console.log(`popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`)
+      switch (msg.command) {
+      case 'syncCompleted':
+        window.alert('home: syncCompleted')
+        if (this.loaded) {
+          window.setTimeout(() => {
+            this.load();
+          }, 500);
+        }
+        break;
+      case 'collectPageDetailsResponse':
+        console.log('home: collectPageDetails')
+        if (msg.sender === BroadcasterSubscriptionId) {
+          const pageDetailsObj = {
+            // frameId: msg.webExtSender.frameId,
+            tab: msg.tab,
+            details: msg.details,
+          }
+          this.pageDetails.push(pageDetailsObj);
+        }
+        break;
+      default:
+        break;
+      }
+    }
   },
 });
 </script>

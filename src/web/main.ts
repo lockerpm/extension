@@ -116,7 +116,7 @@ Vue.mixin({
     async lock () {
       console.log('##### LOCK')
       await Promise.all([
-        this.$cryptoService.clearKey(),
+        this.$cryptoService.clearKey(false),
         this.$cryptoService.clearOrgKeys(true),
         this.$cryptoService.clearKeyPair(true),
         this.$cryptoService.clearEncKey(true)
