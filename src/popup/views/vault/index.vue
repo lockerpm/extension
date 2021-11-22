@@ -25,8 +25,7 @@
         </div>
       </div>
     </div>
-    <!-- <button class="btn btn-primary" @click="test">Test</button> -->
-    {{ciphers.length}}
+    <!-- {{ciphers.length}} -->
     <ul v-if="searchText.length>1">
       <li
         v-for="item in ciphers" :key="item.id"
@@ -136,6 +135,10 @@
           <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }})</div>
         </li>
       </template>
+      <div class="uppercase px-3 border-t border-black-400">No Folders ({{noFolderCiphers.length}})</div>
+      <cipher-row v-for="item in noFolderCiphers" :key="item.id" :item="item">
+      </cipher-row>
+
     </ul>
   </div>
 </template>
@@ -146,7 +149,11 @@ import orderBy from "lodash/orderBy";
 import groupBy from 'lodash/groupBy';
 import { BrowserApi } from '@/browser/browserApi';
 import { CipherType } from 'jslib-common/enums/cipherType';
+import CipherRow from "@/popup/components/ciphers/CipherRow";
 export default Vue.extend({
+  components: {
+    CipherRow
+  },
   data () {
     return {
       menu: [
@@ -181,7 +188,8 @@ export default Vue.extend({
       ],
       folders: [],
       searchText: '',
-      CipherType
+      CipherType,
+      noFolderCiphers: []
     }
   },
   computed: {
@@ -212,7 +220,7 @@ export default Vue.extend({
           return c.isDeleted === false
         }
         const result = await this.$searchService.searchCiphers(this.searchText, [null, deletedFilter], null) || []
-
+        this.noFolderCiphers = result.filter(c => c.folderId===null)
         return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
       },
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']

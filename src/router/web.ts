@@ -301,6 +301,11 @@ const routes: Array<RouteConfig> = [
         path: ":teamId/users",
         name: 'admin-teamId-users',
         component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/users.vue')
+      },
+      {
+        path: ":teamId/policies",
+        name: 'admin-teamId-policies',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/policies.vue')
       }
     ]
   },

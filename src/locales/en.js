@@ -99,7 +99,9 @@ module.exports = {
     logs: 'Logs',
     overview: 'Overview',
     billing: 'Billing',
-    family_members: 'Family Members'
+    family_members: 'Family Members',
+    policies: 'Policies'
+    
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -235,7 +237,10 @@ module.exports = {
       update_team_failed: 'Your Team has not been updated!',
       fingerprint_title: 'Verify fingerprint phrase',
       fingerprint_description_1: 'To ensure the integrity of your encryption keys, please verify the user\'s fingerprint phrase before continuing.',
-      fingerprint_description_2: 'A \'fingerprint phrase\' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.'
+      fingerprint_description_2: 'A \'fingerprint phrase\' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.',
+      min_password_length: 'Minimum password length is {length}',
+      max_password_length: 'Maximum password length is {length}',
+      password_composition: 'Password must contain at least 1 special character'
     },
     profile_menu: {
       lock: 'Lock your account',
@@ -319,6 +324,7 @@ module.exports = {
     timeouts: {
       oneMinute: '1 minute',
       fiveMinutes: '5 minutes',
+      tenMinutes: '10 minutes',
       fifteenMinutes: '15 minutes',
       thirtyMinutes: '30 minutes',
       oneHour: '1 hour',
@@ -475,7 +481,7 @@ module.exports = {
       brand: 'Brand',
       card_number: 'Card number',
       expiration_month: 'Expiration month',
-      expiration_year: 'Expiration tear',
+      expiration_year: 'Expiration year',
       cvv: 'Security Code (CVV)',
       notes: 'Notes',
       name: 'Name',

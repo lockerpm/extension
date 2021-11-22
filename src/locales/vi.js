@@ -99,7 +99,8 @@ module.exports = {
     overview: 'Tổng quan',
     billing: 'Thanh toán',
     family_members: 'Thành viên gói cước',
-    cardholder: 'Tên chủ thẻ'
+    cardholder: 'Tên chủ thẻ',
+    policies: 'Chính sách'
   },
   errors: {
     confirm_password: 'Mật khẩu xác nhận không trùng khớp',
@@ -231,7 +232,10 @@ module.exports = {
       update_team_failed: 'Cập nhật thất bại!',
       fingerprint_title: 'Xác minh Fingerprint Phrase',
       fingerprint_description_1: 'Để đảm bảo tính minh bạch của khóa mã hóa, vui lòng xác minh Fingerprint Phrase trước khi tiếp tục.',
-      fingerprint_description_2: '\'Fingerprint Phrase\' là cụm từ duy nhất của mỗi tài khoản, dùng để xác minh khóa công khai với người dùng khác trong trường hợp chia sẻ và tham gia vào một tổ chức.'
+      fingerprint_description_2: '\'Fingerprint Phrase\' là cụm từ duy nhất của mỗi tài khoản, dùng để xác minh khóa công khai với người dùng khác trong trường hợp chia sẻ và tham gia vào một tổ chức.',
+      min_password_length: 'Mật khẩu phải chứ ít nhất {length} ký tự',
+      max_password_length: 'Độ dài tối đa của mật khẩu là {length}',
+      password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt'
     },
     profile_menu: {
       lock: 'Khóa tài khoản',
@@ -315,6 +319,7 @@ module.exports = {
     timeouts: {
       oneMinute: '1 phút',
       fiveMinutes: '5 phút',
+      tenMinutes: '10 phút',
       fifteenMinutes: '15 phút',
       thirtyMinutes: '30 phút',
       oneHour: '1 giờ',

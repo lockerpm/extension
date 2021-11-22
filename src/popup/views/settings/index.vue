@@ -42,44 +42,51 @@
         </li>
       </ul>
     </div>
+    <!-- <el-dialog
+      title="Your acccount's fingerprint phrase"
+      :visible.sync="fingerprintDialog"
+      width="80%"
+      center
+    >
+      <span>{{fingerprint}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="fingerprintDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="fingerprintDialog = false">Confirm</el-button>
+      </span>
+    </el-dialog> -->
+    <Fingerprint ref="fingerprintDialog"/>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue'
 import { BrowserApi } from '@/browser/browserApi';
+import Fingerprint from '@/popup/components/setting/Fingerprint.vue'
 export default Vue.extend({
+  components: {
+    Fingerprint
+  },
+  async mounted() {
+    chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      this.processMessage(msg, sender, response);
+    });
+  },
+  // asyncComputed: {
+  //   fingerprint: {
+  //     async get () {
+  //       const fingerprint = await this.$cryptoService.getFingerprint(await this.$userService.getUserId())
+  //       if (fingerprint != null) {
+  //         return fingerprint.join('-')
+  //       }
+  //       return ''
+  //     },
+  //     watch: ['$store.state.syncedCiphersToggle']
+  //   }
+  // },
   data () {
     return {
+      fingerprintDialog: false,
       menu: [
-        // {
-        //   icon: 'fa-home',
-        //   routeName: 'settings-general',
-        //   externalUrl: '',
-        //   divided: false,
-        //   name: 'general'
-        // },
-        // {
-        //   icon: 'fa-home',
-        //   routeName: 'settings-security',
-        //   externalUrl: '',
-        //   divided: false,
-        //   name: 'security'
-        // },
-        // {
-        //   icon: 'fa-home',
-        //   routeName: 'settings-account',
-        //   externalUrl: '',
-        //   divided: false,
-        //   name: 'account'
-        // },
-        // {
-        //   icon: 'fa-home',
-        //   routeName: 'settings-support',
-        //   externalUrl: '',
-        //   divided: true,
-        //   name: 'support'
-        // }
         {
           name: 'general',
           divided: false,
@@ -117,7 +124,7 @@ export default Vue.extend({
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/vault',
+              externalUrl: '/web.html#/settings',
               name: 'Vault Timeout'
             },
             {
@@ -130,6 +137,7 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               externalUrl: '/web.html#/settings/exclude-domains',
+              action: 'fingerprint',
               name: 'Fingerprint Phrase'
             },
             {
@@ -167,6 +175,7 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               externalUrl: '/web.html#/settings/',
+              action: 'sync_data',
               name: 'Sync data Now'
             }
           ]
@@ -213,18 +222,44 @@ export default Vue.extend({
   methods: {
     openRoute (item) {
       console.log(item.name)
-      if (item.externalUrl) {
+      if (item.lock){
+        this.lock()
+      }
+      else if(item.action){
+        switch (item.action){
+        case 'sync_data':
+          this.getSyncData()
+          break
+        case 'fingerprint': 
+          // this.fingerprintDialog = true
+          this.openFingerprintDialog()
+          break
+        default:
+          break
+        }
+      }
+      else if (item.externalUrl) {
         this.$platformUtilsService.launchUri(item.externalUrl)
       }
-      else if (item.lock){
-        this.lock()
-      } else {
+      else {
         this.$router.push({name: item.routeName})
       }
     },
     async test () {
       const test = await BrowserApi.getTabFromCurrentWindow()
       console.log(test)
+    },
+    async processMessage(msg: any, sender: any, sendResponse: any) {
+      switch (msg.command) {
+      case 'syncCompleted':
+        this.notify('Syncing complete', 'success')
+        break;
+      default:
+        break;
+      }
+    },
+    openFingerprintDialog(){
+      this.$refs.fingerprintDialog.openDialog()
     }
   }
 })

@@ -63,6 +63,10 @@ export default Vue.extend({
           routeName: 'admin-teamId-shared-folders'
         },
         {
+          label: 'policies',
+          routeName: 'admin-teamId-policies'
+        },
+        {
           label: 'logs',
           routeName: 'admin-teamId-activity-logs'
         },

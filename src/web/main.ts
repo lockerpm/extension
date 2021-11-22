@@ -269,7 +269,7 @@ Vue.mixin({
         callbackDeleted(cipher)
         return
       }
-
+      console.log(cipher)
       if (this.$route.name === 'vault') {
         this.$router.push({
           name: 'vault-id',

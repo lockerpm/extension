@@ -66,7 +66,7 @@
               :disabled="isDeleted"
               is-password
             />
-            <PasswordStrengthBar :score="passwordStrength.score" class="mt-2" />
+            <!-- <PasswordStrengthBar :score="passwordStrength.score" class="mt-2" /> -->
             <div v-if="!isDeleted && !cipher.id" class="text-right">
               <el-popover
                 placement="right"

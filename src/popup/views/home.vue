@@ -177,6 +177,7 @@
           v-for="item in cardCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          @click="fillCipher(item)"
         >
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
@@ -205,6 +206,7 @@
           v-for="item in identityCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          @click="fillCipher(item)"
         >
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
@@ -535,7 +537,6 @@ export default Vue.extend({
       console.log(`popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`)
       switch (msg.command) {
       case 'syncCompleted':
-        window.alert('home: syncCompleted')
         if (this.loaded) {
           window.setTimeout(() => {
             this.load();

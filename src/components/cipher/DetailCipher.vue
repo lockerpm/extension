@@ -86,12 +86,13 @@
             :view-password="cipher.viewPassword"
             should-hide
           />
-          <div class="grid md:grid-cols-6 cipher-item">
+          <!-- {{passwordStrength}} -->
+          <!-- <div class="grid md:grid-cols-6 cipher-item">
             <div class="">{{ $t('data.ciphers.password_security') }}</div>
             <div class="col-span-4 font-semibold">
               <PasswordStrength :score="passwordStrength.score" />
             </div>
-          </div>
+          </div> -->
           <div
             v-for="(item, index) in cipher.login.uris"
             v-show="item.uri"
@@ -187,7 +188,7 @@ export default Vue.extend({
   components: {
     TextHaveCopy,
     AddEditCipher,
-    PasswordStrength,
+    // PasswordStrength,
     Vnodes,
     ShareCipher,
     MoveFolder

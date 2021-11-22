@@ -36,10 +36,10 @@
           <el-dropdown-item icon="far fa-comment">
             {{ $t('data.profile_menu.feedback') }}
           </el-dropdown-item>
-          <el-dropdown-item icon="fas fa-lock" @click="lock">
+          <el-dropdown-item icon="fas fa-lock" @click.native="lock()">
             {{ $t('data.profile_menu.lock') }}
           </el-dropdown-item>
-          <el-dropdown-item icon="fas fa-sign-out-alt" @click="logout">
+          <el-dropdown-item icon="fas fa-sign-out-alt" @click.native="logout()">
             {{ $t('data.profile_menu.logout') }}
           </el-dropdown-item>
         </el-dropdown-menu>

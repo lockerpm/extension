@@ -120,25 +120,27 @@ export default Vue.extend({
       this.dialogVisible = false
     },
     async shareCipher (cipher) {
-      try {
-        this.loading = true
-        const cipherEnc = await this.$cipherService.encrypt(cipher)
-        const data = new CipherRequest(cipherEnc)
-        const url = this.isBelongToTeam ? `cystack_platform/pm/ciphers/${cipher.id}` : `cystack_platform/pm/ciphers/${cipher.id}/share`
-        await this.axios.put(url, {
-          ...data,
-          score: this.passwordStrength.score,
-          collectionIds: cipher.collectionIds,
-          view_password: cipher.viewPassword
-        })
-        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
-        this.closeDialog()
-        this.$emit('updated-cipher')
-      } catch (e) {
-        this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'warning')
-        console.log(e)
-      } finally {
-        this.loading = false
+      if (this.checkPolicies(cipher)) {
+        try {
+          this.loading = true
+          const cipherEnc = await this.$cipherService.encrypt(cipher)
+          const data = new CipherRequest(cipherEnc)
+          const url = this.isBelongToTeam ? `cystack_platform/pm/ciphers/${cipher.id}` : `cystack_platform/pm/ciphers/${cipher.id}/share`
+          await this.axios.put(url, {
+            ...data,
+            score: this.passwordStrength.score,
+            collectionIds: cipher.collectionIds,
+            view_password: cipher.viewPassword
+          })
+          this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
+          this.closeDialog()
+          this.$emit('updated-cipher')
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'warning')
+          console.log(e)
+        } finally {
+          this.loading = false
+        }
       }
     },
     async generateOrgKey (publicKey) {
@@ -162,6 +164,30 @@ export default Vue.extend({
     async getWritableCollections (orgId) {
       const allCollections = await this.$collectionService.getAllDecrypted()
       return allCollections.filter(c => !c.readOnly && c.organizationId === orgId)
+    },
+    async getTeamPolicies (teamId) {
+      this.policies = await this.axios.get(`cystack_platform/pm/teams/${teamId}/policy`)
+    },
+    checkPolicies (cipher) {
+      if (cipher.type === CipherType.Login) {
+        if (this.policies.min_password_length && cipher.login.password.length < this.policies.min_password_length) {
+          this.notify(this.$t('data.notifications.min_password_length', { length: this.policies.min_password_length }), 'warning')
+          return false
+        }
+        if (this.policies.max_password_length && cipher.login.password.length > this.policies.max_password_length) {
+          this.notify(this.$t('data.notifications.max_password_length', { length: this.policies.max_password_length }), 'warning')
+          return false
+        }
+        if (this.policies.password_composition) {
+          const reg = /(?=.*[!@#$%^&*])/
+          const check = reg.test(cipher.login.password)
+          if (!check) {
+            this.notify(this.$t('data.notifications.password_composition'), 'warning')
+            return check
+          }
+        }
+      }
+      return true
     }
   }
 })
