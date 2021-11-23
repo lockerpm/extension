@@ -12,7 +12,6 @@
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" @click="test">Test</button>
     <ul class="">
       <li v-for="(item, index) in menu" :key="index"
         class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5" :class="[item.divided ? 'border-t border-black-400' : '']"
@@ -36,46 +35,51 @@ export default Vue.extend({
   data () {
     return {
       menu: [
-        {
-          icon: 'fa-home',
-          queryParam: 'folder',
-          divided: true,
-          name: 'Add Folder'
-        },
+        // {
+        //   icon: 'fa-home',
+        //   queryParam: 'folder',
+        //   divided: true,
+        //   name: 'Add Folder'
+        // },
         {
           icon: 'fa-home',
           queryParam: 'passwords',
           divided: false,
-          name: 'Add Password'
+          name: 'Add Password',
+          type: 'Login'
         },
         {
           icon: 'fa-home',
           queryParam: 'notes',
           divided: false,
-          name: 'Add Note'
+          name: 'Add Note',
+          type: 'SecureNote'
         },
         {
           icon: 'fa-home',
           queryParam: 'card',
           divided: false,
-          name: 'Add Card'
+          name: 'Add Card',
+          type: 'Card'
         },
         {
           icon: 'fa-home',
           queryParam: 'indentities',
           divided: true,
-          name: 'Add Identity'
+          name: 'Add Identity',
+          type: 'Identity'
         }
       ]
     }
   },
   methods: {
     openRoute (item) {
-      if (item.queryParam==='folder') {
-        this.$platformUtilsService.launchUri(`/web.html#/vault?dialog=${item.queryParam}`)
-      } else {
-        this.$platformUtilsService.launchUri(`/web.html#/vault?add_item=${item.queryParam}`)
-      }
+      // if (item.queryParam==='folder') {
+      //   this.$platformUtilsService.launchUri(`/web.html#/vault?dialog=${item.queryParam}`)
+      // } else {
+      //   this.$router.push({name: 'add-item-create', params: {type: item.type}})
+      // }
+      this.$router.push({name: 'add-item-create', params: {type: item.type}})
     },
     async test () {
       const test = await BrowserApi.getTabFromCurrentWindow()

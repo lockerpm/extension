@@ -1,14 +1,13 @@
 <template>
   <div>
     <div class="">
-      <div class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-           @click="$router.back()"
+      <div class="flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
       >
-        <div class="menu-icon mr-4">
-          <i class="fas fa-chevron-left text-[20px]"></i>
+        <div class="menu-icon mr-4" @click="$router.back()">
+          <i class="fas fa-chevron-left text-[20px]"></i> Back
         </div>
-        <div class="flex-grow">
-          Back
+        <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
+          <i class="fas fa-plus-circle text-[20px]"></i>
         </div>
       </div>
     </div>
@@ -88,6 +87,9 @@
 import Vue from 'vue'
 import orderBy from "lodash/orderBy";
 import {CipherType} from "jslib-common/enums/cipherType";
+import { type } from '@/locales/en';
+import { Cipher } from 'jslib-common/models/domain/cipher';
+import { defaults } from 'lodash';
 export default Vue.extend({
   props: {
     deleted: {
@@ -106,6 +108,26 @@ export default Vue.extend({
   data () {
     return {
       CipherType
+    }
+  },
+  computed: {
+    type() {
+      if(this.ciphers.length){
+        const type = this.ciphers[0].type
+        switch(type){
+        case CipherType.Login:
+          return 'Login'
+        case CipherType.SecureNote:
+          return 'SecureNote'
+        case CipherType.Card:
+          return 'Card';
+        case CipherType.Identity:
+          return 'Identity' 
+        default:
+          return 'Login'
+        }
+      }
+      return 'Login'
     }
   },
   asyncComputed: {

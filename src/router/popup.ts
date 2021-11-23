@@ -60,6 +60,14 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
+    path: "/add_item/create",
+    name: "add-item-create",
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
+      )
+  },
+  {
     path: "/add_item",
     name: "add-item",
     component: () =>
