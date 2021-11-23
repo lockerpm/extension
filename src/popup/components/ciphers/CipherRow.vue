@@ -86,6 +86,11 @@ export default Vue.extend(
       return {
         CipherType
       }
+    },
+    methods: {
+      addEdit (item) {
+        this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+      }
     }
   }
 )
