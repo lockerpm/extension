@@ -144,6 +144,7 @@ Vue.mixin({
     },
     async login () {
       try {
+        console.log('login')
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
@@ -154,7 +155,8 @@ Vue.mixin({
           device_type: this.$platformUtilsService.getDevice(),
           device_identifier: this.randomString()
         })
-        this.$messagingService.send('loggedIn')
+        // this.$messagingService.send('loggedIn')
+        chrome.runtime.sendMessage({command: 'loggedIn'})
         console.log(res)
         await this.$tokenService.setTokens(res.access_token, res.refresh_token)
         await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
@@ -166,7 +168,8 @@ Vue.mixin({
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
-        this.$messagingService.send('unlocked')
+        // this.$messagingService.send('unlocked')
+        chrome.runtime.sendMessage({ command: "unlocked" });
         // this.$router.push({ path: this.$store.state.currentPath === '/lock' ? '/vault' : this.$store.state.currentPath })
         this.$router.push({ name: 'home' })
       } catch (e) {

@@ -100,7 +100,7 @@ export class BrowserApi {
     static async closeLoginTab() {
         const tabs = await BrowserApi.tabsQuery({
             active: true,
-            title: 'Bitwarden',
+            title: 'Popup',
             windowType: 'normal',
             currentWindow: true,
         });

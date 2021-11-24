@@ -48,9 +48,11 @@ export default class RuntimeBackground {
     switch (msg.command) {
       case 'loggedIn':
       case 'unlocked':
+        console.log('processMessage: ', msg.command)
         let item: LockedVaultPendingNotificationsItem;
 
         if (this.lockedVaultPendingNotifications.length > 0) {
+          console.log('closeLoginTab')
           await BrowserApi.closeLoginTab();
 
           item = this.lockedVaultPendingNotifications.pop();
