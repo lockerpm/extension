@@ -69,6 +69,7 @@ export default class RuntimeBackground {
         }
         break;
       case 'addToLockedVaultPendingNotifications':
+        console.log(msg.data)
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
       case 'logout':
@@ -84,7 +85,7 @@ export default class RuntimeBackground {
         break;
       case 'promptForLogin':
         // await BrowserApi.createNewTab('popup/index.html?uilocation=popout', true, true);
-        await BrowserApi.createNewTab('web.html#/vault', true, true);
+        await BrowserApi.createNewTab('popup.html?uilocation=popout', true, true);
         break;
       case 'showDialogResolve':
         this.platformUtilsService.resolveDialogPromise(msg.dialogId, msg.confirmed);

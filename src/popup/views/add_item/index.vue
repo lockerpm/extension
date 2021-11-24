@@ -2,7 +2,7 @@
   <div>
     <div class="">
       <div class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-           @click="$router.back()"
+           @click="$router.push('/')"
       >
         <div class="menu-icon mr-4">
           <i class="fas fa-chevron-left text-[20px]"></i>

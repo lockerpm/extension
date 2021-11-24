@@ -80,6 +80,7 @@ export default class NotificationBackground {
             case 'bgAddSave':
             case 'bgChangeSave':
                 if (await this.vaultTimeoutService.isLocked()) {
+                    console.log('vault locked');
                     const retryMessage: LockedVaultPendingNotificationsItem = {
                         commandToRetry: {
                             msg: msg,
@@ -283,6 +284,7 @@ export default class NotificationBackground {
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
+        console.log('saveOrUpdateCredentials')
         for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
             const queueMessage = this.notificationQueue[i];
             if (queueMessage.tabId !== tab.id ||

@@ -384,6 +384,29 @@ export default Vue.extend({
         return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
       },
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
+    },
+    async locked () {
+      return await this.$vaultTimeoutService.isLocked()
+    }
+  },
+  watch: {
+    '$store.state.userPw' (newValue) {
+      if (newValue.is_pwd_manager === false) {
+        this.$router.push({ name: 'set-master-password' })
+      }
+    },
+    'locked' (newValue) {
+      if (newValue === true) {
+        this.$router.push({ name: 'lock' })
+        this.disconnectSocket()
+      }
+      if (newValue === false) {
+        this.$store.dispatch('LoadTeams')
+        this.getSyncData()
+        this.getInvitations()
+        this.reconnectSocket()
+        this.$store.dispatch('LoadCurrentPlan')
+      }
     }
   },
   methods: {

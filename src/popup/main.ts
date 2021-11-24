@@ -118,8 +118,8 @@ Vue.mixin({
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
       // this.$searchService.clearIndex()
-      // this.$router.push({ name: 'lock' })
-      this.$platformUtilsService.launchUri("/web.html#/lock");
+      this.$router.push({ name: 'lock' })
+      // this.$platformUtilsService.launchUri("/web.html#/lock");
     },
     randomString () {
       return nanoid()
@@ -168,7 +168,7 @@ Vue.mixin({
         }
         this.$messagingService.send('unlocked')
         // this.$router.push({ path: this.$store.state.currentPath === '/lock' ? '/vault' : this.$store.state.currentPath })
-        this.$router.push({ name: 'vault' })
+        this.$router.push({ name: 'home' })
       } catch (e) {
         console.log(e)
         this.notify('Xác thực thông tin thất bại', 'warning')
