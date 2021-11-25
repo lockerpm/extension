@@ -8,6 +8,7 @@ import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { StorageService } from 'jslib-common/abstractions/storage.service';
+import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
@@ -35,7 +36,7 @@ export default class NotificationBackground {
     constructor(private main: MainBackground, private autofillService: AutofillService,
         private cipherService: CipherService, private storageService: StorageService,
         private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-        private folderService: FolderService) {
+        private folderService: FolderService,  private userService: UserService) {
     }
 
     async init() {
@@ -52,7 +53,7 @@ export default class NotificationBackground {
 
     async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
         switch (msg.command) {
-            case 'unlockCompleted':
+          case 'unlockCompleted':
                 if (msg.data.target !== 'notification.background') {
                     return;
                 }
@@ -92,6 +93,7 @@ export default class NotificationBackground {
                     await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
                     return;
                 }
+                console.log('vault unlocked')
                 await this.saveOrUpdateCredentials(sender.tab, msg.folder);
                 break;
             case 'bgNeverSave':
@@ -182,7 +184,11 @@ export default class NotificationBackground {
         }
     }
 
-    private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
+  private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
+      if (!await this.userService.isAuthenticated()) {
+            console.log('unauthenticated')
+            return;
+        }
         const loginDomain = Utils.getDomain(loginInfo.url);
         if (loginDomain == null) {
             return;

@@ -52,7 +52,6 @@ export default class RuntimeBackground {
         let item: LockedVaultPendingNotificationsItem;
 
         if (this.lockedVaultPendingNotifications.length > 0) {
-          console.log('closeLoginTab')
           await BrowserApi.closeLoginTab();
 
           item = this.lockedVaultPendingNotifications.pop();
@@ -60,8 +59,7 @@ export default class RuntimeBackground {
             await BrowserApi.focusSpecifiedTab(item.commandToRetry.sender.tab.id);
           }
         }
-
-        await this.main.setIcon();
+        // await this.main.setIcon(); // error => prevent send message unlockCompleted
         await this.main.refreshBadgeAndMenu(false);
         this.notificationsService.updateConnection(msg.command === 'unlocked');
         this.systemService.cancelProcessReload();
