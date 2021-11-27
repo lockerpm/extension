@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="">
+    <div class="relative" style="padding-top: 44px">
       <div
-        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between"
+        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0"
+        style="z-index: 1"
       >
         <div class="menu-icon mr-4" @click="$router.back()">
           <i class="fas fa-chevron-left text-[20px]"></i> Back
@@ -524,9 +525,9 @@ export default Vue.extend({
           collectionIds: cipher.collectionIds,
           view_password: cipher.viewPassword
         })
-        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.type}`, 1) }), 'success')
+        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
       } catch (e) {
-        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.type}`, 1) }), 'warning')
+        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         // this.notify(e, 'warning')
       } finally {

@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="p-5 bg-[#F5F6F7]">
+    <div class="uppercase px-3 mt-4 mb-3">CREATE STRONG AND SECURED PASSWORDS</div>
+    <div class="p-5 bg-white">
       <div class="flex items-center justify-between mb-8">
         <div class="text-[20px] flex-grow truncate leading-[2rem]">
           {{ password }}
@@ -39,35 +40,35 @@
           />
           <el-checkbox
             v-model="options.uppercase"
-            class="mb-2"
+            class="mb-2 w-full"
             @change="regenerate"
           >
             {{ $t('data.tools.uppercase') }}
           </el-checkbox>
           <el-checkbox
             v-model="options.lowercase"
-            class="mb-2"
+            class="mb-2 w-full"
             @change="regenerate"
           >
             {{ $t('data.tools.lowercase') }}
           </el-checkbox>
           <el-checkbox
             v-model="options.number"
-            class="mb-2"
+            class="mb-2 w-full"
             @change="regenerate"
           >
             {{ $t('data.tools.digits') }}
           </el-checkbox>
           <el-checkbox
             v-model="options.special"
-            class="mb-2"
+            class="mb-2 w-full"
             @change="regenerate"
           >
             {{ $t('data.tools.symbols') }}
           </el-checkbox>
           <el-checkbox
             v-model="options.ambiguous"
-            class="mb-2"
+            class="mb-2 w-full"
             @change="regenerate"
           >
             {{ $t('data.tools.ambiguous') }}

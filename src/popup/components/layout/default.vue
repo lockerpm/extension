@@ -1,0 +1,151 @@
+<template>
+  <div
+    class="relative overflow-scroll"
+    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px"
+  >
+    <template>
+      <div
+        id="popup-header"
+        v-if="!locked"
+        class="fixed top-0 left-0 right-0 flex items-center bg-white cursor-pointer h-[44px] leading-[44px] px-3"
+        style="z-index:1"
+      >
+        <img
+          src="@/assets/images/logo/popup_logo.png"
+          alt="Locker"
+          class="h-[36px] mr-3"
+          @click="$router.push('/')"
+        >
+        <el-input
+          v-model="searchText"
+          placeholder="Search vault"
+          class="mr-5"
+        >
+          <i
+            slot="suffix"
+            class="el-icon-search el-input__icon text-20 font-weight-700 text-black"
+          >
+          </i>
+        </el-input>
+        <div
+          style="margin-left: 12px"
+          @click="$router.push({ name: 'add-item-create' })"
+        >
+          <i class="fas fa-plus-circle text-[20px]"></i>
+        </div>
+      </div>
+      <ul v-if="searchText.length>1">
+        <cipher-row v-for="item in ciphers" :key="item.id" :item="item">
+        </cipher-row>
+      </ul>
+      <router-view v-else-if="wrapperType === 'component'" />
+      <slot v-else-if="wrapperType === 'wrapper'"></slot>
+      <div
+        v-if="!locked"
+        id="popup-navigator"
+        class="h-auto grid grid-cols-4 bg-white fixed bottom-0 left-0 right-0"
+      >
+        <div
+          v-for="item in menu"
+          :key="item.routeName"
+          class="text-center menu-item"
+        >
+          <router-link :to="{name: item.routeName}">
+            <img
+              :src="require(`@/assets/images/icons/${item.icon}`)"
+              alt="Current"
+              class="h-5 mx-auto"
+            >
+            {{item.label}}
+          </router-link>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
+
+<script>
+import Vue from 'vue'
+import orderBy from "lodash/orderBy";
+import { CipherType } from 'jslib-common/enums/cipherType';
+import CipherRow from "@/popup/components/ciphers/CipherRow";
+export default Vue.extend({
+  components: {
+    CipherRow
+  },
+  props: {
+    wrapperType: {
+      type: String,
+      default: 'component'
+    }
+  },
+  data () {
+    return {
+      menu: [
+        {
+          label: 'Current',
+          routeName: 'home',
+          icon: 'popup_current.svg'
+        },
+        {
+          label: 'Vault',
+          routeName: 'vault',
+          icon: 'popup_vault.svg'
+        },
+        {
+          label: 'Generate',
+          routeName: 'generator',
+          icon: 'popup_generate.svg'
+        },
+        {
+          label: 'Settings',
+          routeName: 'settings',
+          icon: 'popup_settings.svg'
+        }
+      ],
+      locked: true,
+      loading: false,
+      lastActivity: null,
+      idleTimer: null,
+      isIdle: false,
+      searchText: '',
+      CipherType
+    }
+  },
+  asyncComputed: {
+    async locked () {
+      return await this.$vaultTimeoutService.isLocked()
+    },
+    ciphers: {
+      async get () {
+        const deletedFilter = c => {
+          return c.isDeleted === false
+        }
+        const result = await this.$searchService.searchCiphers(this.searchText, [null, deletedFilter], null) || []
+        this.noFolderCiphers = result.filter(c => c.folderId===null)
+        return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
+      },
+      watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText']
+    },
+  },
+  methods: {
+  }
+}
+)
+</script>
+<style>
+#popup-header input {
+  height: 32px;
+}
+#popup-navigator .router-link-exact-active.router-link-active {
+  color: #268334;
+}
+.menu-item {
+  @apply hover:bg-[#F1F1F1];
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+.menu-item a {
+  @apply hover:no-underline;
+}
+</style>

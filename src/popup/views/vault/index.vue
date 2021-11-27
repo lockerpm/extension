@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="">
+    <!-- <div class="">
       <div
         class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
       >
@@ -24,76 +24,14 @@
           <i class="fas fa-plus-circle text-[20px]"></i>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- {{ciphers.length}} -->
-    <ul v-if="searchText.length>1">
-      <li
-        v-for="item in ciphers" :key="item.id"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5 border-t border-black-400"
-      >
-        <div class="flex-grow">
-          <div class="text-black font-semibold truncate flex items-center">
-            {{ item.name }}
-          </div>
-          <div>
-            {{ item.subTitle }}
-          </div>
-        </div>
-        <div>
-          <div class="col-actions">
-            <button
-              v-if="item.login.canLaunch"
-              class="btn btn-icon btn-xs hover:bg-black-400"
-              :title="`Launch ${item.login.uri}`"
-              @click="openNewTab(item.login.uri)"
-              >
-                <i class="fas fa-external-link-square-alt" />
-            </button>
-            <el-dropdown trigger="click" :hide-on-click="false">
-              <button class="btn btn-icon btn-xs hover:bg-black-400">
-                <i class="fas fa-clone" />
-              </button>
-              <el-dropdown-menu slot="dropdown">
-                <div v-if="item.type === CipherType.Login">
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.username"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.username') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.password"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.password') }}
-                  </el-dropdown-item>
-                </div>
-                <div v-if="item.type === CipherType.SecureNote">
-                  <el-dropdown-item
-                    v-clipboard:copy="item.notes"
-                    v-clipboard:success="clipboardSuccessHandler"
-                    divided
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.note') }}
-                  </el-dropdown-item>
-                </div>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <button class="btn btn-icon btn-xs hover:bg-black-400"
-                    @click="addEdit(item)"
-            >
-              <i class="fas fa-pen" />
-            </button>
-          </div>
-        </div>
-      </li>
-    </ul>
-    <ul v-else class="">
-      <div class="uppercase px-3 border-t border-black-400">Types ({{menu.length}})</div>
+    <ul class="">
+      <div class="uppercase px-3 mt-4 mb-1">Types ({{menu.length}})</div>
       <li
         v-for="(item, index) in menu"
         :key="index"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
         @click="openRoute(item)"
       >
         <div class="menu-icon mr-4">
@@ -105,37 +43,46 @@
         <div class="flex-grow">
           {{  item.label  }} ({{ciphersCount[`${item.name}`]}})
         </div>
+        <div>
+            <i class="fas fa-chevron-right"></i>
+        </div>
       </li>
-      <div class="uppercase px-3 border-t border-black-400">Folders ({{folders.length}})</div>
+      <div class="uppercase px-3 mt-4 mb-1">Folders ({{folders.length}})</div>
       <li
         v-for="item in folders"
         :key="item.id"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
         @click="routerFolder(item)"
       >
         <div class="menu-icon mr-4">
           <i class="fas fa-folder text-[20px]"></i>
         </div>
         <div class="flex-grow">{{ item.name }} ({{ item.ciphersCount }})</div>
+        <div>
+            <i class="fas fa-chevron-right"></i>
+        </div>
       </li>
       <template
         v-for="(value, key) in filteredCollection"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5"
       >
-        <div class="uppercase px-3 border-t border-black-400" :key="key">{{ getTeam(teams, key).name }}</div>
+        <div class="uppercase px-3 mt-4 mb-1" :key="key">{{ getTeam(teams, key).name }}</div>
         <li
           v-for="item in value"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
           @click="routerCollection(item)"
         >
           <div class="menu-icon mr-4">
             <i class="fas fa-folder text-[20px]"></i>
           </div>
           <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }})</div>
+          <div>
+            <i class="fas fa-chevron-right"></i>
+        </div>
         </li>
       </template>
-      <div class="uppercase px-3 border-t border-black-400">No Folders ({{noFolderCiphers.length}})</div>
+      <div class="uppercase px-3 mt-4 mb-1">No Folders ({{noFolderCiphers.length}})</div>
       <cipher-row v-for="item in noFolderCiphers" :key="item.id" :item="item">
       </cipher-row>
 

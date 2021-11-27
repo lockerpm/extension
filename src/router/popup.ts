@@ -2,13 +2,20 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import storePromise from "../store/index";
 import Home from '../popup/views/home.vue'
+import Layout from '@/popup/components/layout/default.vue'
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "home",
-    component: Home
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: Home
+      }
+    ]
   },
   {
     path: "/set-master-password",
@@ -23,12 +30,26 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "vault" */ "../popup/views/lock.vue")
   },
+  // {
+  //   path: "/vault",
+  //   name: "vault",
+  //   beforeEnter: VaultGuard,
+  //   component: () =>
+  //     import(/* webpackChunkName: "vault" */ "../popup/views/vault/index.vue")
+  // },
   {
     path: "/vault",
-    name: "vault",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/vault/index.vue")
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'vault',
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/vault/index.vue")
+      }
+    ]
+    
   },
   {
     path: "/vault/passwords",
@@ -98,21 +119,49 @@ const routes: Array<RouteConfig> = [
         /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
       )
   },
+  // {
+  //   path: "/generator",
+  //   name: "generator",
+  //   beforeEnter: VaultGuard,
+  //   component: () =>
+  //     import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
+  // },
   {
     path: "/generator",
-    name: "generator",
+    component: Layout,
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
+    children: [
+      {
+        name: "generator",
+        path: '',
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
+      }
+    ]
   },
+  // {
+  //   path: "/settings",
+  //   name: "settings",
+  //   beforeEnter: VaultGuard,
+  //   component: () =>
+  //     import(
+  //       /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
+  //     )
+  // }
   {
     path: "/settings",
-    name: "settings",
+    component: Layout,
     beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
-      )
+    children: [
+      {
+        path: '',
+        name: "settings",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
+          )
+      }
+    ]
   }
 ];
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="">
+    <!-- <div class="">
       <div
         class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
         @click="$router.back()"
@@ -12,18 +12,17 @@
           Back
         </div>
       </div>
-    </div>
+    </div> -->
     <div
       v-for="(cate, index) in menu"
       :key="index"
-      :class="[cate.divided ? 'border-t border-black-400' : '']"
     >
-      <p class="uppercase px-3">{{cate.name}}</p>
+      <p class="uppercase px-3 mt-4 mb-1">{{cate.name}}</p>
       <ul class="">
         <li
           v-for="(item, index) in cate.items"
           :key="index"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
           :class="[item.divided ? 'border-t border-black-400' : '']"
           @click="openRoute(item)"
         >
@@ -177,6 +176,13 @@ export default Vue.extend({
               externalUrl: '/web.html#/settings/',
               action: 'sync_data',
               name: 'Sync data Now'
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: '',
+              logout: true,
+              name: 'Log Out'
             }
           ]
         },
@@ -224,6 +230,9 @@ export default Vue.extend({
       console.log(item.name)
       if (item.lock){
         this.lock()
+      }
+      else if(item.logout){
+        this.logout()
       }
       else if(item.action){
         switch (item.action){

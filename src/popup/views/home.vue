@@ -34,92 +34,24 @@
       </div>
     </div>
     <div v-else>
-      <div class="">
-        <div class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5">
-          <div class="menu-icon mr-4">
-            <i class="fas fa-search text-[20px]"></i>
-          </div>
-          <el-input
-            v-model="searchText"
-            placeholder="Search vault"
-            id="search"
-          >
-          </el-input>
-        </div>
-      </div>
-      <ul v-if="searchText.length>1">
-        <li
-          v-for="item in ciphers" :key="item.id"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5 border-t border-black-400"
-        >
-          <div class="flex-grow">
-            <div class="text-black font-semibold truncate flex items-center">
-              {{ item.name }}
-            </div>
-            <div>
-              {{ item.subTitle }}
-            </div>
-          </div>
-          <div>
-            <div class="col-actions">
-              <button
-                v-if="item.login.canLaunch"
-                class="btn btn-icon btn-xs hover:bg-black-400"
-                :title="`Launch ${item.login.uri}`"
-                @click="openNewTab(item.login.uri)"
-                >
-                  <i class="fas fa-external-link-square-alt" />
-              </button>
-              <el-dropdown trigger="click" :hide-on-click="false">
-                <button class="btn btn-icon btn-xs hover:bg-black-400">
-                  <i class="fas fa-clone" />
-                </button>
-                <el-dropdown-menu slot="dropdown">
-                  <div v-if="item.type === CipherType.Login">
-                    <el-dropdown-item
-                      v-clipboard:copy="item.login.username"
-                      v-clipboard:success="clipboardSuccessHandler"
-                    >
-                      {{ $t('common.copy') }} {{ $t('common.username') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      v-clipboard:copy="item.login.password"
-                      v-clipboard:success="clipboardSuccessHandler"
-                    >
-                      {{ $t('common.copy') }} {{ $t('common.password') }}
-                    </el-dropdown-item>
-                  </div>
-                  <div v-if="item.type === CipherType.SecureNote">
-                    <el-dropdown-item
-                      v-clipboard:copy="item.notes"
-                      v-clipboard:success="clipboardSuccessHandler"
-                      divided
-                    >
-                      {{ $t('common.copy') }} {{ $t('common.note') }}
-                    </el-dropdown-item>
-                  </div>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <button class="btn btn-icon btn-xs hover:bg-black-400"
-                      @click="addEdit(item)"
-              >
-                <i class="fas fa-pen" />
-              </button>
-            </div>
-          </div>
-        </li>
-      </ul>
-      <ul v-else class="">
+      <ul class="">
         <div
           v-if="loginCiphers.length"
-          class="uppercase px-3 border-t border-black-400"
-        >Logins ({{loginCiphers.length}})</div>
+          class="uppercase px-3 mt-4 mb-1"
+        >PASSWORDS FOR CURRENT WEBSITE ({{loginCiphers.length}})</div>
         <li
           v-for="item in loginCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click="fillCipher(item)"
         >
+          
+          <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
@@ -171,14 +103,20 @@
         </li>
         <div
           v-if="cardCiphers.length"
-          class="uppercase px-3 border-t border-black-400"
+          class="uppercase px-3 mt-4 mb-1"
         >Cards ({{cardCiphers.length}})</div>
         <li
           v-for="item in cardCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click="fillCipher(item)"
         >
+          <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
@@ -200,14 +138,20 @@
         </li>
         <div
           v-if="identityCiphers.length"
-          class="uppercase px-3 border-t border-black-400"
+          class="uppercase px-3 mt-4 mb-1"
         >Identities ({{identityCiphers.length}})</div>
         <li
           v-for="item in identityCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click="fillCipher(item)"
         >
+          <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
           <div class="flex-grow">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
@@ -227,86 +171,6 @@
             </div>
           </div>
         </li>
-        <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5 border-t border-black-400"
-          @click="openVault"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-home text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            Open my Vault
-          </div>
-        </li>
-        <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
-          @click="openRoute({routeName: 'vault'})"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-home text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            All items
-          </div>
-          <div>
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </li>
-        <!-- <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5 border-t border-black-400"
-          @click="openRoute({routeName: 'add_item'})"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-plus-circle text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            Add item
-          </div>
-          <div>
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </li> -->
-        <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
-          @click="openRoute({routeName: 'generator'})"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-home text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            Generate secure password
-          </div>
-          <div>
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </li>
-        <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5 border-t border-black-400"
-          @click="openRoute({routeName: 'settings'})"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-home text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            Settings
-          </div>
-          <div>
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </li>
-        <li
-          class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5"
-          @click="logout"
-        >
-          <div class="menu-icon mr-4">
-            <i class="fas fa-sign-out-alt text-[20px]"></i>
-          </div>
-          <div class="flex-grow">
-            Log Out
-          </div>
-          <div>
-          </div>
-        </li>
       </ul>
     </div>
   </div>
@@ -324,9 +188,13 @@ import { StorageService } from "jslib-common/abstractions/storage.service";
 import BrowserStorageService from "@/services/browserStorage.service";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
+import Vnodes from "@/components/Vnodes";
 const BroadcasterSubscriptionId = "CurrentTabComponent";
 export default Vue.extend({
   name: "Home",
+  components: {
+    Vnodes
+  },
   data() {
     return {
       CipherType,

@@ -16,6 +16,12 @@
         v-for="item in ciphers" :key="item.id"
         class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5 border-t border-black-400"
       >
+        <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
         <div class="flex-grow">
           <div class="text-black font-semibold truncate flex items-center">
             {{ item.name }}
@@ -90,7 +96,11 @@ import {CipherType} from "jslib-common/enums/cipherType";
 import { type } from '@/locales/en';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { defaults } from 'lodash';
+import Vnodes from "@/components/Vnodes";
 export default Vue.extend({
+  components: {
+    Vnodes
+  },
   props: {
     deleted: {
       type: Boolean,

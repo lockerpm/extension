@@ -2,8 +2,14 @@
   <div>
     <li
         v-if="item.id"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5 "
+        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
       >
+        <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
         <div class="flex-grow">
           <div class="text-black font-semibold truncate flex items-center">
             {{ item.name }}
@@ -14,13 +20,6 @@
         </div>
         <div>
           <div class="col-actions">
-            <!--            <button-->
-            <!--              v-if="item.login.canLaunch"-->
-            <!--              class="btn btn-icon btn-xs hover:bg-black-400"-->
-            <!--              @click="$platformUtilsService.launchUri(item.login.uri)"-->
-            <!--            >-->
-            <!--              <i class="fas fa-external-link-square-alt" />-->
-            <!--            </button>-->
             <button
               v-if="item.login.canLaunch"
               class="btn btn-icon btn-xs hover:bg-black-400"
@@ -74,8 +73,12 @@
 import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
 import { CipherView } from 'jslib-common/models/view/cipherView';
+import Vnodes from "@/components/Vnodes";
 export default Vue.extend(
   {
+    components: {
+      Vnodes
+    },
     props: {
       item:{
         type: CipherView,
