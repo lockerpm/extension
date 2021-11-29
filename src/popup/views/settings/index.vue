@@ -261,7 +261,9 @@ export default Vue.extend({
     async processMessage(msg: any, sender: any, sendResponse: any) {
       switch (msg.command) {
       case 'syncCompleted':
-        this.notify('Syncing complete', 'success')
+        if(this.$route.path === '/settings/' && msg.successfully){
+          this.notify('Syncing complete', 'success')
+        }
         break;
       default:
         break;

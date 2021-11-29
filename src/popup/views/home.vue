@@ -420,8 +420,8 @@ export default Vue.extend({
         //   this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         //   this.changeDetectorRef.detectChanges();
         // });
-        // this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
-        this.notify(e, 'warning')
+        this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
+        // this.notify(e, 'warning')
       }
     },
     async processMessage(msg: any, sender: any, sendResponse: any) {
