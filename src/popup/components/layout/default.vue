@@ -1,12 +1,12 @@
 <template>
   <div
     class="relative overflow-scroll"
-    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px"
+    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
   >
     <template>
       <div
         id="popup-header"
-        v-if="!locked"
+        v-if="!locked && isLoggedIn"
         class="fixed top-0 left-0 right-0 flex items-center bg-white cursor-pointer h-[44px] leading-[44px] px-3"
         style="z-index:1"
       >
@@ -41,21 +41,24 @@
       <router-view v-else-if="wrapperType === 'component'" />
       <slot v-else-if="wrapperType === 'wrapper'"></slot>
       <div
-        v-if="!locked"
+        v-if="!locked && isLoggedIn"
         id="popup-navigator"
         class="h-auto grid grid-cols-4 bg-white fixed bottom-0 left-0 right-0"
       >
         <div
           v-for="item in menu"
           :key="item.routeName"
-          class="text-center menu-item"
+          class="text-center text-[16px] menu-item"
         >
           <router-link :to="{name: item.routeName}">
-            <img
+            <!-- <img
               :src="require(`@/assets/images/icons/${item.icon}`)"
               alt="Current"
               class="h-5 mx-auto"
-            >
+            > -->
+            <div>
+              <i :class="`fas fa-${item.icon}`"></i>
+            </div>
             {{item.label}}
           </router-link>
         </div>
@@ -85,22 +88,26 @@ export default Vue.extend({
         {
           label: 'Current',
           routeName: 'home',
-          icon: 'popup_current.svg'
+          // icon: 'popup_current.svg',
+          icon: 'globe'
         },
         {
           label: 'Vault',
           routeName: 'vault',
-          icon: 'popup_vault.svg'
+          // icon: 'popup_vault.svg'
+          icon: 'folder'
         },
         {
           label: 'Generate',
           routeName: 'generator',
-          icon: 'popup_generate.svg'
+          // icon: 'popup_generate.svg'
+          icon: 'sync-alt'
         },
         {
           label: 'Settings',
           routeName: 'settings',
-          icon: 'popup_settings.svg'
+          // icon: 'popup_settings.svg'
+          icon: 'cog'
         }
       ],
       locked: true,

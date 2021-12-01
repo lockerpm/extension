@@ -26,12 +26,12 @@
           :class="[item.divided ? 'border-t border-black-400' : '']"
           @click="openRoute(item)"
         >
-          <div class="menu-icon mr-4">
+          <!-- <div class="menu-icon mr-4">
             <i
               class="fas text-[20px]"
               :class="[item.icon]"
             ></i>
-          </div>
+          </div> -->
           <div class="flex-grow">
             {{  item.name  }}
           </div>

@@ -36,9 +36,12 @@
     <div v-else>
       <ul class="">
         <div
-          v-if="loginCiphers.length"
           class="uppercase px-3 mt-4 mb-1"
         >PASSWORDS FOR CURRENT WEBSITE ({{loginCiphers.length}})</div>
+        <div v-if="!loginCiphers.length" class="bg-white text-center py-4">
+          <p class="mb-2">There is no saved passwords for this site.</p>
+          <router-link :to="{name: 'add-item-create'}" class="uppercase text-primary hover:no-underline">Add a password</router-link>
+        </div>
         <li
           v-for="item in loginCiphers"
           :key="item.id"
