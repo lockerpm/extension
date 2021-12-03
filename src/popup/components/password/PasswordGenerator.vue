@@ -25,6 +25,12 @@
       >
         {{ $t('data.tools.copy_password') }}
       </button>
+      <button
+        class="btn btn-primary-reserve w-full mt-2"
+        @click="savePassword"
+      >
+        Save with Locker
+      </button>
       <!-- <button class="btn btn-clean w-full" @click="toggle = !toggle">
         {{ $t('data.tools.show_options') }} <i class="fa fa-chevron-down" />
       </button> -->
@@ -80,7 +86,9 @@
 </template>
 
 <script>
+import { CipherView } from 'jslib-common/models/view/cipherView'
 import PasswordStrength from './PasswordStrength'
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 export default {
   components: { PasswordStrength },
   data () {
@@ -115,6 +123,45 @@ export default {
       }
       this.password = await this.$passwordGenerationService.generatePassword(this.options)
       this.$emit('generated', this.password)
+    },
+    async savePassword(){
+      let cipher = new CipherView()
+      cipher.login.password = this.password
+      cipher.type = 1
+      const now = new Date()
+      const dateString =
+        now.getFullYear() + '' + this.padNumber(now.getMonth() + 1, 2) + '' + this.padNumber(now.getDate(), 2) +
+        this.padNumber(now.getHours(), 2) + '' + this.padNumber(now.getMinutes(), 2) +
+        this.padNumber(now.getSeconds(), 2)
+      cipher.name = 'password_' + dateString
+      await this.postCipher(cipher)
+    },
+    padNumber (num, width, padCharacter = '0') {
+      const numString = num.toString()
+      return numString.length >= width
+        ? numString
+        : new Array(width - numString.length + 1).join(padCharacter) + numString
+    },
+    async postCipher (cipher) {
+      if (!cipher.name) { return }
+      try {
+        this.loading = true
+        this.errors = {}
+        const cipherEnc = await this.$cipherService.encrypt(cipher)
+        const data = new CipherRequest(cipherEnc)
+        await this.axios.post('cystack_platform/pm/ciphers/vaults', {
+          ...data,
+          score: this.passwordStrength.score
+        })
+        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'success')
+      } catch (e) {
+        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'warning')
+        this.errors = (e.response && e.response.data && e.response.data.details) || {}
+        // this.notify(e, 'warning')
+      } finally {
+        this.loading = false
+        // this.$router.back()
+      }
     }
   }
 }

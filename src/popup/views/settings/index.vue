@@ -22,8 +22,8 @@
         <li
           v-for="(item, index) in cate.items"
           :key="index"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
-          :class="[item.divided ? 'border-t border-black-400' : '']"
+          class="flex items-center hover:bg-black-400 bg-white cursor-pointer px-5 border-b border-black-400"
+          :class="[item.divided ? 'border-t border-black-400' : '', item.picker ? 'h-auto leading-[32px]': 'h-[44px] leading-[44px]']"
           @click="openRoute(item)"
         >
           <!-- <div class="menu-icon mr-4">
@@ -32,12 +32,54 @@
               :class="[item.icon]"
             ></i>
           </div> -->
-          <div class="flex-grow">
+          <template v-if="item.name==='Vault Timeout'">
+            <div class="w-full py-2">
+              <div>{{item.name}}</div>
+              <el-select
+              class="w-full"
+              v-model="user.timeout"
+              placeholder=""
+              :disabled="loading"
+              size="small"
+              @change="putUser"
+            >
+              <el-option
+                v-for="item in vaultTimeouts"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            </div>
+          </template>
+          <template v-else-if="item.name==='Vault Timeout Action'">
+            <div class="w-full py-2">
+              <div>{{item.name}}</div>
+              <el-select
+              class="w-full"
+              v-model="user.timeout_action"
+              placeholder=""
+              :disabled="loading"
+              @change="putUser"
+              size="small"
+            >
+              <el-option
+                v-for="item in vaultTimeoutActions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            </div>
+          </template>
+          <template v-else>
+            <div class="flex-grow">
             {{  item.name  }}
           </div>
           <div>
             <i class="fas fa-chevron-right"></i>
           </div>
+          </template>
         </li>
       </ul>
     </div>
@@ -69,6 +111,7 @@ export default Vue.extend({
     chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
       this.processMessage(msg, sender, response);
     });
+    this.getUser()
   },
   // asyncComputed: {
   //   fingerprint: {
@@ -84,6 +127,8 @@ export default Vue.extend({
   // },
   data () {
     return {
+      user: {},
+      loading: false,
       fingerprintDialog: false,
       menu: [
         {
@@ -124,14 +169,22 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               externalUrl: '/web.html#/settings',
-              name: 'Vault Timeout'
+              name: 'Vault Timeout',
+              picker: true
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings/import-export',
-              name: 'Two-step Login'
+              externalUrl: '/web.html#/settings',
+              name: 'Vault Timeout Action',
+              picker: true
             },
+            // {
+            //   icon: 'fa-home',
+            //   routeName: '',
+            //   externalUrl: '/web.html#/settings/import-export',
+            //   name: 'Two-step Login'
+            // },
             {
               icon: 'fa-home',
               routeName: '',
@@ -225,6 +278,25 @@ export default Vue.extend({
       ]
     }
   },
+  computed: {
+    vaultTimeouts () {
+      return [
+        { label: this.$t('data.timeouts.oneMinute'), value: 1 },
+        { label: this.$t('data.timeouts.fiveMinutes'), value: 5 },
+        { label: this.$t('data.timeouts.fifteenMinutes'), value: 15 },
+        { label: this.$t('data.timeouts.thirtyMinutes'), value: 30 },
+        { label: this.$t('data.timeouts.oneHour'), value: 60 },
+        { label: this.$t('data.timeouts.fourHours'), value: 240 },
+        { label: this.$t('data.timeouts.onRefresh'), value: -1 }
+      ]
+    },
+    vaultTimeoutActions () {
+      return [
+        { label: this.$t('common.lock'), value: 'lock' },
+        { label: this.$t('common.logout'), value: 'logOut' }
+      ]
+    },
+  },
   methods: {
     openRoute (item) {
       console.log(item.name)
@@ -271,6 +343,24 @@ export default Vue.extend({
     },
     openFingerprintDialog(){
       this.$refs.fingerprintDialog.openDialog()
+    },
+    async getUser () {
+      const user = await this.$store.dispatch('LoadCurrentUserPw')
+      this.user = { ...user }
+    },
+    async putUser () {
+      try {
+        this.loading = true
+        await this.axios.put('cystack_platform/pm/users/me', this.user)
+        this.$store.commit('UPDATE_USER_PW', this.user)
+        this.$vaultTimeoutService.setVaultTimeoutOptions(this.user.timeout, this.user.timeout_action)
+        this.notify(this.$t('data.notifications.update_settings_success'), 'success')
+      } catch (e) {
+        console.log(e)
+        this.notify(this.$t('data.notifications.update_settings_failed'), 'warning')
+      } finally {
+        this.loading = false
+      }
     }
   }
 })
