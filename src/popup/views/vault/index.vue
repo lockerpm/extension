@@ -134,7 +134,6 @@ export default Vue.extend({
         }
       ],
       folders: [],
-      searchText: '',
       CipherType,
       noFolderCiphers: []
     }

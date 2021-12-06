@@ -39,7 +39,14 @@ import { nanoid } from 'nanoid'
 
 Vue.mixin({
   data () {
-    return { folders: [] }
+    return {
+      folders: [],
+      strategies: [
+        { key: "google", name: "Google", color: "#4284f4" },
+        { key: "facebook", name: "Facebook", color: "#3c65c4" },
+        { key: "github", name: "GitHub", color: "#202326" }
+      ]
+    };
   },
   computed: {
     language () { return this.$store.state.user.language },

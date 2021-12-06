@@ -154,6 +154,21 @@ const routes: Array<RouteConfig> = [
         path: "import-export",
         name: 'settings-import-export',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/import-export.vue')
+      },
+      {
+        path: "emergency-access",
+        children: [
+          {
+            path: "",
+            name: "settings-emergency-access",
+            component: () => import(/* webpackChunkName: "settings" */ '../views/settings/emergency-access/index.vue')
+          },
+          {
+            path: "id",
+            name: "settings-emergency-access-id",
+            component: () => import(/* webpackChunkName: "settings" */ '../views/settings/emergency-access/_id.vue')
+          }
+        ]
       }
     ]
   },

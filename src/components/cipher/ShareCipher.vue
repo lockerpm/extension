@@ -42,13 +42,13 @@
           </el-checkbox>
         </el-checkbox-group>
       </div>
-      <div v-if="cipher.type===CipherType.Login">
+      <!-- <div v-if="cipher.type===CipherType.Login">
         <label class="font-semibold">{{ $t('data.ciphers.show_password') }}</label>
         <el-checkbox
           v-model="cipher.viewPassword"
         >
         </el-checkbox>
-      </div>
+      </div> -->
     </div>
     <div slot="footer" class="dialog-footer flex items-center text-left">
       <div class="flex-grow" />
@@ -86,7 +86,7 @@ export default Vue.extend({
       cipher: {
         collectionIds: [],
         organizationId: '',
-        viewPassword: true
+        // viewPassword: true
       },
       originCipher: {},
       loading: false,
@@ -130,7 +130,7 @@ export default Vue.extend({
             ...data,
             score: this.passwordStrength.score,
             collectionIds: cipher.collectionIds,
-            view_password: cipher.viewPassword
+            // view_password: cipher.viewPassword
           })
           this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
           this.closeDialog()

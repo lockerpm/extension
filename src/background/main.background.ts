@@ -701,10 +701,12 @@ export default class MainBackground {
         }
 
         const options = {
-            path: {
-                19: 'images/icon19' + suffix + '.png',
-                38: 'images/icon38' + suffix + '.png',
-            },
+          path: {
+            // 19: 'images/icon19' + suffix + '.png',
+            // 38: 'images/icon38' + suffix + '.png',
+            19: 'icons/19' + '.png',
+            38: 'icons/38' + '.png',
+          }
         };
 
         if (this.platformUtilsService.isFirefox()) {

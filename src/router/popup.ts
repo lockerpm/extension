@@ -30,6 +30,13 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "vault" */ "../popup/views/lock.vue")
   },
+  {
+    path: "/login",
+    name: "login",
+    // beforeEnter: VaultGuard,
+    component: () =>
+      import(/* webpackChunkName: "vault" */ "../popup/views/login.vue")
+  },
   // {
   //   path: "/vault",
   //   name: "vault",

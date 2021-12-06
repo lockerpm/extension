@@ -46,16 +46,17 @@
           v-for="item in loginCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click="fillCipher(item)"
+          @click.self="fillCipher(item)"
         >
           
           <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
+            @click="fillCipher(item)"
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow">
+          <div class="flex-grow" @click="fillCipher(item)">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -208,7 +209,6 @@ export default Vue.extend({
       url: "",
       pageDetails: [],
       hostname: "",
-      searchText: "",
       inSidebar: false,
       searchTypeSearch: false,
       loaded: false,
@@ -237,9 +237,9 @@ export default Vue.extend({
       }, 5000);
     }
 
-    window.setTimeout(() => {
-      document.getElementById('search').focus();
-    }, 100);
+    // window.setTimeout(() => {
+    //   document.getElementById('search').focus();
+    // }, 100);
   },
   destroyed() {
     window.clearTimeout(this.loadedTimeout)
@@ -256,8 +256,13 @@ export default Vue.extend({
       },
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
     },
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked()
+    // async locked () {
+    //   return await this.$vaultTimeoutService.isLocked()
+    // }
+    locked :{
+      async get() {
+        return await this.$vaultTimeoutService.isLocked()
+      }
     }
   },
   watch: {
@@ -267,6 +272,7 @@ export default Vue.extend({
       }
     },
     'locked' (newValue) {
+      console.log(newValue)
       if (newValue === true) {
         this.$router.push({ name: 'lock' })
         this.disconnectSocket()
@@ -274,24 +280,50 @@ export default Vue.extend({
       if (newValue === false) {
         this.$store.dispatch('LoadTeams')
         this.getSyncData()
-        this.getInvitations()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }
     }
   },
   methods: {
+    disconnectSocket () {
+      delete this.$options.sockets.onmessage
+      this.$disconnect()
+    },
+    async reconnectSocket () {
+      const token = await this.$storageService.get('cs_token')
+      this.$connect(this.sanitizeUrl(`${process.env.VUE_APP_WS_URL}/cystack_platform/pm/sync?token=${token}`), {
+        format: 'json',
+        reconnection: true,
+        reconnectionAttempts: 60,
+        reconnectionDelay: 3000
+      })
+      this.$options.sockets.onmessage = message => {
+        const data = JSON.parse(message.data)
+        switch (data.event) {
+        case 'sync':
+          this.getSyncData()
+          break
+        case 'members':
+          this.getInvitations()
+          break
+        default:
+          break
+        }
+      }
+    },
     openLogin() {
-      const url = `${
-        process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
+      // const url = `${
+      //   process.env.VUE_APP_ID_URL
+      // }/login?SERVICE_URL=${encodeURIComponent(
+      //   "/sso"
+      // )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
 
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
+      // this.$platformUtilsService.launchUri(url);
+      // BrowserApi.reloadOpenWindows();
+      // const thisWindow = window.open("", "_self");
+      // thisWindow.close();
+      this.$router.push({name: "login"})
     },
     openRegister() {
       const url = `${

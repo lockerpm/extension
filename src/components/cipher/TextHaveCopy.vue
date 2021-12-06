@@ -4,9 +4,9 @@
     <div class="col-span-4 font-semibold">
       <span v-if="text">{{ text | filterPassword(showPassword) }}</span>
     </div>
-    <div v-if="text" class="text-right">
+    <div v-if="text&&viewPassword===true" class="text-right">
       <button
-        v-if="shouldHide&&viewPassword===true"
+        v-if="shouldHide"
         class="btn btn-icon btn-xs btn-action"
         @click="showPassword = !showPassword"
       >

@@ -115,7 +115,6 @@ export default Vue.extend({
       lastActivity: null,
       idleTimer: null,
       isIdle: false,
-      searchText: '',
       CipherType
     }
   },

@@ -116,7 +116,7 @@
           <TextHaveCopy :label="$t('data.ciphers.card_number')" :text="cipher.card.number" />
           <TextHaveCopy :label="$t('data.ciphers.expiration_month')" :text="cipher.card.expMonth" />
           <TextHaveCopy :label="$t('data.ciphers.expiration_year')" :text="cipher.card.expYear" />
-          <TextHaveCopy :label="$t('data.ciphers.cvv')" :text="cipher.card.code" should-hide />
+          <TextHaveCopy :label="$t('data.ciphers.cvv')" :text="cipher.card.code" should-hide :view-password="cipher.viewPassword"/>
         </template>
         <template v-if="cipher.type === CipherType.Identity">
           <TextHaveCopy :label="$t('data.ciphers.title')" :text="cipher.identity.title" />
