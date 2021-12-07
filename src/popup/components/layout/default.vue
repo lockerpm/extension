@@ -115,7 +115,8 @@ export default Vue.extend({
       lastActivity: null,
       idleTimer: null,
       isIdle: false,
-      CipherType
+      CipherType,
+      searchText: ''
     }
   },
   asyncComputed: {

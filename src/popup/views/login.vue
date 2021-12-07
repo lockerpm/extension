@@ -166,9 +166,9 @@
           >
             <div
               v-if="errors.code === '1002'"
-              class="form-control-feedback"
+              class="text-danger-500"
             >
-              {{ $t('data.error_code.1002') }}
+              The authorization code is not valid.
             </div>
           </transition>
         </div>
@@ -352,10 +352,10 @@ export default Vue.extend({
         if (e.response) {
           this.loading = false
           this.error = e.response.data.message
-          // if (e.response.data.code === '1003') {
-          //   this.send_mail = true
-          //   Object.assign(this.userCopy, this.user)
-          // }
+          if (e.response.data.code === '1003') {
+            this.send_mail = true
+            Object.assign(this.userCopy, this.user)
+          }
         }
       }
     },
