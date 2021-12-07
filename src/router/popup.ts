@@ -191,7 +191,7 @@ async function VaultGuard(to, from, next) {
     }
   } else {
     console.log("Dieu huong Login");
-    next({ name: "home" });
+    next({ name: "login" });
   }
 }
 export default router

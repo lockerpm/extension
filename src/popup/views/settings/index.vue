@@ -1,18 +1,5 @@
 <template>
   <div>
-    <!-- <div class="">
-      <div
-        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-        @click="$router.back()"
-      >
-        <div class="menu-icon mr-4">
-          <i class="fas fa-chevron-left text-[20px]"></i>
-        </div>
-        <div class="flex-grow">
-          Back
-        </div>
-      </div>
-    </div> -->
     <div
       v-for="(cate, index) in menu"
       :key="index"
@@ -26,12 +13,6 @@
           :class="[item.divided ? 'border-t border-black-400' : '', item.picker ? 'h-auto leading-[32px]': 'h-[44px] leading-[44px]']"
           @click="openRoute(item)"
         >
-          <!-- <div class="menu-icon mr-4">
-            <i
-              class="fas text-[20px]"
-              :class="[item.icon]"
-            ></i>
-          </div> -->
           <template v-if="item.name==='Vault Timeout'">
             <div class="w-full py-2">
               <div>{{item.name}}</div>
@@ -83,18 +64,6 @@
         </li>
       </ul>
     </div>
-    <!-- <el-dialog
-      title="Your acccount's fingerprint phrase"
-      :visible.sync="fingerprintDialog"
-      width="80%"
-      center
-    >
-      <span>{{fingerprint}}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="fingerprintDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="fingerprintDialog = false">Confirm</el-button>
-      </span>
-    </el-dialog> -->
     <Fingerprint ref="fingerprintDialog"/>
   </div>
 </template>
@@ -113,18 +82,6 @@ export default Vue.extend({
     });
     this.getUser()
   },
-  // asyncComputed: {
-  //   fingerprint: {
-  //     async get () {
-  //       const fingerprint = await this.$cryptoService.getFingerprint(await this.$userService.getUserId())
-  //       if (fingerprint != null) {
-  //         return fingerprint.join('-')
-  //       }
-  //       return ''
-  //     },
-  //     watch: ['$store.state.syncedCiphersToggle']
-  //   }
-  // },
   data () {
     return {
       user: {},
@@ -333,6 +290,7 @@ export default Vue.extend({
     async processMessage(msg: any, sender: any, sendResponse: any) {
       switch (msg.command) {
       case 'syncCompleted':
+        console.log('sync complete')
         if(this.$route.path === '/settings/' && msg.successfully){
           this.notify('Syncing complete', 'success')
         }

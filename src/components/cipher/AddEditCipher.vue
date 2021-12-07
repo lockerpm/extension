@@ -358,12 +358,12 @@ import { CipherType } from "jslib-common/enums/cipherType";
 import { SecureNoteType } from "jslib-common/enums/secureNoteType";
 import { Cipher } from 'jslib-common/models/domain/cipher'
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
-import { CipherView } from "@bitwarden/jslib-common/src/models/view/cipherView";
-import { SecureNoteView } from "@bitwarden/jslib-common/src/models/view/secureNoteView";
-import { IdentityView } from "@bitwarden/jslib-common/src/models/view/identityView";
-import { CardView } from "@bitwarden/jslib-common/src/models/view/cardView";
-import { LoginUriView } from "@bitwarden/jslib-common/src/models/view/loginUriView";
-import { LoginView } from "@bitwarden/jslib-common/src/models/view/loginView";
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { SecureNoteView } from "jslib-common/models/view/secureNoteView";
+import { IdentityView } from "jslib-common/models/view/identityView";
+import { CardView } from "jslib-common/models/view/cardView";
+import { LoginUriView } from "jslib-common/models/view/loginUriView";
+import { LoginView } from "jslib-common/models/view/loginView";
 import AddEditFolder from '@/components/folder/AddEditFolder'
 import PasswordGenerator from '@/components/password/PasswordGenerator'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'

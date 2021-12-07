@@ -10,6 +10,8 @@ import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
 import moment from "moment";
 import VueMomentJS from "vue-momentjs";
+import VueNativeSock from "vue-native-websocket";
+
 
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
@@ -26,6 +28,9 @@ Vue.use(AsyncComputed)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
+Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
+  connectManually: true
+});
 
 if (process.env.NODE_ENV==='development') {
   require('@/assets/buildtw.css')
@@ -389,7 +394,9 @@ storePromise.then((store) => {
         if (error.response.status === 401) {
           browserStorageService.remove('cs_token')
           store.commit('UPDATE_IS_LOGGEDIN', false)
-          router.push({name: 'home'})
+          if (router.currentRoute.name !== 'login') {
+            router.push({ name: "login" });  
+          }
         }
       }
       return Promise.reject(error)

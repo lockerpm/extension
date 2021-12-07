@@ -236,7 +236,6 @@ export default Vue.extend({
         }
       }, 5000);
     }
-
     // window.setTimeout(() => {
     //   document.getElementById('search').focus();
     // }, 100);
@@ -272,7 +271,7 @@ export default Vue.extend({
       }
     },
     'locked' (newValue) {
-      console.log(newValue)
+      console.log('locked: ', newValue)
       if (newValue === true) {
         this.$router.push({ name: 'lock' })
         this.disconnectSocket()

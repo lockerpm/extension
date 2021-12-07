@@ -197,7 +197,7 @@
       >
         <div
           v-if="error!=null"
-          class="alert alert-danger m--margin-top-10"
+          class="text-danger-500"
           role="alert"
         >
           {{ error }}
@@ -247,7 +247,7 @@
             class="btn btn-primary w-full"
             type="button"
             :disabled="loading"
-            @click="login"
+            @click.prevent="login"
           >
             Login
           </button>
@@ -303,8 +303,13 @@ export default Vue.extend({
     }
   },
   methods: {
+    reset_state () {
+      this.error = null
+      this.send_mail = false
+    },
     async login () {
-      this.loading = true
+      if (this.loading) { return }
+      this.reset_state()
       try {
         const res = await this.axios.post('/sso/auth', {
           ...this.user
