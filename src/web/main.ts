@@ -412,7 +412,7 @@ storePromise.then((store) => {
         if (error.response.status === 401) {
           browserStorageService.remove('cs_token')
           store.commit('UPDATE_IS_LOGGEDIN', false)
-          router.push({name: 'login'})
+          router.push({name: 'home'})
         }
       }
       return Promise.reject(error)

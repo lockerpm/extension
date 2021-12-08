@@ -162,7 +162,7 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true,
           })
-          BrowserApi.createNewTab('web.html#/vault');
+          BrowserApi.createNewTab('web.html#/vault?source=id.cystack.net');
         }
         catch (e) {
           console.log(e)

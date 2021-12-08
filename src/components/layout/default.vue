@@ -227,6 +227,11 @@ export default Vue.extend({
       }
     }
   },
+  created () {
+    if(this.$route.query.source === 'id.cystack.net'){
+      this.notify('Locker has been logged in. Now you can use Locker extension by click icon from toolbar', 'success')
+    }
+  },
   mounted () {
     this.$broadcasterService.subscribe(BroadcasterSubscriptionId, async message => {
       switch (message.command) {
