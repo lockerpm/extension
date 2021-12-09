@@ -11,6 +11,11 @@
         </div>
       </div>
     </div>
+    <NoCipher
+      v-if="shouldRenderNoCipher"
+      :type="type"
+      @add-cipher="handleAddButton"
+    />
     <ul class="overflow-x-auto max-h-[500px]">
       <li
         v-for="item in ciphers" :key="item.id"
@@ -97,9 +102,11 @@ import { type } from '@/locales/en';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { defaults } from 'lodash';
 import Vnodes from "@/components/Vnodes";
+import NoCipher from "@/components/cipher/NoCipher";
 export default Vue.extend({
   components: {
-    Vnodes
+    Vnodes,
+    NoCipher
   },
   props: {
     deleted: {
@@ -121,23 +128,47 @@ export default Vue.extend({
     }
   },
   computed: {
-    type() {
-      if(this.ciphers.length){
-        const type = this.ciphers[0].type
-        switch(type){
-        case CipherType.Login:
-          return 'Login'
-        case CipherType.SecureNote:
-          return 'SecureNote'
-        case CipherType.Card:
-          return 'Card';
-        case CipherType.Identity:
-          return 'Identity' 
-        default:
-          return 'Login'
-        }
+    // type() {
+    //   if(this.ciphers.length){
+    //     const type = this.ciphers[0].type
+    //     switch(type){
+    //     case CipherType.Login:
+    //       return 'Login'
+    //     case CipherType.SecureNote:
+    //       return 'SecureNote'
+    //     case CipherType.Card:
+    //       return 'Card';
+    //     case CipherType.Identity:
+    //       return 'Identity' 
+    //     default:
+    //       return 'Login'
+    //     }
+    //   }
+    //   return 'Login'
+    // },
+    type () {
+      switch (this.routeName) {
+      case 'passwords':
+        return 'Login'
+      case 'notes':
+        return 'SecureNote'
+      case 'cards':
+        return 'Card'
+      case 'identities':
+        return 'Identity'
+      case 'vault':
+        return 'Vault'
+      case 'shares':
+        return 'Shares'
+      case 'trash':
+        return 'Trash'
+      default:
+        return null
       }
-      return 'Login'
+    },
+    shouldRenderNoCipher () {
+      const filteredCiphers = this.ciphers || []
+      return !filteredCiphers.length
     }
   },
   asyncComputed: {
@@ -221,6 +252,9 @@ export default Vue.extend({
   methods: {
     addEdit (item) {
       this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+    },
+    handleAddButton(){
+      this.$router.push({name: 'add-item-create', params: {type: this.type}})
     }
   }
 })

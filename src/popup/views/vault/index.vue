@@ -34,7 +34,7 @@
         class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
         @click="openRoute(item)"
       >
-        <div class="menu-icon mr-4">
+        <div class="menu-icon mr-4" style="padding-top: 4px">
           <i
             class="fas text-[20px]"
             :class="[item.icon]"
@@ -56,7 +56,8 @@
           @click="routerFolder(item)"
         >
           <div class="menu-icon mr-4">
-            <i class="fas fa-folder text-[20px]"></i>
+            <!-- <i class="fas fa-folder text-[20px]"></i> -->
+            <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
           <div class="flex-grow">{{ item.name }} ({{ item.ciphersCount }})</div>
           <div>
@@ -79,7 +80,8 @@
           @click="routerCollection(item)"
         >
           <div class="menu-icon mr-4">
-            <i class="fas fa-folder text-[20px]"></i>
+            <!-- <i class="fas fa-folder text-[20px]"></i> -->
+            <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
           <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }})</div>
           <div>
@@ -114,28 +116,28 @@ export default Vue.extend({
     return {
       menu: [
         {
-          icon: 'fa-home',
+          icon: 'fa-key',
           routeName: 'vault-passwords',
           label: 'Passwords',
           divided: false,
           name: 'passwords'
         },
         {
-          icon: 'fa-home',
+          icon: 'fa-sticky-note',
           routeName: 'vault-notes',
           label: 'Notes',
           divided: false,
           name: 'notes'
         },
         {
-          icon: 'fa-home',
+          icon: 'fa-credit-card',
           routeName: 'vault-cards',
           label: 'Cards',
           divided: false,
           name: 'cards'
         },
         {
-          icon: 'fa-home',
+          icon: 'fa-id-card',
           routeName: 'vault-identities',
           label: 'Identities',
           divided: false,

@@ -125,16 +125,17 @@ export default {
       this.$emit('generated', this.password)
     },
     async savePassword(){
-      let cipher = new CipherView()
-      cipher.login.password = this.password
-      cipher.type = 1
-      const now = new Date()
-      const dateString =
-        now.getFullYear() + '' + this.padNumber(now.getMonth() + 1, 2) + '' + this.padNumber(now.getDate(), 2) +
-        this.padNumber(now.getHours(), 2) + '' + this.padNumber(now.getMinutes(), 2) +
-        this.padNumber(now.getSeconds(), 2)
-      cipher.name = 'password_' + dateString
-      await this.postCipher(cipher)
+      // let cipher = new CipherView()
+      // cipher.login.password = this.password
+      // cipher.type = 1
+      // const now = new Date()
+      // const dateString =
+      //   now.getFullYear() + '' + this.padNumber(now.getMonth() + 1, 2) + '' + this.padNumber(now.getDate(), 2) +
+      //   this.padNumber(now.getHours(), 2) + '' + this.padNumber(now.getMinutes(), 2) +
+      //   this.padNumber(now.getSeconds(), 2)
+      // cipher.name = 'password_' + dateString
+      // await this.postCipher(cipher)
+      this.$router.push({name: 'add-item-create', params: {password: this.password, type: 'Login'}})
     },
     padNumber (num, width, padCharacter = '0') {
       const numString = num.toString()

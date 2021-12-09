@@ -86,7 +86,7 @@
               trigger="click"
               popper-class="locker-pw-generator"
             >
-              <PasswordGenerator @generated="(p) => cipher.login.password = p" />
+              <PasswordGenerator @generated="setPassword" />
 
               <button
                 slot="reference"
@@ -395,6 +395,7 @@ import InputText from '@/components/input/InputText'
 import InputSelect from '@/components/input/InputSelect'
 import InputSelectFolder from '@/components/input/InputSelectFolder'
 import InputSelectOrg from '@/components/input/InputSelectOrg'
+import { BrowserApi } from "@/browser/browserApi";
 export default Vue.extend({
   components: {
     PasswordGenerator,
@@ -418,6 +419,10 @@ export default Vue.extend({
     data: {
       type: CipherView,
       default: new CipherView()
+    },
+    password: {
+      type: String,
+      default: null
     }
   },
   data () {
@@ -444,6 +449,11 @@ export default Vue.extend({
     } else {
       this.newCipher('Login', this.data)
     }
+    if(this.password){
+      this.cipher.login.password = this.password
+    }
+    this.cipher.name = (await BrowserApi.getTabFromCurrentWindow()).url;
+    this.cipher.login.uris[0].uri = this.cipher.name
   },
   computed: {
     typeOptions () {
@@ -650,6 +660,11 @@ export default Vue.extend({
     async getWritableCollections (orgId) {
       const allCollections = await this.$collectionService.getAllDecrypted()
       return allCollections.filter(c => !c.readOnly && c.organizationId === orgId)
+    },
+    setPassword(p){
+      if(!this.cipher.login.password){
+        this.cipher.login.password = p
+      }
     }
   }
 }

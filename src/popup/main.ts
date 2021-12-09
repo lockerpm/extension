@@ -372,8 +372,12 @@ storePromise.then((store) => {
   axios.interceptors.request.use(
     async (config) => {
       const token = await browserStorageService.get('cs_token')
+      const deviceId = await browserStorageService.get('device-id')
       if (token) {
         config.headers['Authorization'] = `Bearer ${ token }`
+      }
+      if (deviceId) {
+        config.headers['device-id'] = deviceId
       }
       config.baseURL = process.env.VUE_APP_BASE_API_URL
       return config
@@ -384,6 +388,10 @@ storePromise.then((store) => {
   )
   axios.interceptors.response.use(
     (response) => {
+      if (response.headers['device-id']) {
+        console.log(response.headers['device-id'])
+        browserStorageService.save("device-id", response.headers["device-id"]);
+      }
       return response && response.data
     },
     (error) => {

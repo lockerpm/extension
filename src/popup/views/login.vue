@@ -1,5 +1,8 @@
 <template>
   <div class="flex flex-grow flex-col items-center">
+    <div class="mt-[3rem]">
+        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
+      </div>
     <div class="md:w-[410px] md:mx-0 mx-5 py-[2.8125rem] px-6 text-center">
       <div
         v-if="!factor2"
@@ -65,7 +68,7 @@
         </div>
       </div>
       <div v-if="factor2 && step === 1" class="text-left">
-        <h3 class="text-[20px]">
+        <h3 class="text-[20px] py-6">
           <a
             class=""
             @click="factor2=false"
@@ -136,7 +139,7 @@
         </div>
       </div>
       <div v-if="factor2 && (step === 2 || step === 3)" class="text-left">
-        <h3 class="text-[20px]">
+        <h3 class="text-[20px] py-6">
           <a
             class=""
             @click="step = 1"
@@ -157,7 +160,7 @@
           <input
             ref="otp"
             v-model="otp"
-            class="form-control m-input mt-2"
+            class="form-control m-input mt-4"
             :name="randomString()"
           >
           <transition
@@ -173,18 +176,19 @@
           </transition>
         </div>
         <div class="m-login__form-action mt-2">
-          <!-- <div class="row m-login__form-sub">
+          <div class="row m-login__form-sub mb-3">
             <div class="col m--align-left m-login__form-left pl-0">
               <el-checkbox v-model="save_device">
                 Remember this device
               </el-checkbox>
             </div>
-          </div> -->
+          </div>
           <button
-            :class="[loadingOtp?'m-loader m-loader--light m-loader--left m-loader--md':'','btn btn-primary m-btn btn-block m-login__btn-cs text-uppercase']"
+            class="btn btn-primary uppercase w-full"
             type="button"
             :disabled="loadingOtp || !otp"
             @click="postOtp"
+            :loading="loadingOtp"
           >
             Authenticate
           </button>
@@ -389,7 +393,6 @@ export default Vue.extend({
           save_device: this.save_device
         })
         try {
-          console.log('test')
           await this.$storageService.save('cs_token', res.token)
           const store = await this.$storageService.get('cs_store')
           let oldStoreParsed = {}
@@ -412,7 +415,7 @@ export default Vue.extend({
           this.notify(e, 'warning')
         }
         this.axios.post('/sso/me/last_active')
-        this.$router.replace({ name: 'lock' })
+        this.$router.push({ name: 'lock' })
       } catch (e) {
         this.loadingOtp = false
         if (e.response) {

@@ -1,5 +1,5 @@
 <template>
-  <ListCipher :filter="c => c.type === CipherType['SecureNote']" />
+  <ListCipher :filter="c => c.type === CipherType['SecureNote']" route-name="notes" />
 </template>
 
 <script>
