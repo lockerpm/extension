@@ -41,7 +41,7 @@
           ></i>
         </div>
         <div class="flex-grow">
-          {{  item.label  }} ({{ciphersCount[`${item.name}`]}})
+          {{  item.label  }} ({{ciphersCount[`${item.name}`]}} {{ ciphersCount[`${item.name}`] > 1 ? 'items':'item'}})
         </div>
         <div>
           <i class="fas fa-chevron-right"></i>
@@ -59,7 +59,7 @@
             <!-- <i class="fas fa-folder text-[20px]"></i> -->
             <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
-          <div class="flex-grow">{{ item.name }} ({{ item.ciphersCount }})</div>
+          <div class="flex-grow">{{ item.name }} ({{ item.ciphersCount }} {{item.ciphersCount>1?'items':'item'}})</div>
           <div>
             <i class="fas fa-chevron-right"></i>
           </div>
@@ -83,7 +83,7 @@
             <!-- <i class="fas fa-folder text-[20px]"></i> -->
             <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
-          <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }})</div>
+          <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }} {{item.ciphersCount > 1? 'items':'item'}})</div>
           <div>
             <i class="fas fa-chevron-right"></i>
           </div>
@@ -117,28 +117,28 @@ export default Vue.extend({
       menu: [
         {
           icon: 'fa-key',
-          routeName: 'vault-passwords',
+          routeName: 'passwords',
           label: 'Passwords',
           divided: false,
           name: 'passwords'
         },
         {
           icon: 'fa-sticky-note',
-          routeName: 'vault-notes',
+          routeName: 'notes',
           label: 'Notes',
           divided: false,
           name: 'notes'
         },
         {
           icon: 'fa-credit-card',
-          routeName: 'vault-cards',
+          routeName: 'cards',
           label: 'Cards',
           divided: false,
           name: 'cards'
         },
         {
           icon: 'fa-id-card',
-          routeName: 'vault-identities',
+          routeName: 'identities',
           label: 'Identities',
           divided: false,
           name: 'identities'
@@ -227,7 +227,6 @@ export default Vue.extend({
       })
     },
     routerCollection (item) {
-      console.log('dd')
       if (item.id === 'unassigned') {
         this.$router.push({
           name: 'vault-teams-teamId-tfolders-tfolderId',

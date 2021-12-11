@@ -11,8 +11,8 @@ const routes: Array<RouteConfig> = [
     component: Layout,
     children: [
       {
-        path: '',
-        name: 'home',
+        path: "",
+        name: "home",
         component: Home
       }
     ]
@@ -21,7 +21,9 @@ const routes: Array<RouteConfig> = [
     path: "/set-master-password",
     name: "set-master-password",
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/set-master-password.vue")
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/set-master-password.vue"
+      )
   },
   {
     path: "/lock",
@@ -37,61 +39,92 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "vault" */ "../popup/views/login.vue")
   },
-  // {
-  //   path: "/vault",
-  //   name: "vault",
-  //   beforeEnter: VaultGuard,
-  //   component: () =>
-  //     import(/* webpackChunkName: "vault" */ "../popup/views/vault/index.vue")
-  // },
   {
     path: "/vault",
     beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
-        path: '',
-        name: 'vault',
+        path: "",
+        name: "vault",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/vault/index.vue")
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/vault/index.vue"
+          )
       }
     ]
-    
   },
   {
-    path: "/vault/passwords",
-    name: "vault-passwords",
+    path: "/vault/:id",
+    name: "vault-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(/* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue")
+  },
+  {
+    path: "/passwords/:id",
+    name: "passwords-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(/* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue")
+  },
+  {
+    path: "/passwords",
+    name: "passwords",
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/passwords.vue"
+        /* webpackChunkName: "vault" */ "../popup/views/passwords/index.vue"
       )
   },
   {
-    path: "/vault/notes",
-    name: "vault-notes",
+    path: "/notes",
+    name: "notes",
     beforeEnter: VaultGuard,
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/vault/notes.vue")
+      import(/* webpackChunkName: "vault" */ "../popup/views/notes/index.vue")
   },
   {
-    path: "/vault/cards",
-    name: "vault-cards",
+    path: "/notes/:id",
+    name: "notes-id",
     beforeEnter: VaultGuard,
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/vault/cards.vue")
+      import(/* webpackChunkName: "vault" */ "../popup/views/notes/_id.vue")
   },
   {
-    path: "/vault/identities",
-    name: "vault-identities",
+    path: "/cards",
+    name: "cards",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(/* webpackChunkName: "vault" */ "../popup/views/cards/index.vue")
+  },
+  {
+    path: "/cards/:id",
+    name: "cards-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(/* webpackChunkName: "vault" */ "../popup/views/cards/_id.vue")
+  },
+  {
+    path: "/identities",
+    name: "identities",
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/identities.vue"
+        /* webpackChunkName: "vault" */ "../popup/views/identities/index.vue"
       )
   },
   {
-    path: "vault/folders/:folderId",
+    path: "/identities/:id",
+    name: "identities-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/identities/_id.vue"
+      )
+  },
+  {
+    path: "/vault/folders/:folderId",
     name: "vault-folders-folderId",
     beforeEnter: VaultGuard,
     component: () =>
@@ -100,12 +133,30 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
-    path: "vault/teams/:teamId?/tfolders/:tfolderId",
+    path: "/vault/folders/:folderId/:id",
+    name: "vault-folders-folderId-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/vault/folders/_folderId/_id.vue"
+      )
+  },
+  {
+    path: "/vault/teams/:teamId?/tfolders/:tfolderId",
     name: "vault-teams-teamId-tfolders-tfolderId",
     beforeEnter: VaultGuard,
     component: () =>
       import(
         /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
+      )
+  },
+  {
+    path: "/vault/teams/:teamId?/tfolders/:tfolderId/:id",
+    name: "vault-teams-teamId-tfolders-tfolderId-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
       )
   },
   {
@@ -126,13 +177,6 @@ const routes: Array<RouteConfig> = [
         /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
       )
   },
-  // {
-  //   path: "/generator",
-  //   name: "generator",
-  //   beforeEnter: VaultGuard,
-  //   component: () =>
-  //     import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
-  // },
   {
     path: "/generator",
     component: Layout,
@@ -140,7 +184,7 @@ const routes: Array<RouteConfig> = [
     children: [
       {
         name: "generator",
-        path: '',
+        path: "",
         component: () =>
           import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
       }
@@ -161,7 +205,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     children: [
       {
-        path: '',
+        path: "",
         name: "settings",
         component: () =>
           import(

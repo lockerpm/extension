@@ -1,33 +1,46 @@
 <template>
-  <div>
-    <div class="">
-      <div class="flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
+  <div
+    class="relative"
+    style="background: #F1F1F1; padding-top: 44px; min-height: 600px; max-width: 400px"
+  >
+
+    <div class="fixed top-0 left-0 right-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
+        style="z-index:1"
+    >
+      <div
+        class="menu-icon mr-4"
+        @click="$router.back()"
       >
-        <div class="menu-icon mr-4" @click="$router.back()">
-          <i class="fas fa-chevron-left text-[20px]"></i> Back
-        </div>
-        <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
-          <i class="fas fa-plus-circle text-[20px]"></i>
-        </div>
+        <i class="fas fa-chevron-left text-[20px]"></i> Back
+      </div>
+      <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
+        <i class="fas fa-plus-circle text-[20px]"></i>
       </div>
     </div>
+
     <NoCipher
       v-if="shouldRenderNoCipher"
       :type="type"
       @add-cipher="handleAddButton"
     />
-    <ul class="overflow-x-auto max-h-[500px]">
+    <ul class="overflow-x-auto max-h-[600px]">
       <li
-        v-for="item in ciphers" :key="item.id"
+        v-for="item in ciphers"
+        :key="item.id"
         class="flex items-center hover:bg-black-400 cursor-pointer h-[62px] px-5 border-t border-black-400"
+        @click.self="routerCipher(item, addEdit)"
       >
         <div
-            class="text-[34px] mr-3 flex-shrink-0"
-            :class="{'filter grayscale': item.isDeleted}"
-          >
-            <Vnodes :vnodes="getIconCipher(item, 34)" />
-          </div>
-        <div class="flex-grow">
+          class="text-[34px] mr-3 flex-shrink-0"
+          :class="{'filter grayscale': item.isDeleted}"
+          @click="routerCipher(item, addEdit)"
+        >
+          <Vnodes :vnodes="getIconCipher(item, 34)" />
+        </div>
+        <div
+          class="flex-grow"
+          @click="routerCipher(item, addEdit)"
+        >
           <div class="text-black font-semibold truncate flex items-center">
             {{ item.name }}
           </div>
@@ -37,22 +50,19 @@
         </div>
         <div>
           <div class="col-actions">
-            <!--            <button-->
-            <!--              v-if="item.login.canLaunch"-->
-            <!--              class="btn btn-icon btn-xs hover:bg-black-400"-->
-            <!--              @click="$platformUtilsService.launchUri(item.login.uri)"-->
-            <!--            >-->
-            <!--              <i class="fas fa-external-link-square-alt" />-->
-            <!--            </button>-->
             <button
               v-if="item.login.canLaunch"
               class="btn btn-icon btn-xs hover:bg-black-400"
               :title="`Launch ${item.login.uri}`"
               @click="openNewTab(item.login.uri)"
-              >
-                <i class="fas fa-external-link-square-alt" />
+            >
+              <i class="fas fa-external-link-square-alt" />
             </button>
-            <el-dropdown v-if="!item.isDeleted" trigger="click" :hide-on-click="false">
+            <el-dropdown
+              v-if="!item.isDeleted"
+              trigger="click"
+              :hide-on-click="false"
+            >
               <button class="btn btn-icon btn-xs hover:bg-black-400">
                 <i class="fas fa-clone" />
               </button>
@@ -82,8 +92,9 @@
                 </template>
               </el-dropdown-menu>
             </el-dropdown>
-            <button class="btn btn-icon btn-xs hover:bg-black-400"
-                    @click="addEdit(item)"
+            <button
+              class="btn btn-icon btn-xs hover:bg-black-400"
+              @click="addEdit(item)"
             >
               <i class="fas fa-pen" />
             </button>
@@ -97,7 +108,7 @@
 <script>
 import Vue from 'vue'
 import orderBy from "lodash/orderBy";
-import {CipherType} from "jslib-common/enums/cipherType";
+import { CipherType } from "jslib-common/enums/cipherType";
 import { type } from '@/locales/en';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { defaults } from 'lodash';
@@ -250,11 +261,15 @@ export default Vue.extend({
     // this.$store.commit('UPDATE_SYNCED_CIPHERS')
   },
   methods: {
+    // addEdit (item) {
+    //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+    // },
     addEdit (item) {
-      this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+      this.$router.push({ name: 'add-item-create', params: { data: item } })
     },
-    handleAddButton(){
-      this.$router.push({name: 'add-item-create', params: {type: this.type}})
+    handleAddButton () {
+      this.$router.push({ name: 'add-item-create', params: { type: this.type } })
     }
   }
 })

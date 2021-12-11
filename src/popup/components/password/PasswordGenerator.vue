@@ -135,7 +135,7 @@ export default {
       //   this.padNumber(now.getSeconds(), 2)
       // cipher.name = 'password_' + dateString
       // await this.postCipher(cipher)
-      this.$router.push({name: 'add-item-create', params: {password: this.password, type: 'Login'}})
+      this.$router.push({name: 'add-item-create', params: {password: this.password}})
     },
     padNumber (num, width, padCharacter = '0') {
       const numString = num.toString()

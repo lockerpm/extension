@@ -9,22 +9,14 @@
           <i class="fas fa-chevron-left text-[20px]"></i> Back
         </div>
         <div>Add item</div>
-        <div @click="postCipher(cipher)">
+        <div v-if="cipher.id" @click="putCipher(cipher)">
+          Update
+        </div>
+        <div v-else @click="postCipher(cipher)">
           Save
         </div>
       </div>
     </div>
-    <!-- <div slot="title">
-        <div class="text-head-5 text-black-700 font-semibold truncate">
-          <span v-if="cipher.id">
-            {{ isDeleted ? $t('common.restore') : $t('common.edit') }} {{ $tc(`type.${cipher.type}`, 1) }}
-          </span>
-          <span v-else>
-            {{ $t('common.add') }} {{ $tc(`type.${type}`, 1) }}
-          </span>
-        </div>
-      </div> -->
-
     <div class="text-left px-3 py-5">
       <el-select
           v-model="cipher.type"
@@ -326,50 +318,8 @@
             </el-checkbox>
           </el-checkbox-group>
         </div>
-        <!-- <div v-if="cipher.organizationId && cipher.type===CipherType.Login">
-          <label class="font-semibold">{{ $t('data.ciphers.show_password') }}</label>
-          <el-checkbox v-model="cipher.viewPassword" />
-        </div> -->
       </template>
     </div>
-    <!-- <div
-      slot="footer"
-      class="dialog-footer flex items-center text-left"
-    >
-      <div class="flex-grow">
-        <button
-          v-if="cipher.id"
-          class="btn btn-icon !text-danger"
-          @click="isDeleted ? deleteCiphers([cipher.id]) : moveTrashCiphers([cipher.id])"
-        >
-          <i class="fa fa-trash-alt" />
-        </button>
-      </div>
-      <div>
-        <button
-          class="btn btn-default"
-          @click="closeDialog"
-        >
-          {{ $t('common.cancel') }}
-        </button>
-        <button
-          v-if="isDeleted"
-          class="btn btn-primary"
-          :disabled="loading"
-          @click="restoreCiphers([cipher.id])"
-        >
-          {{ $t('common.restore') }}
-        </button>
-        <button
-          v-else
-          class="btn btn-primary"
-          :disabled="loading || !cipher.name"
-          @click="cipher.id ?putCipher(cipher):postCipher(cipher)"
-        >
-          {{ cipher.id ? $t('common.update') : $t('common.add') }}
-        </button>
-      </div>
-    </div> -->
     <AddEditFolder ref="addEditFolder" @created-folder="handleCreatedFolder" />
   </div>
 </template>
@@ -410,7 +360,7 @@ export default Vue.extend({
   props: {
     type: {
       type: String,
-      default: 'Login'
+      default: null
     },
     routeName: {
       type: String,
@@ -448,12 +398,12 @@ export default Vue.extend({
       this.newCipher(this.type, this.data)
     } else {
       this.newCipher('Login', this.data)
+      if(this.password){
+        this.cipher.login.password = this.password
+      }
+      this.cipher.name = (await BrowserApi.getTabFromCurrentWindow()).url;
+      this.cipher.login.uris[0].uri = this.cipher.name
     }
-    if(this.password){
-      this.cipher.login.password = this.password
-    }
-    this.cipher.name = (await BrowserApi.getTabFromCurrentWindow()).url;
-    this.cipher.login.uris[0].uri = this.cipher.name
   },
   computed: {
     typeOptions () {
@@ -536,13 +486,13 @@ export default Vue.extend({
           // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
+        this.$router.push({name: 'vault'})
       } catch (e) {
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         // this.notify(e, 'warning')
       } finally {
         this.loading = false
-        this.$router.back()
       }
     },
     async putCipher (cipher) {
@@ -556,7 +506,8 @@ export default Vue.extend({
           // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
-        this.$emit('updated-cipher')
+        // this.$emit('updated-cipher')
+        this.$router.push({name: 'vault'})
       } catch (e) {
         this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'warning')
       } finally {

@@ -316,6 +316,7 @@ Vue.mixin({
         name = 'identities'
         break
       }
+      console.log(cipher.id)
       this.$router.push({
         name: name + '-id',
         params: { id: cipher.id }

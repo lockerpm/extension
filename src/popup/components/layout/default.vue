@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative overflow-scroll"
+    class="relative"
     style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
   >
     <template>
@@ -141,7 +141,50 @@ export default Vue.extend({
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText']
     },
   },
+  watch: {
+    '$store.state.userPw' (newValue) {
+      if (newValue.is_pwd_manager === false) {
+        this.$router.push({ name: 'set-master-password' })
+      }
+    },
+    'locked' (newValue) {
+      console.log('locked: ', newValue)
+      if (newValue === true) {
+        this.$router.push({ name: 'lock' })
+        this.disconnectSocket()
+      }
+      if (newValue === false) {
+        this.$store.dispatch('LoadTeams')
+        this.getSyncData()
+        this.reconnectSocket()
+        this.$store.dispatch('LoadCurrentPlan')
+      }
+    }
+  },
   methods: {
+    disconnectSocket () {
+      delete this.$options.sockets.onmessage
+      this.$disconnect()
+    },
+    async reconnectSocket () {
+      const token = await this.$storageService.get('cs_token')
+      this.$connect(this.sanitizeUrl(`${process.env.VUE_APP_WS_URL}/cystack_platform/pm/sync?token=${token}`), {
+        format: 'json',
+        reconnection: true,
+        reconnectionAttempts: 60,
+        reconnectionDelay: 3000
+      })
+      this.$options.sockets.onmessage = message => {
+        const data = JSON.parse(message.data)
+        switch (data.event) {
+        case 'sync':
+          this.getSyncData()
+          break
+        default:
+          break
+        }
+      }
+    },
   }
 }
 )

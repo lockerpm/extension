@@ -1,5 +1,5 @@
 <template>
-  <DetailCipher route-name="vault" />
+  <DetailCipher type="Card" route-name="cards" />
 </template>
 
 <script>

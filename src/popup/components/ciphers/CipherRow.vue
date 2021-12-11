@@ -3,14 +3,16 @@
     <li
         v-if="item.id"
         class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+        @click.self="routerCipher(item)"
       >
         <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
+            @click="routerCipher(item)"
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-        <div class="flex-grow">
+        <div class="flex-grow" @click="routerCipher(item)">
           <div class="text-black font-semibold truncate flex items-center">
             {{ item.name }}
           </div>
@@ -91,9 +93,13 @@ export default Vue.extend(
       }
     },
     methods: {
+      // addEdit (item) {
+      //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+      // }
       addEdit (item) {
-        this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
-      }
+      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+        this.$router.push({name: 'add-item-create', params: {data: item}})
+      },
     }
   }
 )

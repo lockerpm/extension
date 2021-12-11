@@ -255,62 +255,16 @@ export default Vue.extend({
       },
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
     },
-    // async locked () {
-    //   return await this.$vaultTimeoutService.isLocked()
+    async locked () {
+      return await this.$vaultTimeoutService.isLocked()
+    }
+    // locked :{
+    //   async get() {
+    //     return await this.$vaultTimeoutService.isLocked()
+    //   }
     // }
-    locked :{
-      async get() {
-        return await this.$vaultTimeoutService.isLocked()
-      }
-    }
-  },
-  watch: {
-    '$store.state.userPw' (newValue) {
-      if (newValue.is_pwd_manager === false) {
-        this.$router.push({ name: 'set-master-password' })
-      }
-    },
-    'locked' (newValue) {
-      console.log('locked: ', newValue)
-      if (newValue === true) {
-        this.$router.push({ name: 'lock' })
-        this.disconnectSocket()
-      }
-      if (newValue === false) {
-        this.$store.dispatch('LoadTeams')
-        this.getSyncData()
-        this.reconnectSocket()
-        this.$store.dispatch('LoadCurrentPlan')
-      }
-    }
   },
   methods: {
-    disconnectSocket () {
-      delete this.$options.sockets.onmessage
-      this.$disconnect()
-    },
-    async reconnectSocket () {
-      const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${process.env.VUE_APP_WS_URL}/cystack_platform/pm/sync?token=${token}`), {
-        format: 'json',
-        reconnection: true,
-        reconnectionAttempts: 60,
-        reconnectionDelay: 3000
-      })
-      this.$options.sockets.onmessage = message => {
-        const data = JSON.parse(message.data)
-        switch (data.event) {
-        case 'sync':
-          this.getSyncData()
-          break
-        case 'members':
-          this.getInvitations()
-          break
-        default:
-          break
-        }
-      }
-    },
     openLogin() {
       // const url = `${
       //   process.env.VUE_APP_ID_URL
@@ -450,10 +404,6 @@ export default Vue.extend({
           }
         }
       } catch (e) {
-        // this.ngZone.run(() => {
-        //   this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-        //   this.changeDetectorRef.detectChanges();
-        // });
         this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
         // this.notify(e, 'warning')
       }
