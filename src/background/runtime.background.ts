@@ -217,7 +217,8 @@ export default class RuntimeBackground {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-          BrowserApi.createNewTab('https://locker.io');
+          const url = `${process.env.VUE_APP_ID_URL}/login?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
+          BrowserApi.createNewTab(url);
           await this.setDefaultSettings();
         }
 

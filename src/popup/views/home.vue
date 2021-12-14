@@ -113,15 +113,16 @@
           v-for="item in cardCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click="fillCipher(item)"
+          @click.self="fillCipher(item)"
         >
           <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
+            @click="fillCipher(item)"
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow">
+          <div class="flex-grow" @click="fillCipher(item)">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -148,15 +149,16 @@
           v-for="item in identityCiphers"
           :key="item.id"
           class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click="fillCipher(item)"
+          @click.self="fillCipher(item)"
         >
           <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
+            @click="fillCipher(item)"
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow">
+          <div class="flex-grow" @click="fillCipher(item)">
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -366,7 +368,8 @@ export default Vue.extend({
       this.loaded = true;
     },
     addEdit(item) {
-      this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
+      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
+      this.$router.push({ name: 'add-item-create', params: { data: item } })
     },
     async fillCipher(cipher: CipherView) {
       console.log(this.pageDetails.length)
