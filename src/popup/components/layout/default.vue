@@ -197,7 +197,7 @@ export default Vue.extend({
   color: #268334;
 }
 .menu-item {
-  @apply hover:bg-[#F1F1F1];
+  @apply hover:bg-[#F1F1F1] text-black-500;
   padding-top: 10px;
   padding-bottom: 5px;
 }

@@ -45,7 +45,7 @@
         <li
           v-for="item in loginCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click.self="fillCipher(item)"
         >
           
@@ -68,7 +68,7 @@
             <div class="col-actions">
               <button
                 v-if="item.login.canLaunch"
-                class="btn btn-icon btn-xs hover:bg-black-400"
+                class="btn btn-icon btn-xs hover:text-primary"
                 :title="`Launch ${item.login.uri}`"
                 @click="openNewTab(item.login.uri)"
               >
@@ -78,7 +78,7 @@
                 trigger="click"
                 :hide-on-click="false"
               >
-                <button class="btn btn-icon btn-xs hover:bg-black-400">
+                <button class="btn btn-icon btn-xs hover:text-primary">
                   <i class="fas fa-clone" />
                 </button>
                 <el-dropdown-menu slot="dropdown">
@@ -97,7 +97,7 @@
                 </el-dropdown-menu>
               </el-dropdown>
               <button
-                class="btn btn-icon btn-xs hover:bg-black-400"
+                class="btn btn-icon btn-xs hover:text-primary"
                 @click="addEdit(item)"
               >
                 <i class="fas fa-pen" />
@@ -112,7 +112,7 @@
         <li
           v-for="item in cardCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click.self="fillCipher(item)"
         >
           <div
@@ -133,7 +133,7 @@
           <div>
             <div class="col-actions">
               <button
-                class="btn btn-icon btn-xs hover:bg-black-400"
+                class="btn btn-icon btn-xs hover:text-primary"
                 @click="addEdit(item)"
               >
                 <i class="fas fa-pen" />
@@ -148,7 +148,7 @@
         <li
           v-for="item in identityCiphers"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click.self="fillCipher(item)"
         >
           <div
@@ -169,7 +169,7 @@
           <div>
             <div class="col-actions">
               <button
-                class="btn btn-icon btn-xs hover:bg-black-400"
+                class="btn btn-icon btn-xs hover:text-primary"
                 @click="addEdit(item)"
               >
                 <i class="fas fa-pen" />
@@ -273,7 +273,6 @@ export default Vue.extend({
       // }/login?SERVICE_URL=${encodeURIComponent(
       //   "/sso"
       // )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-
       // this.$platformUtilsService.launchUri(url);
       // BrowserApi.reloadOpenWindows();
       // const thisWindow = window.open("", "_self");

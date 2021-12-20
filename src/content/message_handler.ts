@@ -1,7 +1,6 @@
 window.addEventListener('message', event => {
     if (event.source !== window)
         return;
-
     if (event.data.command && (event.data.command === 'cs-authResult')) {
         chrome.runtime.sendMessage({
             command: event.data.command,
@@ -11,6 +10,14 @@ window.addEventListener('message', event => {
         });
     }
 
+  if (event.data.command && event.data.command === "locker-authResult") {
+    chrome.runtime.sendMessage({
+      command: event.data.command,
+      token: event.data.token,
+      state: event.data.state,
+      referrer: event.source.location.hostname
+    });
+  }
   if (event.data.command && (event.data.command === 'authResult')) {
     chrome.runtime.sendMessage({
       command: event.data.command,

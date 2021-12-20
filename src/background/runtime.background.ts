@@ -46,9 +46,9 @@ export default class RuntimeBackground {
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
     switch (msg.command) {
-      case 'loggedIn':
-      case 'unlocked':
-        console.log('processMessage: ', msg.command)
+      case "loggedIn":
+      case "unlocked":
+        console.log("processMessage: ", msg.command);
         let item: LockedVaultPendingNotificationsItem;
 
         if (this.lockedVaultPendingNotifications.length > 0) {
@@ -56,142 +56,210 @@ export default class RuntimeBackground {
 
           item = this.lockedVaultPendingNotifications.pop();
           if (item.commandToRetry.sender?.tab?.id) {
-            await BrowserApi.focusSpecifiedTab(item.commandToRetry.sender.tab.id);
+            await BrowserApi.focusSpecifiedTab(
+              item.commandToRetry.sender.tab.id
+            );
           }
         }
         // await this.main.setIcon(); // error => prevent send message unlockCompleted
         await this.main.refreshBadgeAndMenu(false);
-        this.notificationsService.updateConnection(msg.command === 'unlocked');
+        this.notificationsService.updateConnection(msg.command === "unlocked");
         this.systemService.cancelProcessReload();
 
         if (item) {
-          await BrowserApi.tabSendMessageData(item.commandToRetry.sender.tab, 'unlockCompleted', item);
+          await BrowserApi.tabSendMessageData(
+            item.commandToRetry.sender.tab,
+            "unlockCompleted",
+            item
+          );
         }
         break;
-      case 'addToLockedVaultPendingNotifications':
-        console.log(msg.data)
+      case "addToLockedVaultPendingNotifications":
+        console.log(msg.data);
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
-      case 'logout':
+      case "logout":
         await this.main.logout(msg.expired);
         break;
-      case 'syncCompleted':
+      case "syncCompleted":
         if (msg.successfully) {
           setTimeout(async () => await this.main.refreshBadgeAndMenu(), 2000);
         }
         break;
-      case 'openPopup':
+      case "openPopup":
         await this.main.openPopup();
         break;
-      case 'promptForLogin':
+      case "promptForLogin":
         // await BrowserApi.createNewTab('popup/index.html?uilocation=popout', true, true);
-        await BrowserApi.createNewTab('popup.html?uilocation=popout', true, true);
+        await BrowserApi.createNewTab(
+          "popup.html?uilocation=popout",
+          true,
+          true
+        );
         break;
-      case 'showDialogResolve':
-        this.platformUtilsService.resolveDialogPromise(msg.dialogId, msg.confirmed);
+      case "showDialogResolve":
+        this.platformUtilsService.resolveDialogPromise(
+          msg.dialogId,
+          msg.confirmed
+        );
         break;
-      case 'bgCollectPageDetails':
-        await this.main.collectPageDetailsForContentScript(sender.tab, msg.sender, sender.frameId);
+      case "bgCollectPageDetails":
+        await this.main.collectPageDetailsForContentScript(
+          sender.tab,
+          msg.sender,
+          sender.frameId
+        );
         break;
-      case 'bgUpdateContextMenu':
-      case 'editedCipher':
-      case 'addedCipher':
-      case 'deletedCipher':
+      case "bgUpdateContextMenu":
+      case "editedCipher":
+      case "addedCipher":
+      case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
-      case 'bgReseedStorage':
+      case "bgReseedStorage":
         await this.main.reseedStorage();
         break;
-      case 'collectPageDetailsResponse':
+      case "collectPageDetailsResponse":
         switch (msg.sender) {
-          case 'autofiller':
-          case 'autofill_cmd':
-            const totpCode = await this.autofillService.doAutoFillActiveTab([{
-              frameId: sender.frameId,
-              tab: msg.tab,
-              details: msg.details,
-            }], msg.sender === 'autofill_cmd');
+          case "autofiller":
+          case "autofill_cmd":
+            const totpCode = await this.autofillService.doAutoFillActiveTab(
+              [
+                {
+                  frameId: sender.frameId,
+                  tab: msg.tab,
+                  details: msg.details
+                }
+              ],
+              msg.sender === "autofill_cmd"
+            );
             if (totpCode != null) {
-              this.platformUtilsService.copyToClipboard(totpCode, { window: window });
+              this.platformUtilsService.copyToClipboard(totpCode, {
+                window: window
+              });
             }
             break;
-          case 'contextMenu':
+          case "contextMenu":
             clearTimeout(this.autofillTimeout);
             this.pageDetailsToAutoFill.push({
               frameId: sender.frameId,
               tab: msg.tab,
-              details: msg.details,
+              details: msg.details
             });
-            this.autofillTimeout = setTimeout(async () => await this.autofillPage(), 300);
+            this.autofillTimeout = setTimeout(
+              async () => await this.autofillPage(),
+              300
+            );
             break;
           default:
             break;
         }
         break;
-      case 'authResult':
+      case "authResult":
         const vaultUrl = this.environmentService.getWebVaultUrl();
 
-        if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
+        if (
+          msg.referrer == null ||
+          Utils.getHostname(vaultUrl) !== msg.referrer
+        ) {
           return;
         }
 
         try {
-          BrowserApi.createNewTab('popup/index.html?uilocation=popout#/sso?code=' +
-            msg.code + '&state=' + msg.state);
-        }
-        catch { }
+          BrowserApi.createNewTab(
+            "popup/index.html?uilocation=popout#/sso?code=" +
+              msg.code +
+              "&state=" +
+              msg.state
+          );
+        } catch {}
         break;
-      case 'cs-authResult':
-        console.log(msg.referrer)
+      case "cs-authResult":
+        console.log(msg.referrer);
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
 
         try {
-          await this.storageService.save('cs_token', msg.token)
-          const store = await this.storageService.get('cs_store')
-          let oldStoreParsed = {}
-          if (typeof store === 'object') {
-            oldStoreParsed = store
+          await this.storageService.save("cs_token", msg.token);
+          const store = await this.storageService.get("cs_store");
+          let oldStoreParsed = {};
+          if (typeof store === "object") {
+            oldStoreParsed = store;
           }
-          await this.storageService.save('cs_store', {
+          await this.storageService.save("cs_store", {
             ...oldStoreParsed,
-            isLoggedIn: true,
-          })
+            isLoggedIn: true
+          });
           console.log({
             ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          BrowserApi.createNewTab('web.html#/vault?source=id.cystack.net');
-        }
-        catch (e) {
-          console.log(e)
+            isLoggedIn: true
+          });
+          BrowserApi.createNewTab("web.html#/vault?source=id.cystack.net");
+        } catch (e) {
+          console.log(e);
         }
         break;
-      case 'webAuthnResult':
+      case "locker-authResult":
+        console.log(msg.referrer);
+        // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
+        //     return;
+        // }
+
+        try {
+          await this.storageService.save("cs_token", msg.token);
+          const store = await this.storageService.get("cs_store");
+          let oldStoreParsed = {};
+          if (typeof store === "object") {
+            oldStoreParsed = store;
+          }
+          await this.storageService.save("cs_store", {
+            ...oldStoreParsed,
+            isLoggedIn: true
+          });
+          console.log({
+            ...oldStoreParsed,
+            isLoggedIn: true
+          });
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      case "webAuthnResult":
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
 
-        if (msg.referrer == null || Utils.getHostname(vaultUrl2) !== msg.referrer) {
+        if (
+          msg.referrer == null ||
+          Utils.getHostname(vaultUrl2) !== msg.referrer
+        ) {
           return;
         }
 
-        const params = `webAuthnResponse=${encodeURIComponent(msg.data)};remember=${msg.remember}`;
-        BrowserApi.createNewTab(`popup/index.html?uilocation=popout#/2fa;${params}`, undefined, false);
+        const params = `webAuthnResponse=${encodeURIComponent(
+          msg.data
+        )};remember=${msg.remember}`;
+        BrowserApi.createNewTab(
+          `popup/index.html?uilocation=popout#/2fa;${params}`,
+          undefined,
+          false
+        );
         break;
-      case 'reloadPopup':
-        this.messagingService.send('reloadPopup');
+      case "reloadPopup":
+        this.messagingService.send("reloadPopup");
         break;
-      case 'emailVerificationRequired':
-        this.messagingService.send('showDialog', {
-          dialogId: 'emailVerificationRequired',
-          title: this.i18nService.t('emailVerificationRequired'),
-          text: this.i18nService.t('emailVerificationRequiredDesc'),
-          confirmText: this.i18nService.t('ok'),
-          type: 'info',
+      case "emailVerificationRequired":
+        this.messagingService.send("showDialog", {
+          dialogId: "emailVerificationRequired",
+          title: this.i18nService.t("emailVerificationRequired"),
+          text: this.i18nService.t("emailVerificationRequiredDesc"),
+          confirmText: this.i18nService.t("ok"),
+          type: "info"
         });
         break;
-      case 'getClickedElementResponse':
-        this.platformUtilsService.copyToClipboard(msg.identifier, { window: window });
+      case "getClickedElementResponse":
+        this.platformUtilsService.copyToClipboard(msg.identifier, {
+          window: window
+        });
       default:
         break;
     }

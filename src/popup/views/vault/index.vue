@@ -31,7 +31,7 @@
       <li
         v-for="(item, index) in menu"
         :key="index"
-        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
+        class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
         @click="openRoute(item)"
       >
         <div class="menu-icon mr-4" style="padding-top: 4px">
@@ -40,8 +40,13 @@
             :class="[item.icon]"
           ></i>
         </div>
-        <div class="flex-grow">
-          {{  item.label  }} ({{ciphersCount[`${item.name}`]}} {{ ciphersCount[`${item.name}`] > 1 ? 'items':'item'}})
+        <div class="flex-grow flex justify-between mr-2">
+          <div>
+            {{  item.label  }} 
+          </div>
+          <div>
+            {{ciphersCount[`${item.name}`]}} {{ ciphersCount[`${item.name}`] > 1 ? 'items':'item'}}
+          </div>
         </div>
         <div>
           <i class="fas fa-chevron-right"></i>
@@ -52,14 +57,21 @@
         <li
           v-for="item in folders"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
           @click="routerFolder(item)"
         >
           <div class="menu-icon mr-4">
             <!-- <i class="fas fa-folder text-[20px]"></i> -->
             <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
-          <div class="flex-grow">{{ item.name }} ({{ item.ciphersCount }} {{item.ciphersCount>1?'items':'item'}})</div>
+          <div class="flex-grow flex justify-between mr-2">
+            <div>
+              {{ item.name }} 
+            </div>
+            <div>
+              {{ item.ciphersCount }} {{item.ciphersCount>1?'items':'item'}}
+            </div>
+          </div>
           <div>
             <i class="fas fa-chevron-right"></i>
           </div>
@@ -67,7 +79,7 @@
       </template>
       <template
         v-for="(value, key) in filteredCollection"
-        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5"
+        class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[44px] leading-[44px] px-5"
       >
         <div
           class="uppercase px-3 mt-4 mb-1"
@@ -76,14 +88,21 @@
         <li
           v-for="item in value"
           :key="item.id"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
           @click="routerCollection(item)"
         >
           <div class="menu-icon mr-4">
             <!-- <i class="fas fa-folder text-[20px]"></i> -->
             <img src="@/assets/images/icons/folder.svg" alt="" class="">
           </div>
-          <div class="flex-grow">{{item.name }} ({{ item.ciphersCount }} {{item.ciphersCount > 1? 'items':'item'}})</div>
+          <div class="flex-grow flex justify-between mr-2">
+            <div>
+              {{item.name }}
+            </div> 
+            <div>
+              {{ item.ciphersCount }} {{item.ciphersCount > 1? 'items':'item'}}
+            </div>
+          </div>
           <div>
             <i class="fas fa-chevron-right"></i>
           </div>

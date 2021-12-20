@@ -9,7 +9,7 @@
         <li
           v-for="(item, index) in cate.items"
           :key="index"
-          class="flex items-center hover:bg-black-400 bg-white cursor-pointer px-5 border-b border-black-400"
+          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer px-5 border-b border-black-400"
           :class="[item.divided ? 'border-t border-black-400' : '', item.picker ? 'h-auto leading-[32px]': 'h-[44px] leading-[44px]']"
           @click="openRoute(item)"
         >

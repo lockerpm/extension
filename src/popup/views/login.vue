@@ -1,14 +1,20 @@
 <template>
   <div class="flex flex-grow flex-col items-center">
-    <div class="mt-[3rem]">
-        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
-      </div>
-    <div class="md:w-[410px] md:mx-0 mx-5 py-[2.8125rem] px-6 text-center">
+    <div class="mt-[3rem] text-center">
+        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px] mx-auto">
+        <div class="font-bold text-head-4 text-black-700 mt-7">
+          Login
+        </div>
+        <div class="text-[10px] text-black-500 mt-2">
+          Vui lòng đăng nhập CyStack ID để sử dụng Locker
+        </div>
+    </div>
+    <div class="md:w-[410px] md:mx-0 mx-5 py-6 px-6 text-center">
       <div
         v-if="!factor2"
         class="mb-4"
       >
-        <div class="form-group !mb-4">
+        <!-- <div class="form-group !mb-4">
           <label class="text-left">
             Username/Emaillll
           </label>
@@ -26,8 +32,19 @@
           >
             {{ bugs.username[0] }}
           </div>
-        </div>
-        <div
+        </div> -->
+          <InputText
+            v-model="user.username"
+            label="Email / Username"
+            class="w-full"
+          />
+          <InputText
+              v-model="user.password"
+              :label="$t('data.ciphers.password')"
+              class="w-full"
+              is-password
+            />
+        <!-- <div
           v-if="!factor2"
           :class="[bugs.password?'has-danger':'','form-group m-form__group']"
         >
@@ -65,7 +82,7 @@
               {{ bugs.password[0] }}
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div v-if="factor2 && step === 1" class="text-left">
         <h3 class="text-[20px] py-6">
@@ -233,18 +250,6 @@
       </transition>
       <div v-if="!factor2">
         <div class="text-center mt-2">
-          <div class="flex px-2 my-4 mx-auto">
-            <div class="text-left w-full pl-0">
-              <a
-                v-if="!factor2"
-                @click.prevent="openForgot"
-                tag="a"
-                class="text-[#0476e9] no-underline"
-              >
-                Forgot Password?
-              </a>
-            </div>
-          </div>
           <button
             id="m_login_signin_submit"
             :loading="loading"
@@ -255,6 +260,20 @@
           >
             Login
           </button>
+          <div class="flex px-2 my-4 mx-auto">
+            <div class="text-left w-full pl-0 text-center">
+              <a
+                v-if="!factor2"
+                @click.prevent="openForgot"
+                tag="a"
+                class="text-[#0476e9] no-underline"
+              >
+                Forgot Password?
+              </a>
+            </div>
+          </div>
+        </div>
+        <div  class="mx-auto border border-black-500 h-[1px]" style="width: 30px; margin-top: 30px">   
         </div>
         <div class="mt-3 text-center">
           <p class="mb-2">
@@ -282,7 +301,11 @@
 <script>
 import Vue from 'vue'
 import { BrowserApi } from "@/browser/browserApi";
+import InputText from '@/components/input/InputText'
 export default Vue.extend({
+  components: {
+    InputText
+  },
   data () {
     return {
       user: {},

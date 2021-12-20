@@ -4,7 +4,7 @@
     style="background: #F1F1F1; padding-top: 44px"
   >
     <div
-      class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0"
+      class="flex items-center cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0 bg-white"
       style="z-index: 1"
     >
       <div

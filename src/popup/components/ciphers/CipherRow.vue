@@ -2,7 +2,7 @@
   <div>
     <li
         v-if="item.id"
-        class="flex items-center hover:bg-black-400 bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+        class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
         @click.self="routerCipher(item)"
       >
         <div
@@ -24,14 +24,14 @@
           <div class="col-actions">
             <button
               v-if="item.login.canLaunch"
-              class="btn btn-icon btn-xs hover:bg-black-400"
+              class="btn btn-icon btn-xs hover:text-primary"
               :title="`Launch ${item.login.uri}`"
               @click="openNewTab(item.login.uri)"
               >
                 <i class="fas fa-external-link-square-alt" />
             </button>
             <el-dropdown v-if="!item.isDeleted" trigger="click" :hide-on-click="false">
-              <button class="btn btn-icon btn-xs hover:bg-black-400">
+              <button class="btn btn-icon btn-xs hover:text-primary">
                 <i class="fas fa-clone" />
               </button>
               <el-dropdown-menu slot="dropdown">
@@ -60,7 +60,7 @@
                 </template>
               </el-dropdown-menu>
             </el-dropdown>
-            <button class="btn btn-icon btn-xs hover:bg-black-400"
+            <button class="btn btn-icon btn-xs hover:text-primary"
                     @click="addEdit(item)"
             >
               <i class="fas fa-pen" />

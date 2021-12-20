@@ -14,7 +14,7 @@
     </div>
     <ul class="">
       <li v-for="(item, index) in menu" :key="index"
-        class="flex items-center hover:bg-black-400 cursor-pointer h-[44px] leading-[44px] px-5" :class="[item.divided ? 'border-t border-black-400' : '']"
+        class="flex items-center hover:bg-[#E4F2E1] cursor-pointer h-[44px] leading-[44px] px-5" :class="[item.divided ? 'border-t border-black-400' : '']"
           @click="openRoute(item)"
       >
         <div class="menu-icon mr-4">
