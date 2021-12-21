@@ -1,90 +1,41 @@
 <template>
   <div class="flex flex-grow flex-col items-center">
     <div class="mt-[3rem] text-center">
-        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px] mx-auto">
-        <div class="font-bold text-head-4 text-black-700 mt-7">
-          Login
-        </div>
-        <div class="text-[10px] text-black-500 mt-2">
-          Vui lòng đăng nhập CyStack ID để sử dụng Locker
-        </div>
+      <img
+        src="@/assets/images/logo/logo_black.svg"
+        alt=""
+        class="h-[36px] mx-auto"
+      >
+      <div class="font-bold text-head-4 text-black-700 mt-7">
+        Login
+      </div>
+      <div class="text-base mt-2">
+        Vui lòng đăng nhập CyStack ID để sử dụng Locker
+      </div>
     </div>
-    <div class="md:w-[410px] md:mx-0 mx-5 py-6 px-6 text-center">
+    <div class="w-full p-6 text-center">
       <div
         v-if="!factor2"
         class="mb-4"
       >
-        <!-- <div class="form-group !mb-4">
-          <label class="text-left">
-            Username/Emaillll
-          </label>
-          <div class="input-group mb-1.5">
-            <input
-              v-model="user.username"
-              type="text"
-              class="form-control"
-              @keyup.enter="login"
-            >
-          </div>
-          <div
-            v-if="bugs.username"
-            class="invalid-feedback"
-          >
-            {{ bugs.username[0] }}
-          </div>
-        </div> -->
-          <InputText
-            v-model="user.username"
-            label="Email / Username"
-            class="w-full"
-          />
-          <InputText
-              v-model="user.password"
-              :label="$t('data.ciphers.password')"
-              class="w-full"
-              is-password
-            />
-        <!-- <div
-          v-if="!factor2"
-          :class="[bugs.password?'has-danger':'','form-group m-form__group']"
-        >
-          <div class="form-group !mb-4">
-            <label class="text-left">
-              Password
-            </label>
-            <div class="input-group mb-1.5">
-              <input
-                v-model="user.password"
-                :type="showPassword ? 'text' : 'password'"
-                class="form-control"
-                :name="randomString()"
-                autocomplete="new-password"
-                @keyup.enter="login"
-              >
-              <div class="input-group-append !bg-white">
-                <button
-                  class="btn btn-icon"
-                  type="button"
-                  tabindex="-1"
-                  @click="showPassword = !showPassword"
-                >
-                  <i
-                    class="far"
-                    :class="{'fa-eye': !showPassword, 'fa-eye-slash': showPassword}"
-                  />
-                </button>
-              </div>
-            </div>
-            <div
-              v-if="bugs.password"
-              class="invalid-feedback"
-            >
-              {{ bugs.password[0] }}
-            </div>
-          </div>
-        </div> -->
+        <InputText
+          v-model="user.username"
+          label="Email / Username"
+          class="w-full"
+          @done="login"
+        />
+        <InputText
+          v-model="user.password"
+          :label="$t('data.ciphers.password')"
+          class="w-full"
+          is-password
+          @done="login"
+        />
       </div>
-      <div v-if="factor2 && step === 1" class="text-left">
+      <div
+        v-if="factor2 && step === 1"
+        class="text-left"
+      >
         <h3 class="text-[20px] py-6">
           <a
             class=""
@@ -155,7 +106,10 @@
           </button>
         </div>
       </div>
-      <div v-if="factor2 && (step === 2 || step === 3)" class="text-left">
+      <div
+        v-if="factor2 && (step === 2 || step === 3)"
+        class="text-left"
+      >
         <h3 class="text-[20px] py-6">
           <a
             class=""
@@ -273,7 +227,10 @@
             </div>
           </div>
         </div>
-        <div  class="mx-auto border border-black-500 h-[1px]" style="width: 30px; margin-top: 30px">   
+        <div
+          class="mx-auto border border-black-500 h-[1px]"
+          style="width: 30px; margin-top: 30px"
+        >
         </div>
         <div class="mt-3 text-center">
           <p class="mb-2">
@@ -507,15 +464,15 @@ export default Vue.extend({
   border: 1px solid #ebedf2;
 }
 .m-option .m-option__control {
-    width: 2.7rem;
-    padding-top: 0.1rem;
+  width: 2.7rem;
+  padding-top: 0.1rem;
 }
 .m-option .m-option__label {
-    width: 100%;
+  width: 100%;
 }
 .m-option .m-option__label .m-option__body {
-    display: block;
-    padding-top: 0.7rem;
-    font-size: .85rem;
+  display: block;
+  padding-top: 0.7rem;
+  font-size: 0.85rem;
 }
 </style>

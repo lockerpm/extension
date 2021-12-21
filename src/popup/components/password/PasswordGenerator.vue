@@ -15,7 +15,10 @@
           </button>
         </div>
       </div>
-      <PasswordStrength v-if="password" :score="passwordStrength.score" />
+      <PasswordStrength
+        v-if="password"
+        :score="passwordStrength.score"
+      />
     </div>
     <div class="p-5">
       <button
@@ -34,53 +37,54 @@
       <!-- <button class="btn btn-clean w-full" @click="toggle = !toggle">
         {{ $t('data.tools.show_options') }} <i class="fa fa-chevron-down" />
       </button> -->
-      <div class="locker-pw-generator-options">
-        <div>
-          <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
-          <el-slider
-            v-model="options.length"
-            :min="8"
-            :max="64"
-            :debounce="800"
-            @change="regenerate"
-          />
-          <el-checkbox
-            v-model="options.uppercase"
-            class="mb-2 w-full"
-            @change="regenerate"
-          >
-            {{ $t('data.tools.uppercase') }}
-          </el-checkbox>
-          <el-checkbox
-            v-model="options.lowercase"
-            class="mb-2 w-full"
-            @change="regenerate"
-          >
-            {{ $t('data.tools.lowercase') }}
-          </el-checkbox>
-          <el-checkbox
-            v-model="options.number"
-            class="mb-2 w-full"
-            @change="regenerate"
-          >
-            {{ $t('data.tools.digits') }}
-          </el-checkbox>
-          <el-checkbox
-            v-model="options.special"
-            class="mb-2 w-full"
-            @change="regenerate"
-          >
-            {{ $t('data.tools.symbols') }}
-          </el-checkbox>
-          <el-checkbox
-            v-model="options.ambiguous"
-            class="mb-2 w-full"
-            @change="regenerate"
-          >
-            {{ $t('data.tools.ambiguous') }}
-          </el-checkbox>
-        </div>
+    </div>
+    <div class="uppercase px-3 mb-3">Password options</div>
+    <div class="locker-pw-generator-options mb-2">
+      <div class="generator-option">
+        <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
+        <el-slider
+          v-model="options.length"
+          :min="8"
+          :max="64"
+          :debounce="800"
+          @change="regenerate"
+        />
       </div>
+      <el-checkbox
+        v-model="options.uppercase"
+        class="generator-option"
+        @change="regenerate"
+      >
+        {{ $t('data.tools.uppercase') }}
+      </el-checkbox>
+      <el-checkbox
+        v-model="options.lowercase"
+        class="generator-option"
+        @change="regenerate"
+      >
+        {{ $t('data.tools.lowercase') }}
+      </el-checkbox>
+      <el-checkbox
+        v-model="options.number"
+        class="generator-option"
+        @change="regenerate"
+      >
+        {{ $t('data.tools.digits') }}
+      </el-checkbox>
+      <el-checkbox
+        v-model="options.special"
+        class="generator-option"
+        @change="regenerate"
+      >
+        {{ $t('data.tools.symbols') }}
+      </el-checkbox>
+      <el-checkbox
+        v-model="options.ambiguous"
+        class="generator-option"
+        @change="regenerate"
+      >
+        {{ $t('data.tools.ambiguous') }}
+      </el-checkbox>
     </div>
   </div>
 </template>
@@ -124,7 +128,7 @@ export default {
       this.password = await this.$passwordGenerationService.generatePassword(this.options)
       this.$emit('generated', this.password)
     },
-    async savePassword(){
+    async savePassword () {
       // let cipher = new CipherView()
       // cipher.login.password = this.password
       // cipher.type = 1
@@ -135,7 +139,7 @@ export default {
       //   this.padNumber(now.getSeconds(), 2)
       // cipher.name = 'password_' + dateString
       // await this.postCipher(cipher)
-      this.$router.push({name: 'add-item-create', params: {password: this.password}})
+      this.$router.push({ name: 'add-item-create', params: { password: this.password } })
     },
     padNumber (num, width, padCharacter = '0') {
       const numString = num.toString()
@@ -167,3 +171,8 @@ export default {
   }
 }
 </script>
+<style>
+.generator-option {
+  @apply mb-2 w-full px-5 py-2 bg-white;
+}
+</style>

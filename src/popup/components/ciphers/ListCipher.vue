@@ -14,7 +14,7 @@
         <i class="fas fa-chevron-left text-[20px]"></i> Back
       </div>
       <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
-        <i class="fas fa-plus-circle text-[20px]"></i>
+        <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
       :type="type"
       @add-cipher="handleAddButton"
     />
-    <ul class="overflow-x-auto max-h-[600px]">
+    <ul class="">
       <li
         v-for="item in ciphers"
         :key="item.id"

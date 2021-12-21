@@ -31,7 +31,7 @@
           style="margin-left: 12px"
           @click="$router.push({ name: 'add-item-create' })"
         >
-          <i class="fas fa-plus-circle text-[20px]"></i>
+          <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i>
         </div>
       </div>
       <ul v-if="searchText.length>1">
@@ -48,6 +48,7 @@
         v-if="!locked && isLoggedIn"
         id="popup-navigator"
         class="h-auto grid grid-cols-4 bg-white fixed bottom-0 left-0 right-0"
+        style="z-index:1"
       >
         <router-link
           :to="{name: item.routeName}"

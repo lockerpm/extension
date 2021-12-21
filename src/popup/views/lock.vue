@@ -4,7 +4,7 @@
       <div class="mt-[3rem]">
         <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
       </div>
-      <div class="md:w-[410px] md:mx-0 mx-5 py-[2.8125rem] px-6 text-center">
+      <div class="w-full py-[2.8125rem] px-6 text-center">
         <template v-if="step===1">
           <div class="text-head-4 font-semibold mb-2.5">
             {{ $t('master_password.enter_password_desc') }}

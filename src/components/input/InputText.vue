@@ -37,6 +37,7 @@
         @blur="focusing = false"
         @input="handleInput"
         @mouseenter="handleHover"
+        @keyup.enter="handleEnterKeyup"
       >
     </template>
 
@@ -150,6 +151,9 @@ export default Vue.extend({
     handleHover () {
       if (this.disabled) { return }
       this.hovering = true
+    },
+    handleEnterKeyup() {
+      this.$emit('done')
     }
   }
 })

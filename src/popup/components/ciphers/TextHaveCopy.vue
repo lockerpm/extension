@@ -1,5 +1,5 @@
 <template>
-  <div class="cs-field border-b border-black-400" style="padding-top: 8px">
+  <div class="cipher-field" style="">
     <div class="">{{ label }}</div>
     <div class="flex justify-between">
       <div class="col-span-4 font-semibold">

@@ -25,194 +25,193 @@
       class="uppercase px-3 mt-4 mb-1"
       style="padding-left: 20px"
     >Item information</div>
-    <div class="flex-grow p-5 bg-white">
+    <div
+      v-show="!editMode"
+      class="cipher-item"
+    >
       <div
-        v-show="!editMode"
-        class="cipher-item"
+        class="cipher-field"
+        style=""
       >
-        <div
-          class="cs-field border-b border-black-400"
-          style="padding-top: 8px"
-        >
-          <div class="">Name</div>
-          <div class="font-semibold">{{cipher.name}}</div>
-        </div>
-        <template v-if="cipher.type === CipherType.Login">
-          <TextHaveCopy
-            label="Email / Username"
-            :text="cipher.login.username"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.password')"
-            :text="cipher.login.password"
-            :view-password="cipher.viewPassword"
-            should-hide
-          />
-          <!-- {{passwordStrength}} -->
-          <div
-            class="grid md:grid-cols-6 cipher-item border-b border-black-400"
-            style="padding: 0px; padding-top: 8px"
-          >
-            <div class="">{{ $t('data.ciphers.password_security') }}</div>
-            <div class="col-span-4 font-semibold">
-              <PasswordStrength :score="passwordStrength.score" />
-            </div>
-          </div>
-          <div
-            v-for="(item, index) in cipher.login.uris"
-            v-show="item.uri"
-            :key="index"
-            class="grid md:grid-cols-6 cipher-item border-b border-black-400"
-            style="padding: 0px; padding-top: 8px"
-          >
-            <div class="">{{ $t('data.ciphers.website_address') }}</div>
-            <div class="flex justify-between">
-              <div class="col-span-4 font-semibold">
-                {{ item.uri }}
-              </div>
-              <div class="text-right">
-                <button
-                  v-if="item.canLaunch"
-                  class="btn btn-icon btn-xs btn-action"
-                  @click="openNewTab(item.uri)"
-                >
-                  <i class="fas fa-external-link-square-alt" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </template>
-        <template v-if="cipher.type === CipherType.Card">
-          <TextHaveCopy
-            :label="$t('data.ciphers.card_holder')"
-            :text="cipher.card.cardholderName"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.brand')"
-            :text="cipher.card.brand"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.card_number')"
-            :text="cipher.card.number"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.expiration_month')"
-            :text="cipher.card.expMonth"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.expiration_year')"
-            :text="cipher.card.expYear"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.cvv')"
-            :text="cipher.card.code"
-            should-hide
-          />
-        </template>
-        <template v-if="cipher.type === CipherType.Identity">
-          <TextHaveCopy
-            :label="$t('data.ciphers.title')"
-            :text="cipher.identity.title"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.first_name')"
-            :text="cipher.identity.firstName"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.last_name')"
-            :text="cipher.identity.lastName"
-          />
-          <TextHaveCopy
-            label="Username"
-            :text="cipher.identity.username"
-          />
-          <TextHaveCopy
-            label="Email"
-            :text="cipher.identity.email"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.company')"
-            :text="cipher.identity.company"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.ssn')"
-            :text="cipher.identity.ssn"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.passport')"
-            :text="cipher.identity.passportNumber"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.license')"
-            :text="cipher.identity.licenseNumber"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.address') + '1'"
-            :text="cipher.identity.address1"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.address') + '2'"
-            :text="cipher.identity.address2"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.city_town')"
-            :text="cipher.identity.city"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.state_province')"
-            :text="cipher.identity.state"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.zip')"
-            :text="cipher.identity.postalCode"
-          />
-          <TextHaveCopy
-            :label="$t('data.ciphers.country')"
-            :text="cipher.identity.country"
-          />
-        </template>
+        <div class="">Name</div>
+        <div class="font-semibold">{{cipher.name}}</div>
+      </div>
+      <template v-if="cipher.type === CipherType.Login">
         <TextHaveCopy
-          :label="$t('data.ciphers.notes')"
-          :text="cipher.notes"
+          label="Email / Username"
+          :text="cipher.login.username"
         />
+        <TextHaveCopy
+          :label="$t('data.ciphers.password')"
+          :text="cipher.login.password"
+          :view-password="cipher.viewPassword"
+          should-hide
+        />
+        <!-- {{passwordStrength}} -->
         <div
-          class="grid md:grid-cols-6 cipher-item border-b border-black-400"
-          style="padding: 0px; padding-top: 8px"
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
         >
-          <div class="">{{ $t('data.ciphers.owned_by') }}</div>
-          <div class="col-span-4 font-semibold flex items-center">
-            <span>{{ getTeam(teams, cipher.organizationId).name || $t('common.me') }}</span>
+          <div class="">{{ $t('data.ciphers.password_security') }}</div>
+          <div class="col-span-4 font-semibold">
+            <PasswordStrength :score="passwordStrength.score" />
           </div>
         </div>
         <div
-          class="grid md:grid-cols-6 cipher-item border-b border-black-400"
-          style="padding: 0px; padding-top: 8px"
+          v-for="(item, index) in cipher.login.uris"
+          v-show="item.uri"
+          :key="index"
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
         >
-          <div class="">{{ $t('data.ciphers.folder') }}</div>
-          <div class="col-span-4">
-            <template v-if="cipher.collectionIds && cipher.collectionIds.length">
-              <div
-                v-for="item in cipher.collectionIds"
-                :key="item"
-                class="font-semibold flex items-center"
+          <div class="">{{ $t('data.ciphers.website_address') }}</div>
+          <div class="flex justify-between">
+            <div class="col-span-4 font-semibold">
+              {{ item.uri }}
+            </div>
+            <div class="text-right">
+              <button
+                v-if="item.canLaunch"
+                class="btn btn-icon btn-xs btn-action"
+                @click="openNewTab(item.uri)"
               >
-                <img
-                  :src="item.id === 'unassigned' ? require('@/assets/images/icons/folderSolid.svg') : require('@/assets/images/icons/folderSolidShare.svg')"
-                  alt=""
-                  class="mr-3"
-                > {{ findFolder(collections, item).name }}
-              </div>
-            </template>
+                <i class="fas fa-external-link-square-alt" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template v-if="cipher.type === CipherType.Card">
+        <TextHaveCopy
+          :label="$t('data.ciphers.card_holder')"
+          :text="cipher.card.cardholderName"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.brand')"
+          :text="cipher.card.brand"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.card_number')"
+          :text="cipher.card.number"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.expiration_month')"
+          :text="cipher.card.expMonth"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.expiration_year')"
+          :text="cipher.card.expYear"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.cvv')"
+          :text="cipher.card.code"
+          should-hide
+        />
+      </template>
+      <template v-if="cipher.type === CipherType.Identity">
+        <TextHaveCopy
+          :label="$t('data.ciphers.title')"
+          :text="cipher.identity.title"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.first_name')"
+          :text="cipher.identity.firstName"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.last_name')"
+          :text="cipher.identity.lastName"
+        />
+        <TextHaveCopy
+          label="Username"
+          :text="cipher.identity.username"
+        />
+        <TextHaveCopy
+          label="Email"
+          :text="cipher.identity.email"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.company')"
+          :text="cipher.identity.company"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.ssn')"
+          :text="cipher.identity.ssn"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.passport')"
+          :text="cipher.identity.passportNumber"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.license')"
+          :text="cipher.identity.licenseNumber"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.address') + '1'"
+          :text="cipher.identity.address1"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.address') + '2'"
+          :text="cipher.identity.address2"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.city_town')"
+          :text="cipher.identity.city"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.state_province')"
+          :text="cipher.identity.state"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.zip')"
+          :text="cipher.identity.postalCode"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.country')"
+          :text="cipher.identity.country"
+        />
+      </template>
+      <TextHaveCopy
+        :label="$t('data.ciphers.notes')"
+        :text="cipher.notes"
+      />
+      <div
+        class="grid md:grid-cols-6 cipher-field"
+        style=""
+      >
+        <div class="">{{ $t('data.ciphers.owned_by') }}</div>
+        <div class="col-span-4 font-semibold flex items-center">
+          <span>{{ getTeam(teams, cipher.organizationId).name || $t('common.me') }}</span>
+        </div>
+      </div>
+      <div
+        class="grid md:grid-cols-6 cipher-field"
+        style=""
+        v-if="(cipher.collectionIds && cipher.collectionIds.length) || cipher.folderId"
+      >
+        <div class="">{{ $t('data.ciphers.folder') }}</div>
+        <div class="col-span-4">
+          <template v-if="cipher.collectionIds && cipher.collectionIds.length">
             <div
-              v-if="cipher.folderId"
-              class="font-semibold flex items-center"
+              v-for="item in cipher.collectionIds"
+              :key="item"
+              class="font-semibold flex items-center mt-2"
             >
               <img
-                src="@/assets/images/icons/folderSolid.svg"
+                :src="item.id === 'unassigned' ? require('@/assets/images/icons/folderSolid.svg') : require('@/assets/images/icons/folderSolidShare.svg')"
                 alt=""
                 class="mr-3"
-              > {{ findFolder(folders, cipher.folderId).name }}
+              > {{ findFolder(collections, item).name }}
             </div>
+          </template>
+          <div
+            v-if="cipher.folderId"
+            class="font-semibold flex items-center mt-2"
+          >
+            <img
+              src="@/assets/images/icons/folderSolid.svg"
+              alt=""
+              class="mr-3"
+            > {{ findFolder(folders, cipher.folderId).name }}
           </div>
         </div>
       </div>
@@ -329,3 +328,8 @@ export default Vue.extend({
   }
 })
 </script>
+<style>
+.cipher-item .cipher-field {
+  @apply mb-2 w-full px-5 py-2 bg-white;
+}
+</style>

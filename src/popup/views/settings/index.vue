@@ -4,7 +4,7 @@
       v-for="(cate, index) in menu"
       :key="index"
     >
-      <p class="uppercase px-3 mt-4 mb-1">{{cate.name}}</p>
+      <p class="uppercase px-3 mt-4 mb-1 font-semibold">{{cate.name}}</p>
       <ul class="">
         <li
           v-for="(item, index) in cate.items"
