@@ -10,7 +10,7 @@
         Login
       </div>
       <div class="text-base mt-2">
-        Vui lòng đăng nhập CyStack ID để sử dụng Locker
+        Login with CyStack ID to use Locker
       </div>
     </div>
     <div class="w-full p-6 text-center">
@@ -217,7 +217,6 @@
           <div class="flex px-2 my-4 mx-auto">
             <div class="text-left w-full pl-0 text-center">
               <a
-                v-if="!factor2"
                 @click.prevent="openForgot"
                 tag="a"
                 class="text-[#0476e9] no-underline"
@@ -249,6 +248,23 @@
               :alt="s.key"
             >
           </button>
+        </div>
+        <div class="absolute left-0 right-0" style="bottom: 20px">
+          <div class="flex px-2 my-4 mx-auto">
+            <div class="w-full pl-0 text-center">
+              <span>
+                Don't have an account yet?
+                <a
+                @click.prevent="openRegister"
+                tag="a"
+                class="text-[#0476e9] no-underline"
+              >
+                Sign Up
+              </a>
+              </span>
+              
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -309,23 +325,24 @@ export default Vue.extend({
           }
         } else {
           try {
-            await this.$storageService.save('cs_token', res.token)
-            const store = await this.$storageService.get('cs_store')
-            let oldStoreParsed = {}
-            if (typeof store === 'object') {
-              oldStoreParsed = store
-            }
-            await this.$storageService.save('cs_store', {
-              ...oldStoreParsed,
-              isLoggedIn: true,
-            })
-            console.log({
-              ...oldStoreParsed,
-              isLoggedIn: true,
-            })
-            this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-            this.axios.post('/sso/me/last_active')
-            this.$router.push({ name: 'lock' })
+            // await this.$storageService.save('cs_token', res.token)
+            // const store = await this.$storageService.get('cs_store')
+            // let oldStoreParsed = {}
+            // if (typeof store === 'object') {
+            //   oldStoreParsed = store
+            // }
+            // await this.$storageService.save('cs_store', {
+            //   ...oldStoreParsed,
+            //   isLoggedIn: true,
+            // })
+            // console.log({
+            //   ...oldStoreParsed,
+            //   isLoggedIn: true,
+            // })
+            // this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+            this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
+            // this.$router.push({name: 'lock'})
+            await this.getAccessToken(res.token)
           }
           catch (e) {
             this.notify(e, 'warning')
@@ -373,29 +390,12 @@ export default Vue.extend({
           save_device: this.save_device
         })
         try {
-          await this.$storageService.save('cs_token', res.token)
-          const store = await this.$storageService.get('cs_store')
-          let oldStoreParsed = {}
-          if (typeof store === 'object') {
-            oldStoreParsed = store
-          }
-          await this.$storageService.save('cs_store', {
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          console.log({
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.axios.post('/sso/me/last_active')
-          this.$router.push({ name: 'lock' })
+          this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
+          await this.getAccessToken(res.token)
         }
         catch (e) {
           this.notify(e, 'warning')
         }
-        this.axios.post('/sso/me/last_active')
-        this.$router.push({ name: 'lock' })
       } catch (e) {
         this.loadingOtp = false
         if (e.response) {
@@ -427,6 +427,51 @@ export default Vue.extend({
       } else {
         this.step = 2
         this.$nextTick(() => this.$refs.otp.focus())
+      }
+    },
+    openRegister() {
+      const url = `${
+        process.env.VUE_APP_ID_URL
+      }/register?SERVICE_URL=${encodeURIComponent(
+        "/sso"
+      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
+      this.$platformUtilsService.launchUri(url);
+    },
+    async getAccessToken(token){
+      const url = '/sso/access_token'
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      const payload = {
+        SERVICE_URL: "/sso",
+        SERVICE_SCOPE: "pwdmanager",
+        CLIENT: "browser"
+      }
+      try {
+        const data = await this.axios.post(url,payload,config)
+        if(data.url){
+          const url = data.url
+          let token = url.substring(url.indexOf("token")+6)
+          token = token.indexOf("&") === -1?token:token.substring(0, token.indexOf("&"))
+          await this.$storageService.save('cs_token', token)
+          const store = await this.$storageService.get('cs_store')
+          let oldStoreParsed = {}
+          if (typeof store === 'object') {
+            oldStoreParsed = store
+          }
+          await this.$storageService.save('cs_store', {
+            ...oldStoreParsed,
+            isLoggedIn: true,
+          })
+          console.log({
+            ...oldStoreParsed,
+            isLoggedIn: true,
+          })
+          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+          this.$router.push({ name: 'lock' })
+        }
+      } catch (error) {
+        this.notify(error, 'warning')
       }
     }
   }

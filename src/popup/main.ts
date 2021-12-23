@@ -154,18 +154,24 @@ Vue.mixin({
         return ''
       }
     },
-    async login () {
+    async login() {
+      const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+      const deviceId = await browserStorageService.get("device_id")
+      const deviceIdentifier = deviceId || this.randomString();
+      if (!deviceId) {
+        browserStorageService.save("device_id", deviceIdentifier);
+      }
       try {
         console.log('login')
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
         const res = await this.axios.post('cystack_platform/pm/users/session', {
-          client_id: 'web',
+          client_id: 'browser',
           password: hashedPassword,
           device_name: this.$platformUtilsService.getDeviceString(),
           device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: this.randomString()
+          device_identifier: deviceIdentifier
         })
         // this.$messagingService.send('loggedIn')
         chrome.runtime.sendMessage({command: 'loggedIn'})
@@ -373,7 +379,7 @@ storePromise.then((store) => {
   axios.interceptors.request.use(
     async (config) => {
       const token = await browserStorageService.get('cs_token')
-      const deviceId = await browserStorageService.get('device-id')
+      const deviceId = await browserStorageService.get('device_id')
       if (token) {
         config.headers['Authorization'] = `Bearer ${ token }`
       }
@@ -390,8 +396,7 @@ storePromise.then((store) => {
   axios.interceptors.response.use(
     (response) => {
       if (response.headers['device-id']) {
-        console.log(response.headers['device-id'])
-        browserStorageService.save("device-id", response.headers["device-id"]);
+        browserStorageService.save("device_id", response.headers["device-id"]);
       }
       return response && response.data
     },

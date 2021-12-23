@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col flex-grow relative"
+    class="flex flex-col flex-grow relative h-screen"
     style="background: #F1F1F1; padding-top: 44px"
   >
     <div

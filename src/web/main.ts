@@ -46,7 +46,14 @@ import { nanoid } from 'nanoid'
 
 Vue.mixin({
   data () {
-    return { folders: [] }
+    return {
+      folders: [],
+      strategies: [
+        { key: "google", name: "Google", color: "#4284f4" },
+        { key: "facebook", name: "Facebook", color: "#3c65c4" },
+        { key: "github", name: "GitHub", color: "#202326" }
+      ]
+    };
   },
   computed: {
     language () { return this.$store.state.user.language },
@@ -58,7 +65,7 @@ Vue.mixin({
     searchText () { return this.$store.state.searchText },
     teams () { return this.$store.state.teams || [] },
     currentOrg () { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
-    currentPlan () { return this.$store.state.currentPlan }
+    currentPlan() { return this.$store.state.currentPlan }
   },
   methods: {
     changeLang (value) {
@@ -149,17 +156,23 @@ Vue.mixin({
         return ''
       }
     },
-    async login () {
+    async login() {
+      const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+      const deviceId = await browserStorageService.get('device_id')
+      const deviceIdentifier = deviceId || this.randomString()
+      if (!deviceId) {
+        browserStorageService.save("device_id", deviceIdentifier);
+      }
       try {
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
         const res = await this.axios.post('cystack_platform/pm/users/session', {
-          client_id: 'web',
+          client_id: 'browser',
           password: hashedPassword,
           device_name: this.$platformUtilsService.getDeviceString(),
           device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: this.randomString()
+          device_identifier: deviceIdentifier
         })
         this.$messagingService.send('loggedIn')
         console.log(res)
@@ -389,12 +402,16 @@ storePromise.then((store) => {
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
   axios.interceptors.request.use(
     async (config) => {
-      const token = await browserStorageService.get('cs_token')
+      const token = await browserStorageService.get("cs_token");
+      const deviceId = await browserStorageService.get("device_id");
       if (token) {
-        config.headers['Authorization'] = `Bearer ${ token }`
+        config.headers["Authorization"] = `Bearer ${token}`;
       }
-      config.baseURL = process.env.VUE_APP_BASE_API_URL
-      return config
+      if (deviceId) {
+        config.headers["device-id"] = deviceId;
+      }
+      config.baseURL = process.env.VUE_APP_BASE_API_URL;
+      return config;
     },
     (error) => {
       return Promise.reject(error)
@@ -402,17 +419,20 @@ storePromise.then((store) => {
   )
   axios.interceptors.response.use(
     (response) => {
+      if (response.headers["device-id"]) {
+        browserStorageService.save("device_id", response.headers["device-id"]);
+      }
       return response && response.data
     },
     (error) => {
       if (error.response) {
         if (error.response.status === 404) {
-          router.push({name: 'Home'})
+          router.push({name: 'home'})
         }
         if (error.response.status === 401) {
           browserStorageService.remove('cs_token')
           store.commit('UPDATE_IS_LOGGEDIN', false)
-          router.push({name: 'home'})
+          router.push({name: 'login'})
         }
       }
       return Promise.reject(error)
