@@ -13,7 +13,6 @@ import moment from "moment";
 import numeral from "numeral";
 import VueMomentJS from "vue-momentjs";
 import VueNativeSock from 'vue-native-websocket'
-
 import App from '@/popup/App.vue'
 import router from '@/router/web'
 import storePromise from '@/store/web'
@@ -22,6 +21,7 @@ import JSLib from '@/popup/services/services'
 import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
+
 
 Vue.config.productionTip = false
 Vue.use(JSLib)
@@ -43,6 +43,8 @@ import '@/assets/tailwind.css'
 import '@/assets/app.scss'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
+import { Avatar } from "element-ui";
+import extractDomain from "extract-domain";
 
 Vue.mixin({
   data () {

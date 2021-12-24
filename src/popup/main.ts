@@ -41,6 +41,8 @@ import '@/assets/tailwind.css'
 import '@/assets/app.scss'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
+import { Avatar } from "element-ui";
+import extractDomain from "extract-domain";
 
 Vue.mixin({
   data () {

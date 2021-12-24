@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-column-fluid relative">
+  <div v-loading="loading" class="flex flex-col flex-column-fluid relative">
     <NoCipher
       v-if="shouldRenderNoCipher"
       :type="type"
@@ -89,19 +89,18 @@
         v-if="$route.name === 'vault' && folders"
         class="mb-10"
       >
-        <div class="grid grid-cols-4 md:grid-cols-4 2xl:grid-cols-5 gap-6 ">
+        <div class="grid grid-cols-2 2xl:grid-cols-5 gap-6 ">
           <div
             v-for="item in folders"
             :key="item.id"
             class="px-4 py-6 flex items-center cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
             :class="{'border-primary': selectedFolder.id === item.id}"
             :title="item.name"
-            @click="selectedFolder = item"
-            @dblclick="routerFolder(item)"
+            @click="routerFolder(item)"
             @contextmenu.prevent="$refs.menu.open($event, item)"
           >
             <img src="@/assets/images/icons/folderSolid.svg" alt="" class="select-none mr-2">
-            <div class="font-semibold break-all select-none">{{ item.name }} ({{ item.ciphersCount }})</div>
+            <div class="font-semibold truncate select-none">{{ item.name }} ({{ item.ciphersCount }})</div>
           </div>
           <component
             :is="context"
@@ -134,15 +133,14 @@
           <div :key="key" class="mb-5 font-medium">
             {{ getTeam(teams, key).name }}
           </div>
-          <div :key="key" class="grid grid-cols-4 md:grid-cols-4 2xl:grid-cols-5 gap-6 ">
+          <div :key="key" class="grid grid-cols-3 2xl:grid-cols-5 gap-6 ">
             <div
               v-for="item in value"
               :key="item.id"
               class="px-4 py-6 cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
               :class="{'border-primary': selectedFolder.id === item.id}"
               :title="`${item.name} (${item.ciphersCount})`"
-              @click="selectedFolder = item"
-              @dblclick="routerCollection(item)"
+              @click="routerCollection(item)"
               @contextmenu.prevent="canManageFolder(teams, item) ? $refs.menuTeam.open($event, item) : null"
             >
               <div class="flex items-center">

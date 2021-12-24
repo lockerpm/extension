@@ -1,7 +1,8 @@
 <template>
   <div class="flex flex-col sm:flex-row flex-1">
     <template v-if="!locked">
-      <div class="w-60 h-screen bg-aside min-h-500px min-w-60 fixed flex flex-col justify-between">
+      <div class="locker-sidebar">
+        <div class="w-60 h-screen bg-aside min-h-500px min-w-60 fixed flex flex-col justify-between">
         <div>
           <div class="mt-7 px-6">
             <img class="h-[32px]" src="@/assets/images/logo/logo_white.svg" alt="Logo">
@@ -38,7 +39,8 @@
           </nav>
         </div>
       </div>
-      <div class="pl-60 flex flex-col flex-row-fluid">
+      </div>
+      <div class="vault-container flex flex-col flex-row-fluid">
         <Header />
         <div v-if="shouldWelcome !=='false'" class="flex-column-fluid lg:px-28 py-10 px-10">
           <div class="border border-black-200 rounded p-5 md:p-8 relative">
@@ -386,3 +388,19 @@ export default Vue.extend({
 }
 )
 </script>
+<style scoped>
+.locker-sidebar{
+  display: block;
+}
+.vault-container{
+  @apply pl-60
+}
+@media screen and (max-width: 768px)  {
+  .locker-sidebar{
+    display: none;
+  }
+  .vault-container{
+    padding-left: 0px;
+  }
+}
+</style>
