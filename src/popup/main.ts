@@ -200,26 +200,29 @@ Vue.mixin({
     async clearKeys () {
       await this.$cryptoService.clearKeys()
     },
-    async getSyncData () {
+    async getSyncData() {
+      this.$store.commit("UPDATE_SYNCING", true);
       try {
-        this.$messagingService.send('syncStarted')
-        let res = await this.axios.get('cystack_platform/pm/sync')
-        res = new SyncResponse(res)
+        this.$messagingService.send("syncStarted");
+        let res = await this.axios.get("cystack_platform/pm/sync");
+        res = new SyncResponse(res);
 
-        const userId = await this.$userService.getUserId()
-        await this.$syncService.syncProfile(res.profile)
-        await this.$syncService.syncFolders(userId, res.folders)
-        await this.$syncService.syncCollections(res.collections)
-        await this.$syncService.syncCiphers(userId, res.ciphers)
-        await this.$syncService.syncSends(userId, res.sends)
-        await this.$syncService.syncSettings(userId, res.domains)
-        await this.$syncService.syncPolicies(res.policies)
-        await this.$syncService.setLastSync(new Date())
-        this.$messagingService.send('syncCompleted', { successfully: true })
-        this.$store.commit('UPDATE_SYNCED_CIPHERS')
+        const userId = await this.$userService.getUserId();
+        await this.$syncService.syncProfile(res.profile);
+        await this.$syncService.syncFolders(userId, res.folders);
+        await this.$syncService.syncCollections(res.collections);
+        await this.$syncService.syncCiphers(userId, res.ciphers);
+        await this.$syncService.syncSends(userId, res.sends);
+        await this.$syncService.syncSettings(userId, res.domains);
+        await this.$syncService.syncPolicies(res.policies);
+        await this.$syncService.setLastSync(new Date());
+        this.$messagingService.send("syncCompleted", { successfully: true });
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
       } catch (e) {
-        this.$messagingService.send('syncCompleted', { successfully: false })
-        this.$store.commit('UPDATE_SYNCED_CIPHERS')
+        this.$messagingService.send("syncCompleted", { successfully: false });
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+      } finally {
+        this.$store.commit("UPDATE_SYNCING", false);
       }
     },
     async getFolders () {

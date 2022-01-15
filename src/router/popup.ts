@@ -70,12 +70,18 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/passwords",
-    name: "passwords",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/passwords/index.vue"
-      )
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "passwords",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/passwords/index.vue"
+          )
+      }
+    ]
   },
   {
     path: "/notes",

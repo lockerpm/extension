@@ -1,5 +1,9 @@
 <template>
-  <div class="">
+  <div 
+    class="relative"
+    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
+  >
+    <Header></Header>
     <div
       v-if="!isLoggedIn"
       class="p-6"
@@ -34,13 +38,30 @@
       </div>
     </div>
     <div v-else>
-      <ul class="">
+      <template v-if="searchText.length>1">
+        <ul>
+          <cipher-row
+            v-for="item in ciphers"
+            :key="item.id"
+            :item="item"
+          >
+          </cipher-row>
+        </ul>
+      </template>
+      <ul
+        v-else
+        class=""
+      >
+        <div class="uppercase px-3 mt-4 mb-1">PASSWORDS FOR CURRENT WEBSITE ({{loginCiphers.length}})</div>
         <div
-          class="uppercase px-3 mt-4 mb-1"
-        >PASSWORDS FOR CURRENT WEBSITE ({{loginCiphers.length}})</div>
-        <div v-if="!loginCiphers.length" class="bg-white text-center py-4">
+          v-if="!loginCiphers.length"
+          class="bg-white text-center py-4"
+        >
           <p class="mb-2">There is no saved passwords for this site.</p>
-          <router-link :to="{name: 'add-item-create'}" class="uppercase text-primary hover:no-underline">Add a password</router-link>
+          <router-link
+            :to="{name: 'add-item-create'}"
+            class="uppercase text-primary hover:no-underline"
+          >Add a password</router-link>
         </div>
         <li
           v-for="item in loginCiphers"
@@ -48,7 +69,7 @@
           class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
           @click.self="fillCipher(item)"
         >
-          
+
           <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
@@ -56,7 +77,10 @@
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow" @click="fillCipher(item)">
+          <div
+            class="flex-grow"
+            @click="fillCipher(item)"
+          >
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -122,7 +146,10 @@
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow" @click="fillCipher(item)">
+          <div
+            class="flex-grow"
+            @click="fillCipher(item)"
+          >
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -158,7 +185,10 @@
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-          <div class="flex-grow" @click="fillCipher(item)">
+          <div
+            class="flex-grow"
+            @click="fillCipher(item)"
+          >
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
             </div>
@@ -179,13 +209,14 @@
         </li>
       </ul>
     </div>
+    <Footer></Footer>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
-import groupBy from 'lodash/groupBy';
+import groupBy from "lodash/groupBy";
 import { BrowserApi } from "@/browser/browserApi";
 import { Utils } from "jslib-common/misc/utils";
 import { CipherType } from "jslib-common/enums/cipherType";
@@ -195,11 +226,17 @@ import BrowserStorageService from "@/services/browserStorage.service";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import Vnodes from "@/components/Vnodes";
+import CipherRow from "@/popup/components/ciphers/CipherRow";
+import Header from "@/popup/components/layout/parts/Header";
+import Footer from "@/popup/components/layout/parts/Footer";
 const BroadcasterSubscriptionId = "CurrentTabComponent";
 export default Vue.extend({
   name: "Home",
   components: {
-    Vnodes
+    Vnodes,
+    CipherRow,
+    Header,
+    Footer
   },
   data() {
     return {
@@ -225,9 +262,11 @@ export default Vue.extend({
     // BrowserApi.messageListener('home.popup', async (msg: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
     //   await this.processMessage(msg, sender, sendResponse);
     // });
-    chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-      this.processMessage(msg, sender, response);
-    });
+    chrome.runtime.onMessage.addListener(
+      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+        this.processMessage(msg, sender, response);
+      }
+    );
     // await this.load();
     if (!this.$syncService.syncInProgress) {
       await this.load();
@@ -243,23 +282,30 @@ export default Vue.extend({
     // }, 100);
   },
   destroyed() {
-    window.clearTimeout(this.loadedTimeout)
+    window.clearTimeout(this.loadedTimeout);
   },
   asyncComputed: {
     ciphers: {
-      async get () {
-        const deletedFilter = c => {
-          return c.isDeleted === false
-        }
-        const result = await this.$searchService.searchCiphers(this.searchText, [null, deletedFilter], null) || []
+      async get() {
+        const deletedFilter = (c) => {
+          return c.isDeleted === false;
+        };
+        const result = await this.$searchService.searchCiphers(this.searchText,[null, deletedFilter],null) || []
 
-        return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
+        return (orderBy(result,[c => this.orderField === "name"? c.name && c.name.toLowerCase() : c.revisionDate,], [this.orderDirection]) || [])
       },
-      watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "deleted",
+        "searchText",
+        "filter",
+        "orderField",
+        "orderDirection",
+      ],
     },
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked()
-    }
+    async locked() {
+      return await this.$vaultTimeoutService.isLocked();
+    },
     // locked :{
     //   async get() {
     //     return await this.$vaultTimeoutService.isLocked()
@@ -277,7 +323,7 @@ export default Vue.extend({
       // BrowserApi.reloadOpenWindows();
       // const thisWindow = window.open("", "_self");
       // thisWindow.close();
-      this.$router.push({name: "login"})
+      this.$router.push({ name: "login" });
     },
     openRegister() {
       const url = `${
@@ -315,7 +361,7 @@ export default Vue.extend({
 
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
-      console.log('popup send cmd: collectPageDetails')
+      console.log("popup send cmd: collectPageDetails");
       BrowserApi.tabSendMessage(tab, {
         command: "collectPageDetails",
         tab: tab,
@@ -368,11 +414,14 @@ export default Vue.extend({
     },
     addEdit(item) {
       // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
-      this.$router.push({ name: 'add-item-create', params: { data: item } })
+      this.$router.push({ name: "add-item-create", params: { data: item } });
     },
     async fillCipher(cipher: CipherView) {
-      console.log(this.pageDetails.length)
-      if (cipher.reprompt !== CipherRepromptType.None && !await this.$passwordRepromptService.showPasswordPrompt()) {
+      console.log(this.pageDetails.length);
+      if (
+        cipher.reprompt !== CipherRepromptType.None &&
+        !(await this.$passwordRepromptService.showPasswordPrompt())
+      ) {
         return;
       }
 
@@ -383,7 +432,10 @@ export default Vue.extend({
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
         // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-        this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
+        this.notify(
+          "Unable to auto-fill the selected item on this page. Copy and paste the information instead.",
+          "warning"
+        );
         return;
       }
 
@@ -395,10 +447,15 @@ export default Vue.extend({
           fillNewPassword: true,
         });
         if (this.totpCode != null) {
-          this.$platformUtilsService.copyToClipboard(this.totpCode, { window: window });
+          this.$platformUtilsService.copyToClipboard(this.totpCode, {
+            window: window,
+          });
         }
         if (this.$popupUtilsService.inPopup(window)) {
-          if (this.$platformUtilsService.isFirefox() || this.$platformUtilsService.isSafari()) {
+          if (
+            this.$platformUtilsService.isFirefox() ||
+            this.$platformUtilsService.isSafari()
+          ) {
             BrowserApi.closePopup(window);
           } else {
             // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
@@ -406,35 +463,40 @@ export default Vue.extend({
           }
         }
       } catch (e) {
-        this.notify('Unable to auto-fill the selected item on this page. Copy and paste the information instead.', 'warning')
+        this.notify(
+          "Unable to auto-fill the selected item on this page. Copy and paste the information instead.",
+          "warning"
+        );
         // this.notify(e, 'warning')
       }
     },
     async processMessage(msg: any, sender: any, sendResponse: any) {
-      console.log(`popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`)
+      console.log(
+        `popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`
+      );
       switch (msg.command) {
-      case 'syncCompleted':
+      case "syncCompleted":
         if (this.loaded) {
           window.setTimeout(() => {
             this.load();
           }, 500);
         }
         break;
-      case 'collectPageDetailsResponse':
-        console.log('home: collectPageDetails')
+      case "collectPageDetailsResponse":
+        console.log("home: collectPageDetails");
         if (msg.sender === BroadcasterSubscriptionId) {
           const pageDetailsObj = {
             // frameId: msg.webExtSender.frameId,
             tab: msg.tab,
             details: msg.details,
-          }
+          };
           this.pageDetails.push(pageDetailsObj);
         }
         break;
       default:
         break;
       }
-    }
+    },
   },
 });
 </script>

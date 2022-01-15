@@ -251,6 +251,9 @@ svg {
 }
 .el-avatar {
   background: transparent;
+  img {
+    object-fit: contain !important;
+  }
 }
 
 a {

@@ -43,6 +43,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       isLoggedInPw: false,
       syncedCiphersToggle: false,
+      syncing: false,
       searchText: '',
       teams: [],
       currentTeam: {},
@@ -115,6 +116,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_SYNCED_CIPHERS (state) {
         state.syncedCiphersToggle = !state.syncedCiphersToggle
+      },
+      UPDATE_SYNCING (state, syncing) {
+        state.syncing = syncing
       },
       UPDATE_SEARCH (state, value) {
         state.searchText = value

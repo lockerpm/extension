@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div
+    class="relative"
+    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
+  >
+    <Header></Header>
     <div
       v-for="(cate, index) in menu"
       :key="index"
@@ -64,6 +68,7 @@
         </li>
       </ul>
     </div>
+    <Footer></Footer>
     <Fingerprint ref="fingerprintDialog"/>
   </div>
 </template>
@@ -72,9 +77,13 @@
 import Vue from 'vue'
 import { BrowserApi } from '@/browser/browserApi';
 import Fingerprint from '@/popup/components/setting/Fingerprint.vue'
+import Header from "@/popup/components/layout/parts/Header";
+import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
   components: {
-    Fingerprint
+    Fingerprint,
+    Header,
+    Footer
   },
   async mounted() {
     chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {

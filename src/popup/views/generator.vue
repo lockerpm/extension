@@ -1,26 +1,21 @@
 <template>
-  <div>
-    <!-- <div class="">
-      <div class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-           @click="$router.back()"
-      >
-        <div class="menu-icon mr-4">
-          <i class="fas fa-chevron-left text-[20px]"></i>
-        </div>
-        <div class="flex-grow">
-          Back
-        </div>
-      </div>
-    </div> -->
+  <div
+    class="relative"
+    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
+  >
+    <Header></Header>
     <PasswordGenerator />
+    <Footer></Footer>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import PasswordGenerator from '@/popup/components/password/PasswordGenerator'
+import Header from "@/popup/components/layout/parts/Header";
+import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
-  components: { PasswordGenerator },
+  components: { PasswordGenerator, Header, Footer },
   data() {
     return {}
   },

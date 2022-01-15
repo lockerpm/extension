@@ -83,7 +83,7 @@ export default Vue.extend(
     },
     props: {
       item:{
-        type: CipherView,
+        type: Object,
         default: null
       }
     },

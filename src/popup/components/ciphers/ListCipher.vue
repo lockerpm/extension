@@ -4,8 +4,9 @@
     style="padding-top: 44px; min-height: 600px; max-width: 400px"
   >
 
-    <div class="fixed top-0 left-0 right-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-        style="z-index:1"
+    <div
+      class="fixed top-0 left-0 right-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
+      style="z-index:1"
     >
       <div
         class="menu-icon mr-4"
@@ -23,85 +24,87 @@
       :type="type"
       @add-cipher="handleAddButton"
     />
-    <ul class="">
-      <li
-        v-for="item in ciphers"
-        :key="item.id"
-        class="flex items-center hover:bg-[#E4F2E1] cursor-pointer h-[62px] px-5 border-t border-black-400"
-        @click.self="routerCipher(item, addEdit)"
-      >
-        <div
-          class="text-[34px] mr-3 flex-shrink-0"
-          :class="{'filter grayscale': item.isDeleted}"
-          @click="routerCipher(item, addEdit)"
+    <div>
+      <ul class="">
+        <li
+          v-for="item in dataRendered"
+          :key="item.id"
+          class="flex items-center hover:bg-[#E4F2E1] cursor-pointer h-[62px] px-5 border-t border-black-400"
+          @click.self="routerCipher(item, addEdit)"
         >
-          <Vnodes :vnodes="getIconCipher(item, 34)" />
-        </div>
-        <div
-          class="flex-grow"
-          @click="routerCipher(item, addEdit)"
-        >
-          <div class="text-black font-semibold truncate flex items-center">
-            {{ item.name }}
+          <div
+            class="text-[34px] mr-3 flex-shrink-0"
+            :class="{'filter grayscale': item.isDeleted}"
+            @click="routerCipher(item, addEdit)"
+          >
+            <Vnodes :vnodes="getIconCipher(item, 34)" />
+          </div>
+          <div
+            class="flex-grow"
+            @click="routerCipher(item, addEdit)"
+          >
+            <div class="text-black font-semibold truncate flex items-center">
+              {{ item.name }}
+            </div>
+            <div>
+              {{ item.subTitle }}
+            </div>
           </div>
           <div>
-            {{ item.subTitle }}
-          </div>
-        </div>
-        <div>
-          <div class="col-actions">
-            <button
-              v-if="item.login.canLaunch"
-              class="btn btn-icon btn-xs hover:text-primary"
-              :title="`Launch ${item.login.uri}`"
-              @click="openNewTab(item.login.uri)"
-            >
-              <i class="fas fa-external-link-square-alt" />
-            </button>
-            <el-dropdown
-              v-if="!item.isDeleted"
-              trigger="click"
-              :hide-on-click="false"
-            >
-              <button class="btn btn-icon btn-xs hover:text-primary">
-                <i class="fas fa-clone" />
+            <div class="col-actions">
+              <button
+                v-if="item.login.canLaunch"
+                class="btn btn-icon btn-xs hover:text-primary"
+                :title="`Launch ${item.login.uri}`"
+                @click="openNewTab(item.login.uri)"
+              >
+                <i class="fas fa-external-link-square-alt" />
               </button>
-              <el-dropdown-menu slot="dropdown">
-                <template v-if="item.type === CipherType.Login">
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.username"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.username') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.password"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.password') }}
-                  </el-dropdown-item>
-                </template>
-                <template v-if="item.type === CipherType.SecureNote">
-                  <el-dropdown-item
-                    v-clipboard:copy="item.notes"
-                    v-clipboard:success="clipboardSuccessHandler"
-                    divided
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.note') }}
-                  </el-dropdown-item>
-                </template>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <button
-              class="btn btn-icon btn-xs hover:text-primary"
-              @click="addEdit(item)"
-            >
-              <i class="fas fa-pen" />
-            </button>
+              <el-dropdown
+                v-if="!item.isDeleted"
+                trigger="click"
+                :hide-on-click="false"
+              >
+                <button class="btn btn-icon btn-xs hover:text-primary">
+                  <i class="fas fa-clone" />
+                </button>
+                <el-dropdown-menu slot="dropdown">
+                  <template v-if="item.type === CipherType.Login">
+                    <el-dropdown-item
+                      v-clipboard:copy="item.login.username"
+                      v-clipboard:success="clipboardSuccessHandler"
+                    >
+                      {{ $t('common.copy') }} {{ $t('common.username') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      v-clipboard:copy="item.login.password"
+                      v-clipboard:success="clipboardSuccessHandler"
+                    >
+                      {{ $t('common.copy') }} {{ $t('common.password') }}
+                    </el-dropdown-item>
+                  </template>
+                  <template v-if="item.type === CipherType.SecureNote">
+                    <el-dropdown-item
+                      v-clipboard:copy="item.notes"
+                      v-clipboard:success="clipboardSuccessHandler"
+                      divided
+                    >
+                      {{ $t('common.copy') }} {{ $t('common.note') }}
+                    </el-dropdown-item>
+                  </template>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <button
+                class="btn btn-icon btn-xs hover:text-primary"
+                @click="addEdit(item)"
+              >
+                <i class="fas fa-pen" />
+              </button>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -135,7 +138,22 @@ export default Vue.extend({
   },
   data () {
     return {
-      CipherType
+      CipherType,
+      loading: false,
+      dataRendered: [],
+      renderIndex: 0
+    }
+  },
+  mounted () {
+    window.onscroll = () => {
+      const bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight + 500 >= document.documentElement.scrollHeight
+
+      if (bottomOfWindow) {
+        this.renderIndex += 50
+        if (this.renderIndex <= this.ciphers.length) {
+          this.dataRendered = this.dataRendered.concat(this.ciphers.slice(this.renderIndex, this.renderIndex + 50))
+        }
+      }
     }
   },
   computed: {
@@ -185,12 +203,15 @@ export default Vue.extend({
   asyncComputed: {
     ciphers: {
       async get () {
+        this.loading = true
         const deletedFilter = c => {
           return c.isDeleted === this.deleted
         }
         let result = await this.$searchService.searchCiphers(this.searchText, [this.filter, deletedFilter], null) || []
         // remove ciphers generated by authenticator
         result = result.filter(cipher => [CipherType.Login, CipherType.SecureNote, CipherType.Card, CipherType.Identity].includes(cipher.type))
+        this.dataRendered = result.slice(0, 50)
+        this.renderIndex = 0
         return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
       },
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
@@ -215,50 +236,13 @@ export default Vue.extend({
           const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
           f.ciphersCount = ciphers && ciphers.length
         })
+        if (!this.$store.state.syncing) {
+          this.loading = false
+        }
         return collections
       },
       watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
-    },
-    weakPasswordScores: {
-      async get () {
-        const weakPasswordScores = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
-        if (this.$route.name === 'vault') {
-          const allCiphers = await this.$cipherService.getAllDecrypted()
-          const isUserNameNotEmpty = c => {
-            return c.login.username != null && c.login.username.trim() !== ''
-          }
-          allCiphers.forEach(c => {
-            if (c.type !== CipherType.Login || c.login.password == null || c.login.password === '' || c.isDeleted || c.organizationId) {
-              return
-            }
-            const hasUserName = isUserNameNotEmpty(c)
-            let userInput = []
-            if (hasUserName) {
-              const atPosition = c.login.username.indexOf('@')
-              if (atPosition > -1) {
-                userInput = userInput.concat(
-                  c.login.username.substr(0, atPosition).trim().toLowerCase().split(/[^A-Za-z0-9]/))
-                  .filter(i => i.length >= 3)
-              } else {
-                userInput = c.login.username.trim().toLowerCase().split(/[^A-Za-z0-9]/)
-                  .filter(i => i.length >= 3)
-              }
-            }
-            const result = this.$passwordGenerationService.passwordStrength(c.login.password,
-              userInput.length > 0 ? userInput : null)
-            weakPasswordScores[result.score]++
-          })
-          await this.axios.put('/cystack_platform/pm/users/me', {
-            scores: weakPasswordScores
-          })
-        }
-        return weakPasswordScores
-      },
-      watch: ['$store.state.syncedCiphersToggle']
     }
-  },
-  mounted () {
-    // this.$store.commit('UPDATE_SYNCED_CIPHERS')
   },
   methods: {
     // addEdit (item) {
