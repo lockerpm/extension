@@ -176,7 +176,7 @@ export default Vue.extend({
       ],
       CipherType,
       noFolderCiphers: [],
-      loading: false,
+      loading: true,
       dataRendered: [],
       renderIndex: 0
     }
@@ -217,10 +217,16 @@ export default Vue.extend({
       }
     }
   },
+  watch: {
+    ciphers () {
+      if (this.ciphers) {
+        this.loading = false
+      }
+    }
+  },
   asyncComputed: {
     ciphers: {
       async get () {
-        this.loading = true
         const deletedFilter = c => {
           return c.isDeleted === false
         }

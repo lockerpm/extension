@@ -285,6 +285,11 @@ Vue.mixin({
         return
       }
       console.log(cipher)
+      this.$router.push({
+        name: "vault-id",
+        params: { id: cipher.id }
+      });
+      return;
       if (this.$route.name === 'vault') {
         this.$router.push({
           name: 'vault-id',

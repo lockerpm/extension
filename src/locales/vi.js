@@ -8,6 +8,7 @@ module.exports = {
     delete: 'Xóa',
     success: 'Thành công',
     warning: 'Cảnh báo',
+    error: 'Lỗi',
     failed: 'Thất bại',
     copied: 'Sao chép vào bộ nhớ tạm',
     clone: 'Nhân bản',

@@ -8,6 +8,7 @@ module.exports = {
     delete: 'Delete',
     success: 'Success',
     warning: 'Warning',
+    error: 'Error',
     failed: 'Failed',
     copied: 'Copied to clipboard',
     clone: 'Clone',

@@ -1,5 +1,6 @@
 <template>
   <div
+    v-loading="loading"
     class="relative"
     style="padding-top: 44px; min-height: 600px; max-width: 400px"
   >
@@ -139,7 +140,7 @@ export default Vue.extend({
   data () {
     return {
       CipherType,
-      loading: false,
+      loading: true,
       dataRendered: [],
       renderIndex: 0
     }
@@ -153,6 +154,13 @@ export default Vue.extend({
         if (this.renderIndex <= this.ciphers.length) {
           this.dataRendered = this.dataRendered.concat(this.ciphers.slice(this.renderIndex, this.renderIndex + 50))
         }
+      }
+    }
+  },
+  watch: {
+    ciphers () {
+      if (this.ciphers) {
+        this.loading = false
       }
     }
   },
@@ -203,7 +211,6 @@ export default Vue.extend({
   asyncComputed: {
     ciphers: {
       async get () {
-        this.loading = true
         const deletedFilter = c => {
           return c.isDeleted === this.deleted
         }
@@ -228,21 +235,18 @@ export default Vue.extend({
       },
       watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
     },
-    collections: {
-      async get () {
-        let collections = await this.$collectionService.getAllDecrypted() || []
-        collections = collections.filter(f => f.id)
-        collections.forEach(f => {
-          const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
-          f.ciphersCount = ciphers && ciphers.length
-        })
-        if (!this.$store.state.syncing) {
-          this.loading = false
-        }
-        return collections
-      },
-      watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
-    }
+    // collections: {
+    //   async get () {
+    //     let collections = await this.$collectionService.getAllDecrypted() || []
+    //     collections = collections.filter(f => f.id)
+    //     collections.forEach(f => {
+    //       const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
+    //       f.ciphersCount = ciphers && ciphers.length
+    //     })
+    //     return collections
+    //   },
+    //   watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
+    // }
   },
   methods: {
     // addEdit (item) {

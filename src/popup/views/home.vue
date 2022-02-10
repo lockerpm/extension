@@ -37,7 +37,7 @@
         </button>
       </div>
     </div>
-    <div v-else>
+    <div v-else v-loading="loading">
       <template v-if="searchText.length>1">
         <ul>
           <cipher-row
@@ -256,6 +256,7 @@ export default Vue.extend({
       totpTimeout: null,
       loadedTimeout: null,
       searchTimeout: null,
+      loading: true
     };
   },
   async mounted() {
@@ -284,6 +285,16 @@ export default Vue.extend({
   destroyed() {
     window.clearTimeout(this.loadedTimeout);
   },
+  watch: {
+    ciphers () {
+      if (this.ciphers) {
+        this.loading = false
+      }
+      window.setTimeout(() => {
+        this.load();
+      }, 500);
+    }
+  },
   asyncComputed: {
     ciphers: {
       async get() {
@@ -303,14 +314,6 @@ export default Vue.extend({
         "orderDirection",
       ],
     },
-    async locked() {
-      return await this.$vaultTimeoutService.isLocked();
-    },
-    // locked :{
-    //   async get() {
-    //     return await this.$vaultTimeoutService.isLocked()
-    //   }
-    // }
   },
   methods: {
     openLogin() {
@@ -334,7 +337,8 @@ export default Vue.extend({
       this.$platformUtilsService.launchUri(url);
     },
     openVault() {
-      this.$platformUtilsService.launchUri("/web.html#/vault");
+      // this.$platformUtilsService.launchUri("/web.html#/vault");
+      this.$platformUtilsService.launchUri("https://locker.io/vault");
     },
     openLock() {
       this.$router.push({ name: "lock" });
@@ -476,11 +480,14 @@ export default Vue.extend({
       );
       switch (msg.command) {
       case "syncCompleted":
-        if (this.loaded) {
-          window.setTimeout(() => {
-            this.load();
-          }, 500);
-        }
+        // if (this.loaded) {
+        //   window.setTimeout(() => {
+        //     this.load();
+        //   }, 500);
+        // }
+        window.setTimeout(() => {
+          this.load();
+        }, 500);
         break;
       case "collectPageDetailsResponse":
         console.log("home: collectPageDetails");

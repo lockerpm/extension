@@ -44,6 +44,7 @@ export default Vue.extend({
       }
       if (newValue === false) {
         this.$store.dispatch('LoadTeams')
+        console.log('unlock sync')
         this.getSyncData()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')

@@ -65,7 +65,10 @@ Vue.mixin({
     searchText () { return this.$store.state.searchText },
     teams () { return this.$store.state.teams || [] },
     currentOrg () { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
-    currentPlan () { return this.$store.state.currentPlan }
+    currentPlan() { return this.$store.state.currentPlan },
+    cipherCount () {
+      return this.$store.state.cipherCount
+    },
   },
   methods: {
     changeLang (value) {
@@ -113,10 +116,24 @@ Vue.mixin({
     },
     async logout () {
       console.log('###### LOG OUT')
+      const userId = await this.$userService.getUserId()
       await this.axios.post('/users/logout')
-      await this.$cryptoService.clearKeys()
-      await this.$userService.clear()
-      await this.$storageService.remove('cs_token')
+      await Promise.all([
+        this.$storageService.remove("cs_token"),
+        this.$cryptoService.clearKeys(),
+        this.$userService.clear(),
+        this.$folderService.clear(userId),
+        this.$collectionService.clear(userId),
+        this.$cipherService.clear(userId),
+        this.$settingsService.clear(userId),
+        this.$policyService.clear(userId),
+        this.$tokenService.clearToken()
+      ]);
+      // await this.$cryptoService.clearKeys()
+      // await this.$userService.clear()
+      // await this.$folderService.clear(userId)
+      // await this.$cipherService.clear(userId)
+      // await this.$storageService.remove('cs_token')
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$router.push({ name: 'home' })
     },
@@ -200,29 +217,78 @@ Vue.mixin({
     async clearKeys () {
       await this.$cryptoService.clearKeys()
     },
-    async getSyncData() {
-      this.$store.commit("UPDATE_SYNCING", true);
-      try {
-        this.$messagingService.send("syncStarted");
-        let res = await this.axios.get("cystack_platform/pm/sync");
-        res = new SyncResponse(res);
+    // async getSyncData() {
+    //   this.$store.commit("UPDATE_SYNCING", true);
+    //   try {
+    //     this.$messagingService.send("syncStarted");
+    //     let res = await this.axios.get("cystack_platform/pm/sync");
+    //     res = new SyncResponse(res);
 
-        const userId = await this.$userService.getUserId();
-        await this.$syncService.syncProfile(res.profile);
-        await this.$syncService.syncFolders(userId, res.folders);
-        await this.$syncService.syncCollections(res.collections);
-        await this.$syncService.syncCiphers(userId, res.ciphers);
-        await this.$syncService.syncSends(userId, res.sends);
-        await this.$syncService.syncSettings(userId, res.domains);
-        await this.$syncService.syncPolicies(res.policies);
-        await this.$syncService.setLastSync(new Date());
-        this.$messagingService.send("syncCompleted", { successfully: true });
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+    //     const userId = await this.$userService.getUserId();
+    //     await this.$syncService.syncProfile(res.profile);
+    //     await this.$syncService.syncFolders(userId, res.folders);
+    //     await this.$syncService.syncCollections(res.collections);
+    //     await this.$syncService.syncCiphers(userId, res.ciphers);
+    //     await this.$syncService.syncSends(userId, res.sends);
+    //     await this.$syncService.syncSettings(userId, res.domains);
+    //     await this.$syncService.syncPolicies(res.policies);
+    //     await this.$syncService.setLastSync(new Date());
+    //     this.$messagingService.send("syncCompleted", { successfully: true });
+    //     this.$store.commit("UPDATE_SYNCED_CIPHERS");
+    //   } catch (e) {
+    //     this.$messagingService.send("syncCompleted", { successfully: false });
+    //     this.$store.commit("UPDATE_SYNCED_CIPHERS");
+    //   } finally {
+    //     this.$store.commit("UPDATE_SYNCING", false);
+    //   }
+    // },
+    async getSyncData () {
+      this.$store.commit('UPDATE_SYNCING', true)
+      const pageSize = 100
+      try {
+        let page = 1
+        let allCiphers = []
+        const userId = await this.$userService.getUserId()
+        this.$messagingService.send('syncStarted')
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          console.log('sync')
+          let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
+          if (res.count && res.count.ciphers) {
+            this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
+          }
+          res = new SyncResponse(res)
+          allCiphers = allCiphers.concat(res.ciphers)
+          await this.$syncService.syncProfile(res.profile)
+          await this.$syncService.syncFolders(userId, res.folders);
+          await this.$syncService.syncCollections(res.collections);
+          await this.$syncService.syncSomeCiphers(userId, res.ciphers);
+          await this.$syncService.syncSends(userId, res.sends);
+          await this.$syncService.syncSettings(userId, res.domains);
+          await this.$syncService.syncPolicies(res.policies);
+          await this.$syncService.setLastSync(new Date());
+          this.$store.commit('UPDATE_SYNCED_CIPHERS')
+          if (page * pageSize >= this.cipherCount) {
+            break
+          }
+          page += 1
+        }
+        // delete cached cipher if it is not in sync data
+        const decryptedCipherCache = this.$cipherService.decryptedCipherCache
+        decryptedCipherCache.forEach(function (cipher, i) {
+          const syncIndex = allCiphers.findIndex(c => c.id === cipher.id)
+          if (syncIndex < 0) {
+            decryptedCipherCache.splice(i, 1)
+          }
+        })
+        // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
+        this.$messagingService.send('syncCompleted', { successfully: true })
+        console.log('sync completed')
       } catch (e) {
-        this.$messagingService.send("syncCompleted", { successfully: false });
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$messagingService.send('syncCompleted', { successfully: false })
+        this.$store.commit('UPDATE_SYNCED_CIPHERS')
       } finally {
-        this.$store.commit("UPDATE_SYNCING", false);
+        this.$store.commit('UPDATE_SYNCING', false)
       }
     },
     async getFolders () {
@@ -288,7 +354,6 @@ Vue.mixin({
         callbackDeleted(cipher)
         return
       }
-
       if (this.$route.name === 'vault') {
         this.$router.push({
           name: 'vault-id',

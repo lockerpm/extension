@@ -56,17 +56,16 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/vault/:id",
-    name: "vault-id",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue")
-  },
-  {
-    path: "/passwords/:id",
-    name: "passwords-id",
-    beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue")
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "vault-id",
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/vault/_id.vue")
+      }
+    ]
   },
   {
     path: "/passwords",
@@ -84,50 +83,104 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: "/notes",
-    name: "notes",
+    path: "/passwords/:id",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/notes/index.vue")
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "passwords-id",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue"
+          )
+      }
+    ]
+  },
+  {
+    path: "/notes",
+    beforeEnter: VaultGuard,
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "notes",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/notes/index.vue"
+          )
+      }
+    ]
   },
   {
     path: "/notes/:id",
-    name: "notes-id",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/notes/_id.vue")
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "notes-id",
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/notes/_id.vue")
+      }
+    ]
   },
   {
     path: "/cards",
-    name: "cards",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/cards/index.vue")
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "cards",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/cards/index.vue"
+          )
+      }
+    ]
   },
   {
     path: "/cards/:id",
-    name: "cards-id",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/cards/_id.vue")
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "cards-id",
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/cards/_id.vue")
+      }
+    ]
   },
   {
     path: "/identities",
-    name: "identities",
     beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/identities/index.vue"
-      )
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "identities",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/identities/index.vue"
+          )
+      }
+    ]
   },
   {
     path: "/identities/:id",
-    name: "identities-id",
-    beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/identities/_id.vue"
-      )
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "identities-id",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/identities/_id.vue"
+          )
+      }
+    ]
   },
   {
     path: "/vault/folders/:folderId",
@@ -196,15 +249,6 @@ const routes: Array<RouteConfig> = [
       }
     ]
   },
-  // {
-  //   path: "/settings",
-  //   name: "settings",
-  //   beforeEnter: VaultGuard,
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
-  //     )
-  // }
   {
     path: "/settings",
     component: Layout,
@@ -216,6 +260,14 @@ const routes: Array<RouteConfig> = [
         component: () =>
           import(
             /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
+          )
+      },
+      {
+        path: "excluded-domains",
+        name: "settings-excluded-domains",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/excluded-domains.vue"
           )
       }
     ]

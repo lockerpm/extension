@@ -195,7 +195,8 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true
           });
-          BrowserApi.createNewTab("web.html#/vault?source=id.cystack.net");
+          // BrowserApi.createNewTab("web.html#/vault?source=id.cystack.net");
+          BrowserApi.createNewTab("https://locker.io/vault");
         } catch (e) {
           console.log(e);
         }

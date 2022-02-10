@@ -104,20 +104,21 @@ export default Vue.extend({
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/vault',
+              // externalUrl: '/web.html#/vault',
+              externalUrl: '/vault',
               name: 'Go to Web Vault'
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings/import-export',
+              // externalUrl: '/web.html#/settings/import-export',
+              externalUrl: '/settings/options#import',
               name: 'Import & Export'
             },
             {
               icon: 'fa-home',
-              routeName: '',
-              externalUrl: '/web.html#/settings/exclude-domains',
-              name: 'Exclude domains'
+              routeName: 'settings-excluded-domains',
+              name: 'Excluded Domains'
             },
             // {
             //   icon: 'fa-home',
@@ -134,15 +135,19 @@ export default Vue.extend({
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings',
+              // externalUrl: '/web.html#/settings',
+              externalUrl: '/settings/options',
               name: 'Vault Timeout',
+              action: 'vault_timeout',
               picker: true
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings',
+              // externalUrl: '/web.html#/settings',
+              externalUrl: '/settings/options',
               name: 'Vault Timeout Action',
+              action: 'vault_timeout_action',
               picker: true
             },
             // {
@@ -174,19 +179,22 @@ export default Vue.extend({
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/upgrade/',
+              // externalUrl: '/web.html#/upgrade/',
+              externalUrl: '/plans',
               name: 'Upgrade to Premium'
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings?action=change-master-password',
+              // externalUrl: '/web.html#/settings?action=change-master-password',
+              externalUrl: '/settings/security',
               name: 'Change Master Password'
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: '/web.html#/settings/',
+              // externalUrl: '/web.html#/settings/',
+              externalUrl: '/settings/account',
               name: 'Manage your account'
             },
             {
@@ -281,12 +289,14 @@ export default Vue.extend({
           // this.fingerprintDialog = true
           this.openFingerprintDialog()
           break
+        case 'vault_timeout':
+        case 'vault_timeout_action':
         default:
           break
         }
       }
       else if (item.externalUrl) {
-        this.$platformUtilsService.launchUri(item.externalUrl)
+        this.$platformUtilsService.launchUri('https://locker.io' + item.externalUrl)
       }
       else {
         this.$router.push({name: item.routeName})

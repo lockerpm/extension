@@ -230,6 +230,7 @@ import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy'
 import Vnodes from '@/components/Vnodes'
 import ShareCipher from '@/components/cipher/ShareCipher'
 import MoveFolder from '@/components/folder/MoveFolder'
+import router from '@/router/popup';
 export default Vue.extend({
   components: {
     TextHaveCopy,
