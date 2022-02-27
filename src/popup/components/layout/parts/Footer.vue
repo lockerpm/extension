@@ -2,8 +2,8 @@
   <div
     v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator'].includes(this.$route.name)"
     id="popup-navigator"
-    class="h-auto grid grid-cols-4 bg-white fixed bottom-0 left-0 right-0"
-    style="z-index:1"
+    class="h-auto grid grid-cols-4 bg-white fixed bottom-0"
+    style="z-index:1; width: 400px"
   >
     <router-link
       :to="{name: item.routeName}"

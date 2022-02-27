@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative"
+    class="relative mx-auto"
     style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>

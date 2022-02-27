@@ -2,8 +2,8 @@
   <div
     id="popup-header"
     v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator'].includes(this.$route.name)"
-    class="fixed top-0 left-0 right-0 flex items-center bg-white cursor-pointer h-[44px] leading-[44px] px-3"
-    style="z-index:1"
+    class="fixed top-0 flex items-center bg-white cursor-pointer h-[44px] leading-[44px] px-3"
+    style="z-index:1; width: 400px"
   >
     <img
       src="@/assets/images/logo/popup_logo.png"

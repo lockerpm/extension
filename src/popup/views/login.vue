@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-grow flex-col items-center">
+  <div class="flex flex-grow flex-col items-center mx-auto" style="width: 400px;">
     <div class="mt-[3rem] text-center">
       <img
         src="@/assets/images/logo/logo_black.svg"
@@ -249,7 +249,7 @@
             >
           </button>
         </div>
-        <div class="absolute left-0 right-0" style="bottom: 20px">
+        <div class="absolute" style="bottom: 20px; width: 400px; padding-right: 48px">
           <div class="flex px-2 my-4 mx-auto">
             <div class="w-full pl-0 text-center">
               <span>

@@ -1,13 +1,13 @@
 <template>
   <div
     v-loading="loading"
-    class="relative"
+    class="relative mx-auto"
     style="padding-top: 44px; min-height: 600px; max-width: 400px"
   >
 
     <div
-      class="fixed top-0 left-0 right-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-      style="z-index:1"
+      class="fixed top-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
+      style="z-index:1; width: 400px"
     >
       <div
         class="menu-icon mr-4"

@@ -1,11 +1,11 @@
 <template>
   <div
-    class="flex flex-col flex-grow relative h-screen"
-    style="background: #F1F1F1; padding-top: 44px"
+    class="flex flex-col flex-grow relative h-screen mx-auto"
+    style="background: #F1F1F1; padding-top: 44px; max-width: 400px"
   >
     <div
-      class="flex items-center cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0 bg-white"
-      style="z-index: 1"
+      class="flex items-center cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 bg-white"
+      style="z-index: 1; width: 400px"
     >
       <div
         class="menu-icon mr-4"

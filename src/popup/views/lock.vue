@@ -1,8 +1,15 @@
 <template>
   <BlankLayout>
-    <div class="flex flex-grow flex-col items-center">
+    <div
+      class="flex flex-grow flex-col items-center"
+      style="width: 400px"
+    >
       <div class="mt-[3rem]">
-        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
+        <img
+          src="@/assets/images/logo/logo_black.svg"
+          alt=""
+          class="h-[36px]"
+        >
       </div>
       <div class="w-full py-[2.8125rem] px-6 text-center">
         <template v-if="step===1">
@@ -14,11 +21,18 @@
           </div>
           <div class="inline-block mb-8 select-none">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
-              <img :src="currentUser.avatar" alt="" class="w-[28px] h-[28px] rounded-full mr-2">
+              <img
+                :src="currentUser.avatar"
+                alt=""
+                class="w-[28px] h-[28px] rounded-full mr-2"
+              >
               <div class="mr-2">{{ currentUser.email }}</div>
             </div>
           </div>
-          <form class="mb-8" @submit.prevent="setMasterPass">
+          <form
+            class="mb-8"
+            @submit.prevent="setMasterPass"
+          >
             <div class="form-group !mb-4">
               <label class="text-left">
                 {{ $t('master_password.enter_password') }}
@@ -47,7 +61,10 @@
                 </div>
               </div>
               <div class="invalid-feedback">{{ $t('errors.invalid_password') }}</div>
-              <div class="text-primary text-left cursor-pointer" @click="step = 2">
+              <div
+                class="text-primary text-left cursor-pointer"
+                @click="step = 2"
+              >
                 {{ $t('master_password.get_hint') }}
               </div>
             </div>
@@ -80,7 +97,11 @@
           </div>
           <div class="inline-block mb-8 select-none">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
-              <img :src="currentUser.avatar" alt="" class="w-[28px] h-[28px] rounded-full mr-2">
+              <img
+                :src="currentUser.avatar"
+                alt=""
+                class="w-[28px] h-[28px] rounded-full mr-2"
+              >
               <div class="mr-2">{{ currentUser.email }}</div>
             </div>
           </div>
@@ -95,20 +116,33 @@
           </div>
         </template>
         <template v-if="step===3">
-          <img src="@/assets/images/icons/icon_settings.svg" alt="" class="mx-auto mb-4">
+          <img
+            src="@/assets/images/icons/icon_settings.svg"
+            alt=""
+            class="mx-auto mb-4"
+          >
           <div class="text-head-4 font-semibold mb-2.5">
             {{ $t('master_password.master_password_hint') }}
           </div>
           <div class="text-base mb-4">
             {{ $t('master_password.hint_success') }}
           </div>
-          <button class="btn btn-clean !text-primary !pb-0" @click="step = 1">
+          <button
+            class="btn btn-clean !text-primary !pb-0"
+            @click="step = 1"
+          >
             <i class="fa fa-chevron-left" />&nbsp;&nbsp;&nbsp;{{ $t('master_password.back_login') }}
           </button>
         </template>
       </div>
-      <div v-if="step === 2" class="mt-1">
-        <button class="btn btn-clean !text-primary" @click="step = 1">
+      <div
+        v-if="step === 2"
+        class="mt-1"
+      >
+        <button
+          class="btn btn-clean !text-primary"
+          @click="step = 1"
+        >
           <i class="fa fa-chevron-left" />&nbsp;&nbsp;&nbsp;{{ $t('master_password.back_login') }}
         </button>
       </div>

@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="relative"
+    class="relative mx-auto"
     style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
@@ -260,9 +260,6 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    // BrowserApi.messageListener('home.popup', async (msg: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
-    //   await this.processMessage(msg, sender, sendResponse);
-    // });
     chrome.runtime.onMessage.addListener(
       (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
         this.processMessage(msg, sender, response);
@@ -278,9 +275,6 @@ export default Vue.extend({
         }
       }, 5000);
     }
-    // window.setTimeout(() => {
-    //   document.getElementById('search').focus();
-    // }, 100);
   },
   destroyed() {
     window.clearTimeout(this.loadedTimeout);

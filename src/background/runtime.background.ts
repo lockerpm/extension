@@ -63,7 +63,7 @@ export default class RuntimeBackground {
         }
         // await this.main.setIcon(); // error => prevent send message unlockCompleted
         await this.main.refreshBadgeAndMenu(false);
-        this.notificationsService.updateConnection(msg.command === "unlocked");
+        // this.notificationsService.updateConnection(msg.command === "unlocked");
         this.systemService.cancelProcessReload();
 
         if (item) {
@@ -195,8 +195,8 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true
           });
-          // BrowserApi.createNewTab("web.html#/vault?source=id.cystack.net");
-          BrowserApi.createNewTab("https://locker.io/vault");
+          BrowserApi.createNewTab("popup.html#/lock?source=id.cystack.net");
+          // BrowserApi.createNewTab("https://locker.io/vault");
         } catch (e) {
           console.log(e);
         }

@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div class="relative" style="padding-top: 44px">
+  <div style="max-width: 400px" class="mx-auto">
+    <div class="relative mx-auto" style="padding-top: 44px;">
       <div
-        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0"
-        style="z-index: 1"
+        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0"
+        style="z-index: 1; width: 400px"
       >
         <div class="menu-icon mr-4" @click="$router.back()">
           <i class="fas fa-chevron-left text-[20px]"></i> Back

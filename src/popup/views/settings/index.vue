@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative"
+    class="relative mx-auto"
     style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
@@ -80,6 +80,7 @@ import Fingerprint from '@/popup/components/setting/Fingerprint.vue'
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
+  name: 'Settings',
   components: {
     Fingerprint,
     Header,
