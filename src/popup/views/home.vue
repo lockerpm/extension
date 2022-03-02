@@ -469,9 +469,9 @@ export default Vue.extend({
       }
     },
     async processMessage(msg: any, sender: any, sendResponse: any) {
-      console.log(
-        `popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`
-      );
+      // console.log(
+      //   `popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`
+      // );
       switch (msg.command) {
       case "syncCompleted":
         // if (this.loaded) {

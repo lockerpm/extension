@@ -15,7 +15,8 @@
     "http://*/*",
     "https://*/*",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "identity"
   ],
   "optional_permissions": [
     "nativeMessaging"

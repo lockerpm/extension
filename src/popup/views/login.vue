@@ -271,7 +271,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue'
 import { BrowserApi } from "@/browser/browserApi";
 import InputText from '@/components/input/InputText'
@@ -302,7 +302,24 @@ export default Vue.extend({
       showPassword: false
     }
   },
+  async mounted() {
+    chrome.runtime.onMessage.addListener(
+      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+        this.processMessage(msg, sender, response);
+      }
+    );
+  },
   methods: {
+    async processMessage(msg: any, sender: any, sendResponse: any) {
+      switch (msg.command) {
+      case "loginWithSuccess":
+        await this.checkToken(msg.access_token, msg.provider)
+        break;
+      
+      default:
+        break;
+      }
+    },
     reset_state () {
       this.error = null
       this.send_mail = false
@@ -370,15 +387,44 @@ export default Vue.extend({
       thisWindow.close();
     },
     loginWith (provider) {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
+      if(provider === 'google'){
+        chrome.runtime.sendMessage({ command: 'loginWith', provider }, function (response) {
+          // if (response.msg === 'success') {
+          //   const access_token = response.access_token
+          //   console.log(access_token)
+          // }
+        });
+      }
+      else {
+        const url = `${process.env.VUE_APP_ID_URL
+        }/login?SERVICE_URL=${encodeURIComponent(
+          "/sso"
+        )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
 
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
+        this.$platformUtilsService.launchUri(url);
+        BrowserApi.reloadOpenWindows();
+        const thisWindow = window.open("", "_self");
+        thisWindow.close();
+      }
+    },
+    async checkToken (access_token, authStrategy) {
+      if (authStrategy === 'facebook' || authStrategy === 'google' || authStrategy === 'github') {
+        const accessToken = access_token
+        const url = '/sso/auth/social'
+        try {
+          const myHeaders = {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          }
+          const data = await this.axios.post(url, {
+            provider: authStrategy,
+            access_token: accessToken.split(' ').pop()
+          }, myHeaders)
+          this.getAccessToken(data.token)
+        } catch (e) {
+          // this.$router.replace({ name: 'login' })
+          console.log(e)
+        }
+      }
     },
     async postOtp () {
       try {

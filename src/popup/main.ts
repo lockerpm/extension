@@ -425,6 +425,9 @@ Vue.mixin({
       }
 
       return connectionUrl
+    },
+    test(token) {
+      console.log(token)
     }
   }
 })

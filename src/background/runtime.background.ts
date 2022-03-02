@@ -15,6 +15,29 @@ import MainBackground from './main.background';
 import { Utils } from 'jslib-common/misc/utils';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 
+const CLIENT_ID = encodeURIComponent('31609893092-0etuuag1o662fpa0c6sap5v96lc44onb.apps.googleusercontent.com');
+const RESPONSE_TYPE = encodeURIComponent('token');
+const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
+const SCOPE = encodeURIComponent('openid email profile');
+const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
+const PROMPT = encodeURIComponent('consent');
+
+function create_auth_endpoint() {
+    let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+
+    let openId_endpoint_url =
+        `https://accounts.google.com/o/oauth2/v2/auth
+?client_id=${CLIENT_ID}
+&response_type=${RESPONSE_TYPE}
+&redirect_uri=${REDIRECT_URI}
+&scope=${SCOPE}
+&state=${STATE}
+&prompt=${PROMPT}`;
+
+    return openId_endpoint_url;
+}
+
+
 export default class RuntimeBackground {
   private autofillTimeout: any;
   private pageDetailsToAutoFill: any[] = [];
@@ -45,10 +68,10 @@ export default class RuntimeBackground {
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
+    console.log(`runtimeBackground processMessage: ${msg.command} - sender: ${sender} - data: ${msg.data}`);
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
-        console.log("processMessage: ", msg.command);
         let item: LockedVaultPendingNotificationsItem;
 
         if (this.lockedVaultPendingNotifications.length > 0) {
@@ -195,8 +218,7 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true
           });
-          BrowserApi.createNewTab("popup.html#/lock?source=id.cystack.net");
-          // BrowserApi.createNewTab("https://locker.io/vault");
+          // BrowserApi.createNewTab(`https://locker.io/authenticate?token=${msg.token}&return_url=/vault`);
         } catch (e) {
           console.log(e);
         }
@@ -261,6 +283,22 @@ export default class RuntimeBackground {
         this.platformUtilsService.copyToClipboard(msg.identifier, {
           window: window
         });
+      case "loginWith": 
+        const provider = msg.provider
+        chrome.identity.launchWebAuthFlow({
+                'url': create_auth_endpoint(),
+                'interactive': true
+            }, function (redirect_url) {
+                console.log(redirect_url)
+                if (chrome.runtime.lastError) {
+                    // problem signing in
+                } else {
+                  let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
+                  access_token = access_token.substring(0, access_token.indexOf("&"));
+                  chrome.runtime.sendMessage({command: 'loginWithSuccess', access_token, provider})
+                  // sendResponse({ msg: "success", access_token });
+                }
+            });
       default:
         break;
     }
