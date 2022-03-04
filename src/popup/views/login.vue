@@ -388,7 +388,23 @@ export default Vue.extend({
     },
     loginWith (provider) {
       if(provider === 'google'){
-        chrome.runtime.sendMessage({ command: 'loginWith', provider }, function (response) {
+        chrome.runtime.sendMessage({ command: 'loginWithGG', provider }, function (response) {
+          // if (response.msg === 'success') {
+          //   const access_token = response.access_token
+          //   console.log(access_token)
+          // }
+        });
+      }
+      else if(provider === 'facebook'){
+        chrome.runtime.sendMessage({ command: 'loginWithFB', provider }, function (response) {
+          // if (response.msg === 'success') {
+          //   const access_token = response.access_token
+          //   console.log(access_token)
+          // }
+        });
+      }
+      else if(provider === 'github'){
+        chrome.runtime.sendMessage({ command: 'loginWithGithub', provider }, function (response) {
           // if (response.msg === 'success') {
           //   const access_token = response.access_token
           //   console.log(access_token)
@@ -422,7 +438,7 @@ export default Vue.extend({
           this.getAccessToken(data.token)
         } catch (e) {
           // this.$router.replace({ name: 'login' })
-          console.log(e)
+          this.notify('Login failed', 'error')
         }
       }
     },
@@ -494,6 +510,7 @@ export default Vue.extend({
         CLIENT: "browser"
       }
       try {
+        this.axios.post('/sso/me/last_active', {}, config)
         const data = await this.axios.post(url,payload,config)
         if(data.url){
           const url = data.url

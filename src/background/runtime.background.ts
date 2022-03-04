@@ -16,15 +16,18 @@ import { Utils } from 'jslib-common/misc/utils';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 
 const CLIENT_ID = encodeURIComponent('31609893092-0etuuag1o662fpa0c6sap5v96lc44onb.apps.googleusercontent.com');
+const FB_CLIENT_ID = encodeURIComponent("914989149119054");
+const GITHUB_CLIENT_ID = encodeURIComponent("2d2090f44568a41519f3");
 const RESPONSE_TYPE = encodeURIComponent('token');
 const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
 const SCOPE = encodeURIComponent('openid email profile');
-const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
+const FB_SCOPE = encodeURIComponent('public_profile+email');
+const GITHUB_SCOPE = encodeURIComponent('read:user+user:email')
 const PROMPT = encodeURIComponent('consent');
 
 function create_auth_endpoint() {
-    let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
-
+    // let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+    const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
     let openId_endpoint_url =
         `https://accounts.google.com/o/oauth2/v2/auth
 ?client_id=${CLIENT_ID}
@@ -37,6 +40,28 @@ function create_auth_endpoint() {
     return openId_endpoint_url;
 }
 
+function create_fb_auth_endpoint() {
+  const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
+    let endpoint_url = 'https://www.facebook.com/v13.0/dialog/oauth?client_id=' + FB_CLIENT_ID +
+              '&response_type=token' +
+              '&scope=' + FB_SCOPE +
+              '&protocol=oauth2' +
+              '&redirect_uri=' + REDIRECT_URI +
+              '&state=' + STATE
+
+    return endpoint_url;
+}
+
+function create_github_auth_endpoint() {
+  const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
+    let endpoint_url = 'https://www.github.com/login/oauth/authorize?client_id=' + GITHUB_CLIENT_ID +
+              '&response_type=code' +
+              '&scope=' + GITHUB_SCOPE +
+              '&redirect_uri=' + REDIRECT_URI +
+              '&state=' + STATE
+
+    return endpoint_url;
+}
 
 export default class RuntimeBackground {
   private autofillTimeout: any;
@@ -283,22 +308,54 @@ export default class RuntimeBackground {
         this.platformUtilsService.copyToClipboard(msg.identifier, {
           window: window
         });
-      case "loginWith": 
-        const provider = msg.provider
+      case "loginWithGG":
         chrome.identity.launchWebAuthFlow({
-                'url': create_auth_endpoint(),
-                'interactive': true
-            }, function (redirect_url) {
-                console.log(redirect_url)
-                if (chrome.runtime.lastError) {
-                    // problem signing in
-                } else {
-                  let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
-                  access_token = access_token.substring(0, access_token.indexOf("&"));
-                  chrome.runtime.sendMessage({command: 'loginWithSuccess', access_token, provider})
-                  // sendResponse({ msg: "success", access_token });
-                }
-            });
+          'url': create_auth_endpoint(),
+          'interactive': true
+        }, function (redirect_url) {
+          console.log(redirect_url)
+          if (chrome.runtime.lastError) {
+            // problem signing in
+          } else {
+            let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
+            access_token = access_token.substring(0, access_token.indexOf("&"));
+            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
+            // sendResponse({ msg: "success", access_token });
+          }
+        });
+        break;
+      case "loginWithFB":
+        chrome.identity.launchWebAuthFlow({
+          'url': create_fb_auth_endpoint(),
+          'interactive': true
+        }, function (redirect_url) {
+          console.log(redirect_url)
+          if (chrome.runtime.lastError) {
+            // problem signing in
+          } else {
+            let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
+            access_token = access_token.substring(0, access_token.indexOf("&"));
+            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
+            // sendResponse({ msg: "success", access_token });
+          }
+        });
+        break;
+      case "loginWithGithub":
+        chrome.identity.launchWebAuthFlow({
+          'url': create_github_auth_endpoint(),
+          'interactive': true
+        }, function (redirect_url) {
+          console.log(redirect_url)
+          if (chrome.runtime.lastError) {
+            // problem signing in
+          } else {
+            let access_token = redirect_url.substring(redirect_url.indexOf('code=') + 5);
+            access_token = access_token.substring(0, access_token.indexOf("&"));
+            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
+            // sendResponse({ msg: "success", access_token });
+          }
+        });
+        break;
       default:
         break;
     }
