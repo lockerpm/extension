@@ -551,7 +551,8 @@ module.exports = {
       lowercase: 'Sử dụng chữ in thường (a-z)',
       digits: 'Sử dụng số (0-9)',
       symbols: 'Sử dụng ký tự đặc biệt (@!$%*)',
-      ambiguous: 'Tránh các ký tự dễ nhầm lẫn'
+      ambiguous: 'Tránh các ký tự dễ nhầm lẫn',
+      fill_password: 'Sử dụng'
     }
   }
 }

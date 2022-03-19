@@ -126,7 +126,7 @@ export default {
         this.options.lowercase = true
       }
       this.password = await this.$passwordGenerationService.generatePassword(this.options)
-      this.$emit('generated', this.password)
+      // this.$emit('generated', this.password)
     },
     async savePassword () {
       // let cipher = new CipherView()

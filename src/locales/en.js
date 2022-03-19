@@ -561,7 +561,8 @@ module.exports = {
       lowercase: 'Use lowercase letters (a-z)',
       digits: 'Use digits (0-9)',
       symbols: 'Use symbols (@!$%*)',
-      ambiguous: 'Avoid ambiguous characters'
+      ambiguous: 'Avoid ambiguous characters',
+      fill_password: 'Fill password'
     }
   }
 }

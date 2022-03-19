@@ -78,7 +78,7 @@
               trigger="click"
               popper-class="locker-pw-generator"
             >
-              <PasswordGenerator @generated="setPassword" />
+              <PasswordGenerator @generated="setPassword" @fill-password="fillPassword"/>
 
               <button
                 slot="reference"
@@ -616,6 +616,9 @@ export default Vue.extend({
       if(!this.cipher.login.password){
         this.cipher.login.password = p
       }
+    },
+    fillPassword(p){
+      this.cipher.login.password = p
     }
   }
 }

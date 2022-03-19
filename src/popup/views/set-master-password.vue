@@ -5,7 +5,7 @@
         <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
       </div> -->
       <div class="w-full max-w-[500px] text-center">
-        <div class="text-head-4 font-semibold mb-2.5">Tạo Master Password</div>
+        <div class="text-head-4 font-semibold mb-2.5">Create Master Password</div>
         <!--        <div class="text-base text-black-600 mb-4">-->
         <!--          Master Password là mật khẩu mở khóa Locker của bạn-->
         <!--        </div>-->
@@ -19,13 +19,13 @@
               class="btn btn-sm btn-clean btn-primary !px-3 !font-normal"
               @click="logout"
             >
-              Đăng xuất
+              Log out
             </button>
           </div>
         </div>
         <div class="text-left">
           <div class="form-group !mb-4">
-            <label>Nhập Master Password</label>
+            <label>Enter Master Password</label>
             <div class="input-group mb-1.5">
               <input
                 v-model="masterPassword"
@@ -46,7 +46,7 @@
             <PasswordStrengthBar v-if="masterPassword" :score="passwordStrength.score" />
           </div>
           <div class="form-group !mb-4">
-            <label>Xác nhận Master Password</label>
+            <label>Confirm Master Password</label>
             <div class="input-group" :class="[errors.masterRePassword ? 'is-invalid' :'']">
               <input
                 v-model="masterRePassword"
@@ -67,7 +67,7 @@
             <div class="invalid-feedback">{{ $t('errors.confirm_password') }}</div>
           </div>
           <div class="form-group !mb-8">
-            <label>Gợi ý mật khẩu (tuỳ chọn)</label>
+            <label>Master password hint (optional)</label>
             <input
               v-model="masterPasswordHint"
               class="form-control"
@@ -82,11 +82,11 @@
             :disabled="loading"
             @click="setMasterPass"
           >
-            Tạo mật khẩu
+            Create password
           </button>
         </div>
         <div class="md:w-[320px] text-black-600 mx-auto">
-          Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Master Password trong trường hợp bạn quên hoặc đánh mất.
+          Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.
         </div>
       </div>
     </div>
