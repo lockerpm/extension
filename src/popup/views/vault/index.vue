@@ -40,7 +40,7 @@
               {{  item.label  }}
             </div>
             <div>
-              {{ciphersCount[`${item.name}`]}} {{ ciphersCount[`${item.name}`] > 1 ? 'items':'item'}}
+              {{ciphersCount[`${item.name}`]}} {{ $tc('type.Vault', ciphersCount[`${item.name}`])}}
             </div>
           </div>
           <div>
@@ -70,7 +70,7 @@
                 {{ item.name }}
               </div>
               <div>
-                {{ item.ciphersCount }} {{item.ciphersCount>1?'items':'item'}}
+                {{ item.ciphersCount }} {{$tc('type.Vault', item.ciphersCount)}}
               </div>
             </div>
             <div>
@@ -105,7 +105,7 @@
                 {{item.name }}
               </div>
               <div>
-                {{ item.ciphersCount }} {{item.ciphersCount > 1? 'items':'item'}}
+                {{ item.ciphersCount }} {{$tc('type.Vault', item.ciphersCount)}}
               </div>
             </div>
             <div>
@@ -144,36 +144,6 @@ export default Vue.extend({
   },
   data () {
     return {
-      menu: [
-        {
-          icon: 'fa-key',
-          routeName: 'passwords',
-          label: 'Passwords',
-          divided: false,
-          name: 'passwords'
-        },
-        {
-          icon: 'fa-sticky-note',
-          routeName: 'notes',
-          label: 'Notes',
-          divided: false,
-          name: 'notes'
-        },
-        {
-          icon: 'fa-credit-card',
-          routeName: 'cards',
-          label: 'Cards',
-          divided: false,
-          name: 'cards'
-        },
-        {
-          icon: 'fa-id-card',
-          routeName: 'identities',
-          label: 'Identities',
-          divided: false,
-          name: 'identities'
-        }
-      ],
       CipherType,
       noFolderCiphers: [],
       loading: true,
@@ -197,6 +167,38 @@ export default Vue.extend({
     }
   },
   computed: {
+    menu () {
+      return [
+        {
+          icon: 'fa-key',
+          routeName: 'passwords',
+          label: this.$tc('type.Login'),
+          divided: false,
+          name: 'passwords'
+        },
+        {
+          icon: 'fa-sticky-note',
+          routeName: 'notes',
+          label: this.$tc('type.SecureNote'),
+          divided: false,
+          name: 'notes'
+        },
+        {
+          icon: 'fa-credit-card',
+          routeName: 'cards',
+          label: this.$tc('type.Card'),
+          divided: false,
+          name: 'cards'
+        },
+        {
+          icon: 'fa-id-card',
+          routeName: 'identities',
+          label: this.$tc('type.Identity'),
+          divided: false,
+          name: 'identities'
+        }
+      ]
+    },
     filteredCollection () {
       return groupBy(this.collections, 'organizationId')
     },

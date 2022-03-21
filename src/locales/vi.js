@@ -78,7 +78,8 @@ module.exports = {
     back: 'Trở lại',
     item_name: 'Tên mục',
     details: 'Chi tiết',
-    type: 'Loại'
+    type: 'Loại',
+    item_info: 'Thông tin mục'
   },
   sidebar: {
     all: 'Tất cả',
@@ -144,7 +145,8 @@ module.exports = {
     send: 'Gửi',
     master_password_hint_desc: 'Cụm từ gợi nhớ mật khẩu chính sẽ được gửi về địa chỉ email của bạn',
     back_login: 'Trở lại Đăng nhập',
-    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ mật khẩu chính.'
+    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ mật khẩu chính.',
+    unlock: 'Mở khóa'
   },
   enum: {
     Login: 'Mật khẩu',
@@ -167,7 +169,7 @@ module.exports = {
     Vault: 'Mục | Mục',
     Shares: 'Mục | Mục',
     folder: 'Thư mục',
-    no_folder: 'Không trong thư mục'
+    no_folder: 'Không có thư mục'
   },
   data: {
     notifications: {
@@ -545,7 +547,7 @@ module.exports = {
       language: 'Ngôn ngữ',
       vietnamese: 'Vietnamese',
       english: 'English',
-      fingerprint_dialog: 'Dấu vân tay của bạn',
+      fingerprint_dialog: 'Cụm từ định danh tài khoản của bạn',
       excluded_domains: 'Không lưu mật khẩu',
       general: 'Chung',
       go_to_web_vault: 'Đi tới Web',
@@ -621,6 +623,13 @@ module.exports = {
       hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
       create_btn: 'Tạo mật khẩu',
       note: 'Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Master Password trong trường hợp bạn quên hoặc đánh mất.'
+    },
+    parts: {
+      current: 'Hiện tại',
+      vault: 'Kho',
+      generate: 'Tạo Mật khẩu',
+      settings: 'Cài đặt',
+      search: 'Tìm trong kho'
     }
   }
 }

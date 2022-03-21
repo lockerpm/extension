@@ -17,7 +17,7 @@
           :class="[item.divided ? 'border-t border-black-400' : '', item.picker ? 'h-auto leading-[32px]': 'h-[44px] leading-[44px]']"
           @click="openRoute(item)"
         >
-          <template v-if="item.name==='Vault Timeout'">
+          <template v-if="item.action==='vault_timeout'">
             <div class="w-full py-2">
               <div>{{item.name}}</div>
               <el-select
@@ -37,7 +37,7 @@
             </el-select>
             </div>
           </template>
-          <template v-else-if="item.name==='Vault Timeout Action'">
+          <template v-else-if="item.action==='vault_timeout_action'">
             <div class="w-full py-2">
               <div>{{item.name}}</div>
               <el-select

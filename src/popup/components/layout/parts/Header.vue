@@ -16,7 +16,7 @@
         type="text"
         :value="searchText"
         class="sm:w-1/2 w-full focus:border-0 border-0 truncate"
-        placeholder="Search vault"
+        :placeholder="$t('data.parts.search')"
         @input="handleSearch"
       >
       <span><i

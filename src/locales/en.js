@@ -79,7 +79,8 @@ module.exports = {
     back: 'Back',
     item_name: 'Item name',
     details: 'Details',
-    type: 'Types'
+    type: 'Types',
+    item_info: 'Item Information'
   },
   sidebar: {
     all: 'All',
@@ -631,6 +632,13 @@ module.exports = {
       hint_pass: 'Master password hint (optional)',
       create_btn: 'Create password',
       note: 'Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.'
+    },
+    parts: {
+      current: 'Current',
+      vault: 'Vault',
+      generate: 'Generate',
+      settings: 'Settings',
+      search: 'Search Vault'
     }
   }
 }

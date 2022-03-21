@@ -24,32 +24,6 @@ import Vue from 'vue'
 export default Vue.extend({
   data () {
     return {
-      menu: [
-        {
-          label: 'Current',
-          routeName: 'home',
-          // icon: 'popup_current.svg',
-          icon: 'globe'
-        },
-        {
-          label: 'Vault',
-          routeName: 'vault',
-          // icon: 'popup_vault.svg'
-          icon: 'folder'
-        },
-        {
-          label: 'Generate',
-          routeName: 'generator',
-          // icon: 'popup_generate.svg'
-          icon: 'sync-alt'
-        },
-        {
-          label: 'Settings',
-          routeName: 'settings',
-          // icon: 'popup_settings.svg'
-          icon: 'cog'
-        }
-      ]
     }
   },
   asyncComputed: {
@@ -57,6 +31,36 @@ export default Vue.extend({
       return await this.$vaultTimeoutService.isLocked()
     }
   },
+  computed: {
+    menu () {
+      return [
+        {
+          label: this.$t('data.parts.current'),
+          routeName: 'home',
+          // icon: 'popup_current.svg',
+          icon: 'globe'
+        },
+        {
+          label: this.$t('data.parts.vault'),
+          routeName: 'vault',
+          // icon: 'popup_vault.svg'
+          icon: 'folder'
+        },
+        {
+          label: this.$t('data.parts.generate'),
+          routeName: 'generator',
+          // icon: 'popup_generate.svg'
+          icon: 'sync-alt'
+        },
+        {
+          label: this.$t('data.parts.settings'),
+          routeName: 'settings',
+          // icon: 'popup_settings.svg'
+          icon: 'cog'
+        }
+      ]
+    }
+  }
 })
 </script>
 

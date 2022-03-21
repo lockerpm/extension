@@ -18,13 +18,13 @@
         v-if="canManageItem(teams, cipher)"
         @click="addEdit(cipher)"
       >
-        Edit
+        {{$t('common.edit')}}
       </div>
     </div>
     <div
       class="uppercase px-3 mt-4 mb-1"
       style="padding-left: 20px"
-    >Item information</div>
+    >{{$t('common.item_info')}}</div>
     <div
       v-show="!editMode"
       class="cipher-item"

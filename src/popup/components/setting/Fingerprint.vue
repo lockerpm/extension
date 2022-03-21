@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      title="Your acccount's fingerprint phrase"
+      :title="$t('data.settings.fingerprint_dialog')"
       :visible.sync="dialogVisible"
       width="90%"
       center
@@ -9,7 +9,7 @@
       <span>{{fingerprint}}</span>
       <span slot="footer" class="dialog-footer">
         <!-- <el-button @click="dialogVisible = false">Cancel</el-button> -->
-        <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+        <el-button type="primary" @click="dialogVisible = false">{{$t('common.confirm')}}</el-button>
       </span>
     </el-dialog>
   </div>
