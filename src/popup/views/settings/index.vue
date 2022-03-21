@@ -96,161 +96,7 @@ export default Vue.extend({
     return {
       user: {},
       loading: false,
-      fingerprintDialog: false,
-      menu: [
-        {
-          name: 'general',
-          divided: false,
-          items: [
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/vault',
-              externalUrl: '/vault',
-              name: 'Go to Web Vault'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/settings/import-export',
-              externalUrl: '/settings/options#import',
-              name: 'Import & Export'
-            },
-            {
-              icon: 'fa-home',
-              routeName: 'settings-excluded-domains',
-              name: 'Excluded Domains'
-            },
-            // {
-            //   icon: 'fa-home',
-            //   routeName: 'settings-support',
-            //   externalUrl: '',
-            //   name: 'Theme (Light/Dark)'
-            // }
-          ]
-        },
-        {
-          name: 'security',
-          divided: true,
-          items: [
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/settings',
-              externalUrl: '/settings/options',
-              name: 'Vault Timeout',
-              action: 'vault_timeout',
-              picker: true
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/settings',
-              externalUrl: '/settings/options',
-              name: 'Vault Timeout Action',
-              action: 'vault_timeout_action',
-              picker: true
-            },
-            // {
-            //   icon: 'fa-home',
-            //   routeName: '',
-            //   externalUrl: '/web.html#/settings/import-export',
-            //   name: 'Two-step Login'
-            // },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '/web.html#/settings/exclude-domains',
-              action: 'fingerprint',
-              name: 'Fingerprint Phrase'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              lock: true,
-              name: 'Lock Now'
-            }
-          ]
-        },
-        {
-          name: 'ACCOUNT',
-          divided: true,
-          items: [
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/upgrade/',
-              externalUrl: '/plans',
-              name: 'Upgrade to Premium'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/settings?action=change-master-password',
-              externalUrl: '/settings/security',
-              name: 'Change Master Password'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              // externalUrl: '/web.html#/settings/',
-              externalUrl: '/settings/account',
-              name: 'Manage your account'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '/web.html#/settings/',
-              action: 'sync_data',
-              name: 'Sync data Now'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              logout: true,
-              name: 'Log Out'
-            }
-          ]
-        },
-        {
-          name: 'support',
-          divided: true,
-          items: [
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              name: 'About'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              name: 'Documentation'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              name: 'Help & Feedback'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              name: 'Rate the Extension'
-            },
-            {
-              icon: 'fa-home',
-              routeName: '',
-              externalUrl: '',
-              name: 'Contact us'
-            }
-          ]
-        }
-      ]
+      fingerprintDialog: false
     }
   },
   computed: {
@@ -271,6 +117,162 @@ export default Vue.extend({
         { label: this.$t('common.logout'), value: 'logOut' }
       ]
     },
+    menu () {
+      return [
+        {
+          name: this.$t('data.settings.general'),
+          divided: false,
+          items: [
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/vault',
+              externalUrl: '/vault',
+              name: this.$t('data.settings.go_to_web_vault')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/settings/import-export',
+              externalUrl: '/settings/options#import',
+              name: this.$t('data.settings.import_export')
+            },
+            {
+              icon: 'fa-home',
+              routeName: 'settings-excluded-domains',
+              name: this.$t('data.settings.excluded_domains')
+            },
+            // {
+            //   icon: 'fa-home',
+            //   routeName: 'settings-support',
+            //   externalUrl: '',
+            //   name: 'Theme (Light/Dark)'
+            // }
+          ]
+        },
+        {
+          name: 'security',
+          divided: true,
+          items: [
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/settings',
+              externalUrl: '/settings/options',
+              name: this.$t('data.settings.vault_timeout'),
+              action: 'vault_timeout',
+              picker: true
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/settings',
+              externalUrl: '/settings/options',
+              name: this.$t('data.settings.vault_timeout_action'),
+              action: 'vault_timeout_action',
+              picker: true
+            },
+            // {
+            //   icon: 'fa-home',
+            //   routeName: '',
+            //   externalUrl: '/web.html#/settings/import-export',
+            //   name: 'Two-step Login'
+            // },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: '/web.html#/settings/exclude-domains',
+              action: 'fingerprint',
+              name: this.$t('data.settings.fingerprint_phase')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: '',
+              lock: true,
+              name: this.$t('data.settings.lock_now')
+            }
+          ]
+        },
+        {
+          name: this.$t('data.settings.account'),
+          divided: true,
+          items: [
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/upgrade/',
+              externalUrl: 'https://locker.io/plans',
+              name: this.$t('data.settings.upgrade_to_premium')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/settings?action=change-master-password',
+              externalUrl: 'https://locker.io/settings/security',
+              name: this.$t('data.settings.change_master_password')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              // externalUrl: '/web.html#/settings/',
+              externalUrl: 'https://locker.io/settings/account',
+              name: this.$t('data.settings.manage_your_account')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: '/web.html#/settings/',
+              action: 'sync_data',
+              name: this.$t('data.settings.sync_data')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: '',
+              logout: true,
+              name: this.$t('data.settings.logout')
+            }
+          ]
+        },
+        {
+          name: this.$t('data.settings.support'),
+          divided: true,
+          items: [
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: 'https://cystack.net/about',
+              name: this.$t('data.settings.about')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: 'https://support.locker.io',
+              name: this.$t('data.settings.documentation')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: 'https://support.locker.io',
+              name: this.$t('data.settings.help_feedback')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: 'https://chrome.google.com/webstore/detail/cystack-locker-free-passw/cmajindocfndlkpkjnmjpjoilibjgmgh',
+              name: this.$t('data.settings.rate_extension')
+            },
+            {
+              icon: 'fa-home',
+              routeName: '',
+              externalUrl: 'https://locker.io/contact-us',
+              name: this.$t('data.settings.contact_us')
+            }
+          ]
+        }
+      ]
+    }
   },
   methods: {
     openRoute (item) {
@@ -297,7 +299,7 @@ export default Vue.extend({
         }
       }
       else if (item.externalUrl) {
-        this.$platformUtilsService.launchUri('https://locker.io' + item.externalUrl)
+        this.$platformUtilsService.launchUri(item.externalUrl)
       }
       else {
         this.$router.push({name: item.routeName})

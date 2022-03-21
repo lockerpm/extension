@@ -13,7 +13,7 @@
         class="menu-icon mr-4"
         @click="$router.back()"
       >
-        <i class="fas fa-chevron-left text-[20px]"></i> Back
+        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
       </div>
       <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
         <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i>

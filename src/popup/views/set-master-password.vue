@@ -5,7 +5,7 @@
         <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
       </div> -->
       <div class="w-full max-w-[500px] text-center">
-        <div class="text-head-4 font-semibold mb-2.5">Create Master Password</div>
+        <div class="text-head-4 font-semibold mb-2.5">{{$t('data.set_master_pass.create')}}</div>
         <!--        <div class="text-base text-black-600 mb-4">-->
         <!--          Master Password là mật khẩu mở khóa Locker của bạn-->
         <!--        </div>-->
@@ -19,13 +19,13 @@
               class="btn btn-sm btn-clean btn-primary !px-3 !font-normal"
               @click="logout"
             >
-              Log out
+              {{$t('data.set_master_pass.logout')}}
             </button>
           </div>
         </div>
         <div class="text-left">
           <div class="form-group !mb-4">
-            <label>Enter Master Password</label>
+            <label>{{$t('data.set_master_pass.enter_pass')}}</label>
             <div class="input-group mb-1.5">
               <input
                 v-model="masterPassword"
@@ -46,7 +46,7 @@
             <PasswordStrengthBar v-if="masterPassword" :score="passwordStrength.score" />
           </div>
           <div class="form-group !mb-4">
-            <label>Confirm Master Password</label>
+            <label>{{$t('data.set_master_pass.confirm_pass')}}</label>
             <div class="input-group" :class="[errors.masterRePassword ? 'is-invalid' :'']">
               <input
                 v-model="masterRePassword"
@@ -67,7 +67,7 @@
             <div class="invalid-feedback">{{ $t('errors.confirm_password') }}</div>
           </div>
           <div class="form-group !mb-8">
-            <label>Master password hint (optional)</label>
+            <label>{{$t('data.set_master_pass.hint_pass')}}</label>
             <input
               v-model="masterPasswordHint"
               class="form-control"
@@ -82,11 +82,11 @@
             :disabled="loading"
             @click="setMasterPass"
           >
-            Create password
+            {{$t('data.set_master_pass.create_btn')}}
           </button>
         </div>
         <div class="md:w-[320px] text-black-600 mx-auto">
-          Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.
+          {{$t('data.set_master_pass.note')}}
         </div>
       </div>
     </div>

@@ -7,10 +7,10 @@
         class="h-[36px] mx-auto"
       >
       <div class="font-bold text-head-4 text-black-700 mt-7">
-        Login
+        {{$t('data.login.login')}}
       </div>
       <div class="text-base mt-2">
-        Login with CyStack ID to use Locker
+        {{$t('data.login.login_desc')}}
       </div>
     </div>
     <div class="w-full p-6 text-center">
@@ -43,7 +43,7 @@
           >
             <i class="fas fa-long-arrow-alt-left m--font-primary"></i>
           </a>
-          Verify your identity
+          {{$t('data.login.verify')}}
         </h3>
         <label
           v-for="m in methods"
@@ -77,7 +77,7 @@
                   Email {{ m.data }}
                 </span>
                 <span v-if="m.type === 'smart_otp'">
-                  Authentication App
+                  {{$t('data.login.authentication_app')}}
                 </span>
               </span>
               <span class="m-option__focus"></span>
@@ -90,7 +90,7 @@
                 class="m-link m-link--primary _clickable m--font-primary m--icon-font-size-sm3"
                 @click="step = 3"
               >
-                I have a code
+                {{$t('data.login.have_code')}}
               </a>
             </span>
           </span>
@@ -102,7 +102,7 @@
             :disabled="loading"
             @click="nextMethod"
           >
-            Next
+            {{$t('data.login.next')}}
           </button>
         </div>
       </div>
@@ -117,17 +117,17 @@
           >
             <i class="fas fa-long-arrow-alt-left m--font-primary"></i>
           </a>
-          Enter code
+          {{$t('data.login.enter_code')}}
         </h3>
         <p v-if="selectedMethod.type === 'mail'">
-          An email has been sent to {{selectedMethod.data}}. Check you inbox/spam to get verification code.
+          {{$t('data.login.check_email', {email: selectedMethod.data})}}
         </p>
         <p v-if="selectedMethod.type === 'smart_otp' && step !== 3">
-          Please use your authentication app (such as Duo or Google Authenticator) to get the code.
+          {{$t('data.login.use_authentication_app')}}
         </p>
 
         <div :class="[errors.code === '1002'?'has-danger':'','form-group m-form__group']">
-          <label>Enter verification code here</label>
+          <label>{{$t('data.login.enter_code_here')}}</label>
           <input
             ref="otp"
             v-model="otp"
@@ -142,7 +142,7 @@
               v-if="errors.code === '1002'"
               class="text-danger-500"
             >
-              The authorization code is not valid.
+              {{$t('data.login.authorization_error')}}
             </div>
           </transition>
         </div>
@@ -150,7 +150,7 @@
           <div class="row m-login__form-sub mb-3">
             <div class="col m--align-left m-login__form-left pl-0">
               <el-checkbox v-model="save_device">
-                Remember this device
+                {{$t('data.login.remember_device')}}
               </el-checkbox>
             </div>
           </div>
@@ -161,7 +161,7 @@
             @click="postOtp"
             :loading="loadingOtp"
           >
-            Authenticate
+            {{$t('data.login.authenticate')}}
           </button>
         </div>
       </div>
@@ -189,7 +189,7 @@
           role="alert"
         >
           <div class="m-login__desc">
-            An email has been sent to:
+            {{$t('data.login.email_sent')}}
             <div
               class="alert alert-info mt-3 mx-5 text-center"
               role="alert"
@@ -197,7 +197,7 @@
               {{ userCopy.email }}
             </div>
             <p>
-              Please go to your inbox now, open the email and follow the instructions.
+              {{$t('data.login.go_to_inbox')}}
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@
             :disabled="loading"
             @click.prevent="login"
           >
-            Login
+            {{$t('data.login.login')}}
           </button>
           <div class="flex px-2 my-4 mx-auto">
             <div class="text-left w-full pl-0 text-center">
@@ -221,7 +221,7 @@
                 tag="a"
                 class="text-[#0476e9] no-underline"
               >
-                Forgot Password?
+                {{$t('data.login.forgot_password')}}
               </a>
             </div>
           </div>
@@ -233,7 +233,7 @@
         </div>
         <div class="mt-3 text-center">
           <p class="mb-2">
-            Or Log in with
+            {{$t('data.login.login_with')}}
           </p>
           <button
             v-for="s in strategies"
@@ -253,13 +253,13 @@
           <div class="flex px-2 my-4 mx-auto">
             <div class="w-full pl-0 text-center">
               <span>
-                Don't have an account yet?
+                {{$t('data.login.dont_have_account')}}
                 <a
                 @click.prevent="openRegister"
                 tag="a"
                 class="text-[#0476e9] no-underline"
               >
-                Sign Up
+                {{$t('data.login.sign_up')}}
               </a>
               </span>
               

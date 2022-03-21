@@ -13,7 +13,7 @@
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
         <div class="flex-grow" @click="routerCipher(item)">
-          <div class="text-black font-semibold truncate flex items-center">
+          <div class="text-black w-[200px] font-semibold truncate flex items-center">
             {{ item.name }}
           </div>
           <div>

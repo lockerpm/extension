@@ -11,13 +11,13 @@
         class="menu-icon mr-4"
         @click="$router.back()"
       >
-        <i class="fas fa-chevron-left text-[20px]"></i> Cancel
+        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.cancel')}}
       </div>
-      <div>Excluded Domains</div>
+      <div>{{$t('data.settings.excluded_domains')}}</div>
       <div
         @click="submit"
       >
-        Save
+        {{ $t('common.save') }}
       </div>
     </div>
     <div class="mt-4">

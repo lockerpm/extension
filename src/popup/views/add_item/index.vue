@@ -8,7 +8,7 @@
           <i class="fas fa-chevron-left text-[20px]"></i>
         </div>
         <div class="flex-grow">
-          Back
+          {{$t('common.back')}}
         </div>
       </div>
     </div>

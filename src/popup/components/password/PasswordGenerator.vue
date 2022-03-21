@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="uppercase px-3 mt-4 mb-3">CREATE STRONG AND SECURED PASSWORDS</div>
+    <div class="uppercase px-3 mt-4 mb-3">{{$t('data.tools.password_generator_desc')}}</div>
     <div class="p-5 bg-white">
       <div class="flex items-center justify-between mb-8">
         <div class="text-[20px] flex-grow truncate leading-[2rem]">
@@ -32,13 +32,13 @@
         class="btn btn-primary-reserve w-full mt-2"
         @click="savePassword"
       >
-        Save with Locker
+        {{ $t('data.tools.save_with_locker') }}
       </button>
       <!-- <button class="btn btn-clean w-full" @click="toggle = !toggle">
         {{ $t('data.tools.show_options') }} <i class="fa fa-chevron-down" />
       </button> -->
     </div>
-    <div class="uppercase px-3 mb-3">Password options</div>
+    <div class="uppercase px-3 mb-3">{{ $t('data.tools.password_options') }}</div>
     <div class="locker-pw-generator-options mb-2">
       <div class="generator-option">
         <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>

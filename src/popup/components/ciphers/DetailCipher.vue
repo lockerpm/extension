@@ -11,9 +11,9 @@
         class="menu-icon mr-4"
         @click="$router.back()"
       >
-        <i class="fas fa-chevron-left text-[20px]"></i> Back
+        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
       </div>
-      <div>View item</div>
+      <div>{{$t('common.details')}}</div>
       <div
         v-if="canManageItem(teams, cipher)"
         @click="addEdit(cipher)"
@@ -33,7 +33,7 @@
         class="cipher-field"
         style=""
       >
-        <div class="">Name</div>
+        <div class="">{{$t('common.item_name')}}</div>
         <div class="font-semibold">{{cipher.name}}</div>
       </div>
       <template v-if="cipher.type === CipherType.Login">

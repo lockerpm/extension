@@ -14,26 +14,26 @@
         class="h-[50px] mx-auto"
       >
       <div class="my-5 text-center text-head-5">
-        Log in or create a new account to access your secure vault.
+        {{$t('data.home.title')}}
       </div>
       <div class="w-full max-w-[500px]">
         <button
           class="btn btn-primary w-full mb-4"
           @click="openLogin"
         >
-          Login
+          {{$t('data.home.login')}}
         </button>
         <button
           class="btn btn-default w-full mb-4"
           @click="openRegister"
         >
-          Register
+          {{$t('data.home.register')}}
         </button>
         <button
           class="btn btn-default w-full mb-4"
           @click="openVault"
         >
-          Vault
+          {{$t('data.home.vault')}}
         </button>
       </div>
     </div>
@@ -52,16 +52,16 @@
         v-else
         class=""
       >
-        <div class="uppercase px-3 mt-4 mb-1">PASSWORDS FOR CURRENT WEBSITE ({{loginCiphers.length}})</div>
+        <div class="uppercase px-3 mt-4 mb-1">{{$t('data.home.for_current')}} ({{loginCiphers.length}})</div>
         <div
           v-if="!loginCiphers.length"
           class="bg-white text-center py-4"
         >
-          <p class="mb-2">There is no saved passwords for this site.</p>
+          <p class="mb-2">{{$t('data.home.no_for_current')}}</p>
           <router-link
             :to="{name: 'add-item-create'}"
             class="uppercase text-primary hover:no-underline"
-          >Add a password</router-link>
+          >{{$t('data.home.add_password')}}</router-link>
         </div>
         <li
           v-for="item in loginCiphers"
@@ -132,7 +132,7 @@
         <div
           v-if="cardCiphers.length"
           class="uppercase px-3 mt-4 mb-1"
-        >Cards ({{cardCiphers.length}})</div>
+        >{{$tc('data.type.Card', 2)}} ({{cardCiphers.length}})</div>
         <li
           v-for="item in cardCiphers"
           :key="item.id"
@@ -171,7 +171,7 @@
         <div
           v-if="identityCiphers.length"
           class="uppercase px-3 mt-4 mb-1"
-        >Identities ({{identityCiphers.length}})</div>
+        >{{$tc('data.type.Identity', 2)}} ({{identityCiphers.length}})</div>
         <li
           v-for="item in identityCiphers"
           :key="item.id"

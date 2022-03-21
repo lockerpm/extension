@@ -6,14 +6,14 @@
         style="z-index: 1; width: 400px"
       >
         <div class="menu-icon mr-4" @click="$router.back()">
-          <i class="fas fa-chevron-left text-[20px]"></i> Back
+          <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
         </div>
-        <div>Add item</div>
+        <div>{{$t('data.ciphers.add_cipher')}}</div>
         <div v-if="cipher.id" @click="putCipher(cipher)">
-          Update
+          {{$t('common.update')}}
         </div>
         <div v-else @click="postCipher(cipher)">
-          Save
+          {{ $t('common.save') }}
         </div>
       </div>
     </div>
@@ -34,11 +34,11 @@
       <ValidationProvider
         v-slot="{ errors: err }"
         rules="required"
-        :name="$t('common.name')"
+        :name="$t('common.item_name')"
       >
         <InputText
           v-model="cipher.name"
-          :label="$t('common.name')"
+          :label="$t('common.item_name')"
           class="w-full"
           :error-text="err && err.length && err[0]"
           :disabled="isDeleted"
@@ -100,7 +100,7 @@
         </template>
       </template>
       <template v-if="cipher.type === CipherType.Card">
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">Chi tiết thẻ</div>
+        <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.card_details')}}</div>
         <ValidationProvider
           v-slot="{ errors: err }"
           rules="required"
@@ -221,7 +221,7 @@
             :disabled="isDeleted"
           />
         </div>
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">Thông tin liên lạc</div>
+        <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.contact_info')}}</div>
         <div class="grid grid-cols-2 gap-x-2 mb-4">
           <InputText
             v-model="cipher.identity.address1"

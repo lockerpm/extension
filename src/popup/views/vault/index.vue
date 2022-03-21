@@ -66,7 +66,7 @@
               >
             </div>
             <div class="flex-grow flex justify-between mr-2">
-              <div>
+              <div class="w-[200px] truncate">
                 {{ item.name }}
               </div>
               <div>
@@ -101,7 +101,7 @@
               >
             </div>
             <div class="flex-grow flex justify-between mr-2">
-              <div>
+              <div class="w-[200px] truncate">
                 {{item.name }}
               </div>
               <div>

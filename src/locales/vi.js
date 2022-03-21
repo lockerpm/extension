@@ -74,7 +74,10 @@ module.exports = {
     go_to_website: 'Đi tới trang web',
     accept: 'Đồng ý',
     reject: 'Từ chối',
-    shared_with_you: 'Được chia sẻ với bạn trong CyStack'
+    shared_with_you: 'Được chia sẻ với bạn trong CyStack',
+    back: 'Trở lại',
+    item_name: 'Tên mục',
+    details: 'Chi tiết'
   },
   sidebar: {
     all: 'Tất cả',
@@ -150,18 +153,18 @@ module.exports = {
     null: 'Trash'
   },
   type: {
-    1: 'Password | Passwords',
-    2: 'Note | Notes',
-    3: 'Card | Cards',
-    4: 'Identity | Identities',
-    0: 'Item | Items',
-    Login: 'Password | Passwords',
-    SecureNote: 'Note | Notes',
-    Card: 'Card | Cards',
-    Identity: 'Identity | Identities',
+    1: 'Mật khẩu | Mật khẩu',
+    2: 'Ghi chú | Ghi chú',
+    3: 'Thẻ | Thẻ',
+    4: 'Định danh | Định danh',
+    0: 'Mục | Mục',
+    Login: 'Mật khẩu | Mật khẩu',
+    SecureNote: 'Ghi chú | Notes',
+    Card: 'Thẻ | Thẻ',
+    Identity: 'Định danh | Định danh',
     Dashboard: 'Item | Items',
-    Vault: 'Item | Items',
-    Shares: 'Item | Items'
+    Vault: 'Mục | Mục',
+    Shares: 'Mục | Mục'
   },
   data: {
     notifications: {
@@ -513,7 +516,9 @@ module.exports = {
       add_item: 'Thêm mục',
       selected_items: 'Các mục đã chọn',
       generate_random_password: 'Tạo mật khẩu ngẫu nhiên',
-      show_password: 'HIện mật khẩu'
+      show_password: 'HIện mật khẩu',
+      card_details: 'Chi tiết thẻ',
+      contact_info: 'Thông tin liên lạc'
     },
     settings: {
       account: 'Tài khoản',
@@ -536,11 +541,30 @@ module.exports = {
       delete_account: 'Xóa tài khoản',
       language: 'Ngôn ngữ',
       vietnamese: 'Vietnamese',
-      english: 'English'
+      english: 'English',
+      fingerprint_dialog: 'Dấu vân tay của bạn',
+      excluded_domains: 'Không lưu mật khẩu',
+      general: 'Chung',
+      go_to_web_vault: 'Đi tới Web',
+      import_export: 'Nhập & Xuất dữ liệu',
+      vault_timeout: 'Hẹn giờ khóa',
+      vault_timeout_action: 'Hành động khi hết giờ',
+      fingerprint_phase: 'Định danh',
+      lock_now: 'Khóa ngay',
+      upgrade_to_premium: 'Nâng cấp Premium',
+      manage_your_account: 'Quản lý tài khoản',
+      sync_data: 'Đồng bộ ngay',
+      support: 'Hỗ trợ',
+      logout: 'Đăng xuất',
+      about: 'Về chúng tôi',
+      documentation: 'Tài liệu',
+      help_feedback: 'Trợ giúp & Phản hồi',
+      rate_extension: 'Đánh giá Extension',
+      contact_us: 'Liên hệ'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
-      password_generator_desc: 'Tạo một mật khẩu mạnh và ngẫu nhiên cho tài khoản của bạn',
+      password_generator_desc: 'Tạo một mật khẩu mạnh và an toàn',
       password_health: 'Sức khỏe mật khẩu',
       password_health_desc: 'Xác định các mật khẩu yếu, trùng lặp có thể khiến bạn bị tấn công bởi tội phạm mạng',
       data_breach: 'Cảnh báo lộ dữ liệu',
@@ -552,7 +576,48 @@ module.exports = {
       digits: 'Sử dụng số (0-9)',
       symbols: 'Sử dụng ký tự đặc biệt (@!$%*)',
       ambiguous: 'Tránh các ký tự dễ nhầm lẫn',
-      fill_password: 'Sử dụng'
+      fill_password: 'Sử dụng',
+      save_with_locker: 'Lưu với Locker',
+      password_options: 'Các tùy chọn'
+    },
+    home: {
+      title: 'Đăng nhập hoặc tạo tài khoản mới để truy cập kho của bạn.',
+      login: 'Đăng nhập',
+      register: 'Đăng ký',
+      vault: 'Kho',
+      for_current: 'MẬT KHẨU CHO TRANG WEB HIỆN TẠI',
+      no_for_current: 'Không có mật khẩu nào cho trang web này.',
+      add_password: 'Thêm mật khẩu'
+    },
+    login: {
+      login: 'Đăng nhập',
+      login_desc: 'Đăng nhập bằng CyStack ID để sử dụng Locker',
+      verify: 'Xác minh danh tính của bạn',
+      authentication_app: 'Ứng dụng xác thực',
+      have_code: 'Tôi đã có code',
+      next: 'Tiếp',
+      enter_code: 'Nhập code',
+      check_email: 'Thư đã được gửi đến {email}. Kiểm tra hòm thư/spam để lấy mã xác thực.',
+      use_authentication_app: 'Xử dụng ứng dụng xác thực (như Duo hoặc Google Authenticator) để lấy mã.',
+      enter_code_here: 'Nhập mã xác thực ở đây',
+      authorization_error: 'Mã ủy quyền không hợp lệ',
+      remember_device: 'Nhớ thiết bị này',
+      authenticate: 'Xác thực',
+      email_sent: 'Một email đã được gửi đến:',
+      go_to_inbox: 'Vui lòng truy cập hộp thư đến của bạn ngay bây giờ, mở email và làm theo hướng dẫn.',
+      forgot_password: 'Quên mật khẩu?',
+      login_with: 'Hoặc Đăng nhập với',
+      dont_have_account: 'Chưa có tài khoản?',
+      sign_up: 'Đăng ký'
+    },
+    set_master_pass: {
+      create: 'Tạo mật khẩu chính',
+      logout: 'Đăng xuất',
+      enter_pass: 'Nhập mật khẩu chính',
+      confirm_pass: 'Xác nhận mật khẩu',
+      hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
+      create_btn: 'Tạo mật khẩu',
+      note: 'Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Master Password trong trường hợp bạn quên hoặc đánh mất.'
     }
   }
 }

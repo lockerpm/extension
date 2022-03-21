@@ -75,7 +75,10 @@ module.exports = {
     go_to_website: 'Go to website',
     accept: 'Accept',
     reject: 'Reject',
-    shared_with_you: 'Shared with you in CyStack'
+    shared_with_you: 'Shared with you in CyStack',
+    back: 'Back',
+    item_name: 'Item name',
+    details: 'Details'
   },
   sidebar: {
     all: 'All',
@@ -121,11 +124,11 @@ module.exports = {
     create_failed: 'Your Master Password has not been created!',
     scores: {
       na: 'N/A',
-      very_weak: 'Rất yếu',
-      weak: 'Yếu',
-      medium: 'Trung bình',
-      good: 'Tốt',
-      strong: 'Mạnh'
+      very_weak: 'Very weak',
+      weak: 'Weak',
+      medium: 'Medium',
+      good: 'Good',
+      strong: 'Strong'
     },
     change: 'Change Master Password',
     current_password: 'Enter current Master Password',
@@ -518,7 +521,9 @@ module.exports = {
       add_item: 'Add item',
       selected_items: 'selected items',
       generate_random_password: 'Generate random password',
-      show_password: 'Show password'
+      show_password: 'Show password',
+      card_details: 'Card Information',
+      contact_info: 'Contact Information'
     },
     settings: {
       account: 'Account',
@@ -546,11 +551,30 @@ module.exports = {
       deauthorize_sessions_title: 'Concerned your account is logged in on another device? Proceed below to deauthorize all computers or devices that you have previously used. This security step is recommended if you previously used a public computer or accidentally saved your password on a device that isn\'t yours.',
       deauthorize_sessions_desc: 'Proceeding will also log you out of your current session, requiring you to log back in.',
       deauthorize_sessions_success: 'All Sessions Deauthorized',
-      deauthorize_sessions_failed: 'Something went wrong'
+      deauthorize_sessions_failed: 'Something went wrong',
+      fingerprint_dialog: 'Your account\'s fingerprint phrase',
+      excluded_domains: 'Excluded Domains',
+      general: 'General',
+      go_to_web_vault: 'Go to Web Vault',
+      import_export: 'Import & Export',
+      vault_timeout: 'Vault Timeout',
+      vault_timeout_action: 'Vault Timeout Action',
+      fingerprint_phase: 'Fingerprint Phrase',
+      lock_now: 'Lock Now',
+      upgrade_to_premium: 'Upgrade to Premium',
+      manage_your_account: 'Manage your account',
+      sync_data: 'Sync data Now',
+      logout: 'Log Out',
+      support: 'Support',
+      about: 'About',
+      documentation: 'Documentation',
+      help_feedback: 'Help & Feedback',
+      rate_extension: 'Rate the Extension',
+      contact_us: 'Contact us'
     },
     tools: {
       password_generator: 'Password Generator',
-      password_generator_desc: 'Create secure passwords for your accounts',
+      password_generator_desc: 'Create strong and secured passwords',
       password_health: 'Password Health',
       password_health_desc: 'Identify passwords that can put you at risk',
       data_breach: 'Data Breach Scanner',
@@ -562,7 +586,48 @@ module.exports = {
       digits: 'Use digits (0-9)',
       symbols: 'Use symbols (@!$%*)',
       ambiguous: 'Avoid ambiguous characters',
-      fill_password: 'Fill password'
+      fill_password: 'Fill password',
+      save_with_locker: 'Save with Locker',
+      password_options: 'Password options'
+    },
+    home: {
+      title: 'Log in or create a new account to access your secure vault.',
+      login: 'Login',
+      register: 'Register',
+      vault: 'Vault',
+      for_current: 'PASSWORDS FOR CURRENT WEBSITE',
+      no_for_current: 'There is no saved passwords for this site.',
+      add_password: 'Add a password'
+    },
+    login: {
+      login: 'Login',
+      login_desc: 'Login with CyStack ID to use Locker',
+      verify: 'Verify your identity',
+      authentication_app: 'Authentication App',
+      have_code: 'I have a code',
+      next: 'Next',
+      enter_code: 'Enter code',
+      check_email: 'An email has been sent to {email}. Check you inbox/spam to get verification code.',
+      use_authentication_app: 'Please use your authentication app (such as Duo or Google Authenticator) to get the code.',
+      enter_code_here: 'Enter verification code here',
+      authorization_error: 'The authorization code is not valid.',
+      remember_device: 'Remember this device',
+      authenticate: 'Authenticate',
+      email_sent: 'An email has been sent to:',
+      go_to_inbox: 'Please go to your inbox now, open the email and follow the instructions.',
+      forgot_password: 'Forgot Password?',
+      login_with: 'Or Log in with',
+      dont_have_account: 'Don\'t have an account yet?',
+      sign_up: 'Sign Up'
+    },
+    set_master_pass: {
+      create: 'Create Master Password',
+      logout: 'Log out',
+      enter_pass: 'Enter Master Password',
+      confirm_pass: 'Confirm Master Password',
+      hint_pass: 'Master password hint (optional)',
+      create_btn: 'Create password',
+      note: 'Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.'
     }
   }
 }
