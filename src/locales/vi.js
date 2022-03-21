@@ -77,7 +77,8 @@ module.exports = {
     shared_with_you: 'Được chia sẻ với bạn trong CyStack',
     back: 'Trở lại',
     item_name: 'Tên mục',
-    details: 'Chi tiết'
+    details: 'Chi tiết',
+    type: 'Loại'
   },
   sidebar: {
     all: 'Tất cả',
@@ -164,7 +165,9 @@ module.exports = {
     Identity: 'Định danh | Định danh',
     Dashboard: 'Item | Items',
     Vault: 'Mục | Mục',
-    Shares: 'Mục | Mục'
+    Shares: 'Mục | Mục',
+    folder: 'Thư mục',
+    no_folder: 'Không trong thư mục'
   },
   data: {
     notifications: {

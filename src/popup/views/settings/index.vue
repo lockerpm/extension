@@ -151,7 +151,7 @@ export default Vue.extend({
           ]
         },
         {
-          name: 'security',
+          name: this.$t('data.settings.security'),
           divided: true,
           items: [
             {

@@ -78,7 +78,8 @@ module.exports = {
     shared_with_you: 'Shared with you in CyStack',
     back: 'Back',
     item_name: 'Item name',
-    details: 'Details'
+    details: 'Details',
+    type: 'Types'
   },
   sidebar: {
     all: 'All',
@@ -167,7 +168,9 @@ module.exports = {
     Identity: 'Identity | Identities',
     Dashboard: 'Item | Items',
     Vault: 'Item | Items',
-    Shares: 'Item | Items'
+    Shares: 'Item | Items',
+    folder: 'Folders',
+    no_folder: 'No folder'
   },
   data: {
     notifications: {

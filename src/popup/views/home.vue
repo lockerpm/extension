@@ -132,7 +132,7 @@
         <div
           v-if="cardCiphers.length"
           class="uppercase px-3 mt-4 mb-1"
-        >{{$tc('data.type.Card', 2)}} ({{cardCiphers.length}})</div>
+        >{{$tc('type.Card', 2)}} ({{cardCiphers.length}})</div>
         <li
           v-for="item in cardCiphers"
           :key="item.id"
@@ -171,7 +171,7 @@
         <div
           v-if="identityCiphers.length"
           class="uppercase px-3 mt-4 mb-1"
-        >{{$tc('data.type.Identity', 2)}} ({{identityCiphers.length}})</div>
+        >{{$tc('type.Identity', 2)}} ({{identityCiphers.length}})</div>
         <li
           v-for="item in identityCiphers"
           :key="item.id"

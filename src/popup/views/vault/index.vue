@@ -19,7 +19,7 @@
         v-else
         class=""
       >
-        <div class="uppercase px-3 mt-4 mb-1">Types ({{menu.length}})</div>
+        <div class="uppercase px-3 mt-4 mb-1">{{$t('common.type')}} ({{menu.length}})</div>
         <li
           v-for="(item, index) in menu"
           :key="index"
@@ -49,7 +49,7 @@
         </li>
         <template v-if="folders">
           <div class="flex justify-between">
-            <div class="uppercase px-3 mt-4 mb-1">Folders ({{folders.length}})</div>
+            <div class="uppercase px-3 mt-4 mb-1">{{$t('type.folder')}} ({{folders.length}})</div>
           </div>
           <li
             v-for="item in folders"
@@ -113,7 +113,7 @@
             </div>
           </li>
         </template>
-        <div class="uppercase px-3 mt-4 mb-1">No Folders ({{noFolderCiphers.length}})</div>
+        <div class="uppercase px-3 mt-4 mb-1">{{$t('type.no_folder')}} ({{noFolderCiphers.length}})</div>
         <cipher-row
           v-for="item in dataRendered"
           :key="item.id"
