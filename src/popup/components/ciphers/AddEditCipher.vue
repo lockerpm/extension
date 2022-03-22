@@ -8,7 +8,7 @@
         <div class="menu-icon mr-4" @click="$router.back()">
           <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
         </div>
-        <div>{{$t('data.ciphers.add_cipher')}}</div>
+        <div>{{cipher.id? $t('common.edit') : $t('data.ciphers.add_cipher')}}</div>
         <div v-if="cipher.id" @click="putCipher(cipher)">
           {{$t('common.update')}}
         </div>

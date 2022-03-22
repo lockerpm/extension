@@ -1,13 +1,13 @@
 {
   "appName": {
-    "message": "CyStack Locker"
+    "message": "Locker"
   },
   "extName": {
-    "message": "CyStack Locker",
+    "message": "Locker - Free Password Manager",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {
-    "message": "Một trình quản lý mật khẩu an toàn và miễn phí cho mọi thiết bị của bạn.",
+    "message": "Tiện ích mở rộng giúp bạn tận hưởng cuộc sống online an toàn và liền mạch.",
     "description": "Extension description"
   },
   "loginOrCreateNewAccount": {
@@ -449,10 +449,10 @@
     "message": "Thay đổi mật khẩu chính"
   },
   "changeMasterPasswordConfirmation": {
-    "message": "Bạn có thể thay đổi mật khẩu chủ trong trang web CyStack Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
+    "message": "Bạn có thể thay đổi mật khẩu chủ trong trang web Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
   },
   "twoStepLoginConfirmation": {
-    "message": "Xác thực hai lớp giúp cho tài khoản của bạn an toàn hơn bằng cách yêu cầu bạn xác minh thông tin đăng nhập của bạn bằng một thiết bị khác như khóa bảo mật, ứng dụng xác thực, SMS, cuộc gọi điện thoại hoặc email. Bạn có thể bật xác thực hai lớp trong trang web CyStack Locker. Bạn có muốn ghé thăm bitwarden.com bây giờ?"
+    "message": "Xác thực hai lớp giúp cho tài khoản của bạn an toàn hơn bằng cách yêu cầu bạn xác minh thông tin đăng nhập của bạn bằng một thiết bị khác như khóa bảo mật, ứng dụng xác thực, SMS, cuộc gọi điện thoại hoặc email. Bạn có thể bật xác thực hai lớp trong trang web Locker. Bạn có muốn ghé thăm bitwarden.com bây giờ?"
   },
   "editedFolder": {
     "message": "Chỉnh sửa Thư mục"
@@ -552,7 +552,7 @@
     "description": "Clipboard is the operating system thing where you copy/paste data to on your device."
   },
   "notificationAddDesc": {
-    "message": "Bạn có cần CyStack Locker nhớ giúp bạn mật khẩu này không?"
+    "message": "Bạn có cần Locker nhớ giúp bạn mật khẩu này không?"
   },
   "notificationAddSave": {
     "message": "Vâng, Lưu Ngay"
@@ -567,7 +567,7 @@
     "message": "The \"Changed Password Notification\" automatically prompts you to update a login's password in your vault whenever it detects that you have changed it on a website."
   },
   "notificationChangeDesc": {
-    "message": "Bạn có muốn cập nhật mật khẩu này trên CyStack Locker không?"
+    "message": "Bạn có muốn cập nhật mật khẩu này trên Locker không?"
   },
   "notificationChangeSave": {
     "message": "Yes, Update Now"
@@ -623,7 +623,7 @@
     "message": "This export encrypts your data using your account's encryption key. If you ever rotate your account's encryption key you should export again since you will not be able to decrypt this export file."
   },
   "encExportAccountWarningDesc": {
-    "message": "Account encryption keys are unique to each CyStack Locker user account, so you can't import an encrypted export into a different account."
+    "message": "Account encryption keys are unique to each Locker user account, so you can't import an encrypted export into a different account."
   },
   "exportMasterPassword": {
     "message": "Nhập mật khẩu chủ để xuất kho dữ liệu của bạn."
@@ -635,7 +635,7 @@
     "message": "Learn about Organizations"
   },
   "learnOrgConfirmation": {
-    "message": "CyStack Locker allows you to share your vault items with others by using an organization. Would you like to visit the bitwarden.com website to learn more?"
+    "message": "Locker allows you to share your vault items with others by using an organization. Would you like to visit the bitwarden.com website to learn more?"
   },
   "moveToOrganization": {
     "message": "Move to Organization"
@@ -714,7 +714,7 @@
     "message": "Quản lý Thành viên"
   },
   "premiumManageAlert": {
-    "message": "Bạn có thể quản lý các thành viên trong trang web CyStack Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
+    "message": "Bạn có thể quản lý các thành viên trong trang web Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
   },
   "premiumRefresh": {
     "message": "Làm mới thành viên"
@@ -747,13 +747,13 @@
     "message": "Mua bản Cao Cấp"
   },
   "premiumPurchaseAlert": {
-    "message": "Bạn có thể nâng cấp làm thành viên cao cấp trong trang web CyStack Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
+    "message": "Bạn có thể nâng cấp làm thành viên cao cấp trong trang web Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
   },
   "premiumCurrentMember": {
     "message": "Bạn là một thành viên cao cấp!"
   },
   "premiumCurrentMemberThanks": {
-    "message": "Cảm ơn bạn đã hỗ trợ CyStack Locker."
+    "message": "Cảm ơn bạn đã hỗ trợ Locker."
   },
   "premiumPrice": {
     "message": "Tất cả chỉ với $PRICE$ /năm!",
@@ -1285,7 +1285,7 @@
     "message": "Weak Master Password"
   },
   "weakMasterPasswordDesc": {
-    "message": "Mật khẩu chính bạn vừa chọn có vẻ yếu. Bạn nên chọn mật khẩu chính (hoặc cụm từ mật khẩu) mạnh để bảo vệ đúng cách tài khoản CyStack Locker của bạn. Bạn có thực sự muốn dùng mật khẩu chính này?"
+    "message": "Mật khẩu chính bạn vừa chọn có vẻ yếu. Bạn nên chọn mật khẩu chính (hoặc cụm từ mật khẩu) mạnh để bảo vệ đúng cách tài khoản Locker của bạn. Bạn có thực sự muốn dùng mật khẩu chính này?"
   },
   "pin": {
     "message": "Mã PIN",
@@ -1295,7 +1295,7 @@
     "message": "Mở khóa với mã PIN"
   },
   "setYourPinCode": {
-    "message": "Đặt mã PIN của bạn để mở khóa CyStack Locker. Cài đặt mã PIN của bạn sẽ bị xóa nếu bạn hoàn toàn đăng xuất khỏi ứng dụng."
+    "message": "Đặt mã PIN của bạn để mở khóa Locker. Cài đặt mã PIN của bạn sẽ bị xóa nếu bạn hoàn toàn đăng xuất khỏi ứng dụng."
   },
   "pinRequired": {
     "message": "Mã PIN là bắt buộc."
@@ -1316,7 +1316,7 @@
     "message": "Awaiting confirmation from desktop"
   },
   "awaitDesktopDesc": {
-    "message": "Please confirm using biometrics in the CyStack Locker Desktop application to enable biometrics for browser."
+    "message": "Please confirm using biometrics in the Locker Desktop application to enable biometrics for browser."
   },
   "lockWithMasterPassOnRestart": {
     "message": "Khóa với mật khẩu chính khi trình duyệt khởi động lại"
@@ -1453,13 +1453,13 @@
     "message": "Browser integration is not enabled"
   },
   "desktopIntegrationDisabledDesc": {
-    "message": "Browser integration is not enabled in the CyStack Locker Desktop application. Please enable it in the settings within the desktop application."
+    "message": "Browser integration is not enabled in the Locker Desktop application. Please enable it in the settings within the desktop application."
   },
   "startDesktopTitle": {
-    "message": "Start the CyStack Locker Desktop application"
+    "message": "Start the Locker Desktop application"
   },
   "startDesktopDesc": {
-    "message": "The CyStack Locker Desktop application needs to be started before this function can be used."
+    "message": "The Locker Desktop application needs to be started before this function can be used."
   },
   "errorEnableBiometricTitle": {
     "message": "Không thể bật nhận dạng sinh trắc học"
@@ -1495,7 +1495,7 @@
     "message": "Permission not provided"
   },
   "nativeMessaginPermissionErrorDesc": {
-    "message": "Without permission to communicate with the CyStack Locker Desktop Application we cannot provide biometrics in the browser extension. Please try again."
+    "message": "Without permission to communicate with the Locker Desktop Application we cannot provide biometrics in the browser extension. Please try again."
   },
   "nativeMessaginPermissionSidebarTitle": {
     "message": "Permission request error"
@@ -1513,7 +1513,7 @@
     "message": "Excluded Domains"
   },
   "excludedDomainsDesc": {
-    "message": "CyStack Locker will not ask to save login details for these domains. You must refresh the page for changes to take effect."
+    "message": "Locker will not ask to save login details for these domains. You must refresh the page for changes to take effect."
   },
   "excludedDomainsInvalidDomain": {
     "message": "$DOMAIN$ is not a valid domain",
@@ -1526,15 +1526,15 @@
   },
   "send": {
     "message": "Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "searchSends": {
     "message": "Tìm kiếm Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "addSend": {
     "message": "Thêm Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendTypeText": {
     "message": "Văn bản"
@@ -1544,7 +1544,7 @@
   },
   "allSends": {
     "message": "Toàn bộ Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "maxAccessCountReached": {
     "message": "Max access count reached"
@@ -1560,7 +1560,7 @@
   },
   "copySendLink": {
     "message": "Sao chép liên kết Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "removePassword": {
     "message": "Remove Password"
@@ -1573,11 +1573,11 @@
   },
   "deletedSend": {
     "message": "Đã xóa Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendLink": {
     "message": "Gửi liên kết",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "disabled": {
     "message": "Đã tắt"
@@ -1587,23 +1587,23 @@
   },
   "deleteSend": {
     "message": "Xóa Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "deleteSendConfirmation": {
     "message": "Bạn có chắc chắn muốn xóa Send này?",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "editSend": {
     "message": "Chỉnh sửa Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendTypeHeader": {
     "message": "Đây là loại Send gì?",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendNameDesc": {
     "message": "Một tên gợi nhớ để mô tả về Send này.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendFileDesc": {
     "message": "Tập tin bạn muốn gửi."
@@ -1613,14 +1613,14 @@
   },
   "deletionDateDesc": {
     "message": "Send sẽ được xóa vĩnh viễn vào ngày và giờ được chỉ định.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "expirationDate": {
     "message": "Expiration Date"
   },
   "expirationDateDesc": {
     "message": "Nếu được thiết lập, truy cập vào Send này sẽ hết hạn vào ngày và giờ được chỉ định.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "oneDay": {
     "message": "1 ngày"
@@ -1642,56 +1642,56 @@
   },
   "maximumAccessCountDesc": {
     "message": "Nếu được thiết lập, khi đã đạt tới số lượng truy cập tối đa, người dùng sẽ không thể truy cập Send này nữa.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendPasswordDesc": {
     "message": "Optionally require a password for users to access this Send.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendNotesDesc": {
     "message": "Private notes about this Send.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendDisableDesc": {
     "message": "Disable this Send so that no one can access it.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendShareDesc": {
     "message": "Copy this Send's link to clipboard upon save.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendTextDesc": {
     "message": "Văn bản bạn muốn gửi."
   },
   "sendHideText": {
     "message": "Hide this Send's text by default.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "currentAccessCount": {
     "message": "Current Access Count"
   },
   "createSend": {
     "message": "Create New Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "newPassword": {
     "message": "New Password"
   },
   "sendDisabled": {
     "message": "Send Disabled",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendDisabledWarning": {
     "message": "Do chính sách doanh nghiệp, bạn chỉ có thể xóa những Send hiện có.",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "createdSend": {
     "message": "Đã tạo Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "editedSend": {
     "message": "Đã chỉnh sửa Send",
-    "description": "'Send' is a noun and the name of a feature called 'CyStack Locker Send'. It should not be translated."
+    "description": "'Send' is a noun and the name of a feature called 'Locker Send'. It should not be translated."
   },
   "sendLinuxChromiumFileWarning": {
     "message": "In order to choose a file, open the extension in the sidebar (if possible) or pop out to a new window by clicking this banner."
