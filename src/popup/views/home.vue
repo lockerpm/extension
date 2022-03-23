@@ -359,7 +359,7 @@ export default Vue.extend({
 
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
-      console.log("popup send cmd: collectPageDetails");
+      // console.log("popup send cmd: collectPageDetails");
       BrowserApi.tabSendMessage(tab, {
         command: "collectPageDetails",
         tab: tab,
@@ -415,7 +415,7 @@ export default Vue.extend({
       this.$router.push({ name: "add-item-create", params: { data: item } });
     },
     async fillCipher(cipher: CipherView) {
-      console.log(this.pageDetails.length);
+      // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
@@ -484,7 +484,7 @@ export default Vue.extend({
         }, 500);
         break;
       case "collectPageDetailsResponse":
-        console.log("home: collectPageDetails");
+        // console.log("home: collectPageDetails");
         if (msg.sender === BroadcasterSubscriptionId) {
           const pageDetailsObj = {
             // frameId: msg.webExtSender.frameId,

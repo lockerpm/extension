@@ -81,7 +81,7 @@ export default class NotificationBackground {
             case 'bgAddSave':
             case 'bgChangeSave':
                 if (await this.vaultTimeoutService.isLocked()) {
-                    console.log('vault locked');
+                    // console.log('vault locked');
                     const retryMessage: LockedVaultPendingNotificationsItem = {
                         commandToRetry: {
                             msg: msg,
@@ -93,7 +93,7 @@ export default class NotificationBackground {
                     await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
                     return;
                 }
-                console.log('vault unlocked')
+                // console.log('vault unlocked')
                 await this.saveOrUpdateCredentials(sender.tab, msg.folder);
                 break;
             case 'bgNeverSave':
@@ -186,7 +186,7 @@ export default class NotificationBackground {
 
   private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
       if (!await this.userService.isAuthenticated()) {
-            console.log('unauthenticated')
+            // console.log('unauthenticated')
             return;
         }
         const loginDomain = Utils.getDomain(loginInfo.url);
@@ -290,7 +290,7 @@ export default class NotificationBackground {
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
-        console.log('saveOrUpdateCredentials')
+        // console.log('saveOrUpdateCredentials')
         for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
             const queueMessage = this.notificationQueue[i];
             if (queueMessage.tabId !== tab.id ||
@@ -358,7 +358,7 @@ export default class NotificationBackground {
         }
 
         const cipher = await this.cipherService.encrypt(model);
-        console.log("notificationBar createNewCipher");
+        // console.log("notificationBar createNewCipher");
         // await this.cipherService.saveWithServer(cipher);
         const csToken = await this.main.storageService.get<string>("cs_token");
         const headers = {
@@ -366,7 +366,7 @@ export default class NotificationBackground {
           "Content-Type": "application/json; charset=utf-8"
         };
         const data = new CipherRequest(cipher)
-        await axios.post('https://api.cystack.net/v3/cystack_platform/pm/ciphers/vaults', data, {headers: headers})
+        await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, {headers: headers})
     }
 
     private async getDecryptedCipherById(cipherId: string) {
@@ -382,14 +382,14 @@ export default class NotificationBackground {
             cipher.login.password = newPassword;
             const newCipher = await this.cipherService.encrypt(cipher);
             // await this.cipherService.saveWithServer(newCipher);
-            console.log('notificationBar updateCipher')
+            // console.log('notificationBar updateCipher')
             const csToken = await this.main.storageService.get<string>("cs_token");
             const headers = {
               "Authorization": "Bearer " + csToken,
               "Content-Type": "application/json; charset=utf-8"
             };
             const data = new CipherRequest(newCipher)
-            await axios.put(`https://api.cystack.net/v3/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
+            await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
         }
     }
 

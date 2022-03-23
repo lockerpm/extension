@@ -37,7 +37,7 @@ export default Vue.extend({
   }),
   methods: {
     async submit() {
-      console.log("email submitted!");
+      // console.log("email submitted!");
     },
     switchLoc () {
       // switch the locale.

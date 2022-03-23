@@ -566,11 +566,11 @@ export default {
         this.loadingSetPassword = true
         const response = await this.axios.post(`/cystack_platform/pm/emergency_access/${this.selectedEmergencyAccess.id}/takeover`)
         const oldKeyBuffer = await this.$cryptoService.rsaDecrypt(response.key_encrypted)
-        console.log('oldKeyBuffer: ', oldKeyBuffer)
+        // console.log('oldKeyBuffer: ', oldKeyBuffer)
         const oldEncKey = new SymmetricCryptoKey(oldKeyBuffer)
-        console.log('oldEnKey: ', oldEncKey)
+        // console.log('oldEnKey: ', oldEncKey)
         if (oldEncKey == null) {
-          console.log('oldEncKey')
+          // console.log('oldEncKey')
           this.notify(this.$t('data.notifications.error_occurred'), 'warning')
           return
         }

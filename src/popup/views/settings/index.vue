@@ -276,7 +276,7 @@ export default Vue.extend({
   },
   methods: {
     openRoute (item) {
-      console.log(item.name)
+      // console.log(item.name)
       if (item.lock){
         this.lock()
       }
@@ -312,7 +312,7 @@ export default Vue.extend({
     async processMessage(msg: any, sender: any, sendResponse: any) {
       switch (msg.command) {
       case 'syncCompleted':
-        console.log('sync complete')
+        // console.log('sync complete')
         if(this.$route.path === '/settings/' && msg.successfully){
           this.notify('Syncing complete', 'success')
         }

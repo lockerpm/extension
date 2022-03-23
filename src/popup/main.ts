@@ -181,7 +181,7 @@ Vue.mixin({
         browserStorageService.save("device_id", deviceIdentifier);
       }
       try {
-        console.log('login')
+        // console.log('login')
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
@@ -252,7 +252,7 @@ Vue.mixin({
         this.$messagingService.send('syncStarted')
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          console.log('sync')
+          // console.log('sync')
           let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
           if (res.count && res.count.ciphers) {
             this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
@@ -283,7 +283,7 @@ Vue.mixin({
         })
         // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
         this.$messagingService.send('syncCompleted', { successfully: true })
-        console.log('sync completed')
+        // console.log('sync completed')
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false })
         this.$store.commit('UPDATE_SYNCED_CIPHERS')
@@ -392,7 +392,7 @@ Vue.mixin({
         name = 'identities'
         break
       }
-      console.log(cipher.id)
+      // console.log(cipher.id)
       this.$router.push({
         name: name + '-id',
         params: { id: cipher.id }

@@ -845,8 +845,8 @@ export default Vue.extend({
       const orgKey = shareKey[0].encryptedString
       const collection = await this.$cryptoService.encrypt('defaultCollection', shareKey[1])
       const collectionName = collection.encryptedString
-      console.log('orgKey', orgKey)
-      console.log('collectionName', collectionName)
+      // console.log('orgKey', orgKey)
+      // console.log('collectionName', collectionName)
     },
     async getCards () {
       this.cards = await this.axios.get('cystack_platform/payments/cards')

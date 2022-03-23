@@ -231,7 +231,7 @@
           style="width: 30px; margin-top: 30px"
         >
         </div>
-        <div class="mt-3 text-center">
+        <!-- <div class="mt-3 text-center">
           <p class="mb-2">
             {{$t('data.login.login_with')}}
           </p>
@@ -248,7 +248,7 @@
               :alt="s.key"
             >
           </button>
-        </div>
+        </div> -->
         <div class="absolute" style="bottom: 20px; width: 400px; padding-right: 48px">
           <div class="flex px-2 my-4 mx-auto">
             <div class="w-full pl-0 text-center">

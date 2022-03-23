@@ -19,7 +19,8 @@ const CLIENT_ID = encodeURIComponent('31609893092-0etuuag1o662fpa0c6sap5v96lc44o
 const FB_CLIENT_ID = encodeURIComponent("914989149119054");
 const GITHUB_CLIENT_ID = encodeURIComponent("2d2090f44568a41519f3");
 const RESPONSE_TYPE = encodeURIComponent('token');
-const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
+// const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
+const REDIRECT_URI = encodeURIComponent('https://chdemnomnfgnemllhkmfhmjgfbamdcbh.chromiumapp.org')
 const SCOPE = encodeURIComponent('openid email profile');
 const FB_SCOPE = encodeURIComponent('public_profile+email');
 const GITHUB_SCOPE = encodeURIComponent('read:user+user:email')
@@ -93,7 +94,7 @@ export default class RuntimeBackground {
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    console.log(`runtimeBackground processMessage: ${msg.command} - sender: ${sender} - data: ${msg.data}`);
+    // console.log(`runtimeBackground processMessage: ${msg.command} - sender: ${sender} - data: ${msg.data}`);
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
@@ -123,7 +124,7 @@ export default class RuntimeBackground {
         }
         break;
       case "addToLockedVaultPendingNotifications":
-        console.log(msg.data);
+        // console.log(msg.data);
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
       case "logout":
@@ -223,7 +224,7 @@ export default class RuntimeBackground {
         } catch {}
         break;
       case "cs-authResult":
-        console.log(msg.referrer);
+        // console.log(msg.referrer);
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
@@ -249,7 +250,7 @@ export default class RuntimeBackground {
         }
         break;
       case "locker-authResult":
-        console.log(msg.referrer);
+        // console.log(msg.referrer);
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
@@ -313,7 +314,6 @@ export default class RuntimeBackground {
           'url': create_auth_endpoint(),
           'interactive': true
         }, function (redirect_url) {
-          console.log(redirect_url)
           if (chrome.runtime.lastError) {
             // problem signing in
           } else {
@@ -329,7 +329,6 @@ export default class RuntimeBackground {
           'url': create_fb_auth_endpoint(),
           'interactive': true
         }, function (redirect_url) {
-          console.log(redirect_url)
           if (chrome.runtime.lastError) {
             // problem signing in
           } else {
@@ -345,7 +344,6 @@ export default class RuntimeBackground {
           'url': create_github_auth_endpoint(),
           'interactive': true
         }, function (redirect_url) {
-          console.log(redirect_url)
           if (chrome.runtime.lastError) {
             // problem signing in
           } else {
