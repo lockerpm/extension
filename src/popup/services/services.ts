@@ -91,7 +91,9 @@ export default {
         Vue.prototype.$vaultTimeoutService =  getBgService<VaultTimeoutService>('vaultTimeoutService')()
         Vue.prototype.$broadcasterService =  getBgService<BroadcasterService>('broadcasterService')()
         Vue.prototype.$autofillService = getBgService<AutofillService>('autofillService')()
-        Vue.prototype.$popupUtilsService = getBgService<PopupUtilsService>("popupUtilsService")();
+        Vue.prototype.$popupUtilsService = getBgService<PopupUtilsService>("popupUtilsService")()
+        Vue.prototype.$settingsService = getBgService<SettingsService>("settingsService")()
+        Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
         if (!popupUtilsService.inPopup(window)) {
             window.document.body.classList.add('body-full');
         } else if (window.screen.availHeight < 600) {

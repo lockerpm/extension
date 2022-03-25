@@ -14,13 +14,15 @@ import MainBackground from './main.background';
 
 import { Utils } from 'jslib-common/misc/utils';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
-
+import axios from "axios";
 const CLIENT_ID = encodeURIComponent('31609893092-0etuuag1o662fpa0c6sap5v96lc44onb.apps.googleusercontent.com');
 const FB_CLIENT_ID = encodeURIComponent("914989149119054");
-const GITHUB_CLIENT_ID = encodeURIComponent("2d2090f44568a41519f3");
+// const GITHUB_CLIENT_ID = encodeURIComponent("2d2090f44568a41519f3");
+const GITHUB_CLIENT_ID = encodeURIComponent("d47ecf32f5a59a07f34d"); 
+const GITHUB_CLIENT_SECRET = encodeURIComponent("b44eb6fc95c9c48182a1ccb6d45f79b3eb579cb5")
 const RESPONSE_TYPE = encodeURIComponent('token');
-// const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
-const REDIRECT_URI = encodeURIComponent('https://chdemnomnfgnemllhkmfhmjgfbamdcbh.chromiumapp.org')
+const REDIRECT_URI = encodeURIComponent('https://cmajindocfndlkpkjnmjpjoilibjgmgh.chromiumapp.org')
+// const REDIRECT_URI = encodeURIComponent('https://hciabnakeampkoldeohkfcbadmgcmebl.chromiumapp.org')
 const SCOPE = encodeURIComponent('openid email profile');
 const FB_SCOPE = encodeURIComponent('public_profile+email');
 const GITHUB_SCOPE = encodeURIComponent('read:user+user:email')
@@ -54,6 +56,7 @@ function create_fb_auth_endpoint() {
 }
 
 function create_github_auth_endpoint() {
+  console.log(chrome.identity.getRedirectURL());
   const STATE = encodeURIComponent(Math.random().toString(36).substring(2, 15));
     let endpoint_url = 'https://www.github.com/login/oauth/authorize?client_id=' + GITHUB_CLIENT_ID +
               '&response_type=code' +
@@ -313,14 +316,15 @@ export default class RuntimeBackground {
         chrome.identity.launchWebAuthFlow({
           'url': create_auth_endpoint(),
           'interactive': true
-        }, function (redirect_url) {
+        }, async function (redirect_url) {
           if (chrome.runtime.lastError) {
+            console.log('chrome runtime error: ',chrome.runtime.lastError)
             // problem signing in
           } else {
             let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
             access_token = access_token.substring(0, access_token.indexOf("&"));
-            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
-            // sendResponse({ msg: "success", access_token });
+            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider, sender: 'runtime' })
+            sendResponse({ msg: "success", access_token, provider: msg.provider });
           }
         });
         break;
@@ -330,12 +334,13 @@ export default class RuntimeBackground {
           'interactive': true
         }, function (redirect_url) {
           if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError)
             // problem signing in
           } else {
             let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
             access_token = access_token.substring(0, access_token.indexOf("&"));
             chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
-            // sendResponse({ msg: "success", access_token });
+            sendResponse({ msg: "success", access_token });
           }
         });
         break;
@@ -346,14 +351,23 @@ export default class RuntimeBackground {
         }, function (redirect_url) {
           if (chrome.runtime.lastError) {
             // problem signing in
+            console.log(chrome.runtime.lastError)
           } else {
             let access_token = redirect_url.substring(redirect_url.indexOf('code=') + 5);
             access_token = access_token.substring(0, access_token.indexOf("&"));
-            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
-            // sendResponse({ msg: "success", access_token });
+            const url = `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${access_token}`;
+            axios.post(url).then((result) => {
+              access_token = result.data.substring(result.data.indexOf('access_token=') + 13);
+              access_token = access_token.substring(0, access_token.indexOf("&"));
+              chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
+            })
+            
+            sendResponse({ msg: "success", access_token });
           }
         });
         break;
+      case "loginWithSuccess":
+        console.log('test')
       default:
         break;
     }

@@ -119,7 +119,6 @@ Vue.mixin({
       const userId = await this.$userService.getUserId()
       await this.axios.post('/users/logout')
       await Promise.all([
-        this.$storageService.remove("cs_token"),
         this.$cryptoService.clearKeys(),
         this.$userService.clear(),
         this.$folderService.clear(userId),
@@ -127,15 +126,11 @@ Vue.mixin({
         this.$cipherService.clear(userId),
         this.$settingsService.clear(userId),
         this.$policyService.clear(userId),
-        this.$tokenService.clearToken()
+        this.$tokenService.clearToken(),
+        this.$storageService.remove("cs_token")
       ]);
-      // await this.$cryptoService.clearKeys()
-      // await this.$userService.clear()
-      // await this.$folderService.clear(userId)
-      // await this.$cipherService.clear(userId)
-      // await this.$storageService.remove('cs_token')
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
-      this.$router.push({ name: 'home' })
+      this.$router.push({ name: 'login' })
     },
     async lock () {
       await Promise.all([
@@ -425,9 +420,6 @@ Vue.mixin({
       }
 
       return connectionUrl
-    },
-    test(token) {
-      console.log(token)
     }
   }
 })

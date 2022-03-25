@@ -280,6 +280,7 @@ const router = new VueRouter({
   routes
 })
 async function VaultGuard(to, from, next) {
+  console.log(to.path, from.path)
   const store = await storePromise;
   if (store.state.isLoggedIn === true) {
     await store.dispatch("LoadCurrentUser");

@@ -231,7 +231,7 @@
           style="width: 30px; margin-top: 30px"
         >
         </div>
-        <!-- <div class="mt-3 text-center">
+        <div class="mt-3 text-center">
           <p class="mb-2">
             {{$t('data.login.login_with')}}
           </p>
@@ -248,7 +248,7 @@
               :alt="s.key"
             >
           </button>
-        </div> -->
+        </div>
         <div class="absolute" style="bottom: 20px; width: 400px; padding-right: 48px">
           <div class="flex px-2 my-4 mx-auto">
             <div class="w-full pl-0 text-center">
@@ -304,22 +304,28 @@ export default Vue.extend({
   },
   async mounted() {
     chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-        this.processMessage(msg, sender, response);
+      async (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+        switch(msg.command){
+        case 'loginWithSuccess':
+          await this.checkToken(msg.access_token, msg.provider);
+          break;
+        default:
+          break;
+        }
+
       }
     );
   },
   methods: {
-    async processMessage(msg: any, sender: any, sendResponse: any) {
-      switch (msg.command) {
-      case "loginWithSuccess":
-        await this.checkToken(msg.access_token, msg.provider)
-        break;
-      
-      default:
-        break;
-      }
-    },
+    // async processMessage(msg: any, sender: any, sendResponse: any) {
+    //   switch (msg.command) {
+    //   case "loginWithSuccess":
+    //     await this.checkToken(msg.access_token, msg.provider)
+    //     break;
+    //   default:
+    //     break;
+    //   }
+    // },
     reset_state () {
       this.error = null
       this.send_mail = false
@@ -391,7 +397,6 @@ export default Vue.extend({
         chrome.runtime.sendMessage({ command: 'loginWithGG', provider }, function (response) {
           // if (response.msg === 'success') {
           //   const access_token = response.access_token
-          //   console.log(access_token)
           // }
         });
       }
@@ -433,9 +438,10 @@ export default Vue.extend({
           }
           const data = await this.axios.post(url, {
             provider: authStrategy,
-            access_token: accessToken.split(' ').pop()
+            access_token: accessToken.split(' ').pop(),
+            scope: "pwdmanager"
           }, myHeaders)
-          this.getAccessToken(data.token)
+          await this.getAccessToken(data.token)
         } catch (e) {
           // this.$router.replace({ name: 'login' })
           this.notify('Login failed', 'error')
@@ -531,7 +537,7 @@ export default Vue.extend({
             isLoggedIn: true,
           })
           this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.$router.push({ name: 'lock' })
+          this.$router.push({ name: 'vault' })
         }
       } catch (error) {
         this.notify(error, 'warning')
