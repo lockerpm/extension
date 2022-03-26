@@ -206,7 +206,7 @@ Vue.mixin({
         this.$router.push({ name: 'home' })
       } catch (e) {
         console.log(e)
-        this.notify('Xác thực thông tin thất bại', 'warning')
+        this.notify(this.$t('data.notifications.authentication_failed'), 'warning')
       }
     },
     async clearKeys () {

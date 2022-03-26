@@ -312,20 +312,19 @@ export default Vue.extend({
         default:
           break;
         }
-
       }
     );
   },
   methods: {
-    // async processMessage(msg: any, sender: any, sendResponse: any) {
-    //   switch (msg.command) {
-    //   case "loginWithSuccess":
-    //     await this.checkToken(msg.access_token, msg.provider)
-    //     break;
-    //   default:
-    //     break;
-    //   }
-    // },
+    async processMessage(msg: any, sender: any, sendResponse: any) {
+      switch (msg.command) {
+      case "loginWithSuccess":
+        await this.checkToken(msg.access_token, msg.provider)
+        break;
+      default:
+        break;
+      }
+    },
     reset_state () {
       this.error = null
       this.send_mail = false
@@ -393,40 +392,24 @@ export default Vue.extend({
       thisWindow.close();
     },
     loginWith (provider) {
-      if(provider === 'google'){
-        chrome.runtime.sendMessage({ command: 'loginWithGG', provider }, function (response) {
-          // if (response.msg === 'success') {
-          //   const access_token = response.access_token
-          // }
-        });
-      }
-      else if(provider === 'facebook'){
-        chrome.runtime.sendMessage({ command: 'loginWithFB', provider }, function (response) {
-          // if (response.msg === 'success') {
-          //   const access_token = response.access_token
-          //   console.log(access_token)
-          // }
-        });
-      }
-      else if(provider === 'github'){
-        chrome.runtime.sendMessage({ command: 'loginWithGithub', provider }, function (response) {
-          // if (response.msg === 'success') {
-          //   const access_token = response.access_token
-          //   console.log(access_token)
-          // }
-        });
-      }
-      else {
-        const url = `${process.env.VUE_APP_ID_URL
-        }/login?SERVICE_URL=${encodeURIComponent(
-          "/sso"
-        )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
+      // if(provider === 'google'){
+      //   chrome.runtime.sendMessage({ command: 'loginWithGG', provider });
+      // }
+      // else if(provider === 'facebook'){
+      //   chrome.runtime.sendMessage({ command: 'loginWithFB', provider });
+      // }
+      // else if(provider === 'github'){
+      //   chrome.runtime.sendMessage({ command: 'loginWithGithub', provider });
+      // }
+      const url = `${process.env.VUE_APP_ID_URL
+      }/login?SERVICE_URL=${encodeURIComponent(
+        "/sso"
+      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
 
-        this.$platformUtilsService.launchUri(url);
-        BrowserApi.reloadOpenWindows();
-        const thisWindow = window.open("", "_self");
-        thisWindow.close();
-      }
+      this.$platformUtilsService.launchUri(url);
+      BrowserApi.reloadOpenWindows();
+      const thisWindow = window.open("", "_self");
+      thisWindow.close();
     },
     async checkToken (access_token, authStrategy) {
       if (authStrategy === 'facebook' || authStrategy === 'google' || authStrategy === 'github') {

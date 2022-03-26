@@ -248,7 +248,8 @@ module.exports = {
       fingerprint_description_2: 'A \'fingerprint phrase\' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.',
       min_password_length: 'Minimum password length is {length}',
       max_password_length: 'Maximum password length is {length}',
-      password_composition: 'Password must contain at least 1 special character'
+      password_composition: 'Password must contain at least 1 special character',
+      authentication_failed: 'Authentication failed'
     },
     profile_menu: {
       lock: 'Lock your account',

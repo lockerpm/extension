@@ -244,7 +244,8 @@ module.exports = {
       fingerprint_description_2: '\'Fingerprint Phrase\' là cụm từ duy nhất của mỗi tài khoản, dùng để xác minh khóa công khai với người dùng khác trong trường hợp chia sẻ và tham gia vào một tổ chức.',
       min_password_length: 'Mật khẩu phải chứ ít nhất {length} ký tự',
       max_password_length: 'Độ dài tối đa của mật khẩu là {length}',
-      password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt'
+      password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
+      authentication_failed: 'Xác thực thông tin thất bại'
     },
     profile_menu: {
       lock: 'Khóa tài khoản',

@@ -165,6 +165,7 @@ export default class RuntimeBackground {
       case "bgUpdateContextMenu":
       case "editedCipher":
       case "addedCipher":
+        console.log("added Cipher")
       case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
@@ -257,22 +258,33 @@ export default class RuntimeBackground {
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
-
+        const myHeaders = {
+           headers: { Authorization: `Bearer ${msg.token}` }
+        };
         try {
-          await this.storageService.save("cs_token", msg.token);
-          const store = await this.storageService.get("cs_store");
-          let oldStoreParsed = {};
-          if (typeof store === "object") {
-            oldStoreParsed = store;
-          }
-          await this.storageService.save("cs_store", {
-            ...oldStoreParsed,
-            isLoggedIn: true
-          });
-          console.log({
-            ...oldStoreParsed,
-            isLoggedIn: true
-          });
+          const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
+          axios.post(url, {
+            "SERVICE_URL": "/sso",
+            "SERVICE_SCOPE":"pwdmanager",
+            "CLIENT":"browser"
+          }, myHeaders).then(async (result) => {
+            const access_token = result.data ? result.data.access_token : ""
+            console.log(access_token)
+            await this.storageService.save("cs_token", access_token);
+            const store = await this.storageService.get("cs_store");
+            let oldStoreParsed = {};
+            if (typeof store === "object") {
+              oldStoreParsed = store;
+            }
+            await this.storageService.save("cs_store", {
+              ...oldStoreParsed,
+              isLoggedIn: true
+            });
+            console.log({
+              ...oldStoreParsed,
+              isLoggedIn: true
+            });
+          })
         } catch (e) {
           console.log(e);
         }

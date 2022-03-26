@@ -93,7 +93,10 @@ export class BrowserApi {
 
     static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
         chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+          setTimeout(function () {
             callback(msg, sender, response);
+          }, 1);
+          return true;
         });
     }
 
