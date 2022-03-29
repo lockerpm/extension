@@ -249,13 +249,13 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               externalUrl: 'https://support.locker.io',
-              name: this.$t('data.settings.documentation')
+              name: this.$t('data.settings.support_center')
             },
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: 'https://support.locker.io',
-              name: this.$t('data.settings.help_feedback')
+              externalUrl: 'https://zo8rr5fc706.typeform.com/to/OotlSyQ7',
+              name: this.$t('data.settings.feedback')
             },
             {
               icon: 'fa-home',
@@ -266,7 +266,7 @@ export default Vue.extend({
             {
               icon: 'fa-home',
               routeName: '',
-              externalUrl: 'https://locker.io/contact-us',
+              externalUrl: 'https://locker.io/contact',
               name: this.$t('data.settings.contact_us')
             }
           ]

@@ -565,6 +565,8 @@ module.exports = {
       about: 'Về chúng tôi',
       documentation: 'Tài liệu',
       help_feedback: 'Trợ giúp & Phản hồi',
+      feedback: 'Phản hồi',
+      support_center: 'Trung tâm hỗ trợ',
       rate_extension: 'Đánh giá Extension',
       contact_us: 'Liên hệ'
     },

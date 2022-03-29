@@ -574,6 +574,8 @@ module.exports = {
       about: 'About',
       documentation: 'Documentation',
       help_feedback: 'Help & Feedback',
+      feedback: 'Give Feedback',
+      support_center: 'Support Center',
       rate_extension: 'Rate the Extension',
       contact_us: 'Contact us'
     },

@@ -535,7 +535,7 @@ export default class AutofillService implements AutofillServiceInterface {
         }
       }
     });
-
+    console.log(fillFields)
     const card = options.cipher.card;
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'cardholderName');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'number');
