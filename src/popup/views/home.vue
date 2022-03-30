@@ -431,8 +431,8 @@ export default Vue.extend({
       if (this.pageDetails == null || this.pageDetails.length === 0) {
         // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         this.notify(
-          "Unable to auto-fill the selected item on this page. Copy and paste the information instead.",
-          "warning"
+          this.$t('errors.autofill'),
+          "error"
         );
         return;
       }
@@ -487,7 +487,7 @@ export default Vue.extend({
         // console.log("home: collectPageDetails");
         if (msg.sender === BroadcasterSubscriptionId) {
           const pageDetailsObj = {
-            // frameId: msg.webExtSender.frameId,
+            frameId: sender.frameId,
             tab: msg.tab,
             details: msg.details,
           };

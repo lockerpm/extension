@@ -119,7 +119,8 @@ module.exports = {
     incomplete_cvc: "Your card's security code is incomplete.",
     incomplete_expiry: "Your card's expiration date is incomplete.",
     invalid_expiry_year: "Your card's expiration year is invalid.",
-    invalid_expiry_year_past: "Your card's expiration year is in the past."
+    invalid_expiry_year_past: "Your card's expiration year is in the past.",
+    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',

@@ -118,7 +118,8 @@ module.exports = {
     incomplete_cvc: 'Vui lòng nhập đầy đủ mã bảo mật.',
     incomplete_expiry: 'Vui lòng nhập đầy đủ ngày hết hạn.',
     invalid_expiry_year: 'Vui lòng nhập chính xác năm hết hạn.',
-    invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.'
+    invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.',
+    autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.'
   },
   master_password: {
     create_success: 'Mật khẩu tổng đã được tạo',
