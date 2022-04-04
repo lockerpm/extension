@@ -80,7 +80,12 @@ module.exports = {
     item_name: 'Item name',
     details: 'Details',
     type: 'Types',
-    item_info: 'Item Information'
+    item_info: 'Item Information',
+    select: 'Select',
+    mr: 'Mr',
+    mrs: 'Mrs',
+    ms: 'Ms',
+    dr: 'Dr'
   },
   sidebar: {
     all: 'All',

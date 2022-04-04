@@ -199,6 +199,7 @@ export default Vue.extend({
     left: 11px;
   }
   &.is-focus .cs-textarea, &.have-value .cs-textarea {
+    margin-top: 8px;
     padding-top: 8px;
   }
   &.is-disabled {

@@ -118,6 +118,7 @@
           v-for="item in dataRendered"
           :key="item.id"
           :item="item"
+          @do-fill="fillCipher(item)"
         >
         </cipher-row>
 
@@ -127,7 +128,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue'
 import orderBy from "lodash/orderBy";
 import groupBy from 'lodash/groupBy';
@@ -136,6 +137,9 @@ import { CipherType } from 'jslib-common/enums/cipherType';
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
+const BroadcasterSubscriptionId = 'ChildViewComponent';
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({
   components: {
     CipherRow,
@@ -148,10 +152,11 @@ export default Vue.extend({
       noFolderCiphers: [],
       loading: true,
       dataRendered: [],
-      renderIndex: 0
+      renderIndex: 0,
+      pageDetails: []
     }
   },
-  mounted () {
+  async mounted () {
     window.onscroll = () => {
       const bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight + 500 >= document.documentElement.scrollHeight
 
@@ -165,6 +170,25 @@ export default Vue.extend({
         }
       }
     }
+    await this.loadPageDetails()
+    chrome.runtime.onMessage.addListener(
+      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+        switch (msg.command) {
+        case "collectPageDetailsResponse":
+          if (msg.sender === BroadcasterSubscriptionId) {
+            const pageDetailsObj = {
+              frameId: sender.frameId,
+              tab: msg.tab,
+              details: msg.details,
+            };
+            this.pageDetails.push(pageDetailsObj);
+          }
+          break;
+        default:
+          break;
+        }
+      }
+    )
   },
   computed: {
     menu () {
@@ -303,6 +327,71 @@ export default Vue.extend({
     },
     addEdit (item) {
       this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+    },
+    async loadPageDetails() {
+      this.pageDetails = [];
+      this.tab = await BrowserApi.getTabFromCurrentWindow();
+      if (this.tab == null) {
+        return;
+      }
+      BrowserApi.tabSendMessage(this.tab, {
+        command: 'collectPageDetails',
+        tab: this.tab,
+        sender: BroadcasterSubscriptionId,
+      });
+    },
+    async fillCipher(cipher: CipherView) {
+      // console.log(this.pageDetails.length);
+      if (
+        cipher.reprompt !== CipherRepromptType.None &&
+        !(await this.$passwordRepromptService.showPasswordPrompt())
+      ) {
+        return;
+      }
+
+      this.totpCode = null;
+      if (this.totpTimeout != null) {
+        window.clearTimeout(this.totpTimeout);
+      }
+
+      if (this.pageDetails == null || this.pageDetails.length === 0) {
+        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
+        this.notify(
+          this.$t('errors.autofill'),
+          "error"
+        );
+        return;
+      }
+
+      try {
+        this.totpCode = await this.$autofillService.doAutoFill({
+          cipher: cipher,
+          pageDetails: this.pageDetails,
+          doc: window.document,
+          fillNewPassword: true,
+        });
+        if (this.totpCode != null) {
+          this.$platformUtilsService.copyToClipboard(this.totpCode, {
+            window: window,
+          });
+        }
+        if (this.$popupUtilsService.inPopup(window)) {
+          if (
+            this.$platformUtilsService.isFirefox() ||
+            this.$platformUtilsService.isSafari()
+          ) {
+            BrowserApi.closePopup(window);
+          } else {
+            // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
+            setTimeout(() => BrowserApi.closePopup(window), 50);
+          }
+        }
+      } catch (e) {
+        this.notify(
+          this.$t('errors.autofill'),
+          "error"
+        )
+      }
     }
   }
 })

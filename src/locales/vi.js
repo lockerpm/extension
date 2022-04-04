@@ -79,7 +79,12 @@ module.exports = {
     item_name: 'Tên mục',
     details: 'Chi tiết',
     type: 'Loại',
-    item_info: 'Thông tin mục'
+    item_info: 'Thông tin mục',
+    select: 'Chọn',
+    mr: 'Ông',
+    mrs: 'Bà',
+    ms: 'Chị',
+    dr: 'Bác sĩ'
   },
   sidebar: {
     all: 'Tất cả',

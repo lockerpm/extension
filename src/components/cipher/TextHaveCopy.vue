@@ -2,7 +2,8 @@
   <div class="grid md:grid-cols-6 cipher-item">
     <div class="">{{ label }}</div>
     <div class="col-span-4 font-semibold">
-      <span v-if="text">{{ text | filterPassword(showPassword) }}</span>
+      <div v-if="text&&textArea" class="whitespace-pre-wrap" v-html="text" />
+      <span v-if="text&&!textArea">{{ text | filterPassword(showPassword) }}</span>
     </div>
     <div v-if="text&&viewPassword===true" class="text-right">
       <button
@@ -45,6 +46,10 @@ export default Vue.extend({
     viewPassword: {
       type: Boolean,
       default: true
+    },
+    textArea: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

@@ -366,9 +366,9 @@ document.addEventListener('DOMContentLoaded', event => {
         if (wrappingEl == null) {
             return null;
         }
-
+        // console.log(wrappingEl)
         const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-
+        // console.log(wrappingElIsForm)
         let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
             'button[type="submit"]') as HTMLElement;
         if (submitButton == null && wrappingElIsForm) {

@@ -35,14 +35,14 @@ const UsernameFieldNames: string[] = [
 
 const FirstnameFieldNames: string[] = [
   // English
-  'f-name', 'first-name', 'given-name', 'first-n',
+  'f-name', 'first-name', 'given-name', 'first-n', 'first',
   // German
   'vorname',
 ];
 
 const LastnameFieldNames: string[] = [
   // English
-  'l-name', 'last-name', 's-name', 'surname', 'family-name', 'family-n', 'last-n',
+  'l-name', 'last-name', 's-name', 'surname', 'family-name', 'family-n', 'last-n', 'last',
   // German
   'nachname', 'familienname',
 ];

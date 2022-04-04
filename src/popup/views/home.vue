@@ -44,6 +44,7 @@
             v-for="item in ciphers"
             :key="item.id"
             :item="item"
+            @do-fill="fillCipher(item)"
           >
           </cipher-row>
         </ul>
@@ -462,8 +463,8 @@ export default Vue.extend({
         }
       } catch (e) {
         this.notify(
-          "Unable to auto-fill the selected item on this page. Copy and paste the information instead.",
-          "warning"
+          this.$t('errors.autofill'),
+          "error"
         );
         // this.notify(e, 'warning')
       }

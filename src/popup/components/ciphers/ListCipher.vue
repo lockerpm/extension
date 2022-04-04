@@ -31,18 +31,18 @@
           v-for="item in dataRendered"
           :key="item.id"
           class="flex items-center hover:bg-[#E4F2E1] cursor-pointer h-[62px] px-5 border-t border-black-400"
-          @click.self="routerCipher(item, addEdit)"
+          @click.self="fillCipher(item)"
         >
           <div
             class="text-[34px] mr-3 flex-shrink-0"
             :class="{'filter grayscale': item.isDeleted}"
-            @click="routerCipher(item, addEdit)"
+            @click="fillCipher(item)"
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
           <div
             class="flex-grow"
-            @click="routerCipher(item, addEdit)"
+            @click="fillCipher(item)"
           >
             <div class="text-black font-semibold truncate flex items-center">
               {{ item.name }}
@@ -109,15 +109,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue'
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-import { type } from '@/locales/en';
-import { Cipher } from 'jslib-common/models/domain/cipher';
-import { defaults } from 'lodash';
 import Vnodes from "@/components/Vnodes";
 import NoCipher from "@/components/cipher/NoCipher";
+import { BrowserApi } from "@/browser/browserApi";
+const BroadcasterSubscriptionId = 'ChildViewComponent';
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({
   components: {
     Vnodes,
@@ -142,10 +143,12 @@ export default Vue.extend({
       CipherType,
       loading: true,
       dataRendered: [],
-      renderIndex: 0
+      renderIndex: 0,
+      pageDetails: []
     }
   },
-  mounted () {
+  async mounted () {
+    await this.loadPageDetails()
     window.onscroll = () => {
       const bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight + 500 >= document.documentElement.scrollHeight
 
@@ -156,6 +159,24 @@ export default Vue.extend({
         }
       }
     }
+    chrome.runtime.onMessage.addListener(
+      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+        switch (msg.command) {
+        case "collectPageDetailsResponse":
+          if (msg.sender === BroadcasterSubscriptionId) {
+            const pageDetailsObj = {
+              frameId: sender.frameId,
+              tab: msg.tab,
+              details: msg.details,
+            };
+            this.pageDetails.push(pageDetailsObj);
+          }
+          break;
+        default:
+          break;
+        }
+      }
+    )
   },
   watch: {
     ciphers () {
@@ -258,7 +279,73 @@ export default Vue.extend({
     },
     handleAddButton () {
       this.$router.push({ name: 'add-item-create', params: { type: this.type } })
-    }
+    },
+    async loadPageDetails() {
+      this.pageDetails = [];
+      this.tab = await BrowserApi.getTabFromCurrentWindow();
+      if (this.tab == null) {
+        return;
+      }
+      BrowserApi.tabSendMessage(this.tab, {
+        command: 'collectPageDetails',
+        tab: this.tab,
+        sender: BroadcasterSubscriptionId,
+      });
+    },
+    async fillCipher(cipher: CipherView) {
+      // console.log(this.pageDetails.length);
+      if (
+        cipher.reprompt !== CipherRepromptType.None &&
+        !(await this.$passwordRepromptService.showPasswordPrompt())
+      ) {
+        return;
+      }
+
+      this.totpCode = null;
+      if (this.totpTimeout != null) {
+        window.clearTimeout(this.totpTimeout);
+      }
+
+      if (this.pageDetails == null || this.pageDetails.length === 0) {
+        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
+        this.notify(
+          this.$t('errors.autofill'),
+          "error"
+        );
+        return;
+      }
+
+      try {
+        this.totpCode = await this.$autofillService.doAutoFill({
+          cipher: cipher,
+          pageDetails: this.pageDetails,
+          doc: window.document,
+          fillNewPassword: true,
+        });
+        if (this.totpCode != null) {
+          this.$platformUtilsService.copyToClipboard(this.totpCode, {
+            window: window,
+          });
+        }
+        if (this.$popupUtilsService.inPopup(window)) {
+          if (
+            this.$platformUtilsService.isFirefox() ||
+            this.$platformUtilsService.isSafari()
+          ) {
+            BrowserApi.closePopup(window);
+          } else {
+            // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
+            setTimeout(() => BrowserApi.closePopup(window), 50);
+          }
+        }
+      } catch (e) {
+        this.notify(
+          this.$t('errors.autofill'),
+          "error"
+        );
+        // this.notify(e, 'warning')
+      }
+    },
   }
 })
 </script>

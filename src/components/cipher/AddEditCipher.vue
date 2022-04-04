@@ -453,11 +453,11 @@ export default Vue.extend({
     },
     identityTitleOptions () {
       return [
-        { label: '-- ' + this.$t('select') + ' --', value: null },
-        { label: this.$t('mr'), value: this.$t('mr') },
-        { label: this.$t('mrs'), value: this.$t('mrs') },
-        { label: this.$t('ms'), value: this.$t('ms') },
-        { label: this.$t('dr'), value: this.$t('dr') }
+        { label: '-- ' + this.$t('common.select') + ' --', value: null },
+        { label: this.$t('common.mr'), value: 'mr' },
+        { label: this.$t('common.mrs'), value: 'mrs' },
+        { label: this.$t('common.ms'), value: 'ms' },
+        { label: this.$t('common.dr'), value: 'dr' }
       ]
     },
     isDeleted () {

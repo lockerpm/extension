@@ -111,7 +111,7 @@
       <template v-if="cipher.type === CipherType.Identity">
         <TextHaveCopy
           :label="$t('data.ciphers.title')"
-          :text="cipher.identity.title"
+          :text="cipher.identity.title?$t(`common.${cipher.identity.title}`):null"
         />
         <TextHaveCopy
           :label="$t('data.ciphers.first_name')"
@@ -173,6 +173,7 @@
       <TextHaveCopy
         :label="$t('data.ciphers.notes')"
         :text="cipher.notes"
+        :text-area="true"
       />
       <div
         class="grid md:grid-cols-6 cipher-field"

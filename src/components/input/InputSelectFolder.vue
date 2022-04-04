@@ -32,7 +32,7 @@
       <el-option value="" @click.native="$emit('addFolder')">
         <div class="flex items-center">
           <img src="@/assets/images/icons/folderAdd.svg" alt="" class="mr-2.5">
-          <div class="text-black">Thêm thư mục</div>
+          <div class="text-black">{{$t('data.folders.add_folder')}}</div>
         </div>
       </el-option>
     </el-select>
