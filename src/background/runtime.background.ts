@@ -94,10 +94,16 @@ export default class RuntimeBackground {
     BrowserApi.messageListener('runtime.background', async (msg: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
       await this.processMessage(msg, sender, sendResponse);
     });
+    chrome.runtime.onMessageExternal.addListener(
+      async (msg, sender, sendResponse) => {
+        await  this.processMessage(msg, sender, sendResponse)
+      }
+    );
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    // console.log(`runtimeBackground processMessage: ${msg.command} - sender: ${sender} - data: ${msg.data}`);
+    // console.log(`runtimeBackground processMessage: ${msg} - sender: ${sender} - data: ${msg.data}`);
+    // console.log(msg)
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
@@ -244,11 +250,7 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true
           });
-          console.log({
-            ...oldStoreParsed,
-            isLoggedIn: true
-          });
-          // BrowserApi.createNewTab(`https://locker.io/authenticate?token=${msg.token}&return_url=/vault`);
+          sendResponse({success: true})
         } catch (e) {
           console.log(e);
         }
@@ -269,7 +271,6 @@ export default class RuntimeBackground {
             "CLIENT":"browser"
           }, myHeaders).then(async (result) => {
             const access_token = result.data ? result.data.access_token : ""
-            console.log(access_token)
             await this.storageService.save("cs_token", access_token);
             const store = await this.storageService.get("cs_store");
             let oldStoreParsed = {};
@@ -280,10 +281,11 @@ export default class RuntimeBackground {
               ...oldStoreParsed,
               isLoggedIn: true
             });
-            console.log({
-              ...oldStoreParsed,
-              isLoggedIn: true
-            });
+            // console.log({
+            //   ...oldStoreParsed,
+            //   isLoggedIn: true
+            // });
+            sendResponse({success: true})
           })
         } catch (e) {
           console.log(e);

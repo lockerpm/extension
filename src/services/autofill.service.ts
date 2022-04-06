@@ -134,9 +134,13 @@ export default class AutofillService implements AutofillServiceInterface {
               private totpService: TotpService, private eventService: EventService) { }
 
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
+    // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
+    const cvvFields = this.loadCvvFields(pageDetails,true, true, false, false)
+    // console.log(passwordFields)
+    // console.log(cvvFields)
     if (passwordFields.length === 0) {
       return formData;
     }
@@ -936,6 +940,48 @@ export default class AutofillService implements AutofillServiceInterface {
       filledFields[field.opid] = field;
       this.fillByOpid(fillScript, field, dataValue);
     }
+  }
+
+  private loadCvvFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
+                             mustBeEmpty: boolean, fillNewPassword: boolean) {
+    const arr: AutofillField[] = [];
+    pageDetails.fields.forEach(f => {
+      if (this.forCustomFieldsOnly(f)) {
+        return;
+      }
+
+      const isCvv = f.type === 'password';
+      const valueIsLikeCvv = (value: string) => {
+        if (value == null) {
+          return false;
+        }
+        // Removes all whitespace, _ and - characters
+        const cleanedValue = value.toLowerCase().replace(/[\s_\-]/g, '');
+
+        if (cleanedValue.indexOf('cvv') < 0 && cleanedValue.indexOf('cvc') < 0) {
+          return false;
+        }
+
+        return true;
+      };
+      const isLikeCvv = () => {
+        if (valueIsLikeCvv(f.htmlID)) {
+          return true;
+        }
+        if (valueIsLikeCvv(f.htmlName)) {
+          return true;
+        }
+        if (valueIsLikeCvv(f.placeholder)) {
+          return true;
+        }
+        return false;
+      };
+      if (!f.disabled && (canBeReadOnly || !f.readonly) && (isCvv || isLikeCvv())
+        && (canBeHidden || f.viewable) && (!mustBeEmpty || f.value == null || f.value.trim() === '')) {
+        arr.push(f);
+      }
+    });
+    return arr;
   }
 
   private loadPasswordFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,

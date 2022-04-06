@@ -96,6 +96,12 @@
   "web_accessible_resources": [
     "notification/bar.html"
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://*.demo.cystack.net:3011/*",
+      "https://*.locker.io/*"
+    ]
+  },
   "sidebar_action": {
     "default_panel": "popup.html",
     "default_title": "__MSG_extName__",
