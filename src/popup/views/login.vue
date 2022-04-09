@@ -520,7 +520,7 @@ export default Vue.extend({
             isLoggedIn: true,
           })
           this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.$router.push({ name: 'vault' })
+          this.$router.push({ name: 'lock' })
         }
       } catch (error) {
         this.notify(error, 'warning')

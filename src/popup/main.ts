@@ -189,7 +189,7 @@ Vue.mixin({
         })
         // this.$messagingService.send('loggedIn')
         chrome.runtime.sendMessage({command: 'loggedIn'})
-        console.log(res)
+        // console.log(res)
         await this.$tokenService.setTokens(res.access_token, res.refresh_token)
         await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
         await this.$cryptoService.setKey(key)

@@ -7,6 +7,14 @@ import { SystemService } from 'jslib-common/abstractions/system.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
+import { CryptoService } from 'jslib-common/abstractions/crypto.service';
+import { CipherService } from 'jslib-common/abstractions/cipher.service';
+import { FolderService } from 'jslib-common/abstractions/folder.service';
+import { CollectionService } from 'jslib-common/abstractions/collection.service';
+import { UserService } from 'jslib-common/abstractions/user.service';
+import { SettingsService } from 'jslib-common/abstractions/settings.service';
+import { PolicyService } from 'jslib-common/abstractions/policy.service';
+import { TokenService } from 'jslib-common/abstractions/token.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -77,7 +85,9 @@ export default class RuntimeBackground {
               private platformUtilsService: BrowserPlatformUtilsService,
               private storageService: StorageService, private i18nService: I18nService,
               private notificationsService: NotificationsService, private systemService: SystemService,
-              private environmentService: EnvironmentService, private messagingService: MessagingService) {
+              private environmentService: EnvironmentService, private messagingService: MessagingService, 
+              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService,
+              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService) {
 
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
@@ -96,6 +106,7 @@ export default class RuntimeBackground {
     });
     chrome.runtime.onMessageExternal.addListener(
       async (msg, sender, sendResponse) => {
+        // console.log(sender)
         await  this.processMessage(msg, sender, sendResponse)
       }
     );
@@ -238,7 +249,34 @@ export default class RuntimeBackground {
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
+        const token = await this.storageService.get("cs_token")
+        if (token) {
+          try {
+            const myHeaders = {
+              headers: { Authorization: `Bearer ${token}` }
+            };
+            await axios.post(
+              `${process.env.VUE_APP_BASE_API_URL}/users/logout`,
+              {},
+              myHeaders
+            );
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        // const userId = await this.userService.getUserId();
+        await Promise.all([
+          this.cryptoService.clearKeys(),
+          this.storageService.remove("cs_token")
+          // this.folderService.clear(userId),
+          // this.collectionService.clear(userId),
 
+          // this.cipherService.clear(userId),
+          // this.settingsService.clear(userId),
+          // this.policyService.clear(userId),
+          // this.tokenService.clearToken(),
+          // this.userService.clear(),
+        ]);
         try {
           await this.storageService.save("cs_token", msg.token);
           const store = await this.storageService.get("cs_store");

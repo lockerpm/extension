@@ -99,7 +99,8 @@
   "externally_connectable": {
     "matches": [
       "https://*.demo.cystack.net:3011/*",
-      "https://*.locker.io/*"
+      "https://*.locker.io/*",
+      "https://*.id.cystack.net/"
     ]
   },
   "sidebar_action": {

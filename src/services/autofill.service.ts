@@ -138,9 +138,7 @@ export default class AutofillService implements AutofillServiceInterface {
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
-    const cvvFields = this.loadCvvFields(pageDetails,true, true, false, false)
     // console.log(passwordFields)
-    // console.log(cvvFields)
     if (passwordFields.length === 0) {
       return formData;
     }
@@ -167,6 +165,112 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     return formData;
+  }
+
+  getCardForms(pageDetails: AutofillPageDetails): any[] {
+    const formData: any[] = [];
+    // console.log(pageDetails)
+    const cvvFields = this.loadCvvFields(pageDetails, true, true, false, false);
+    // console.log(cvvFields)
+    if (cvvFields.length === 0) {
+      return formData;
+    }
+
+    for (const formKey in pageDetails.forms) {
+      if (!pageDetails.forms.hasOwnProperty(formKey)) {
+        continue;
+      }
+
+      const formCvvFields = cvvFields.filter(pf => formKey === pf.form);
+      if (formCvvFields.length > 0) {
+        let cardholderName = null;
+        let number = null;
+        let exp = null;
+        let expMonth = null;
+        let expYear = null;
+        let brand = null;
+        pageDetails.fields.forEach((f: any) => {
+          if (this.forCustomFieldsOnly(f)) {
+            return;
+          }
+
+          if (this.isExcludedType(f.type, ExcludedAutofillTypes)) {
+            return;
+          }
+
+          for (let i = 0; i < CardAttributes.length; i++) {
+            const attr = CardAttributes[i];
+            if (!f.hasOwnProperty(attr) || !f[attr] || !f.viewable) {
+              continue;
+            }
+
+            // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+            // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
+            if (this.isFieldMatch(f[attr],
+              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
+              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
+              cardholderName = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-number', 'cc-num', 'card-number', 'card-num', 'number', 'cc', 'cc-no', 'card-no',
+                'credit-card', 'numero-carte', 'carte', 'carte-credit', 'num-carte', 'cb-num'],
+              ['cc-number', 'cc-num', 'card-number', 'card-num', 'cc-no', 'card-no', 'numero-carte',
+                'num-carte', 'cb-num'])) {
+              number = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-exp', 'card-exp', 'cc-expiration', 'card-expiration', 'cc-ex', 'card-ex',
+                'card-expire', 'card-expiry', 'validite', 'expiration', 'expiry', 'mm-yy',
+                'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date', 'payment-card-expiration',
+                'payment-cc-date'],
+              ['mm-yy', 'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date',
+                'payment-card-expiration'])) {
+              exp = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['exp-month', 'cc-exp-month', 'cc-month', 'card-month', 'cc-mo', 'card-mo', 'exp-mo',
+                'card-exp-mo', 'cc-exp-mo', 'card-expiration-month', 'expiration-month',
+                'cc-mm', 'cc-m', 'card-mm', 'card-m', 'card-exp-mm', 'cc-exp-mm', 'exp-mm', 'exp-m',
+                'expire-month', 'expire-mo', 'expiry-month', 'expiry-mo', 'card-expire-month',
+                'card-expire-mo', 'card-expiry-month', 'card-expiry-mo', 'mois-validite',
+                'mois-expiration', 'm-validite', 'm-expiration', 'expiry-date-field-month',
+                'expiration-date-month', 'expiration-date-mm', 'exp-mon', 'validity-mo',
+                'exp-date-mo', 'cb-date-mois', 'date-m'])) {
+              expMonth = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['exp-year', 'cc-exp-year', 'cc-year', 'card-year', 'cc-yr', 'card-yr', 'exp-yr',
+                'card-exp-yr', 'cc-exp-yr', 'card-expiration-year', 'expiration-year',
+                'cc-yy', 'cc-y', 'card-yy', 'card-y', 'card-exp-yy', 'cc-exp-yy', 'exp-yy', 'exp-y',
+                'cc-yyyy', 'card-yyyy', 'card-exp-yyyy', 'cc-exp-yyyy', 'expire-year', 'expire-yr',
+                'expiry-year', 'expiry-yr', 'card-expire-year', 'card-expire-yr', 'card-expiry-year',
+                'card-expiry-yr', 'an-validite', 'an-expiration', 'annee-validite',
+                'annee-expiration', 'expiry-date-field-year', 'expiration-date-year', 'cb-date-ann',
+                'expiration-date-yy', 'expiration-date-yyyy', 'validity-year', 'exp-date-year', 'date-y'])) {
+              expYear = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-type', 'card-type', 'card-brand', 'cc-brand', 'cb-type'])) {
+              brand = f;
+              break;
+            }
+          }
+        });
+        formData.push({
+          form: pageDetails.forms[formKey],
+          cvv: formCvvFields[0],
+          cardholderName,
+          number,
+          exp,
+          expMonth,
+          expYear,
+          brand,
+          cvvs: formCvvFields
+        });
+      }
+    }
+
+    return formData
   }
 
   async doAutoFill(options: any) {
@@ -949,8 +1053,6 @@ export default class AutofillService implements AutofillServiceInterface {
       if (this.forCustomFieldsOnly(f)) {
         return;
       }
-
-      const isCvv = f.type === 'password';
       const valueIsLikeCvv = (value: string) => {
         if (value == null) {
           return false;
@@ -976,8 +1078,7 @@ export default class AutofillService implements AutofillServiceInterface {
         }
         return false;
       };
-      if (!f.disabled && (canBeReadOnly || !f.readonly) && (isCvv || isLikeCvv())
-        && (canBeHidden || f.viewable) && (!mustBeEmpty || f.value == null || f.value.trim() === '')) {
+      if (!f.disabled && (canBeReadOnly || !f.readonly) && isLikeCvv()) {
         arr.push(f);
       }
     });

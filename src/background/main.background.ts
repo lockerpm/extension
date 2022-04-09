@@ -248,7 +248,8 @@ export default class MainBackground {
         // Background
         this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
             this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
-            this.notificationsService, this.systemService, this.environmentService, this.messagingService);
+            this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
+             this.userService, this.settingsService, this.policyService, this.tokenService);
         this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
             this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
             this.platformUtilsService);

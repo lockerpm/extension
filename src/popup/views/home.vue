@@ -437,7 +437,7 @@ export default Vue.extend({
         );
         return;
       }
-
+      // console.log(this.pageDetails)
       try {
         this.totpCode = await this.$autofillService.doAutoFill({
           cipher: cipher,

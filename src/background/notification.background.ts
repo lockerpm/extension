@@ -102,8 +102,11 @@ export default class NotificationBackground {
             case 'collectPageDetailsResponse':
                 switch (msg.sender) {
                     case 'notificationBar':
+                        // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
-                        // console.log(forms)
+                        // const testCardForms = this.autofillService.getCardForms(msg.details);
+                        // console.log('login forms: ', forms)
+                        // console.log('card forms: ', testCardForms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
                             forms: forms,
