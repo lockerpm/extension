@@ -293,6 +293,21 @@ export default class RuntimeBackground {
           console.log(e);
         }
         break;
+      case "cs-logout":
+        const userId = await this.userService.getUserId();
+        await Promise.all([
+          this.cryptoService.clearKeys(),
+          this.storageService.remove("cs_token"),
+
+          this.folderService.clear(userId),
+          this.collectionService.clear(userId),
+          this.cipherService.clear(userId),
+          this.settingsService.clear(userId),
+          this.policyService.clear(userId),
+          this.tokenService.clearToken(),
+          this.userService.clear(),
+        ]);
+        break;
       case "locker-authResult":
         // console.log(msg.referrer);
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {

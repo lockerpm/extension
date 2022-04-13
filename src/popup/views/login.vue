@@ -6,15 +6,21 @@
         alt=""
         class="h-[36px] mx-auto"
       >
+    </div>
+    <div class="w-full p-6 text-center mt-14">
       <div class="font-bold text-head-4 text-black-700 mt-7">
         {{$t('data.login.login')}}
       </div>
-      <div class="text-base mt-2">
+      <div class="text-base mt-2 mb-6">
         {{$t('data.login.login_desc')}}
       </div>
-    </div>
-    <div class="w-full p-6 text-center">
-      <div
+      <button
+        class="btn btn-primary w-3/4"
+        @click="openLogin"
+      >
+        Single Sign-On
+      </button>
+      <!-- <div
         v-if="!factor2"
         class="mb-4"
       >
@@ -31,8 +37,8 @@
           is-password
           @done="login"
         />
-      </div>
-      <div
+      </div> -->
+      <!-- <div
         v-if="factor2 && step === 1"
         class="text-left"
       >
@@ -105,8 +111,8 @@
             {{$t('data.login.next')}}
           </button>
         </div>
-      </div>
-      <div
+      </div> -->
+      <!-- <div
         v-if="factor2 && (step === 2 || step === 3)"
         class="text-left"
       >
@@ -164,8 +170,8 @@
             {{$t('data.login.authenticate')}}
           </button>
         </div>
-      </div>
-      <transition
+      </div> -->
+      <!-- <transition
         name="custom-classes-transition"
         enter-active-class="animated flipInX"
         leave-active-class="animated flipOutX"
@@ -177,8 +183,8 @@
         >
           {{ error }}
         </div>
-      </transition>
-      <transition
+      </transition> -->
+      <!-- <transition
         name="custom-classes-transition"
         enter-active-class="animated flipInX"
         leave-active-class="animated flipOutX"
@@ -201,10 +207,10 @@
             </p>
           </div>
         </div>
-      </transition>
+      </transition> -->
       <div v-if="!factor2">
         <div class="text-center mt-2">
-          <button
+          <!-- <button
             id="m_login_signin_submit"
             :loading="loading"
             class="btn btn-primary w-full"
@@ -213,8 +219,8 @@
             @click.prevent="login"
           >
             {{$t('data.login.login')}}
-          </button>
-          <div class="flex px-2 my-4 mx-auto">
+          </button> -->
+          <!-- <div class="flex px-2 my-4 mx-auto">
             <div class="text-left w-full pl-0 text-center">
               <a
                 @click.prevent="openForgot"
@@ -224,7 +230,7 @@
                 {{$t('data.login.forgot_password')}}
               </a>
             </div>
-          </div>
+          </div> -->
         </div>
         <div
           class="mx-auto border border-black-500 h-[1px]"
@@ -274,10 +280,10 @@
 <script lang="ts">
 import Vue from 'vue'
 import { BrowserApi } from "@/browser/browserApi";
-import InputText from '@/components/input/InputText'
+// import InputText from '@/components/input/InputText'
 export default Vue.extend({
   components: {
-    InputText
+    // InputText
   },
   data () {
     return {
@@ -316,6 +322,17 @@ export default Vue.extend({
     );
   },
   methods: {
+    openLogin() {
+      const url = `${
+        process.env.VUE_APP_ID_URL
+      }/login?SERVICE_URL=${encodeURIComponent(
+        "/sso"
+      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
+      this.$platformUtilsService.launchUri(url);
+      BrowserApi.reloadOpenWindows();
+      const thisWindow = window.open("", "_self");
+      thisWindow.close();
+    },
     async processMessage(msg: any, sender: any, sendResponse: any) {
       switch (msg.command) {
       case "loginWithSuccess":
