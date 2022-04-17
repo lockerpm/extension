@@ -105,7 +105,7 @@ export default class NotificationBackground {
                         // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
                         // const testCardForms = this.autofillService.getCardForms(msg.details);
-                        // console.log('login forms: ', forms)
+                        console.log('login forms: ', forms)
                         // console.log('card forms: ', testCardForms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
@@ -116,6 +116,8 @@ export default class NotificationBackground {
                         break;
                 }
                 break;
+            case 'informMenuFillCipher':
+              console.log(msg)
             default:
                 break;
         }
@@ -419,10 +421,13 @@ export default class NotificationBackground {
 
     private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string) {
         const responseData: any = {};
+        // console.log(tab)
         if (responseCommand === 'notificationBarGetFoldersList') {
             responseData.folders = await this.folderService.getAllDecrypted();
         }
-
+        if (responseCommand === 'informMenuGetCiphersList') {
+          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+        }
         await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     }
 

@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', event => {
         });
     }
 
+  
     function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
@@ -193,7 +194,8 @@ document.addEventListener('DOMContentLoaded', event => {
                 const index = parseInt(f.form.opid.split('__')[2], null);
                 formEl = document.getElementsByTagName('form')[index];
             }
-
+            // console.log(f)
+            // setFillLogo(f.password.htmlID)
             if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
                 const formDataObj: any = {
                     data: f,
@@ -209,7 +211,111 @@ document.addEventListener('DOMContentLoaded', event => {
             }
         });
     }
+    
+    function setFillLogo(htmlID) {
+      const logo = document.createElement("span");
+      logo.addEventListener("click", () => {
+        openInformMenu();
+      });
+      const passwordInput = document.getElementById(htmlID);
+      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAA81BMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///8o+loiAAAAT3RSTlMAAAM5dqXI4e/08+7ex6R0NwIZzBUe2sS81hrcufybj9WjidTOfZaRinOmaJRyahzd0c17ErbxxhABwrqNLdsoSEI/yzsjn/WaIAhi110HAA3FRAAAAAFiS0dEUONuTLwAAAAHdElNRQflDBcJLjc+CDUaAAAAqklEQVQY02NgYmZhZWPn4OTi5uHl4xcQZBAS9kcCvCIMomJglrgEmJKUYhCVZpPxl+WSkwcLKAgxiPIoKimrqKqpIwT4NDS1tHVQBHRZ9VAFNFmRVOgbKCoZGhlDzVAWYjBR4TX1lzWD2mJuwWCpA2ZZWYMpGwYGBls7hEMl7YECDA7sML6BIwMYOKlA+M4uIB4jELu6ufv7c3l4grmMIBEvbx8FXz8QnxEArbQur3p5xqYAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMTItMjNUMDk6NDY6NDgrMDA6MDB6ZFIAAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTEyLTIzVDA5OjQ2OjQ4KzAwOjAwCznqvAAAAABJRU5ErkJggg==');
+               height: 16px;
+              width: 16px;
+              right: 10px !important;
+              position: absolute;
+              top: 11px`;
+      passwordInput.parentNode.insertBefore(
+        logo,
+        passwordInput.nextElementSibling
+      );
+      document.onclick = check;
+      function check(e) {
+        const target = e && e.target;
 
+        // Nav Menu
+        if (!checkParent(target, passwordInput)) {
+          // click NOT on the menu
+          // close inform menu
+          if (!checkParent(target, logo)) {
+           closeInformMenu(false); 
+          }
+        }
+      }
+      function checkParent(t, elm) {
+        while (t.parentNode) {
+          if (t === elm) {
+            return true;
+          }
+          t = t.parentNode;
+        }
+        return false;
+      }
+    }
+    function closeInformMenu(explicitClose: boolean) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe");
+      if (menuEl != null) {
+        menuEl.parentElement.removeChild(menuEl);
+      }
+
+
+      if (!explicitClose) {
+        return;
+      }
+    }
+    function openInformMenu() {
+      if (document.body == null) {
+        return;
+      }
+      if (document.getElementById("cs-inform-menu-iframe") != null) {
+        return;
+      }
+      const barPageUrl: string = chrome.extension.getURL(
+        "inform-menu/menu.html"
+      );
+
+      const iframe = document.createElement("iframe");
+      iframe.style.cssText = `height: 42px; width: 100%; border: 0; min-height: initial; top: 0; left: 0; padding: 0; position: fixed;
+        z-index: 2147483647; visibility: visible;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
+        z-index: 2147483647 !important;
+        display: block !important;
+        visibility: visible !important;
+        clip-path: none !important;
+        clip: auto !important;
+        mask: none !important;
+        filter: none !important;
+        pointer-events: auto !important;
+        resize: none !important;
+        border-width: 0px;
+        border-style: initial;
+        border-color: initial;
+        border-image: initial;
+        border-radius: 8px;
+        margin: 0px !important;
+        padding: 0px !important;
+      `;
+      iframe.id = "cs-inform-menu-iframe";
+
+      iframe.src = barPageUrl;
+      iframe.classList.add('cs-inform-iframe')
+
+      // const frameDiv = document.createElement("div");
+      // frameDiv.setAttribute("aria-live", "polite");
+      // frameDiv.id = "cs-inform-menu-bar";
+      // frameDiv.style.cssText =
+      //   "height: 42px; width: 100%; top: 0; left: 0; padding: 0; position: fixed; " +
+      //   "z-index: 2147483647; visibility: visible;";
+      // frameDiv.appendChild(iframe);
+      document.body.appendChild(iframe);
+
+      (iframe.contentWindow.location as any) = barPageUrl;
+
+      // const spacer = document.createElement("div");
+      // spacer.id = "inform-menu-spacer";
+      // spacer.style.cssText = "height: 42px;";
+      // document.body.insertBefore(spacer, document.body.firstChild);
+    }
+  
     function listen(form: HTMLFormElement) {
         form.removeEventListener('submit', formSubmitted, false);
         form.addEventListener('submit', formSubmitted, false);
