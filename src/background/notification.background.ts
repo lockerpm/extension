@@ -117,12 +117,32 @@ export default class NotificationBackground {
                 }
                 break;
             case 'informMenuFillCipher':
-              console.log(msg)
+              // console.log(msg)
+                const ciphers = await this.cipherService.getAllDecrypted();
+                const cipher = ciphers.find(c => c.id === msg.id);
+                if (cipher == null) {
+                    break;
+                }
+                await this.startAutofillPage(cipher)
             default:
                 break;
         }
     }
 
+    private async startAutofillPage(cipher: CipherView) {
+        this.main.loginToAutoFill = cipher;
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        if (tab == null) {
+            return;
+        }
+
+        BrowserApi.tabSendMessage(tab, {
+            command: 'collectPageDetails',
+            tab: tab,
+            sender: 'informMenu',
+        });
+    }
+  
     async checkNotificationQueue(tab: chrome.tabs.Tab = null): Promise<void> {
         if (this.notificationQueue.length === 0) {
             return;

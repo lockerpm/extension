@@ -110,3 +110,44 @@ button.neutral {
     margin: 0px !important;
     padding: 0px !important;
 }
+.cs-inform-container {
+  height: 100%;
+  max-width: 320px;
+  overflow: hidden;
+}
+.selection-item, .dropdown-option {
+  cursor: pointer;
+  padding: 16px;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  &:hover {
+    background-color: #E4F0E6;
+  }
+}
+.cs-inform-header {
+  display: flex;
+  padding-left: 16px;
+  background-color: #F6F6F6;
+  align-items: center;
+  min-height: 52px;
+  .header-title {
+    padding-left: 16px;
+    padding-right: 16px;
+    flex: 1 1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+  button {
+    background-color: transparent;
+    height: 52px;
+    &:hover {
+      background-color: #cfe0e4;
+    }
+  }
+}
+.cs-list-withScroll {
+  max-height: 268px;
+  overflow-y: auto;
+}

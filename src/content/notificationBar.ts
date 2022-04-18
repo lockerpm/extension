@@ -194,8 +194,7 @@ document.addEventListener('DOMContentLoaded', event => {
                 const index = parseInt(f.form.opid.split('__')[2], null);
                 formEl = document.getElementsByTagName('form')[index];
             }
-            // console.log(f)
-            // setFillLogo(f.password.htmlID)
+            setFillLogo(f.password.htmlID);
             if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
                 const formDataObj: any = {
                     data: f,
@@ -214,13 +213,10 @@ document.addEventListener('DOMContentLoaded', event => {
     
     function setFillLogo(htmlID) {
       const logo = document.createElement("span");
-      logo.addEventListener("click", () => {
-        openInformMenu();
-      });
       const passwordInput = document.getElementById(htmlID);
-      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAA81BMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///8o+loiAAAAT3RSTlMAAAM5dqXI4e/08+7ex6R0NwIZzBUe2sS81hrcufybj9WjidTOfZaRinOmaJRyahzd0c17ErbxxhABwrqNLdsoSEI/yzsjn/WaIAhi110HAA3FRAAAAAFiS0dEUONuTLwAAAAHdElNRQflDBcJLjc+CDUaAAAAqklEQVQY02NgYmZhZWPn4OTi5uHl4xcQZBAS9kcCvCIMomJglrgEmJKUYhCVZpPxl+WSkwcLKAgxiPIoKimrqKqpIwT4NDS1tHVQBHRZ9VAFNFmRVOgbKCoZGhlDzVAWYjBR4TX1lzWD2mJuwWCpA2ZZWYMpGwYGBls7hEMl7YECDA7sML6BIwMYOKlA+M4uIB4jELu6ufv7c3l4grmMIBEvbx8FXz8QnxEArbQur3p5xqYAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMTItMjNUMDk6NDY6NDgrMDA6MDB6ZFIAAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTEyLTIzVDA5OjQ2OjQ4KzAwOjAwCznqvAAAAABJRU5ErkJggg==');
-               height: 16px;
-              width: 16px;
+      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+              height: 20px;
+              width: 20px;
               right: 10px !important;
               position: absolute;
               top: 11px`;
@@ -228,6 +224,10 @@ document.addEventListener('DOMContentLoaded', event => {
         logo,
         passwordInput.nextElementSibling
       );
+      const elPosition = passwordInput.getBoundingClientRect();
+      logo.addEventListener("click", () => {
+        openInformMenu(elPosition);
+      });
       document.onclick = check;
       function check(e) {
         const target = e && e.target;
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
     }
-    function openInformMenu() {
+    function openInformMenu(elPosition: any) {
       if (document.body == null) {
         return;
       }
@@ -274,7 +274,14 @@ document.addEventListener('DOMContentLoaded', event => {
       );
 
       const iframe = document.createElement("iframe");
-      iframe.style.cssText = `height: 42px; width: 100%; border: 0; min-height: initial; top: 0; left: 0; padding: 0; position: fixed;
+      iframe.style.cssText =
+        `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
+        position: fixed;
+        height: 200px; 
+        width: 320px;
+        border: 0;
+        min-height: initial;
+        padding: 0;
         z-index: 2147483647; visibility: visible;
         box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
         z-index: 2147483647 !important;
@@ -297,7 +304,6 @@ document.addEventListener('DOMContentLoaded', event => {
       iframe.id = "cs-inform-menu-iframe";
 
       iframe.src = barPageUrl;
-      iframe.classList.add('cs-inform-iframe')
 
       // const frameDiv = document.createElement("div");
       // frameDiv.setAttribute("aria-live", "polite");

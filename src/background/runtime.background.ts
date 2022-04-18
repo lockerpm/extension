@@ -15,6 +15,7 @@ import { UserService } from 'jslib-common/abstractions/user.service';
 import { SettingsService } from 'jslib-common/abstractions/settings.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { TokenService } from 'jslib-common/abstractions/token.service';
+import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -87,7 +88,7 @@ export default class RuntimeBackground {
               private notificationsService: NotificationsService, private systemService: SystemService,
               private environmentService: EnvironmentService, private messagingService: MessagingService, 
               private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService,
-              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService) {
+              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService, private passwordGenerator: PasswordGenerationService) {
 
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
@@ -182,7 +183,7 @@ export default class RuntimeBackground {
       case "bgUpdateContextMenu":
       case "editedCipher":
       case "addedCipher":
-        console.log("added Cipher")
+        // console.log("added Cipher");
       case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
@@ -209,6 +210,7 @@ export default class RuntimeBackground {
               });
             }
             break;
+          case "informMenu":
           case "contextMenu":
             clearTimeout(this.autofillTimeout);
             this.pageDetailsToAutoFill.push({
@@ -225,6 +227,8 @@ export default class RuntimeBackground {
             break;
         }
         break;
+      case "bgGeneratePassword":
+        this.generatePassword(sender.tab, msg.responseCommand, msg.options);
       case "authResult":
         const vaultUrl = this.environmentService.getWebVaultUrl();
 
@@ -249,7 +253,7 @@ export default class RuntimeBackground {
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
-        const token = await this.storageService.get("cs_token")
+        const token = await this.storageService.get("cs_token");
         if (token) {
           try {
             const myHeaders = {
@@ -288,7 +292,7 @@ export default class RuntimeBackground {
             ...oldStoreParsed,
             isLoggedIn: true
           });
-          sendResponse({success: true})
+          sendResponse({ success: true });
         } catch (e) {
           console.log(e);
         }
@@ -305,7 +309,7 @@ export default class RuntimeBackground {
           this.settingsService.clear(userId),
           this.policyService.clear(userId),
           this.tokenService.clearToken(),
-          this.userService.clear(),
+          this.userService.clear()
         ]);
         break;
       case "locker-authResult":
@@ -314,32 +318,38 @@ export default class RuntimeBackground {
         //     return;
         // }
         const myHeaders = {
-           headers: { Authorization: `Bearer ${msg.token}` }
+          headers: { Authorization: `Bearer ${msg.token}` }
         };
         try {
           const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
-          axios.post(url, {
-            "SERVICE_URL": "/sso",
-            "SERVICE_SCOPE":"pwdmanager",
-            "CLIENT":"browser"
-          }, myHeaders).then(async (result) => {
-            const access_token = result.data ? result.data.access_token : ""
-            await this.storageService.save("cs_token", access_token);
-            const store = await this.storageService.get("cs_store");
-            let oldStoreParsed = {};
-            if (typeof store === "object") {
-              oldStoreParsed = store;
-            }
-            await this.storageService.save("cs_store", {
-              ...oldStoreParsed,
-              isLoggedIn: true
+          axios
+            .post(
+              url,
+              {
+                SERVICE_URL: "/sso",
+                SERVICE_SCOPE: "pwdmanager",
+                CLIENT: "browser"
+              },
+              myHeaders
+            )
+            .then(async result => {
+              const access_token = result.data ? result.data.access_token : "";
+              await this.storageService.save("cs_token", access_token);
+              const store = await this.storageService.get("cs_store");
+              let oldStoreParsed = {};
+              if (typeof store === "object") {
+                oldStoreParsed = store;
+              }
+              await this.storageService.save("cs_store", {
+                ...oldStoreParsed,
+                isLoggedIn: true
+              });
+              // console.log({
+              //   ...oldStoreParsed,
+              //   isLoggedIn: true
+              // });
+              sendResponse({ success: true });
             });
-            // console.log({
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true
-            // });
-            sendResponse({success: true})
-          })
         } catch (e) {
           console.log(e);
         }
@@ -380,61 +390,107 @@ export default class RuntimeBackground {
           window: window
         });
       case "loginWithGG":
-        chrome.identity.launchWebAuthFlow({
-          'url': create_auth_endpoint(),
-          'interactive': true
-        }, async function (redirect_url) {
-          if (chrome.runtime.lastError) {
-            console.log('chrome runtime error: ',chrome.runtime.lastError)
-            // problem signing in
-          } else {
-            let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
-            access_token = access_token.substring(0, access_token.indexOf("&"));
-            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider, sender: 'runtime' })
-            sendResponse({ msg: "success", access_token, provider: msg.provider });
+        chrome.identity.launchWebAuthFlow(
+          {
+            url: create_auth_endpoint(),
+            interactive: true
+          },
+          async function(redirect_url) {
+            if (chrome.runtime.lastError) {
+              console.log("chrome runtime error: ", chrome.runtime.lastError);
+              // problem signing in
+            } else {
+              let access_token = redirect_url.substring(
+                redirect_url.indexOf("access_token=") + 13
+              );
+              access_token = access_token.substring(
+                0,
+                access_token.indexOf("&")
+              );
+              chrome.runtime.sendMessage({
+                command: "loginWithSuccess",
+                access_token,
+                provider: msg.provider,
+                sender: "runtime"
+              });
+              sendResponse({
+                msg: "success",
+                access_token,
+                provider: msg.provider
+              });
+            }
           }
-        });
+        );
         break;
       case "loginWithFB":
-        chrome.identity.launchWebAuthFlow({
-          'url': create_fb_auth_endpoint(),
-          'interactive': true
-        }, function (redirect_url) {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError)
-            // problem signing in
-          } else {
-            let access_token = redirect_url.substring(redirect_url.indexOf('access_token=') + 13);
-            access_token = access_token.substring(0, access_token.indexOf("&"));
-            chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
-            sendResponse({ msg: "success", access_token });
+        chrome.identity.launchWebAuthFlow(
+          {
+            url: create_fb_auth_endpoint(),
+            interactive: true
+          },
+          function(redirect_url) {
+            if (chrome.runtime.lastError) {
+              console.log(chrome.runtime.lastError);
+              // problem signing in
+            } else {
+              let access_token = redirect_url.substring(
+                redirect_url.indexOf("access_token=") + 13
+              );
+              access_token = access_token.substring(
+                0,
+                access_token.indexOf("&")
+              );
+              chrome.runtime.sendMessage({
+                command: "loginWithSuccess",
+                access_token,
+                provider: msg.provider
+              });
+              sendResponse({ msg: "success", access_token });
+            }
           }
-        });
+        );
         break;
       case "loginWithGithub":
-        chrome.identity.launchWebAuthFlow({
-          'url': create_github_auth_endpoint(),
-          'interactive': true
-        }, function (redirect_url) {
-          if (chrome.runtime.lastError) {
-            // problem signing in
-            console.log(chrome.runtime.lastError)
-          } else {
-            let access_token = redirect_url.substring(redirect_url.indexOf('code=') + 5);
-            access_token = access_token.substring(0, access_token.indexOf("&"));
-            const url = `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${access_token}`;
-            axios.post(url).then((result) => {
-              access_token = result.data.substring(result.data.indexOf('access_token=') + 13);
-              access_token = access_token.substring(0, access_token.indexOf("&"));
-              chrome.runtime.sendMessage({ command: 'loginWithSuccess', access_token, provider: msg.provider })
-            })
-            
-            sendResponse({ msg: "success", access_token });
+        chrome.identity.launchWebAuthFlow(
+          {
+            url: create_github_auth_endpoint(),
+            interactive: true
+          },
+          function(redirect_url) {
+            if (chrome.runtime.lastError) {
+              // problem signing in
+              console.log(chrome.runtime.lastError);
+            } else {
+              let access_token = redirect_url.substring(
+                redirect_url.indexOf("code=") + 5
+              );
+              access_token = access_token.substring(
+                0,
+                access_token.indexOf("&")
+              );
+              const url = `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${access_token}`;
+              axios.post(url).then(result => {
+                access_token = result.data.substring(
+                  result.data.indexOf("access_token=") + 13
+                );
+                access_token = access_token.substring(
+                  0,
+                  access_token.indexOf("&")
+                );
+                chrome.runtime.sendMessage({
+                  command: "loginWithSuccess",
+                  access_token,
+                  provider: msg.provider
+                });
+              });
+
+              sendResponse({ msg: "success", access_token });
+            }
           }
-        });
+        );
         break;
       case "loginWithSuccess":
-        console.log('test')
+        console.log("test");
       default:
         break;
     }
@@ -483,4 +539,14 @@ export default class RuntimeBackground {
       await this.storageService.save(ConstantsService.vaultTimeoutActionKey, 'lock');
     }
   }
+
+  private async generatePassword(tab, responseCommand, inputOptions) {
+        const responseData: any = {};
+        const options = (await this.passwordGenerator.getOptions())[0];
+        const password = await this.passwordGenerator.generatePassword(options);
+        responseData.password = password
+        await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
+        this.platformUtilsService.copyToClipboard(password, { window: window });
+        this.passwordGenerator.addHistory(password);
+    }
 }
