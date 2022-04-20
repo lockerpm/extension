@@ -8,6 +8,7 @@ module.exports = {
     delete: 'Xóa',
     success: 'Thành công',
     warning: 'Cảnh báo',
+    error: 'Lỗi',
     failed: 'Thất bại',
     copied: 'Sao chép vào bộ nhớ tạm',
     clone: 'Nhân bản',
@@ -69,7 +70,21 @@ module.exports = {
     monthly: 'Gói 1 tháng',
     half_yearly: 'Gói 6 tháng',
     created_date: 'Ngày tạo',
-    plan: 'Gói'
+    plan: 'Gói',
+    go_to_website: 'Đi tới trang web',
+    accept: 'Đồng ý',
+    reject: 'Từ chối',
+    shared_with_you: 'Được chia sẻ với bạn trong CyStack',
+    back: 'Trở lại',
+    item_name: 'Tên mục',
+    details: 'Chi tiết',
+    type: 'Loại',
+    item_info: 'Thông tin mục',
+    select: 'Chọn',
+    mr: 'Ông',
+    mrs: 'Bà',
+    ms: 'Chị',
+    dr: 'Bác sĩ'
   },
   sidebar: {
     all: 'Tất cả',
@@ -95,7 +110,8 @@ module.exports = {
     overview: 'Tổng quan',
     billing: 'Thanh toán',
     family_members: 'Thành viên gói cước',
-    cardholder: 'Tên chủ thẻ'
+    cardholder: 'Tên chủ thẻ',
+    policies: 'Chính sách'
   },
   errors: {
     confirm_password: 'Mật khẩu xác nhận không trùng khớp',
@@ -107,7 +123,8 @@ module.exports = {
     incomplete_cvc: 'Vui lòng nhập đầy đủ mã bảo mật.',
     incomplete_expiry: 'Vui lòng nhập đầy đủ ngày hết hạn.',
     invalid_expiry_year: 'Vui lòng nhập chính xác năm hết hạn.',
-    invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.'
+    invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.',
+    autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.'
   },
   master_password: {
     create_success: 'Mật khẩu tổng đã được tạo',
@@ -134,7 +151,8 @@ module.exports = {
     send: 'Gửi',
     master_password_hint_desc: 'Cụm từ gợi nhớ mật khẩu chính sẽ được gửi về địa chỉ email của bạn',
     back_login: 'Trở lại Đăng nhập',
-    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ mật khẩu chính.'
+    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ mật khẩu chính.',
+    unlock: 'Mở khóa'
   },
   enum: {
     Login: 'Mật khẩu',
@@ -144,18 +162,20 @@ module.exports = {
     null: 'Trash'
   },
   type: {
-    1: 'Password | Passwords',
-    2: 'Note | Notes',
-    3: 'Card | Cards',
-    4: 'Identity | Identities',
-    0: 'Item | Items',
-    Login: 'Password | Passwords',
-    SecureNote: 'Note | Notes',
-    Card: 'Card | Cards',
-    Identity: 'Identity | Identities',
+    1: 'Mật khẩu | Mật khẩu',
+    2: 'Ghi chú | Ghi chú',
+    3: 'Thẻ | Thẻ',
+    4: 'Định danh | Định danh',
+    0: 'Mục | Mục',
+    Login: 'Mật khẩu | Mật khẩu',
+    SecureNote: 'Ghi chú | Notes',
+    Card: 'Thẻ | Thẻ',
+    Identity: 'Định danh | Định danh',
     Dashboard: 'Item | Items',
-    Vault: 'Item | Items',
-    Shares: 'Item | Items'
+    Vault: 'Mục | Mục',
+    Shares: 'Mục | Mục',
+    folder: 'Thư mục',
+    no_folder: 'Không có thư mục'
   },
   data: {
     notifications: {
@@ -227,7 +247,11 @@ module.exports = {
       update_team_failed: 'Cập nhật thất bại!',
       fingerprint_title: 'Xác minh Fingerprint Phrase',
       fingerprint_description_1: 'Để đảm bảo tính minh bạch của khóa mã hóa, vui lòng xác minh Fingerprint Phrase trước khi tiếp tục.',
-      fingerprint_description_2: '\'Fingerprint Phrase\' là cụm từ duy nhất của mỗi tài khoản, dùng để xác minh khóa công khai với người dùng khác trong trường hợp chia sẻ và tham gia vào một tổ chức.'
+      fingerprint_description_2: '\'Fingerprint Phrase\' là cụm từ duy nhất của mỗi tài khoản, dùng để xác minh khóa công khai với người dùng khác trong trường hợp chia sẻ và tham gia vào một tổ chức.',
+      min_password_length: 'Mật khẩu phải chứ ít nhất {length} ký tự',
+      max_password_length: 'Độ dài tối đa của mật khẩu là {length}',
+      password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
+      authentication_failed: 'Xác thực thông tin thất bại'
     },
     profile_menu: {
       lock: 'Khóa tài khoản',
@@ -311,6 +335,7 @@ module.exports = {
     timeouts: {
       oneMinute: '1 phút',
       fiveMinutes: '5 phút',
+      tenMinutes: '10 phút',
       fifteenMinutes: '15 phút',
       thirtyMinutes: '30 phút',
       oneHour: '1 giờ',
@@ -502,7 +527,10 @@ module.exports = {
       all_items: 'Tất cả mục',
       add_item: 'Thêm mục',
       selected_items: 'Các mục đã chọn',
-      generate_random_password: 'Tạo mật khẩu ngẫu nhiên'
+      generate_random_password: 'Tạo mật khẩu ngẫu nhiên',
+      show_password: 'HIện mật khẩu',
+      card_details: 'Chi tiết thẻ',
+      contact_info: 'Thông tin liên lạc'
     },
     settings: {
       account: 'Tài khoản',
@@ -525,11 +553,32 @@ module.exports = {
       delete_account: 'Xóa tài khoản',
       language: 'Ngôn ngữ',
       vietnamese: 'Vietnamese',
-      english: 'English'
+      english: 'English',
+      fingerprint_dialog: 'Cụm từ định danh tài khoản của bạn',
+      excluded_domains: 'Không lưu mật khẩu',
+      general: 'Chung',
+      go_to_web_vault: 'Đi tới Web',
+      import_export: 'Nhập & Xuất dữ liệu',
+      vault_timeout: 'Hẹn giờ khóa',
+      vault_timeout_action: 'Hành động khi hết giờ',
+      fingerprint_phase: 'Định danh',
+      lock_now: 'Khóa ngay',
+      upgrade_to_premium: 'Nâng cấp Premium',
+      manage_your_account: 'Quản lý tài khoản',
+      sync_data: 'Đồng bộ ngay',
+      support: 'Hỗ trợ',
+      logout: 'Đăng xuất',
+      about: 'Về chúng tôi',
+      documentation: 'Tài liệu',
+      help_feedback: 'Trợ giúp & Phản hồi',
+      feedback: 'Phản hồi',
+      support_center: 'Trung tâm hỗ trợ',
+      rate_extension: 'Đánh giá Extension',
+      contact_us: 'Liên hệ'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
-      password_generator_desc: 'Tạo một mật khẩu mạnh và ngẫu nhiên cho tài khoản của bạn',
+      password_generator_desc: 'Tạo một mật khẩu mạnh và an toàn',
       password_health: 'Sức khỏe mật khẩu',
       password_health_desc: 'Xác định các mật khẩu yếu, trùng lặp có thể khiến bạn bị tấn công bởi tội phạm mạng',
       data_breach: 'Cảnh báo lộ dữ liệu',
@@ -540,7 +589,56 @@ module.exports = {
       lowercase: 'Sử dụng chữ in thường (a-z)',
       digits: 'Sử dụng số (0-9)',
       symbols: 'Sử dụng ký tự đặc biệt (@!$%*)',
-      ambiguous: 'Tránh các ký tự dễ nhầm lẫn'
+      ambiguous: 'Tránh các ký tự dễ nhầm lẫn',
+      fill_password: 'Sử dụng',
+      save_with_locker: 'Lưu với Locker',
+      password_options: 'Các tùy chọn'
+    },
+    home: {
+      title: 'Đăng nhập hoặc tạo tài khoản mới để truy cập kho của bạn.',
+      login: 'Đăng nhập',
+      register: 'Đăng ký',
+      vault: 'Kho',
+      for_current: 'MẬT KHẨU CHO TRANG WEB HIỆN TẠI',
+      no_for_current: 'Không có mật khẩu nào cho trang web này.',
+      add_password: 'Thêm mật khẩu'
+    },
+    login: {
+      login: 'Đăng nhập',
+      login_desc: 'Đăng nhập bằng CyStack ID để sử dụng Locker',
+      verify: 'Xác minh danh tính của bạn',
+      authentication_app: 'Ứng dụng xác thực',
+      have_code: 'Tôi đã có code',
+      next: 'Tiếp',
+      enter_code: 'Nhập code',
+      check_email: 'Thư đã được gửi đến {email}. Kiểm tra hòm thư/spam để lấy mã xác thực.',
+      use_authentication_app: 'Xử dụng ứng dụng xác thực (như Duo hoặc Google Authenticator) để lấy mã.',
+      enter_code_here: 'Nhập mã xác thực ở đây',
+      authorization_error: 'Mã ủy quyền không hợp lệ',
+      remember_device: 'Nhớ thiết bị này',
+      authenticate: 'Xác thực',
+      email_sent: 'Một email đã được gửi đến:',
+      go_to_inbox: 'Vui lòng truy cập hộp thư đến của bạn ngay bây giờ, mở email và làm theo hướng dẫn.',
+      forgot_password: 'Quên mật khẩu?',
+      login_with: 'Hoặc Đăng nhập với',
+      dont_have_account: 'Chưa có tài khoản?',
+      sign_up: 'Đăng ký'
+    },
+    set_master_pass: {
+      create: 'Tạo mật khẩu chính',
+      logout: 'Đăng xuất',
+      enter_pass: 'Nhập mật khẩu chính',
+      confirm_pass: 'Xác nhận mật khẩu',
+      hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
+      create_btn: 'Tạo mật khẩu',
+      note: 'Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Master Password trong trường hợp bạn quên hoặc đánh mất.'
+    },
+    parts: {
+      current: 'Hiện tại',
+      vault: 'Kho',
+      generate: 'Tạo Mật khẩu',
+      settings: 'Cài đặt',
+      search: 'Tìm trong kho'
     }
   }
 }

@@ -3,7 +3,7 @@ var path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
-const os=require('os');
+const os = require('os');
 module.exports = {
   pages: {
     web: {
@@ -30,7 +30,9 @@ module.exports = {
             'content/notificationBar': 'src/content/notificationBar.ts',
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',
             'content/shortcuts': 'src/content/shortcuts.ts',
-            'content/message_handler': 'src/content/message_handler.ts'
+            'content/message_handler': 'src/content/message_handler.ts',
+            'notification/bar': './src/notification/bar.js',
+            'inform-menu/menu': './src/inform-menu/menu.js',
           },
         },
       },
@@ -51,13 +53,20 @@ module.exports = {
       }
     },
     entry: {
-      'notification/bar': './src/notification/bar.js'
+      'notification/bar': './src/notification/bar.js',
+      'inform-menu/menu': './src/inform-menu/menu.js'
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: './src/notification/bar.html',
         filename: 'notification/bar.html',
         chunks: ['notification/bar'],
+        cache: false, // Remove after upgrading to Webpack 5
+      }),
+      new HtmlWebpackPlugin({
+        template: './src/inform-menu/menu.html',
+        filename: 'inform-menu/menu.html',
+        chunks: ['inform-menu/menu'],
         cache: false, // Remove after upgrading to Webpack 5
       }),
       new MomentLocalesPlugin({

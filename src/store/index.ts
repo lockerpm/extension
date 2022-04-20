@@ -43,10 +43,12 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       isLoggedInPw: false,
       syncedCiphersToggle: false,
+      syncing: false,
       searchText: '',
       teams: [],
       currentTeam: {},
       currentPlan: {},
+      cipherCount: null,
       ...oldStoreParsed
     },
     mutations: {
@@ -116,6 +118,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       UPDATE_SYNCED_CIPHERS (state) {
         state.syncedCiphersToggle = !state.syncedCiphersToggle
       },
+      UPDATE_SYNCING (state, syncing) {
+        state.syncing = syncing
+      },
       UPDATE_SEARCH (state, value) {
         state.searchText = value
       },
@@ -127,6 +132,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_CURRENT_PLAN (state, plan) {
         state.currentPlan = plan
+      },
+      UPDATE_CIPHER_COUNT (state, value) {
+        state.cipherCount = value
       }
     },
     actions: {

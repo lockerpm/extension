@@ -2,7 +2,7 @@ import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
 
 document.addEventListener('DOMContentLoaded', event => {
-    if (window.location.hostname.indexOf('vault.bitwarden.com') > -1) {
+    if (window.location.hostname.indexOf('id.cystack.net') > -1) {
         return;
     }
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', event => {
     let observeDomTimeout: number = null;
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next']);
+    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
@@ -68,6 +68,16 @@ document.addEventListener('DOMContentLoaded', event => {
             sendResponse();
             return true;
         } else if (msg.command === 'notificationBarPageDetails') {
+          console.log(msg.data)
+            pageDetails.push(msg.data.details);
+            watchForms(msg.data.forms);
+            // for (let i = 0; i < msg.data.passwordFields.length; i++){
+            //   setFillLogo(msg.data.passwordFields[i].htmlID);
+            // }
+            sendResponse();
+            return true;
+        }
+        else if (msg.command === 'informMenuPageDetails') {
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
             sendResponse();
@@ -177,6 +187,7 @@ document.addEventListener('DOMContentLoaded', event => {
         });
     }
 
+  
     function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
@@ -193,7 +204,6 @@ document.addEventListener('DOMContentLoaded', event => {
                 const index = parseInt(f.form.opid.split('__')[2], null);
                 formEl = document.getElementsByTagName('form')[index];
             }
-
             if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
                 const formDataObj: any = {
                     data: f,
@@ -209,7 +219,119 @@ document.addEventListener('DOMContentLoaded', event => {
             }
         });
     }
+    
+    function setFillLogo(htmlID) {
+      const logo = document.createElement("span");
+      logo.id = 'logo-' + htmlID
+      const passwordInput = document.getElementById(htmlID);
+      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+              height: 20px;
+              width: 20px;
+              right: 10px !important;
+              position: absolute;
+              top: 11px`;
+      passwordInput.parentNode.insertBefore(
+        logo,
+        passwordInput.nextElementSibling
+      );
+      const elPosition = passwordInput.getBoundingClientRect();
+      logo.addEventListener("click", () => {
+        openInformMenu(elPosition);
+      });
+      document.onclick = check;
+      function check(e) {
+        const target = e && e.target;
 
+        // Nav Menu
+        if (!checkParent(target, passwordInput)) {
+          // click NOT on the menu
+          // close inform menu
+          if (!checkParent(target, logo)) {
+           closeInformMenu(false, elPosition); 
+          }
+        }
+      }
+      function checkParent(t, elm) {
+        while (t.parentNode) {
+          if (t === elm) {
+            return true;
+          }
+          t = t.parentNode;
+        }
+        return false;
+      }
+    }
+    function closeInformMenu(explicitClose: boolean, elPosition: any) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+      if (menuEl != null) {
+        menuEl.parentElement.removeChild(menuEl);
+      }
+
+
+      if (!explicitClose) {
+        return;
+      }
+    }
+    function openInformMenu(elPosition: any) {
+      if (document.body == null) {
+        return;
+      }
+      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
+        return;
+      }
+      const barPageUrl: string = chrome.extension.getURL(
+        "inform-menu/menu.html"
+      );
+
+      const iframe = document.createElement("iframe");
+      iframe.style.cssText =
+        `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
+        position: fixed;
+        height: 200px; 
+        width: 320px;
+        border: 0;
+        min-height: initial;
+        padding: 0;
+        z-index: 2147483647; visibility: visible;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
+        z-index: 2147483647 !important;
+        display: block !important;
+        visibility: visible !important;
+        clip-path: none !important;
+        clip: auto !important;
+        mask: none !important;
+        filter: none !important;
+        pointer-events: auto !important;
+        resize: none !important;
+        border-width: 0px;
+        border-style: initial;
+        border-color: initial;
+        border-image: initial;
+        border-radius: 8px;
+        margin: 0px !important;
+        padding: 0px !important;
+      `;
+      iframe.id = "cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left);
+
+      iframe.src = barPageUrl;
+
+      // const frameDiv = document.createElement("div");
+      // frameDiv.setAttribute("aria-live", "polite");
+      // frameDiv.id = "cs-inform-menu-bar";
+      // frameDiv.style.cssText =
+      //   "height: 42px; width: 100%; top: 0; left: 0; padding: 0; position: fixed; " +
+      //   "z-index: 2147483647; visibility: visible;";
+      // frameDiv.appendChild(iframe);
+      document.body.appendChild(iframe);
+
+      (iframe.contentWindow.location as any) = barPageUrl;
+
+      // const spacer = document.createElement("div");
+      // spacer.id = "inform-menu-spacer";
+      // spacer.style.cssText = "height: 42px;";
+      // document.body.insertBefore(spacer, document.body.firstChild);
+    }
+  
     function listen(form: HTMLFormElement) {
         form.removeEventListener('submit', formSubmitted, false);
         form.addEventListener('submit', formSubmitted, false);
@@ -366,9 +488,9 @@ document.addEventListener('DOMContentLoaded', event => {
         if (wrappingEl == null) {
             return null;
         }
-
+        // console.log(wrappingEl)
         const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-
+        // console.log(wrappingElIsForm)
         let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
             'button[type="submit"]') as HTMLElement;
         if (submitButton == null && wrappingElIsForm) {

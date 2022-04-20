@@ -83,8 +83,10 @@
           <TextHaveCopy
             :label="$t('data.ciphers.password')"
             :text="cipher.login.password"
+            :view-password="cipher.viewPassword"
             should-hide
           />
+          <!-- {{passwordStrength}} -->
           <div class="grid md:grid-cols-6 cipher-item">
             <div class="">{{ $t('data.ciphers.password_security') }}</div>
             <div class="col-span-4 font-semibold">
@@ -114,10 +116,10 @@
           <TextHaveCopy :label="$t('data.ciphers.card_number')" :text="cipher.card.number" />
           <TextHaveCopy :label="$t('data.ciphers.expiration_month')" :text="cipher.card.expMonth" />
           <TextHaveCopy :label="$t('data.ciphers.expiration_year')" :text="cipher.card.expYear" />
-          <TextHaveCopy :label="$t('data.ciphers.cvv')" :text="cipher.card.code" should-hide />
+          <TextHaveCopy :label="$t('data.ciphers.cvv')" :text="cipher.card.code" should-hide :view-password="cipher.viewPassword"/>
         </template>
         <template v-if="cipher.type === CipherType.Identity">
-          <TextHaveCopy :label="$t('data.ciphers.title')" :text="cipher.identity.title" />
+          <TextHaveCopy :label="$t('data.ciphers.title')" :text="cipher.identity.title?$t(`common.${cipher.identity.title}`):null" />
           <TextHaveCopy :label="$t('data.ciphers.first_name')" :text="cipher.identity.firstName" />
           <TextHaveCopy :label="$t('data.ciphers.last_name')" :text="cipher.identity.lastName" />
           <TextHaveCopy label="Username" :text="cipher.identity.username" />
@@ -133,7 +135,7 @@
           <TextHaveCopy :label="$t('data.ciphers.zip')" :text="cipher.identity.postalCode" />
           <TextHaveCopy :label="$t('data.ciphers.country')" :text="cipher.identity.country" />
         </template>
-        <TextHaveCopy :label="$t('data.ciphers.notes')" :text="cipher.notes" />
+        <TextHaveCopy :label="$t('data.ciphers.notes')" :text="cipher.notes" :text-area="true"/>
         <div class="grid md:grid-cols-6 cipher-item">
           <div class="">{{ $t('data.ciphers.owned_by') }}</div>
           <div class="col-span-4 font-semibold flex items-center">

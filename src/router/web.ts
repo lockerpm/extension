@@ -3,6 +3,7 @@ import VueRouter, {RouteConfig} from 'vue-router'
 import HomeWeb from '../views/homeWeb.vue'
 import storePromise from "../store/web";
 import Layout from '@/components/layout/default.vue'
+import AdminLayout from '@/components/layout/admin.vue'
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -135,24 +136,39 @@ const routes: Array<RouteConfig> = [
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/index.vue')
       },
       {
-        path: "/download",
+        path: "download",
         name: 'settings-download',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/download.vue')
       },
       {
-        path: "/excluded-domains",
+        path: "excluded-domains",
         name: 'settings-excluded-domains',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/excluded-domains.vue')
       },
       {
-        path: "/family-members",
+        path: "family-members",
         name: 'settings-family-members',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/family-members.vue')
       },
       {
-        path: "/import-export",
+        path: "import-export",
         name: 'settings-import-export',
         component: () => import(/* webpackChunkName: "settings" */ '../views/settings/import-export.vue')
+      },
+      {
+        path: "emergency-access",
+        children: [
+          {
+            path: "",
+            name: "settings-emergency-access",
+            component: () => import(/* webpackChunkName: "settings" */ '../views/settings/emergency-access/index.vue')
+          },
+          {
+            path: "id",
+            name: "settings-emergency-access-id",
+            component: () => import(/* webpackChunkName: "settings" */ '../views/settings/emergency-access/_id.vue')
+          }
+        ]
       }
     ]
   },
@@ -254,6 +270,60 @@ const routes: Array<RouteConfig> = [
       }
     ]
   },
+  {
+    path: '/admin',
+    component: AdminLayout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: ":teamId",
+        name: 'admin-teamId',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/index.vue')
+      },
+      {
+        path: ":teamId/activity-logs",
+        name: 'admin-teamId-activity-logs',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/activity-logs.vue')
+      },
+      {
+        path: ":teamId/groups",
+        name: 'admin-teamId-groups',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/groups.vue')
+      },
+      {
+        path: ":teamId/settings",
+        name: 'admin-teamId-settings',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings.vue'),
+        children: [
+          {
+            path: "",
+            name: 'admin-teamId-settings',
+            component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings/index.vue')
+          },
+          {
+            path: "import-export",
+            name: 'admin-teamId-settings-import-export',
+            component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/settings/import-export.vue')
+          },
+        ]
+      },
+      {
+        path: ":teamId/shared-folders",
+        name: 'admin-teamId-shared-folders',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/shared-folders.vue')
+      },
+      {
+        path: ":teamId/users",
+        name: 'admin-teamId-users',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/users.vue')
+      },
+      {
+        path: ":teamId/policies",
+        name: 'admin-teamId-policies',
+        component: () => import(/* webpackChunkName: "vault" */ '../views/admin/_teamId/policies.vue')
+      }
+    ]
+  },
 ]
 
 const router = new VueRouter({
@@ -276,7 +346,7 @@ async function VaultGuard (to, from, next) {
     }
   } else {
     console.log('Dieu huong Login')
-    next({name: 'home'});
+    next({name: 'login'});
   }
 }
 

@@ -14,48 +14,48 @@
           @change="handleChange"
         />
       </div>
-      <client-only>
-        <el-table
-          :data="logs"
-          style="width: 100%"
-        >
-          <el-table-column
-            label="Users"
-          >
-            <template slot-scope="scope">
-              <div class="flex items-center">
-                <el-avatar :src="scope.row.acting_user && scope.row.acting_user.avatar" :size="32" />
-                <div class="ml-2">
-                  <div class="text-black font-semibold truncate">
-                    {{ (scope.row.acting_user && scope.row.acting_user.name) || 'Unknown' }}
-                  </div>
+      <el-table
+        :data="logs"
+        style="width: 100%"
+      >
+        <el-table-column label="Users">
+          <template slot-scope="scope">
+            <div class="flex items-center">
+              <el-avatar
+                :src="scope.row.acting_user && scope.row.acting_user.avatar"
+                :size="32"
+              />
+              <div class="ml-2">
+                <div class="text-black font-semibold truncate">
+                  {{ (scope.row.acting_user && scope.row.acting_user.name) || 'Unknown' }}
                 </div>
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Event"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.description[language] }}
-            </template>
-          </el-table-column>
-          <el-table-column>
-            <template slot-scope="scope">
-              {{ $moment(scope.row.date).utc().format('LLLZ') }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <div v-if="continuationToken" class="text-center">
-          <button
-            class="btn btn-clean btn-primary"
-            :disabled="loading"
-            @click="getLogs"
-          >
-            Load more
-          </button>
-        </div>
-      </client-only>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Event">
+          <template slot-scope="scope">
+            {{ scope.row.description[language] }}
+          </template>
+        </el-table-column>
+        <el-table-column>
+          <template slot-scope="scope">
+            {{ $moment(scope.row.date).utc().format('LLLZ') }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <div
+        v-if="continuationToken"
+        class="text-center"
+      >
+        <button
+          class="btn btn-clean btn-primary"
+          :disabled="loading"
+          @click="getLogs"
+        >
+          Load more
+        </button>
+      </div>
     </div>
   </div>
 </template>

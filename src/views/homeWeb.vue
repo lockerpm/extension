@@ -19,9 +19,9 @@
         <button class="btn btn-default w-full mb-4"
                 @click="openVault"
         >
-          Vault
+          Web Vault
         </button>
-        <button class="btn btn-default w-full mb-4"
+        <!-- <button class="btn btn-default w-full mb-4"
                 @click="openLock"
         >
           Lock
@@ -30,7 +30,7 @@
                 @click="openSet"
         >
           Set master
-        </button>
+        </button> -->
       </div>
     </div>
   </div>

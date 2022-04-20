@@ -1020,10 +1020,11 @@
     End 1Password Extension
     */
 
-    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-        if (msg.command === 'collectPageDetails') {
+  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    if (msg.command === 'collectPageDetails') {
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
+            // console.log(pageDetailsObj)
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,
