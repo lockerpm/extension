@@ -541,12 +541,16 @@ export default class RuntimeBackground {
   }
 
   private async generatePassword(tab, responseCommand, inputOptions) {
-        const responseData: any = {};
-        const options = (await this.passwordGenerator.getOptions())[0];
-        const password = await this.passwordGenerator.generatePassword(options);
-        responseData.password = password
-        await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-        this.platformUtilsService.copyToClipboard(password, { window: window });
-        this.passwordGenerator.addHistory(password);
+      const options = inputOptions
+      if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
+        options.lowercase = true
+      }
+      const responseData: any = {};
+      // const options = (await this.passwordGenerator.getOptions())[0];
+      const password = await this.passwordGenerator.generatePassword(options);
+      responseData.password = password
+      await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
+      this.platformUtilsService.copyToClipboard(password, { window: window });
+      this.passwordGenerator.addHistory(password);
     }
 }

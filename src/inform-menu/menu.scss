@@ -151,3 +151,7 @@ button.neutral {
   max-height: 268px;
   overflow-y: auto;
 }
+.cs-generate-password-options {
+  display: flex;
+  flex-direction: column;
+}

@@ -127,14 +127,14 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               // externalUrl: '/web.html#/vault',
-              externalUrl: '/vault',
+              externalUrl: 'https://locker.io/vault',
               name: this.$t('data.settings.go_to_web_vault')
             },
             {
               icon: 'fa-home',
               routeName: '',
               // externalUrl: '/web.html#/settings/import-export',
-              externalUrl: '/settings/options#import',
+              externalUrl: 'https://locker.io/settings/options#import',
               name: this.$t('data.settings.import_export')
             },
             {
@@ -158,7 +158,7 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               // externalUrl: '/web.html#/settings',
-              externalUrl: '/settings/options',
+              externalUrl: 'https://locker.io/settings/options',
               name: this.$t('data.settings.vault_timeout'),
               action: 'vault_timeout',
               picker: true
@@ -167,7 +167,7 @@ export default Vue.extend({
               icon: 'fa-home',
               routeName: '',
               // externalUrl: '/web.html#/settings',
-              externalUrl: '/settings/options',
+              externalUrl: 'https://locker.io/settings/options',
               name: this.$t('data.settings.vault_timeout_action'),
               action: 'vault_timeout_action',
               picker: true

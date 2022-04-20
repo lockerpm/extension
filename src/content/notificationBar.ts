@@ -68,6 +68,16 @@ document.addEventListener('DOMContentLoaded', event => {
             sendResponse();
             return true;
         } else if (msg.command === 'notificationBarPageDetails') {
+          console.log(msg.data)
+            pageDetails.push(msg.data.details);
+            watchForms(msg.data.forms);
+            // for (let i = 0; i < msg.data.passwordFields.length; i++){
+            //   setFillLogo(msg.data.passwordFields[i].htmlID);
+            // }
+            sendResponse();
+            return true;
+        }
+        else if (msg.command === 'informMenuPageDetails') {
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
             sendResponse();
@@ -194,7 +204,6 @@ document.addEventListener('DOMContentLoaded', event => {
                 const index = parseInt(f.form.opid.split('__')[2], null);
                 formEl = document.getElementsByTagName('form')[index];
             }
-            setFillLogo(f.password.htmlID);
             if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
                 const formDataObj: any = {
                     data: f,
@@ -213,6 +222,7 @@ document.addEventListener('DOMContentLoaded', event => {
     
     function setFillLogo(htmlID) {
       const logo = document.createElement("span");
+      logo.id = 'logo-' + htmlID
       const passwordInput = document.getElementById(htmlID);
       logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
               height: 20px;
@@ -237,7 +247,7 @@ document.addEventListener('DOMContentLoaded', event => {
           // click NOT on the menu
           // close inform menu
           if (!checkParent(target, logo)) {
-           closeInformMenu(false); 
+           closeInformMenu(false, elPosition); 
           }
         }
       }
@@ -251,8 +261,8 @@ document.addEventListener('DOMContentLoaded', event => {
         return false;
       }
     }
-    function closeInformMenu(explicitClose: boolean) {
-      const menuEl = document.getElementById("cs-inform-menu-iframe");
+    function closeInformMenu(explicitClose: boolean, elPosition: any) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
       if (menuEl != null) {
         menuEl.parentElement.removeChild(menuEl);
       }
@@ -266,7 +276,7 @@ document.addEventListener('DOMContentLoaded', event => {
       if (document.body == null) {
         return;
       }
-      if (document.getElementById("cs-inform-menu-iframe") != null) {
+      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
         return;
       }
       const barPageUrl: string = chrome.extension.getURL(
@@ -301,7 +311,7 @@ document.addEventListener('DOMContentLoaded', event => {
         margin: 0px !important;
         padding: 0px !important;
       `;
-      iframe.id = "cs-inform-menu-iframe";
+      iframe.id = "cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left);
 
       iframe.src = barPageUrl;
 

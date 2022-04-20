@@ -133,12 +133,15 @@ export default class AutofillService implements AutofillServiceInterface {
   constructor(private cipherService: CipherService, private userService: UserService,
               private totpService: TotpService, private eventService: EventService) { }
 
+  getPasswordsFields(pageDetails: AutofillPageDetails): any[] {
+    return this.loadPasswordFields(pageDetails, true, true, false, false);
+  }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
     // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
-    // console.log(passwordFields)
+    console.log(passwordFields)
     if (passwordFields.length === 0) {
       return formData;
     }
