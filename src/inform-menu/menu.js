@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('OPTION_GENPASS').onclick = getPasswordGeneration
     }
     else {
+      document.getElementById('header-title').innerHTML = 'Saved Login'
       const mainContainer = document.getElementsByTagName('main')[0]
       mainContainer.innerHTML = '<div class="cs-list-withScroll"></div>'
       sendPlatformMessage({

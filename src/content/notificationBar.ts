@@ -71,9 +71,44 @@ document.addEventListener('DOMContentLoaded', event => {
           console.log(msg.data)
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
-            // for (let i = 0; i < msg.data.passwordFields.length; i++){
-            //   setFillLogo(msg.data.passwordFields[i].htmlID);
-            // }
+            let logoArray = []
+            for (let i = 0; i < msg.data.passwordFields.length; i++){
+              logoArray.push(setFillLogo(msg.data.passwordFields[i].htmlID));
+            }
+            document.onclick = check;
+            function check(e) {
+              const target = e && e.target;
+              let check = false
+              for (let i = 0; i < logoArray.length; i++){
+                if (checkParent(target, logoArray[i].passwordInput) || checkParent(target, logoArray[i].logo)) {
+                  check = true
+                  closeOtherMenu(i)
+                }
+              }
+              if (!check) {
+                for (let i = 0; i < logoArray.length; i++) { 
+                  const elPosition = logoArray[i].passwordInput.getBoundingClientRect();
+                  closeInformMenu(false, elPosition);
+                }
+              }
+            }
+            function closeOtherMenu(indexClick) {
+              for (let i = 0; i < logoArray.length; i++) {
+                if (i !== indexClick) {
+                  const elPosition = logoArray[i].passwordInput.getBoundingClientRect();
+                  closeInformMenu(false, elPosition);
+                }
+              }
+            }
+            function checkParent(t, elm) {
+              while (t.parentNode) {
+                if (t === elm) {
+                  return true;
+                }
+                t = t.parentNode;
+              }
+              return false;
+            }
             sendResponse();
             return true;
         }
@@ -234,31 +269,13 @@ document.addEventListener('DOMContentLoaded', event => {
         logo,
         passwordInput.nextElementSibling
       );
-      const elPosition = passwordInput.getBoundingClientRect();
+      // const elPosition = passwordInput.getBoundingClientRect();
       logo.addEventListener("click", () => {
-        openInformMenu(elPosition);
+        openInformMenu(passwordInput);
       });
-      document.onclick = check;
-      function check(e) {
-        const target = e && e.target;
-
-        // Nav Menu
-        if (!checkParent(target, passwordInput)) {
-          // click NOT on the menu
-          // close inform menu
-          if (!checkParent(target, logo)) {
-           closeInformMenu(false, elPosition); 
-          }
-        }
-      }
-      function checkParent(t, elm) {
-        while (t.parentNode) {
-          if (t === elm) {
-            return true;
-          }
-          t = t.parentNode;
-        }
-        return false;
+      return {
+        logo,
+        passwordInput
       }
     }
     function closeInformMenu(explicitClose: boolean, elPosition: any) {
@@ -272,11 +289,13 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
     }
-    function openInformMenu(elPosition: any) {
+    function openInformMenu(passwordInput: any) {
+      const elPosition = passwordInput.getBoundingClientRect();
       if (document.body == null) {
         return;
       }
       if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
+        // closeInformMenu(false, elPosition)
         return;
       }
       const barPageUrl: string = chrome.extension.getURL(
