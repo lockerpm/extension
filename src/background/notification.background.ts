@@ -129,6 +129,24 @@ export default class NotificationBackground {
                     break;
                 }
                 await this.startAutofillPage(cipher)
+                break;
+            case 'informMenuUsePassword':
+                const tab = await BrowserApi.getTabFromCurrentWindow();
+                if (tab == null) {
+                  return;
+                }
+                await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
+                  password: msg.password
+                });
+                break;
+            case 'bgGeneratePassword':
+                const tab_ = await BrowserApi.getTabFromCurrentWindow();
+                if (tab_ == null) {
+                  return;
+                }
+                await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
+                });
+                break;
             default:
                 break;
         }
@@ -451,7 +469,17 @@ export default class NotificationBackground {
             responseData.folders = await this.folderService.getAllDecrypted();
         }
         if (responseCommand === 'informMenuGetCiphersList') {
-          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null
+          }
+          else {
+            try {
+              responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+            } catch (error) {
+              responseData.ciphers = null
+            }
+          }
         }
         await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     }

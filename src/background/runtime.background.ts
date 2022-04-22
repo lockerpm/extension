@@ -548,7 +548,12 @@ export default class RuntimeBackground {
       const responseData: any = {};
       // const options = (await this.passwordGenerator.getOptions())[0];
       const password = await this.passwordGenerator.generatePassword(options);
+      let passwordStrength: any = {}
+      if (password) {
+        passwordStrength =  this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
+      }
       responseData.password = password
+      responseData.passwordStrength = passwordStrength
       await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
       this.platformUtilsService.copyToClipboard(password, { window: window });
       this.passwordGenerator.addHistory(password);

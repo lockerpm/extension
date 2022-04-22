@@ -150,8 +150,48 @@ button.neutral {
 .cs-list-withScroll {
   max-height: 268px;
   overflow-y: auto;
+  .cs-inform-no-ciphers {
+    text-align: center;
+    padding: 16px;
+    font-size: 16px;
+  }
 }
 .cs-generate-password-options {
   display: flex;
   flex-direction: column;
+}
+.cs-generate-password {
+  font-size: 14px;
+  .cs-generate-password-output{
+    padding: 16px;
+  }
+  .cs-password-output{
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    background-color: #E4F0E6;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 93px;
+  }
+  #generated_password{
+    align-self: center;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cs-password-strength{
+    display: flex;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+  #button_use_password{
+    width: 100%;
+    border-radius: 64px !important;
+    padding: 12px !important;
+  }
+  .cs-generate-password-options{
+    padding: 16px;
+    background-color: #E4F0E6;
+  }
 }
