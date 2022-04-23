@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', event => {
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
-    let logoFields: any[] = []
+    let inputWithLogo: any[] = []
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -70,31 +70,33 @@ document.addEventListener('DOMContentLoaded', event => {
         } else if (msg.command === 'notificationBarPageDetails') {
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
-            // let logoArray = []
             for (let i = 0; i < msg.data.passwordFields.length; i++){
-              logoFields.push(setFillLogo(msg.data.passwordFields[i].htmlID));
+              inputWithLogo.push(setFillLogo(msg.data.passwordFields[i], 'password'));
+            }
+            for (let i = 0; i < msg.data.usernameFields.length; i++) {
+              inputWithLogo.push(setFillLogo(msg.data.usernameFields[i], 'username'));
             }
             document.onclick = check;
             function check(e) {
               const target = e && e.target;
               let check = false
-              for (let i = 0; i < logoFields.length; i++){
-                if (checkParent(target, logoFields[i].passwordInput) || checkParent(target, logoFields[i].logo)) {
+              for (let i = 0; i < inputWithLogo.length; i++){
+                if (checkParent(target, inputWithLogo[i].inputEl) || checkParent(target, inputWithLogo[i].logo)) {
                   check = true
                   closeOtherMenu(i)
                 }
               }
               if (!check) {
-                for (let i = 0; i < logoFields.length; i++) { 
-                  const elPosition = logoFields[i].passwordInput.getBoundingClientRect();
+                for (let i = 0; i < inputWithLogo.length; i++) { 
+                  const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
                   closeInformMenu(false, elPosition);
                 }
               }
             }
             function closeOtherMenu(indexClick) {
-              for (let i = 0; i < logoFields.length; i++) {
+              for (let i = 0; i < inputWithLogo.length; i++) {
                 if (i !== indexClick) {
-                  const elPosition = logoFields[i].passwordInput.getBoundingClientRect();
+                  const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
                   closeInformMenu(false, elPosition);
                 }
               }
@@ -263,41 +265,47 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     
     function useGeneratedPassword(password) {
-      for (const logoField of logoFields) {
-        logoField.passwordInput.value = password;
+      for (const logoField of inputWithLogo) {
+        if (logoField.type === 'password') {
+          logoField.inputEl.value = password;
+        }
       }
-      for (const logoField of logoFields) {
-        const elPosition = logoField.passwordInput.getBoundingClientRect();
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
         closeInformMenu(false, elPosition);
       }
     }
   
-    function setFillLogo(htmlID) {
+    function setFillLogo(el, type='password') {
       const logo = document.createElement("span");
-      logo.id = 'logo-' + htmlID
-      const passwordInput = document.getElementById(htmlID);
+      logo.id = 'cs-logo-' + (el.htmlID || el.htmlName)
+      let inputEl = document.getElementById(el.htmlID);
+      if (!inputEl) {
+        inputEl = document.getElementsByName(el.htmlName)[0]
+      }
       logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
               height: 20px;
               width: 20px;
               right: 10px !important;
               position: absolute;
               top: 11px`;
-      passwordInput.parentNode.insertBefore(
+      inputEl.parentNode.insertBefore(
         logo,
-        passwordInput.nextElementSibling
+        inputEl.nextElementSibling
       );
-      // const elPosition = passwordInput.getBoundingClientRect();
+      // const elPosition = inputEl.getBoundingClientRect();
       logo.addEventListener("click", () => {
-        openInformMenu(passwordInput);
+        openInformMenu(inputEl);
       });
       return {
         logo,
-        passwordInput
+        inputEl,
+        type
       }
     }
     function resizeInformMenu() {
-      for (const logoField of logoFields) {
-        const elPosition = logoField.passwordInput.getBoundingClientRect();
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
         const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
         if (menuEl) {
           menuEl.style.height = '407px'
@@ -315,8 +323,8 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
     }
-    function openInformMenu(passwordInput: any) {
-      const elPosition = passwordInput.getBoundingClientRect();
+    function openInformMenu(inputEl: any) {
+      const elPosition = inputEl.getBoundingClientRect();
       if (document.body == null) {
         return;
       }

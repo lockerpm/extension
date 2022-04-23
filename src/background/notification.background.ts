@@ -104,13 +104,20 @@ export default class NotificationBackground {
                     case 'notificationBar':
                         // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
-                        const passwordFields = this.autofillService.getPasswordsFields(msg.details);
-                        // console.log('login forms: ', forms)
-                        // console.log('card forms: ', testCardForms)
+                        let passwordFields = [];
+                        let usernameFields = [];
+                        for (const form of forms) {
+                          for (const password of form.passwords) {
+                            passwordFields.push(password)
+                          }
+                          usernameFields.push(form.username)
+                        }
+                        // console.log( forms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
                             forms: forms,
-                            passwordFields: passwordFields
+                            passwordFields: passwordFields,
+                            usernameFields: usernameFields
                         });
                       //  await BrowserApi.tabSendMessageData(msg.tab, 'informMenuPageDetails', {
                       //       details: msg.details,

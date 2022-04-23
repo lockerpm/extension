@@ -1,6 +1,6 @@
 {
   "name": "locker-extention",
-  "version": "1.10.1",
+  "version": "1.9.3",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
@@ -17,6 +17,7 @@
     "@tailwindcss/forms": "^0.3.3",
     "axios": "^0.21.4",
     "core-js": "^3.6.5",
+    "crx": "^5.0.1",
     "element-ui": "^2.15.6",
     "extract-domain": "^2.3.4",
     "lodash": "^4.17.21",

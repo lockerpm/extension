@@ -12,16 +12,16 @@
           >
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
-        <div class="flex-grow" @click="fillCipher()">
+        <div class="flex-grow overflow-hidden" @click="fillCipher()">
           <div class="text-black w-[200px] font-semibold truncate flex items-center">
             {{ item.name }}
           </div>
-          <div>
+          <div class="truncate">
             {{ item.subTitle }}
           </div>
         </div>
         <div>
-          <div class="col-actions">
+          <div class="col-actions" style="display: inline-flex">
             <button
               v-if="item.login.canLaunch"
               class="btn btn-icon btn-xs hover:text-primary"

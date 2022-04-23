@@ -253,21 +253,21 @@ export default class RuntimeBackground {
         // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
         //     return;
         // }
-        const token = await this.storageService.get("cs_token");
-        if (token) {
-          try {
-            const myHeaders = {
-              headers: { Authorization: `Bearer ${token}` }
-            };
-            await axios.post(
-              `${process.env.VUE_APP_BASE_API_URL}/users/logout`,
-              {},
-              myHeaders
-            );
-          } catch (error) {
-            console.log(error);
-          }
-        }
+        // const token = await this.storageService.get("cs_token");
+        // if (token) {
+        //   try {
+        //     const myHeaders = {
+        //       headers: { Authorization: `Bearer ${token}` }
+        //     };
+        //     await axios.post(
+        //       `${process.env.VUE_APP_BASE_API_URL}/users/logout`,
+        //       {},
+        //       myHeaders
+        //     );
+        //   } catch (error) {
+        //     console.log(error);
+        //   }
+        // }
         // const userId = await this.userService.getUserId();
         await Promise.all([
           this.cryptoService.clearKeys(),
