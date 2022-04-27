@@ -2,7 +2,7 @@ import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
 
 document.addEventListener('DOMContentLoaded', event => {
-    if (window.location.hostname.indexOf('id.cystack.net') > -1) {
+    if (window.location.hostname.indexOf('id.locker.io') > -1) {
         return;
     }
 
@@ -17,12 +17,14 @@ document.addEventListener('DOMContentLoaded', event => {
     let observeDomTimeout: number = null;
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create']);
+    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register']);
+    const signUpButtonNames = new Set(['sign up', 'create', 'register']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
     let inputWithLogo: any[] = []
+    let isSignUp = false
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -70,46 +72,51 @@ document.addEventListener('DOMContentLoaded', event => {
         } else if (msg.command === 'notificationBarPageDetails') {
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
-            for (let i = 0; i < msg.data.passwordFields.length; i++){
-              inputWithLogo.push(setFillLogo(msg.data.passwordFields[i], 'password'));
-            }
-            for (let i = 0; i < msg.data.usernameFields.length; i++) {
-              inputWithLogo.push(setFillLogo(msg.data.usernameFields[i], 'username'));
-            }
-            document.onclick = check;
-            function check(e) {
-              const target = e && e.target;
-              let check = false
-              for (let i = 0; i < inputWithLogo.length; i++){
-                if (checkParent(target, inputWithLogo[i].inputEl) || checkParent(target, inputWithLogo[i].logo)) {
-                  check = true
-                  closeOtherMenu(i)
-                }
+            chrome.storage.local.get('neverDomains', (ndObj: any) => {
+              const domains = ndObj.neverDomains;
+              if (domains == null || !domains.hasOwnProperty(window.location.hostname)) {
+                  for (let i = 0; i < msg.data.passwordFields.length; i++){
+                    inputWithLogo.push(setFillLogo(msg.data.passwordFields[i], 'password'));
+                  }
+                  for (let i = 0; i < msg.data.usernameFields.length; i++) {
+                    inputWithLogo.push(setFillLogo(msg.data.usernameFields[i], 'username'));
+                  }
+                  document.onclick = check;
+                  function check(e) {
+                    const target = e && e.target;
+                    let check = false
+                    for (let i = 0; i < inputWithLogo.length; i++){
+                      if (checkParent(target, inputWithLogo[i].inputEl) || checkParent(target, inputWithLogo[i].logo)) {
+                        check = true
+                        closeOtherMenu(i)
+                      }
+                    }
+                    if (!check) {
+                      for (let i = 0; i < inputWithLogo.length; i++) { 
+                        const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
+                        closeInformMenu(false, elPosition);
+                      }
+                    }
+                  }
+                  function closeOtherMenu(indexClick) {
+                    for (let i = 0; i < inputWithLogo.length; i++) {
+                      if (i !== indexClick) {
+                        const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
+                        closeInformMenu(false, elPosition);
+                      }
+                    }
+                  }
+                  function checkParent(t, elm) {
+                    while (t.parentNode) {
+                      if (t === elm) {
+                        return true;
+                      }
+                      t = t.parentNode;
+                    }
+                    return false;
+                  }
               }
-              if (!check) {
-                for (let i = 0; i < inputWithLogo.length; i++) { 
-                  const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
-                  closeInformMenu(false, elPosition);
-                }
-              }
-            }
-            function closeOtherMenu(indexClick) {
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (i !== indexClick) {
-                  const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
-                  closeInformMenu(false, elPosition);
-                }
-              }
-            }
-            function checkParent(t, elm) {
-              while (t.parentNode) {
-                if (t === elm) {
-                  return true;
-                }
-                t = t.parentNode;
-              }
-              return false;
-            }
+            })
             sendResponse();
             return true;
         }
@@ -126,6 +133,17 @@ document.addEventListener('DOMContentLoaded', event => {
         }
         else if (msg.command === "resizeInformMenu") {
           resizeInformMenu()
+        }
+        else if (msg.command === "closeInformMenu") {
+          if (inIframe) {
+            return;
+          }
+          for (const logoField of inputWithLogo) {
+            const elPosition = logoField.inputEl.getBoundingClientRect();
+            closeInformMenu(false, elPosition);
+          }
+          sendResponse();
+          return true;
         }
     }
 
@@ -283,20 +301,27 @@ document.addEventListener('DOMContentLoaded', event => {
       if (!inputEl) {
         inputEl = document.getElementsByName(el.htmlName)[0]
       }
+      const elPosition = inputEl.getBoundingClientRect();
       logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
               height: 20px;
               width: 20px;
               right: 10px !important;
               position: absolute;
-              top: 11px`;
+              top: ${(elPosition.height-20)/2}px`;
       inputEl.parentNode.insertBefore(
         logo,
         inputEl.nextElementSibling
       );
       // const elPosition = inputEl.getBoundingClientRect();
+      // inputEl.addEventListener("focus", () => {
+      //   openInformMenu(inputEl)
+      // })
       logo.addEventListener("click", () => {
         openInformMenu(inputEl);
       });
+      // inputEl.addEventListener("click", (e) => {
+      //   openInformMenu(inputEl);
+      // });
       return {
         logo,
         inputEl,
@@ -340,7 +365,7 @@ document.addEventListener('DOMContentLoaded', event => {
       iframe.style.cssText =
         `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
         position: fixed;
-        height: 200px; 
+        height: 244px; 
         width: 320px;
         border: 0;
         min-height: initial;
@@ -391,6 +416,15 @@ document.addEventListener('DOMContentLoaded', event => {
         form.addEventListener('submit', formSubmitted, false);
         const submitButton = getSubmitButton(form, logInButtonNames);
         if (submitButton != null) {
+          //   const buttonText = getButtonText(submitButton);
+          //   console.log(buttonText)
+          //   const matches = Array.from(signUpButtonNames)
+          //     .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
+          // console.log(matches)
+          //   if (matches.length>0) {
+          //     isSignUp = true;
+          //   }
+          //   console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }

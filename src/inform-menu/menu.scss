@@ -125,6 +125,22 @@ button.neutral {
     background-color: #E4F0E6;
   }
 }
+.selection-category {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  &:hover {
+    background-color: #E4F0E6;
+  }
+  .category-icon{
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+}
 .cs-inform-header {
   display: flex;
   padding-left: 16px;
@@ -148,7 +164,6 @@ button.neutral {
   }
 }
 .cs-list-withScroll {
-  max-height: 268px;
   overflow-y: auto;
   .cs-inform-no-ciphers {
     text-align: center;

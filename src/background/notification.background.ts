@@ -60,7 +60,7 @@ export default class NotificationBackground {
                 await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
                 break;
             case 'bgGetDataForTab':
-                await this.getDataForTab(sender.tab, msg.responseCommand);
+                await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
                 break;
             case 'bgCloseNotificationBar':
                 await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
@@ -153,6 +153,9 @@ export default class NotificationBackground {
                 }
                 await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
                 });
+                break;
+            case 'informMenuTurnOff':
+                await this.turnOffAutofill(sender.tab)
                 break;
             default:
                 break;
@@ -469,13 +472,14 @@ export default class NotificationBackground {
         }
     }
 
-    private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string) {
+  private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
+        const otherTypes: CipherType[] = []
         const responseData: any = {};
         // console.log(tab)
         if (responseCommand === 'notificationBarGetFoldersList') {
             responseData.folders = await this.folderService.getAllDecrypted();
         }
-        if (responseCommand === 'informMenuGetCiphersList') {
+        if (responseCommand === 'informMenuGetCiphersForCurrentTab') {
           const isAuthed = await this.userService.isAuthenticated();
           if (!isAuthed) {
             responseData.ciphers = null
@@ -488,10 +492,43 @@ export default class NotificationBackground {
             }
           }
         }
+        if (responseCommand === 'informMenuGetCiphers'){
+          if (type === CipherType.Card) {
+            otherTypes.push(CipherType.Card)
+          }
+          if (type === CipherType.Identity) {
+            otherTypes.push(CipherType.Identity);
+          }
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null;
+          } else {
+            try {
+              if (type === CipherType.Login) {
+                responseData.ciphers = await this.cipherService.getAllDecrypted();
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === CipherType.Login)
+              } else {
+                responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(
+                  tab.url,
+                  otherTypes
+                ); 
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
+              }
+            } catch (error) {
+              responseData.ciphers = null;
+            }
+          }
+        }
         await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     }
 
     private async allowPersonalOwnership(): Promise<boolean> {
         return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
+    }
+  
+    private async turnOffAutofill(tab: chrome.tabs.Tab) {
+      BrowserApi.tabSendMessageData(tab, "closeInformMenu");
+      const hostname = Utils.getHostname(tab.url);
+      await this.cipherService.saveNeverDomain(hostname);
     }
 }
