@@ -325,6 +325,10 @@ Vue.mixin({
         return this.getIconDefaultCipher('Card', size)
       case CipherType.Identity:
         return this.getIconDefaultCipher('Identity', size)
+      case 6:
+        return this.getIconDefaultCipher('CryptoAccount', size)
+      case 7:
+        return this.getIconDefaultCipher('CryptoWallet', size)
       case 'Shares':
         return this.getIconDefaultCipher('Shares', size)
       case 'Trash':

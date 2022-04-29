@@ -541,7 +541,7 @@ export default class RuntimeBackground {
   }
 
   private async generatePassword(tab, responseCommand, inputOptions) {
-      const options = inputOptions
+      const options = inputOptions || (await this.passwordGenerator.getOptions())[0]
       if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
         options.lowercase = true
       }

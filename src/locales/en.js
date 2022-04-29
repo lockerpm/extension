@@ -173,6 +173,7 @@ module.exports = {
     SecureNote: 'Note | Notes',
     Card: 'Card | Cards',
     Identity: 'Identity | Identities',
+    CryptoAsset: 'Crypto Asset | Crypto Assets',
     Dashboard: 'Item | Items',
     Vault: 'Item | Items',
     Shares: 'Item | Items',
@@ -534,7 +535,12 @@ module.exports = {
       generate_random_password: 'Generate random password',
       show_password: 'Show password',
       card_details: 'Card Information',
-      contact_info: 'Contact Information'
+      contact_info: 'Contact Information',
+      wallet_address: 'Wallet Address',
+      seed: 'Seed phrase',
+      seed_phrase_desc: 'Notice: Seed phrase (or recovery phrase, key phrase, etc.) is a phrase that usually contains 12-24 random English words. This is the most sensitive data of your crypto wallet.',
+      recovery_email: 'Recovery email',
+      additional_info: 'Additional Information'
     },
     settings: {
       account: 'Account',

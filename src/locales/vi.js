@@ -171,6 +171,7 @@ module.exports = {
     SecureNote: 'Ghi chú | Notes',
     Card: 'Thẻ | Thẻ',
     Identity: 'Định danh | Định danh',
+    CryptoAsset: 'Tài sản Crypto | Tài sản Crypto',
     Dashboard: 'Item | Items',
     Vault: 'Mục | Mục',
     Shares: 'Mục | Mục',
@@ -530,7 +531,11 @@ module.exports = {
       generate_random_password: 'Tạo mật khẩu ngẫu nhiên',
       show_password: 'HIện mật khẩu',
       card_details: 'Chi tiết thẻ',
-      contact_info: 'Thông tin liên lạc'
+      contact_info: 'Thông tin liên lạc',
+      wallet_address: 'Địa chỉ ví',
+      seed: 'Seed phrase',
+      recovery_email: 'Email khôi phục',
+      additional_info: 'Thông tin thêm',
     },
     settings: {
       account: 'Tài khoản',

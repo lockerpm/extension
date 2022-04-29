@@ -53,9 +53,36 @@
                   <el-dropdown-item
                     v-clipboard:copy="item.notes"
                     v-clipboard:success="clipboardSuccessHandler"
-                    divided
                   >
                     {{ $t('common.copy') }} {{ $t('common.note') }}
+                  </el-dropdown-item>
+                </template>
+                <template v-if="item.type === 6">
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoAccount.username"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('common.username') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoAccount.password"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('common.password') }}
+                  </el-dropdown-item>
+                </template>
+                <template v-if="item.type === 7">
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.seed"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.seed') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.address"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.wallet_address') }}
                   </el-dropdown-item>
                 </template>
               </el-dropdown-menu>

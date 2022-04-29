@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', event => {
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
     const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register']);
-    const signUpButtonNames = new Set(['sign up', 'create', 'register']);
+    const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', event => {
           // console.log(passwordFields)
         }
         else if (msg.command === "resizeInformMenu") {
-          resizeInformMenu()
+          resizeInformMenu(msg.data)
         }
         else if (msg.command === "closeInformMenu") {
           if (inIframe) {
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', event => {
     }
 
   
-    function watchForms(forms: any[]) {
+  function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
         }
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', event => {
       //   openInformMenu(inputEl)
       // })
       logo.addEventListener("click", () => {
-        openInformMenu(inputEl);
+        openInformMenu(inputEl, type);
       });
       // inputEl.addEventListener("click", (e) => {
       //   openInformMenu(inputEl);
@@ -328,12 +328,16 @@ document.addEventListener('DOMContentLoaded', event => {
         type
       }
     }
-    function resizeInformMenu() {
+    function resizeInformMenu(sizeData: any) {
       for (const logoField of inputWithLogo) {
         const elPosition = logoField.inputEl.getBoundingClientRect();
         const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
         if (menuEl) {
-          menuEl.style.height = '407px'
+          if (sizeData) {
+            menuEl.style.height = sizeData.height
+            menuEl.style.width = sizeData.width
+          }
+          // menuEl.style.height = '407px'
         }
       }
     }
@@ -348,7 +352,7 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
     }
-    function openInformMenu(inputEl: any) {
+    function openInformMenu(inputEl: any, type: string = 'password') {
       const elPosition = inputEl.getBoundingClientRect();
       if (document.body == null) {
         return;
@@ -358,7 +362,7 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
       const barPageUrl: string = chrome.extension.getURL(
-        "inform-menu/menu.html"
+        "inform-menu/menu.html" + `${isSignUp && type ==='password' ? "?generate=1" : "?ciphers=1"}`
       );
 
       const iframe = document.createElement("iframe");
@@ -416,15 +420,13 @@ document.addEventListener('DOMContentLoaded', event => {
         form.addEventListener('submit', formSubmitted, false);
         const submitButton = getSubmitButton(form, logInButtonNames);
         if (submitButton != null) {
-          //   const buttonText = getButtonText(submitButton);
-          //   console.log(buttonText)
-          //   const matches = Array.from(signUpButtonNames)
-          //     .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
-          // console.log(matches)
-          //   if (matches.length>0) {
-          //     isSignUp = true;
-          //   }
-          //   console.log(isSignUp)
+            const buttonText = getButtonText(submitButton);
+            const matches = Array.from(signUpButtonNames)
+              .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
+            if (matches.length>0) {
+              isSignUp = true;
+            }
+            // console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }

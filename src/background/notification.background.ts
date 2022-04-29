@@ -151,8 +151,13 @@ export default class NotificationBackground {
                 if (tab_ == null) {
                   return;
                 }
-                await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
-                });
+                if(msg.responseCommand === 'informMenuGetGeneratedPasswordNoOptions'){
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", { width: '400px', height: '180px'
+                    }); 
+                }
+                else {
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {width: '320px', height: '407px'});
+                }
                 break;
             case 'informMenuTurnOff':
                 await this.turnOffAutofill(sender.tab)

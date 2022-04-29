@@ -112,7 +112,7 @@ button.neutral {
 }
 .cs-inform-container {
   height: 100%;
-  max-width: 320px;
+  width: 100%;
   overflow: hidden;
 }
 .selection-item, .dropdown-option {
@@ -200,13 +200,28 @@ button.neutral {
     margin-top: 8px;
     margin-bottom: 16px;
   }
-  #button_use_password{
-    width: 100%;
-    border-radius: 64px !important;
-    padding: 12px !important;
-  }
   .cs-generate-password-options{
     padding: 16px;
     background-color: #E4F0E6;
   }
+}
+  #button_use_password{
+    max-width: 320px;
+    width: 100%;
+    border-radius: 64px !important;
+    padding: 12px !important;
+  }
+input.generated-password{
+  border: 0px;
+}
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+}
+.btn-show-password, .btn-show-options {
+  cursor: pointer;
+}
+.btn-show-password {
+  margin-right: 12px;
 }
