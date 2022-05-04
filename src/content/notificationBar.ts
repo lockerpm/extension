@@ -2,7 +2,7 @@ import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
 
 document.addEventListener('DOMContentLoaded', event => {
-    if (window.location.hostname.indexOf('vault.bitwarden.com') > -1) {
+    if (window.location.hostname.indexOf('id.locker.io') > -1) {
         return;
     }
 
@@ -17,12 +17,14 @@ document.addEventListener('DOMContentLoaded', event => {
     let observeDomTimeout: number = null;
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next']);
+    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register']);
+    const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
-
+    let inputWithLogo: any[] = []
+    let isSignUp = false
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -70,8 +72,78 @@ document.addEventListener('DOMContentLoaded', event => {
         } else if (msg.command === 'notificationBarPageDetails') {
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
+            chrome.storage.local.get('neverDomains', (ndObj: any) => {
+              const domains = ndObj.neverDomains;
+              if (domains == null || !domains.hasOwnProperty(window.location.hostname)) {
+                  for (let i = 0; i < msg.data.passwordFields.length; i++){
+                    inputWithLogo.push(setFillLogo(msg.data.passwordFields[i], 'password'));
+                  }
+                  for (let i = 0; i < msg.data.usernameFields.length; i++) {
+                    inputWithLogo.push(setFillLogo(msg.data.usernameFields[i], 'username'));
+                  }
+                  document.onclick = check;
+                  function check(e) {
+                    const target = e && e.target;
+                    let check = false
+                    for (let i = 0; i < inputWithLogo.length; i++){
+                      if (checkParent(target, inputWithLogo[i].inputEl) || checkParent(target, inputWithLogo[i].logo)) {
+                        check = true
+                        closeOtherMenu(i)
+                      }
+                    }
+                    if (!check) {
+                      for (let i = 0; i < inputWithLogo.length; i++) { 
+                        const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
+                        closeInformMenu(false, elPosition);
+                      }
+                    }
+                  }
+                  function closeOtherMenu(indexClick) {
+                    for (let i = 0; i < inputWithLogo.length; i++) {
+                      if (i !== indexClick) {
+                        const elPosition = inputWithLogo[i].inputEl.getBoundingClientRect();
+                        closeInformMenu(false, elPosition);
+                      }
+                    }
+                  }
+                  function checkParent(t, elm) {
+                    while (t.parentNode) {
+                      if (t === elm) {
+                        return true;
+                      }
+                      t = t.parentNode;
+                    }
+                    return false;
+                  }
+              }
+            })
             sendResponse();
             return true;
+        }
+        else if (msg.command === 'informMenuPageDetails') {
+            pageDetails.push(msg.data.details);
+            watchForms(msg.data.forms);
+            sendResponse();
+            return true;
+        }
+        else if (msg.command === 'informMenuPassword') {
+          useGeneratedPassword(msg.data.password)
+          // console.log(msg.data.password)
+          // console.log(passwordFields)
+        }
+        else if (msg.command === "resizeInformMenu") {
+          resizeInformMenu(msg.data)
+        }
+        else if (msg.command === "closeInformMenu") {
+          if (inIframe) {
+            return;
+          }
+          for (const logoField of inputWithLogo) {
+            const elPosition = logoField.inputEl.getBoundingClientRect();
+            closeInformMenu(false, elPosition);
+          }
+          sendResponse();
+          return true;
         }
     }
 
@@ -177,7 +249,8 @@ document.addEventListener('DOMContentLoaded', event => {
         });
     }
 
-    function watchForms(forms: any[]) {
+  
+  function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
         }
@@ -193,7 +266,6 @@ document.addEventListener('DOMContentLoaded', event => {
                 const index = parseInt(f.form.opid.split('__')[2], null);
                 formEl = document.getElementsByTagName('form')[index];
             }
-
             if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
                 const formDataObj: any = {
                     data: f,
@@ -209,12 +281,152 @@ document.addEventListener('DOMContentLoaded', event => {
             }
         });
     }
+    
+    function useGeneratedPassword(password) {
+      for (const logoField of inputWithLogo) {
+        if (logoField.type === 'password') {
+          logoField.inputEl.value = password;
+        }
+      }
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
+        closeInformMenu(false, elPosition);
+      }
+    }
+  
+    function setFillLogo(el, type='password') {
+      const logo = document.createElement("span");
+      logo.id = 'cs-logo-' + (el.htmlID || el.htmlName)
+      let inputEl = document.getElementById(el.htmlID);
+      if (!inputEl) {
+        inputEl = document.getElementsByName(el.htmlName)[0]
+      }
+      const elPosition = inputEl.getBoundingClientRect();
+      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+              height: 20px;
+              width: 20px;
+              right: 10px !important;
+              position: absolute;
+              top: ${(elPosition.height-20)/2}px`;
+      inputEl.parentNode.insertBefore(
+        logo,
+        inputEl.nextElementSibling
+      );
+      // const elPosition = inputEl.getBoundingClientRect();
+      // inputEl.addEventListener("focus", () => {
+      //   openInformMenu(inputEl)
+      // })
+      logo.addEventListener("click", () => {
+        openInformMenu(inputEl, type);
+      });
+      // inputEl.addEventListener("click", (e) => {
+      //   openInformMenu(inputEl);
+      // });
+      return {
+        logo,
+        inputEl,
+        type
+      }
+    }
+    function resizeInformMenu(sizeData: any) {
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
+        const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+        if (menuEl) {
+          if (sizeData) {
+            menuEl.style.height = sizeData.height
+            menuEl.style.width = sizeData.width
+          }
+          // menuEl.style.height = '407px'
+        }
+      }
+    }
+    function closeInformMenu(explicitClose: boolean, elPosition: any) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+      if (menuEl != null) {
+        menuEl.parentElement.removeChild(menuEl);
+      }
 
+
+      if (!explicitClose) {
+        return;
+      }
+    }
+    function openInformMenu(inputEl: any, type: string = 'password') {
+      const elPosition = inputEl.getBoundingClientRect();
+      if (document.body == null) {
+        return;
+      }
+      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
+        // closeInformMenu(false, elPosition)
+        return;
+      }
+      const barPageUrl: string = chrome.extension.getURL(
+        "inform-menu/menu.html" + `${isSignUp && type ==='password' ? "?generate=1" : "?ciphers=1"}`
+      );
+
+      const iframe = document.createElement("iframe");
+      iframe.style.cssText =
+        `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
+        position: fixed;
+        height: 244px; 
+        width: 320px;
+        border: 0;
+        min-height: initial;
+        padding: 0;
+        z-index: 2147483647; visibility: visible;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
+        z-index: 2147483647 !important;
+        display: block !important;
+        visibility: visible !important;
+        clip-path: none !important;
+        clip: auto !important;
+        mask: none !important;
+        filter: none !important;
+        pointer-events: auto !important;
+        resize: none !important;
+        border-width: 0px;
+        border-style: initial;
+        border-color: initial;
+        border-image: initial;
+        border-radius: 8px;
+        margin: 0px !important;
+        padding: 0px !important;
+      `;
+      iframe.id = "cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left);
+
+      iframe.src = barPageUrl;
+
+      // const frameDiv = document.createElement("div");
+      // frameDiv.setAttribute("aria-live", "polite");
+      // frameDiv.id = "cs-inform-menu-bar";
+      // frameDiv.style.cssText =
+      //   `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
+      //   height: 200px; width: 320px; padding: 0; position: fixed;
+      //   z-index: 2147483647; visibility: visible;`
+      // frameDiv.appendChild(iframe);
+      document.body.appendChild(iframe);
+
+      (iframe.contentWindow.location as any) = barPageUrl;
+
+      // const spacer = document.createElement("div");
+      // spacer.id = "inform-menu-spacer";
+      // spacer.style.cssText = "height: 42px;";
+      // document.body.insertBefore(spacer, document.body.firstChild);
+    }
+  
     function listen(form: HTMLFormElement) {
         form.removeEventListener('submit', formSubmitted, false);
         form.addEventListener('submit', formSubmitted, false);
         const submitButton = getSubmitButton(form, logInButtonNames);
         if (submitButton != null) {
+            const buttonText = getButtonText(submitButton);
+            const matches = Array.from(signUpButtonNames)
+              .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
+            if (matches.length>0) {
+              isSignUp = true;
+            }
+            // console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }
@@ -366,9 +578,9 @@ document.addEventListener('DOMContentLoaded', event => {
         if (wrappingEl == null) {
             return null;
         }
-
+        // console.log(wrappingEl)
         const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-
+        // console.log(wrappingElIsForm)
         let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
             'button[type="submit"]') as HTMLElement;
         if (submitButton == null && wrappingElIsForm) {

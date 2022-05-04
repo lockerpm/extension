@@ -1,93 +1,92 @@
 <template>
   <div>
-    <client-only>
-      <el-table
-        v-loading="loading"
-        :data="users"
-        style="width: 100%"
-      >
-        <el-table-column
-          label=""
-        >
-          <template slot-scope="scope">
-            <div class="flex items-center">
-              <el-avatar :src="scope.row.avatar" :size="32" />
-              <div class="ml-2">
-                <div class="text-black font-semibold truncate">{{ scope.row.full_name || scope.row.email }}</div>
-                <div v-if="scope.row.username">@{{ scope.row.username }}</div>
-              </div>
+    <el-table
+      v-loading="loading"
+      :data="users"
+      style="width: 100%"
+    >
+      <el-table-column label="">
+        <template slot-scope="scope">
+          <div class="flex items-center">
+            <el-avatar
+              :src="scope.row.avatar"
+              :size="32"
+            />
+            <div class="ml-2">
+              <div class="text-black font-semibold truncate">{{ scope.row.full_name || scope.row.email }}</div>
+              <div v-if="scope.row.username">@{{ scope.row.username }}</div>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          :label="$t('common.status')"
-          align="right"
-        >
-          <template slot-scope="scope">
-            <span
-              class="label capitalize"
-              :class="{'label-primary-light': scope.row.status === 'confirmed',
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('common.status')"
+        align="right"
+      >
+        <template slot-scope="scope">
+          <span
+            class="label capitalize"
+            :class="{'label-primary-light': scope.row.status === 'confirmed',
                        'label-success-light': scope.row.status === 'accepted',
                        'label-warning-light': scope.row.status === 'invited',
                        'label-danger-light': scope.row.status === 'expired'
               }"
-            >
-              {{ scope.row.status }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          :label="$t('common.joined')"
-          align="right"
-        >
-          <template slot-scope="scope">
-            {{ $moment(scope.row.access_time * 1000).fromNow() }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="right"
-        >
-          <template slot-scope="scope">
-            <el-dropdown
-              v-if="scope.row.role !=='owner' && scope.row.username !== currentUser.username"
-              trigger="click"
-              :hide-on-click="false"
-            >
-              <button class="btn btn-icon btn-xs hover:bg-black-400">
-                <i class="fas fa-ellipsis-h" />
-              </button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  v-if="scope.row.status === 'accepted'"
-                  @click.native="promptConfirmUser(scope.row)"
-                >
-                  <span class="text-success">{{ $t('common.confirm') }}</span>
+          >
+            {{ scope.row.status }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('common.joined')"
+        align="right"
+      >
+        <template slot-scope="scope">
+          {{ $moment(scope.row.access_time * 1000).fromNow() }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right">
+        <template slot-scope="scope">
+          <el-dropdown
+            v-if="scope.row.role !=='owner' && scope.row.username !== currentUser.username"
+            trigger="click"
+            :hide-on-click="false"
+          >
+            <button class="btn btn-icon btn-xs hover:bg-black-400">
+              <i class="fas fa-ellipsis-h" />
+            </button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                v-if="scope.row.status === 'accepted'"
+                @click.native="promptConfirmUser(scope.row)"
+              >
+                <span class="text-success">{{ $t('common.confirm') }}</span>
+              </el-dropdown-item>
+              <template v-if="scope.row.status === 'confirmed'">
+                <el-dropdown-item @click.native="putUser(scope.row)">
+                  {{ $t('common.edit') }}
                 </el-dropdown-item>
-                <template v-if="scope.row.status === 'confirmed'">
-                  <el-dropdown-item
-                    @click.native="putUser(scope.row)"
-                  >
-                    {{ $t('common.edit') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    @click.native="putUserGroups(scope.row)"
-                  >
-                    {{ $t('common.groups') }}
-                  </el-dropdown-item>
-                </template>
-                <el-dropdown-item @click.native="deleteUser(scope.row)">
-                  <span class="text-danger">
-                    {{ $t('common.remove') }}
-                  </span>
+                <el-dropdown-item @click.native="putUserGroups(scope.row)">
+                  {{ $t('common.groups') }}
                 </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </template>
-        </el-table-column>
-      </el-table>
-    </client-only>
-    <AddFamily ref="addEditUser" @done="getUsers" />
-    <AddEditUserGroups ref="addEditUserGroups" @done="getUsers" />
+              </template>
+              <el-dropdown-item @click.native="deleteUser(scope.row)">
+                <span class="text-danger">
+                  {{ $t('common.remove') }}
+                </span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </template>
+      </el-table-column>
+    </el-table>
+    <AddFamily
+      ref="addEditUser"
+      @done="getUsers"
+    />
+    <AddEditUserGroups
+      ref="addEditUserGroups"
+      @done="getUsers"
+    />
     <div class="fixed bottom-[50px] right-[55px]">
       <button
         class="btn btn-fab btn-primary rounded-full flex items-center justify-center"
@@ -116,7 +115,10 @@
         </div>
         <div class="text-sm">{{ $t('data.notifications.fingerprint_description_2') }}</div>
       </div>
-      <div slot="footer" class="dialog-footer flex items-center text-left">
+      <div
+        slot="footer"
+        class="dialog-footer flex items-center text-left"
+      >
         <div class="flex-grow" />
         <div>
           <button
@@ -140,7 +142,7 @@
 
 <script>
 import Vue from 'vue'
-import {Utils} from "jslib-common/misc/utils";
+import { Utils } from "jslib-common/misc/utils";
 import AddFamily from '@/components/user/AddFamily'
 import AddEditUserGroups from '@/components/user/AddEditUserGroups'
 export default Vue.extend({

@@ -272,6 +272,15 @@ export default Vue.extend({
   },
   mounted () {
     this.getUser()
+    if(this.$route.query.action){
+      switch(this.$route.query.action){
+      case 'change-master-password':
+        this.changeMasterPassword()
+        break
+      default:
+        break
+      }
+    }
   },
   asyncComputed: {
     fingerprint: {

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_extName__",
   "homepage_url": "http://localhost:8080/",
-  "description": "A Browser Extension",
+  "description": "__MSG_extDesc__",
   "default_locale": "en",
   "permissions": [
     "tabs",
@@ -15,7 +15,8 @@
     "http://*/*",
     "https://*/*",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "identity"
   ],
   "optional_permissions": [
     "nativeMessaging"
@@ -91,6 +92,17 @@
       "19": "icons/19.png",
       "38": "icons/38.png"
     }
+  },
+  "web_accessible_resources": [
+    "notification/bar.html",
+    "inform-menu/menu.html"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://*.demo.cystack.net:3011/*",
+      "https://*.locker.io/*",
+      "https://*.id.locker.io/"
+    ]
   },
   "sidebar_action": {
     "default_panel": "popup.html",

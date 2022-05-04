@@ -60,7 +60,7 @@ export class BrowserApi {
         return BrowserApi.tabSendMessage(tab, obj);
     }
 
-    static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
+  static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
         if (!tab || !tab.id) {
             return;
         }
@@ -93,14 +93,17 @@ export class BrowserApi {
 
     static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
         chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+          setTimeout(function () {
             callback(msg, sender, response);
+          }, 1);
+          return true;
         });
     }
 
     static async closeLoginTab() {
         const tabs = await BrowserApi.tabsQuery({
             active: true,
-            title: 'Bitwarden',
+            title: 'Popup',
             windowType: 'normal',
             currentWindow: true,
         });

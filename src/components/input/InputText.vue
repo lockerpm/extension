@@ -37,6 +37,7 @@
         @blur="focusing = false"
         @input="handleInput"
         @mouseenter="handleHover"
+        @keyup.enter="handleEnterKeyup"
       >
     </template>
 
@@ -150,6 +151,9 @@ export default Vue.extend({
     handleHover () {
       if (this.disabled) { return }
       this.hovering = true
+    },
+    handleEnterKeyup() {
+      this.$emit('done')
     }
   }
 })
@@ -165,8 +169,9 @@ export default Vue.extend({
   border-radius: 2px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
+  background-color: #F3F3F3;
   &.is-hover, &.is-focus {
-    @apply border-primary;
+    @apply border-primary bg-white;
     label {
       @apply text-primary
     }
@@ -194,6 +199,7 @@ export default Vue.extend({
     left: 11px;
   }
   &.is-focus .cs-textarea, &.have-value .cs-textarea {
+    margin-top: 8px;
     padding-top: 8px;
   }
   &.is-disabled {
@@ -212,6 +218,7 @@ export default Vue.extend({
     flex: 1;
     color: #161922;
     height: 32px;
+    background-color: inherit;
   }
   .cs-textarea {
     min-height: 100px;

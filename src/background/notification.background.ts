@@ -8,6 +8,7 @@ import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { StorageService } from 'jslib-common/abstractions/storage.service';
+import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
@@ -26,7 +27,8 @@ import AddLoginRuntimeMessage from './models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from './models/changePasswordRuntimeMessage';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 import { NotificationQueueMessageType } from './models/notificationQueueMessageType';
-
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import axios from 'axios';
 export default class NotificationBackground {
 
     private notificationQueue: (AddLoginQueueMessage | AddChangePasswordQueueMessage)[] = [];
@@ -34,7 +36,7 @@ export default class NotificationBackground {
     constructor(private main: MainBackground, private autofillService: AutofillService,
         private cipherService: CipherService, private storageService: StorageService,
         private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-        private folderService: FolderService) {
+        private folderService: FolderService,  private userService: UserService) {
     }
 
     async init() {
@@ -51,14 +53,14 @@ export default class NotificationBackground {
 
     async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
         switch (msg.command) {
-            case 'unlockCompleted':
+          case 'unlockCompleted':
                 if (msg.data.target !== 'notification.background') {
                     return;
                 }
                 await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
                 break;
             case 'bgGetDataForTab':
-                await this.getDataForTab(sender.tab, msg.responseCommand);
+                await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
                 break;
             case 'bgCloseNotificationBar':
                 await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
@@ -79,6 +81,7 @@ export default class NotificationBackground {
             case 'bgAddSave':
             case 'bgChangeSave':
                 if (await this.vaultTimeoutService.isLocked()) {
+                    // console.log('vault locked');
                     const retryMessage: LockedVaultPendingNotificationsItem = {
                         commandToRetry: {
                             msg: msg,
@@ -90,6 +93,7 @@ export default class NotificationBackground {
                     await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
                     return;
                 }
+                // console.log('vault unlocked')
                 await this.saveOrUpdateCredentials(sender.tab, msg.folder);
                 break;
             case 'bgNeverSave':
@@ -98,21 +102,85 @@ export default class NotificationBackground {
             case 'collectPageDetailsResponse':
                 switch (msg.sender) {
                     case 'notificationBar':
+                        // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
+                        let passwordFields = [];
+                        let usernameFields = [];
+                        for (const form of forms) {
+                          for (const password of form.passwords) {
+                            passwordFields.push(password)
+                          }
+                          usernameFields.push(form.username)
+                        }
+                        // console.log( forms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
                             forms: forms,
+                            passwordFields: passwordFields,
+                            usernameFields: usernameFields
                         });
+                      //  await BrowserApi.tabSendMessageData(msg.tab, 'informMenuPageDetails', {
+                      //       details: msg.details,
+                      //       passwordFields: passwordFields,
+                      //   });
                         break;
                     default:
                         break;
                 }
+                break;
+            case 'informMenuFillCipher':
+              // console.log(msg)
+                const ciphers = await this.cipherService.getAllDecrypted();
+                const cipher = ciphers.find(c => c.id === msg.id);
+                if (cipher == null) {
+                    break;
+                }
+                await this.startAutofillPage(cipher)
+                break;
+            case 'informMenuUsePassword':
+                const tab = await BrowserApi.getTabFromCurrentWindow();
+                if (tab == null) {
+                  return;
+                }
+                await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
+                  password: msg.password
+                });
+                break;
+            case 'bgGeneratePassword':
+                const tab_ = await BrowserApi.getTabFromCurrentWindow();
+                if (tab_ == null) {
+                  return;
+                }
+                if(msg.responseCommand === 'informMenuGetGeneratedPasswordNoOptions'){
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", { width: '400px', height: '180px'
+                    }); 
+                }
+                else {
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {width: '320px', height: '407px'});
+                }
+                break;
+            case 'informMenuTurnOff':
+                await this.turnOffAutofill(sender.tab)
                 break;
             default:
                 break;
         }
     }
 
+    private async startAutofillPage(cipher: CipherView) {
+        this.main.loginToAutoFill = cipher;
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        if (tab == null) {
+            return;
+        }
+
+        BrowserApi.tabSendMessage(tab, {
+            command: 'collectPageDetails',
+            tab: tab,
+            sender: 'informMenu',
+        });
+    }
+  
     async checkNotificationQueue(tab: chrome.tabs.Tab = null): Promise<void> {
         if (this.notificationQueue.length === 0) {
             return;
@@ -180,7 +248,11 @@ export default class NotificationBackground {
         }
     }
 
-    private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
+  private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
+      if (!await this.userService.isAuthenticated()) {
+            // console.log('unauthenticated')
+            return;
+        }
         const loginDomain = Utils.getDomain(loginInfo.url);
         if (loginDomain == null) {
             return;
@@ -282,6 +354,7 @@ export default class NotificationBackground {
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
+        // console.log('saveOrUpdateCredentials')
         for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
             const queueMessage = this.notificationQueue[i];
             if (queueMessage.tabId !== tab.id ||
@@ -349,7 +422,15 @@ export default class NotificationBackground {
         }
 
         const cipher = await this.cipherService.encrypt(model);
-        await this.cipherService.saveWithServer(cipher);
+        // console.log("notificationBar createNewCipher");
+        // await this.cipherService.saveWithServer(cipher);
+        const csToken = await this.main.storageService.get<string>("cs_token");
+        const headers = {
+          "Authorization": "Bearer " + csToken,
+          "Content-Type": "application/json; charset=utf-8"
+        };
+        const data = new CipherRequest(cipher)
+        await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, {headers: headers})
     }
 
     private async getDecryptedCipherById(cipherId: string) {
@@ -364,7 +445,15 @@ export default class NotificationBackground {
         if (cipher != null && cipher.type === CipherType.Login) {
             cipher.login.password = newPassword;
             const newCipher = await this.cipherService.encrypt(cipher);
-            await this.cipherService.saveWithServer(newCipher);
+            // await this.cipherService.saveWithServer(newCipher);
+            // console.log('notificationBar updateCipher')
+            const csToken = await this.main.storageService.get<string>("cs_token");
+            const headers = {
+              "Authorization": "Bearer " + csToken,
+              "Content-Type": "application/json; charset=utf-8"
+            };
+            const data = new CipherRequest(newCipher)
+            await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
         }
     }
 
@@ -388,16 +477,63 @@ export default class NotificationBackground {
         }
     }
 
-    private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string) {
+  private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
+        const otherTypes: CipherType[] = []
         const responseData: any = {};
+        // console.log(tab)
         if (responseCommand === 'notificationBarGetFoldersList') {
             responseData.folders = await this.folderService.getAllDecrypted();
         }
-
+        if (responseCommand === 'informMenuGetCiphersForCurrentTab') {
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null
+          }
+          else {
+            try {
+              responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+            } catch (error) {
+              responseData.ciphers = null
+            }
+          }
+        }
+        if (responseCommand === 'informMenuGetCiphers'){
+          if (type === CipherType.Card) {
+            otherTypes.push(CipherType.Card)
+          }
+          if (type === CipherType.Identity) {
+            otherTypes.push(CipherType.Identity);
+          }
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null;
+          } else {
+            try {
+              if (type === CipherType.Login) {
+                responseData.ciphers = await this.cipherService.getAllDecrypted();
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === CipherType.Login)
+              } else {
+                responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(
+                  tab.url,
+                  otherTypes
+                ); 
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
+              }
+            } catch (error) {
+              responseData.ciphers = null;
+            }
+          }
+        }
         await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     }
 
     private async allowPersonalOwnership(): Promise<boolean> {
         return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
+    }
+  
+    private async turnOffAutofill(tab: chrome.tabs.Tab) {
+      BrowserApi.tabSendMessageData(tab, "closeInformMenu");
+      const hostname = Utils.getHostname(tab.url);
+      await this.cipherService.saveNeverDomain(hostname);
     }
 }

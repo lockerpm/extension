@@ -35,14 +35,14 @@ const UsernameFieldNames: string[] = [
 
 const FirstnameFieldNames: string[] = [
   // English
-  'f-name', 'first-name', 'given-name', 'first-n',
+  'f-name', 'first-name', 'given-name', 'first-n', 'first',
   // German
   'vorname',
 ];
 
 const LastnameFieldNames: string[] = [
   // English
-  'l-name', 'last-name', 's-name', 'surname', 'family-name', 'family-n', 'last-n',
+  'l-name', 'last-name', 's-name', 'surname', 'family-name', 'family-n', 'last-n', 'last',
   // German
   'nachname', 'familienname',
 ];
@@ -133,7 +133,17 @@ export default class AutofillService implements AutofillServiceInterface {
   constructor(private cipherService: CipherService, private userService: UserService,
               private totpService: TotpService, private eventService: EventService) { }
 
+  getPasswordsFields(pageDetails: AutofillPageDetails): any[] {
+    return this.loadPasswordFields(pageDetails, true, true, false, false);
+  }
+  getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
+    return this.loadPasswordFields(pageDetails, true, true, false, true);
+  }
+  // getUsernameFields(pageDetails: AutofillPageDetails): any[] {
+  //   return this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
+  // }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
+    // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
@@ -165,7 +175,114 @@ export default class AutofillService implements AutofillServiceInterface {
     return formData;
   }
 
+  getCardForms(pageDetails: AutofillPageDetails): any[] {
+    const formData: any[] = [];
+    // console.log(pageDetails)
+    const cvvFields = this.loadCvvFields(pageDetails, true, true, false, false);
+    // console.log(cvvFields)
+    if (cvvFields.length === 0) {
+      return formData;
+    }
+
+    for (const formKey in pageDetails.forms) {
+      if (!pageDetails.forms.hasOwnProperty(formKey)) {
+        continue;
+      }
+
+      const formCvvFields = cvvFields.filter(pf => formKey === pf.form);
+      if (formCvvFields.length > 0) {
+        let cardholderName = null;
+        let number = null;
+        let exp = null;
+        let expMonth = null;
+        let expYear = null;
+        let brand = null;
+        pageDetails.fields.forEach((f: any) => {
+          if (this.forCustomFieldsOnly(f)) {
+            return;
+          }
+
+          if (this.isExcludedType(f.type, ExcludedAutofillTypes)) {
+            return;
+          }
+
+          for (let i = 0; i < CardAttributes.length; i++) {
+            const attr = CardAttributes[i];
+            if (!f.hasOwnProperty(attr) || !f[attr] || !f.viewable) {
+              continue;
+            }
+
+            // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+            // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
+            if (this.isFieldMatch(f[attr],
+              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
+              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
+              cardholderName = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-number', 'cc-num', 'card-number', 'card-num', 'number', 'cc', 'cc-no', 'card-no',
+                'credit-card', 'numero-carte', 'carte', 'carte-credit', 'num-carte', 'cb-num'],
+              ['cc-number', 'cc-num', 'card-number', 'card-num', 'cc-no', 'card-no', 'numero-carte',
+                'num-carte', 'cb-num'])) {
+              number = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-exp', 'card-exp', 'cc-expiration', 'card-expiration', 'cc-ex', 'card-ex',
+                'card-expire', 'card-expiry', 'validite', 'expiration', 'expiry', 'mm-yy',
+                'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date', 'payment-card-expiration',
+                'payment-cc-date'],
+              ['mm-yy', 'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date',
+                'payment-card-expiration'])) {
+              exp = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['exp-month', 'cc-exp-month', 'cc-month', 'card-month', 'cc-mo', 'card-mo', 'exp-mo',
+                'card-exp-mo', 'cc-exp-mo', 'card-expiration-month', 'expiration-month',
+                'cc-mm', 'cc-m', 'card-mm', 'card-m', 'card-exp-mm', 'cc-exp-mm', 'exp-mm', 'exp-m',
+                'expire-month', 'expire-mo', 'expiry-month', 'expiry-mo', 'card-expire-month',
+                'card-expire-mo', 'card-expiry-month', 'card-expiry-mo', 'mois-validite',
+                'mois-expiration', 'm-validite', 'm-expiration', 'expiry-date-field-month',
+                'expiration-date-month', 'expiration-date-mm', 'exp-mon', 'validity-mo',
+                'exp-date-mo', 'cb-date-mois', 'date-m'])) {
+              expMonth = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['exp-year', 'cc-exp-year', 'cc-year', 'card-year', 'cc-yr', 'card-yr', 'exp-yr',
+                'card-exp-yr', 'cc-exp-yr', 'card-expiration-year', 'expiration-year',
+                'cc-yy', 'cc-y', 'card-yy', 'card-y', 'card-exp-yy', 'cc-exp-yy', 'exp-yy', 'exp-y',
+                'cc-yyyy', 'card-yyyy', 'card-exp-yyyy', 'cc-exp-yyyy', 'expire-year', 'expire-yr',
+                'expiry-year', 'expiry-yr', 'card-expire-year', 'card-expire-yr', 'card-expiry-year',
+                'card-expiry-yr', 'an-validite', 'an-expiration', 'annee-validite',
+                'annee-expiration', 'expiry-date-field-year', 'expiration-date-year', 'cb-date-ann',
+                'expiration-date-yy', 'expiration-date-yyyy', 'validity-year', 'exp-date-year', 'date-y'])) {
+              expYear = f;
+              break;
+            } else if (this.isFieldMatch(f[attr],
+              ['cc-type', 'card-type', 'card-brand', 'cc-brand', 'cb-type'])) {
+              brand = f;
+              break;
+            }
+          }
+        });
+        formData.push({
+          form: pageDetails.forms[formKey],
+          cvv: formCvvFields[0],
+          cardholderName,
+          number,
+          exp,
+          expMonth,
+          expYear,
+          brand,
+          cvvs: formCvvFields
+        });
+      }
+    }
+
+    return formData
+  }
+
   async doAutoFill(options: any) {
+    // console.log(options.pageDetails)
     let totpPromise: Promise<string> = null;
     const tab = await this.getActiveTab();
     if (!tab || !options.cipher || !options.pageDetails || !options.pageDetails.length) {
@@ -535,8 +652,9 @@ export default class AutofillService implements AutofillServiceInterface {
         }
       }
     });
-
+    // console.log(fillFields)
     const card = options.cipher.card;
+    // console.log(card)
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'cardholderName');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'number');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'code');
@@ -905,7 +1023,7 @@ export default class AutofillService implements AutofillServiceInterface {
 
   private makeScriptActionWithValue(fillScript: AutofillScript, dataValue: any, field: AutofillField,
                                     filledFields: { [id: string]: AutofillField; }) {
-
+    // console.log(fillScript, dataValue, field, filledFields)                           
     let doFill = false;
     if (this.hasValue(dataValue) && field) {
       if (field.type === 'select-one' && field.selectInfo && field.selectInfo.options) {
@@ -934,6 +1052,45 @@ export default class AutofillService implements AutofillServiceInterface {
       filledFields[field.opid] = field;
       this.fillByOpid(fillScript, field, dataValue);
     }
+  }
+
+  private loadCvvFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
+                             mustBeEmpty: boolean, fillNewPassword: boolean) {
+    const arr: AutofillField[] = [];
+    pageDetails.fields.forEach(f => {
+      if (this.forCustomFieldsOnly(f)) {
+        return;
+      }
+      const valueIsLikeCvv = (value: string) => {
+        if (value == null) {
+          return false;
+        }
+        // Removes all whitespace, _ and - characters
+        const cleanedValue = value.toLowerCase().replace(/[\s_\-]/g, '');
+
+        if (cleanedValue.indexOf('cvv') < 0 && cleanedValue.indexOf('cvc') < 0) {
+          return false;
+        }
+
+        return true;
+      };
+      const isLikeCvv = () => {
+        if (valueIsLikeCvv(f.htmlID)) {
+          return true;
+        }
+        if (valueIsLikeCvv(f.htmlName)) {
+          return true;
+        }
+        if (valueIsLikeCvv(f.placeholder)) {
+          return true;
+        }
+        return false;
+      };
+      if (!f.disabled && (canBeReadOnly || !f.readonly) && isLikeCvv()) {
+        arr.push(f);
+      }
+    });
+    return arr;
   }
 
   private loadPasswordFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
@@ -1169,6 +1326,9 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   private fillByOpid(fillScript: AutofillScript, field: AutofillField, value: string): void {
+    // console.log('fillScript:', fillScript)
+    // console.log('field:', field)
+    // console.log('value: ', value)
     if (field.maxLength && value && value.length > field.maxLength) {
       value = value.substr(0, value.length);
     }

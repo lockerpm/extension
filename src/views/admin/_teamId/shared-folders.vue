@@ -1,68 +1,60 @@
 <template>
   <div class="flex flex-col flex-column-fluid relative">
     <div class="flex-column-fluid lg:px-28 py-10 px-10 mb-20">
-      <client-only>
-        <el-table
-          :data="collections || []"
-          style="width: 100%"
-        >
-          <el-table-column
-            label="Folders"
-          >
-            <template slot-scope="scope">
-              <div class="flex items-center">
-                <img src="@/assets/images/icons/folderSolidShare.svg" alt="" class="select-none">
-                <div class="ml-2">
-                  <router-link
-                    tag="a"
-                    :to="{name: 'vault-tfolders-tfolderId', params: {tfolderId: scope.row.id}}"
-                    class="text-black truncate"
-                  >
-                    {{ scope.row.name }}
-                  </router-link>
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="right"
-          >
-            <template slot-scope="scope">
-              <el-dropdown
-                trigger="click"
-                :hide-on-click="false"
+      <el-table
+        :data="collections || []"
+        style="width: 100%"
+      >
+        <el-table-column label="Folders">
+          <template slot-scope="scope">
+            <div class="flex items-center">
+              <img
+                src="@/assets/images/icons/folderSolidShare.svg"
+                alt=""
+                class="select-none"
               >
-                <button class="btn btn-icon btn-xs hover:bg-black-400">
-                  <i class="fas fa-ellipsis-h" />
-                </button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    @click.native="addEditFolder(scope.row)"
-                  >
-                    <span class="">{{ $t('common.edit') }}</span>
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    @click.native="putTeamFolderUsers(scope.row)"
-                  >
-                    <span class="">{{ $t('common.users') }}</span>
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    @click.native="putTeamFolderGroups(scope.row)"
-                  >
-                    <span class="">{{ $t('common.groups') }}</span>
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    divided
-                    @click.native="deleteFolder(scope.row)"
-                  >
-                    <span class="text-danger">{{ $t('common.remove') }}</span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </template>
-          </el-table-column>
-        </el-table>
-      </client-only>
+              <div class="ml-2">
+                <router-link
+                  tag="a"
+                  :to="{name: 'vault-tfolders-tfolderId', params: {tfolderId: scope.row.id}}"
+                  class="text-black truncate"
+                >
+                  {{ scope.row.name }}
+                </router-link>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column align="right">
+          <template slot-scope="scope">
+            <el-dropdown
+              trigger="click"
+              :hide-on-click="false"
+            >
+              <button class="btn btn-icon btn-xs hover:bg-black-400">
+                <i class="fas fa-ellipsis-h" />
+              </button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item @click.native="addEditFolder(scope.row)">
+                  <span class="">{{ $t('common.edit') }}</span>
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="putTeamFolderUsers(scope.row)">
+                  <span class="">{{ $t('common.users') }}</span>
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="putTeamFolderGroups(scope.row)">
+                  <span class="">{{ $t('common.groups') }}</span>
+                </el-dropdown-item>
+                <el-dropdown-item
+                  divided
+                  @click.native="deleteFolder(scope.row)"
+                >
+                  <span class="text-danger">{{ $t('common.remove') }}</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
 
     <AddEditTeamFolderGroups ref="addEditTeamFolderGroups" />
@@ -93,6 +85,7 @@ export default {
     }
   },
   mounted () {
+    return
   },
   asyncComputed: {
     collections: {

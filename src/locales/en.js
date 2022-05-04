@@ -8,6 +8,7 @@ module.exports = {
     delete: 'Delete',
     success: 'Success',
     warning: 'Warning',
+    error: 'Error',
     failed: 'Failed',
     copied: 'Copied to clipboard',
     clone: 'Clone',
@@ -70,7 +71,21 @@ module.exports = {
     monthly: '1 month plan',
     half_yearly: '6 months plan',
     created_date: 'Created date',
-    plan: 'Plan'
+    plan: 'Plan',
+    go_to_website: 'Go to website',
+    accept: 'Accept',
+    reject: 'Reject',
+    shared_with_you: 'Shared with you in CyStack',
+    back: 'Back',
+    item_name: 'Item name',
+    details: 'Details',
+    type: 'Types',
+    item_info: 'Item Information',
+    select: 'Select',
+    mr: 'Mr',
+    mrs: 'Mrs',
+    ms: 'Ms',
+    dr: 'Dr'
   },
   sidebar: {
     all: 'All',
@@ -95,7 +110,9 @@ module.exports = {
     logs: 'Logs',
     overview: 'Overview',
     billing: 'Billing',
-    family_members: 'Family Members'
+    family_members: 'Family Members',
+    policies: 'Policies'
+    
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -107,18 +124,19 @@ module.exports = {
     incomplete_cvc: "Your card's security code is incomplete.",
     incomplete_expiry: "Your card's expiration date is incomplete.",
     invalid_expiry_year: "Your card's expiration year is invalid.",
-    invalid_expiry_year_past: "Your card's expiration year is in the past."
+    invalid_expiry_year_past: "Your card's expiration year is in the past.",
+    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',
     create_failed: 'Your Master Password has not been created!',
     scores: {
       na: 'N/A',
-      very_weak: 'Rất yếu',
-      weak: 'Yếu',
-      medium: 'Trung bình',
-      good: 'Tốt',
-      strong: 'Mạnh'
+      very_weak: 'Very weak',
+      weak: 'Weak',
+      medium: 'Medium',
+      good: 'Good',
+      strong: 'Strong'
     },
     change: 'Change Master Password',
     current_password: 'Enter current Master Password',
@@ -155,9 +173,12 @@ module.exports = {
     SecureNote: 'Note | Notes',
     Card: 'Card | Cards',
     Identity: 'Identity | Identities',
+    CryptoAsset: 'Crypto Asset | Crypto Assets',
     Dashboard: 'Item | Items',
     Vault: 'Item | Items',
-    Shares: 'Item | Items'
+    Shares: 'Item | Items',
+    folder: 'Folders',
+    no_folder: 'No folder'
   },
   data: {
     notifications: {
@@ -231,7 +252,11 @@ module.exports = {
       update_team_failed: 'Your Team has not been updated!',
       fingerprint_title: 'Verify fingerprint phrase',
       fingerprint_description_1: 'To ensure the integrity of your encryption keys, please verify the user\'s fingerprint phrase before continuing.',
-      fingerprint_description_2: 'A \'fingerprint phrase\' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.'
+      fingerprint_description_2: 'A \'fingerprint phrase\' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.',
+      min_password_length: 'Minimum password length is {length}',
+      max_password_length: 'Maximum password length is {length}',
+      password_composition: 'Password must contain at least 1 special character',
+      authentication_failed: 'Authentication failed'
     },
     profile_menu: {
       lock: 'Lock your account',
@@ -315,6 +340,7 @@ module.exports = {
     timeouts: {
       oneMinute: '1 minute',
       fiveMinutes: '5 minutes',
+      tenMinutes: '10 minutes',
       fifteenMinutes: '15 minutes',
       thirtyMinutes: '30 minutes',
       oneHour: '1 hour',
@@ -471,7 +497,7 @@ module.exports = {
       brand: 'Brand',
       card_number: 'Card number',
       expiration_month: 'Expiration month',
-      expiration_year: 'Expiration tear',
+      expiration_year: 'Expiration year',
       cvv: 'Security Code (CVV)',
       notes: 'Notes',
       name: 'Name',
@@ -506,7 +532,15 @@ module.exports = {
       all_items: 'All items',
       add_item: 'Add item',
       selected_items: 'selected items',
-      generate_random_password: 'Generate random password'
+      generate_random_password: 'Generate random password',
+      show_password: 'Show password',
+      card_details: 'Card Information',
+      contact_info: 'Contact Information',
+      wallet_address: 'Wallet Address',
+      seed: 'Seed phrase',
+      seed_phrase_desc: 'Notice: Seed phrase (or recovery phrase, key phrase, etc.) is a phrase that usually contains 12-24 random English words. This is the most sensitive data of your crypto wallet.',
+      recovery_email: 'Recovery email',
+      additional_info: 'Additional Information'
     },
     settings: {
       account: 'Account',
@@ -534,11 +568,32 @@ module.exports = {
       deauthorize_sessions_title: 'Concerned your account is logged in on another device? Proceed below to deauthorize all computers or devices that you have previously used. This security step is recommended if you previously used a public computer or accidentally saved your password on a device that isn\'t yours.',
       deauthorize_sessions_desc: 'Proceeding will also log you out of your current session, requiring you to log back in.',
       deauthorize_sessions_success: 'All Sessions Deauthorized',
-      deauthorize_sessions_failed: 'Something went wrong'
+      deauthorize_sessions_failed: 'Something went wrong',
+      fingerprint_dialog: 'Your account\'s fingerprint phrase',
+      excluded_domains: 'Excluded Domains',
+      general: 'General',
+      go_to_web_vault: 'Go to Web Vault',
+      import_export: 'Import & Export',
+      vault_timeout: 'Vault Timeout',
+      vault_timeout_action: 'Vault Timeout Action',
+      fingerprint_phase: 'Fingerprint Phrase',
+      lock_now: 'Lock Now',
+      upgrade_to_premium: 'Upgrade to Premium',
+      manage_your_account: 'Manage your account',
+      sync_data: 'Sync data Now',
+      logout: 'Log Out',
+      support: 'Support',
+      about: 'About',
+      documentation: 'Documentation',
+      help_feedback: 'Help & Feedback',
+      feedback: 'Give Feedback',
+      support_center: 'Support Center',
+      rate_extension: 'Rate the Extension',
+      contact_us: 'Contact us'
     },
     tools: {
       password_generator: 'Password Generator',
-      password_generator_desc: 'Create secure passwords for your accounts',
+      password_generator_desc: 'Create strong and secured passwords',
       password_health: 'Password Health',
       password_health_desc: 'Identify passwords that can put you at risk',
       data_breach: 'Data Breach Scanner',
@@ -549,7 +604,56 @@ module.exports = {
       lowercase: 'Use lowercase letters (a-z)',
       digits: 'Use digits (0-9)',
       symbols: 'Use symbols (@!$%*)',
-      ambiguous: 'Avoid ambiguous characters'
+      ambiguous: 'Avoid ambiguous characters',
+      fill_password: 'Fill password',
+      save_with_locker: 'Save with Locker',
+      password_options: 'Password options'
+    },
+    home: {
+      title: 'Log in or create a new account to access your secure vault.',
+      login: 'Login',
+      register: 'Register',
+      vault: 'Vault',
+      for_current: 'PASSWORDS FOR CURRENT WEBSITE',
+      no_for_current: 'There is no saved passwords for this site.',
+      add_password: 'Add a password'
+    },
+    login: {
+      login: 'Login',
+      login_desc: 'Login with CyStack ID to use Locker',
+      verify: 'Verify your identity',
+      authentication_app: 'Authentication App',
+      have_code: 'I have a code',
+      next: 'Next',
+      enter_code: 'Enter code',
+      check_email: 'An email has been sent to {email}. Check you inbox/spam to get verification code.',
+      use_authentication_app: 'Please use your authentication app (such as Duo or Google Authenticator) to get the code.',
+      enter_code_here: 'Enter verification code here',
+      authorization_error: 'The authorization code is not valid.',
+      remember_device: 'Remember this device',
+      authenticate: 'Authenticate',
+      email_sent: 'An email has been sent to:',
+      go_to_inbox: 'Please go to your inbox now, open the email and follow the instructions.',
+      forgot_password: 'Forgot Password?',
+      login_with: 'Or Log in with',
+      dont_have_account: 'Don\'t have an account yet?',
+      sign_up: 'Sign Up'
+    },
+    set_master_pass: {
+      create: 'Create Master Password',
+      logout: 'Log out',
+      enter_pass: 'Enter Master Password',
+      confirm_pass: 'Confirm Master Password',
+      hint_pass: 'Master password hint (optional)',
+      create_btn: 'Create password',
+      note: 'Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.'
+    },
+    parts: {
+      current: 'Current',
+      vault: 'Vault',
+      generate: 'Generate',
+      settings: 'Settings',
+      search: 'Search Vault'
     }
   }
 }

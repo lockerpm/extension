@@ -19,6 +19,7 @@ import { FileUploadService } from 'jslib-common/services/fileUpload.service';
 import { FolderService } from 'jslib-common/services/folder.service';
 import { NotificationsService } from 'jslib-common/services/notifications.service';
 import { PasswordGenerationService } from '@/services/passwordGeneration.service';
+import { ImportService } from 'jslib-common/services/import.service';
 import { PolicyService } from 'jslib-common/services/policy.service';
 import { SearchService } from 'jslib-common/services/search.service';
 import { SendService } from 'jslib-common/services/send.service';
@@ -49,6 +50,7 @@ import { LogService as LogServiceAbstraction } from 'jslib-common/abstractions/l
 import { MessagingService as MessagingServiceAbstraction } from 'jslib-common/abstractions/messaging.service';
 import { NotificationsService as NotificationsServiceAbstraction } from 'jslib-common/abstractions/notifications.service';
 import { PasswordGenerationService as PasswordGenerationServiceAbstraction } from 'jslib-common/abstractions/passwordGeneration.service';
+import { ImportService as ImportServiceAbstraction } from 'jslib-common/abstractions/import.service';
 import { PlatformUtilsService as PlatformUtilsServiceAbstraction } from 'jslib-common/abstractions/platformUtils.service';
 import { PolicyService as PolicyServiceAbstraction } from 'jslib-common/abstractions/policy.service';
 import { SearchService as SearchServiceAbstraction } from 'jslib-common/abstractions/search.service';
@@ -110,6 +112,7 @@ export default class MainBackground {
     vaultTimeoutService: VaultTimeoutServiceAbstraction;
     syncService: SyncServiceAbstraction;
     passwordGenerationService: PasswordGenerationServiceAbstraction;
+    importService: ImportServiceAbstraction;
     totpService: TotpServiceAbstraction;
     autofillService: AutofillServiceAbstraction;
     containerService: ContainerService;
@@ -224,6 +227,8 @@ export default class MainBackground {
         this.auditService = new AuditService(this.cryptoFunctionService, this.apiService);
         this.exportService = new ExportService(this.folderService, this.cipherService, this.apiService,
             this.cryptoService);
+        this.importService = new ImportService(this.cipherService, this.folderService, this.apiService, this.i18nService, this.collectionService,
+              this.platformUtilsService, this.cryptoService);
         this.notificationsService = new NotificationsService(this.userService, this.syncService, this.appIdService,
             this.apiService, this.vaultTimeoutService, this.environmentService, () => this.logout(true), this.logService);
         this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
@@ -243,14 +248,15 @@ export default class MainBackground {
         // Background
         this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
             this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
-            this.notificationsService, this.systemService, this.environmentService, this.messagingService);
+            this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
+             this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService);
         this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
             this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
             this.platformUtilsService);
         this.commandsBackground = new CommandsBackground(this, this.passwordGenerationService,
             this.platformUtilsService, this.vaultTimeoutService);
         this.notificationBackground = new NotificationBackground(this, this.autofillService, this.cipherService,
-            this.storageService, this.vaultTimeoutService, this.policyService, this.folderService);
+            this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService);
 
         this.tabsBackground = new TabsBackground(this, this.notificationBackground);
         this.contextMenusBackground = new ContextMenusBackground(this, this.cipherService, this.passwordGenerationService,
@@ -294,7 +300,7 @@ export default class MainBackground {
             setTimeout(async () => {
                 await this.environmentService.setUrlsFromStorage();
                 await this.setIcon();
-                this.fullSync(true);
+                // this.fullSync(true);
                 setTimeout(() => this.notificationsService.init(), 2500);
                 resolve();
             }, 500);
@@ -383,7 +389,6 @@ export default class MainBackground {
         if (frameId != null) {
             options.frameId = frameId;
         }
-
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,
@@ -443,7 +448,7 @@ export default class MainBackground {
             type: 'normal',
             id: 'root',
             contexts: ['all'],
-            title: 'Bitwarden',
+            title: 'Locker',
         });
 
         await this.contextMenusCreate({
@@ -470,15 +475,15 @@ export default class MainBackground {
             title: this.i18nService.t('copyPassword'),
         });
 
-        if (await this.userService.canAccessPremium()) {
-            await this.contextMenusCreate({
-                type: 'normal',
-                id: 'copy-totp',
-                parentId: 'root',
-                contexts: ['all'],
-                title: this.i18nService.t('copyVerificationCode'),
-            });
-        }
+        // if (await this.userService.canAccessPremium()) {
+        //     await this.contextMenusCreate({
+        //         type: 'normal',
+        //         id: 'copy-totp',
+        //         parentId: 'root',
+        //         contexts: ['all'],
+        //         title: this.i18nService.t('copyVerificationCode'),
+        //     });
+        // }
 
         await this.contextMenusCreate({
             type: 'separator',
@@ -493,13 +498,13 @@ export default class MainBackground {
             title: this.i18nService.t('generatePasswordCopied'),
         });
 
-        await this.contextMenusCreate({
-            type: 'normal',
-            id: 'copy-identifier',
-            parentId: 'root',
-            contexts: ['all'],
-            title: this.i18nService.t('copyElementIdentifier'),
-        });
+        // await this.contextMenusCreate({
+        //     type: 'normal',
+        //     id: 'copy-identifier',
+        //     parentId: 'root',
+        //     contexts: ['all'],
+        //     title: this.i18nService.t('copyElementIdentifier'),
+        // });
 
         this.buildingContextMenu = false;
     }
@@ -697,10 +702,12 @@ export default class MainBackground {
         }
 
         const options = {
-            path: {
-                19: 'images/icon19' + suffix + '.png',
-                38: 'images/icon38' + suffix + '.png',
-            },
+          path: {
+            // 19: 'images/icon19' + suffix + '.png',
+            // 38: 'images/icon38' + suffix + '.png',
+            19: 'icons/19' + '.png',
+            38: 'icons/38' + '.png',
+          }
         };
 
         if (this.platformUtilsService.isFirefox()) {
@@ -742,7 +749,7 @@ export default class MainBackground {
                 tabId: tabId,
             });
         } else if (this.sidebarAction.setTitle) {
-            let title = 'Bitwarden';
+            let title = 'Locker';
             if (text && text !== '') {
                 title += (' [' + text + ']');
             }

@@ -48,7 +48,7 @@
                 @click="routerCipher(scope.row)"
               >
                 {{ scope.row.name }}
-                <img v-if="scope.row.organizationId" src="@/assets/images/icons/shares.svg" alt="" class="inline-block ml-2">
+                <img v-if="scope.row.organizationId" src="@/assets/images/icons/shares.svg" alt="Shared" :title="$t('common.shared_with_you')" class="inline-block ml-2">
               </a>
               <div>
                 {{ scope.row.subTitle }}
