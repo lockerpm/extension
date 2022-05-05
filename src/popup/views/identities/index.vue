@@ -1,11 +1,16 @@
 <template>
-  <ListCipher :filter="c => c.type === CipherType['Identity']" route-name="identities"/>
+  <div class="p-4 text-[#A2A3A7]">
+    <ListCipher
+      :filter="c => c.type === CipherType['Identity']"
+      route-name="identities"
+    />
+  </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import ListCipher from "@/popup/components/ciphers/ListCipher";
-import {CipherType} from "jslib-common/enums/cipherType";
+import { CipherType } from "jslib-common/enums/cipherType";
 export default Vue.extend({
   components: {
     ListCipher

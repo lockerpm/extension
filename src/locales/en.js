@@ -614,7 +614,7 @@ module.exports = {
       login: 'Login',
       register: 'Register',
       vault: 'Vault',
-      for_current: 'PASSWORDS FOR CURRENT WEBSITE',
+      for_current: 'For this website',
       no_for_current: 'There is no saved passwords for this site.',
       add_password: 'Add a password'
     },

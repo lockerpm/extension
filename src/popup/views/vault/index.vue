@@ -1,38 +1,9 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px"
+    style="background: #E4F0E6; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
-    <div id="vault-slider" class="bg-white">
-      <div class="slider-container">
-        <span
-          id="arrow-left"
-          @click="showPre()"
-          style="padding: 0 10px 5px; cursor: pointer;"
-        ><i class="fas fa-angle-left"></i></span>
-        <div
-          class="catagories-container"
-          style="width: 80%"
-        >
-          <ul
-            class="catalog-list corporate-projects"
-          >
-            <!-- <i id="prev1" class="fas fa-chevron-left move-left"></i> -->
-            <li
-              @click="changeCategory(item.id)"
-              v-for="(item, index) in vault_categories"
-              :key="index"
-              class="catalog-item landing-transition text-12 font-weight-700 text-uppercase"
-            >
-              {{ item.name }}
-            </li>
-            <!-- <i id="next1" class="fas fa-chevron-right move-right"></i> -->
-          </ul>
-        </div>
-        <span @click="showNext()" style="padding: 0 20px 5px; cursor: pointer"><i class="fas fa-angle-right"></i></span>
-      </div>
-    </div>
     <div v-loading="loading">
       <template v-if="searchText.length>1">
         <ul>
@@ -238,26 +209,6 @@ export default Vue.extend({
     );
   },
   computed: {
-    vault_categories () {
-      return [
-        {
-          name: 'Password',
-          routeName: ''
-        },
-        {
-          name: 'Payment',
-          routeName: ''
-        },
-        {
-          name: 'Note',
-          routeName: ''
-        },
-        {
-          name: 'Card',
-          routeName: ''
-        }
-      ]
-    },
     menu() {
       return [
         {
@@ -537,23 +488,7 @@ export default Vue.extend({
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");
       }
-    },
-    showPre() {
-      const slider = document.querySelector('.catalog-list')
-      const scrollLeft = slider.scrollLeft
-      slider.scroll({
-        left: scrollLeft - 150,
-        behavior: 'smooth'
-      })
-    },
-    showNext() {
-      const slider = document.querySelector('.catalog-list')
-      const scrollLeft = slider.scrollLeft
-      slider.scroll({
-        left: scrollLeft + 150,
-        behavior: 'smooth'
-      })
-    },
+    }
   },
 });
 </script>

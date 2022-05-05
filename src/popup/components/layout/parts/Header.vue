@@ -1,9 +1,9 @@
 <template>
   <div
     id="popup-header"
-    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator'].includes(this.$route.name)"
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'cards', 'identities', 'notes'].includes(this.$route.name)"
     class="fixed top-0 bg-white cursor-pointer"
-    style="z-index:1; width: 400px; border-bottom: 1px solid #C5C6C8"
+    style="z-index:1; width: 400px;"
   >
     <div class="h-auto grid grid-cols-3 bg-white navigator">
       <router-link
@@ -14,25 +14,32 @@
       >
         <div class="">
           <!-- <i :class="`fas fa-${item.icon}`"></i> -->
-          <img class="mx-auto navigator-item__image" :src="require(`@/assets/images/${item.image}`)">
+          <img
+            class="mx-auto navigator-item__image"
+            :src="require(`@/assets/images/${item.image}`)"
+          >
         </div>
         <div>
           {{item.label}}
         </div>
       </router-link>
     </div>
-    <div v-if="['home', 'vault', 'settings'].includes(this.$route.name)" class="flex items-center h-[52px] leading-[44px] px-4 pb-4">
+    <div
+      v-if="['home', 'vault', 'settings', 'cards', 'identities', 'notes'].includes(this.$route.name)"
+      class="flex items-center h-[52px] leading-[44px] px-4 pb-4"
+      style="border-bottom: 1px solid #C5C6C8"
+    >
       <img
         src="@/assets/images/logo/logo.png"
         alt="Locker"
         class="h-[25px] mr-3"
         @click="$router.push('/')"
       >
-      <template v-if="['home', 'vault'].includes(this.$route.name)">
+      <template v-if="['home', 'vault', 'cards', 'identities', 'notes'].includes(this.$route.name)">
         <el-input
           :placeholder="$t('data.parts.search')"
           suffix-icon="el-icon-search"
-          v-model="searchText"
+          v-model="inputText"
           @input="handleSearch"
         >
         </el-input>
@@ -48,6 +55,38 @@
         </div>
       </template>
     </div>
+    <div
+      id="vault-slider"
+      class="bg-white"
+    >
+      <div class="slider-container">
+        <span
+          id="arrow-left"
+          @click="showPre()"
+        ><i class="fas fa-angle-left"></i></span>
+        <div
+          class="catagories-container"
+          style="width: 80%"
+        >
+          <ul class="catalog-list corporate-projects">
+            <!-- <i id="prev1" class="fas fa-chevron-left move-left"></i> -->
+            <li
+              v-for="(item, index) in vault_categories"
+              :key="index"
+              class="catalog-item landing-transition text-12 font-weight-700 text-uppercase"
+            >
+              <router-link :to="{name: item.routeName}">
+                {{ item.name }}
+              </router-link>
+            </li>
+            <!-- <i id="next1" class="fas fa-chevron-right move-right"></i> -->
+          </ul>
+        </div>
+        <span
+          @click="showNext()"
+        ><i class="fas fa-angle-right"></i></span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,7 +95,7 @@ import debounce from 'lodash/debounce'
 export default {
   data () {
     return {
-      searchText: ''
+      inputText: ''
     }
   },
   asyncComputed: {
@@ -66,16 +105,52 @@ export default {
   },
   methods: {
     handleSearch: debounce(function (e) {
-      console.log(1)
-      this.$store.commit('UPDATE_SEARCH', this.searchText)
+      // console.log(e)
+      this.$store.commit('UPDATE_SEARCH', this.inputText)
     }, 800),
+    showPre () {
+      const slider = document.querySelector('.catalog-list')
+      const scrollLeft = slider.scrollLeft
+      slider.scroll({
+        left: scrollLeft - 150,
+        behavior: 'smooth'
+      })
+    },
+    showNext () {
+      const slider = document.querySelector('.catalog-list')
+      const scrollLeft = slider.scrollLeft
+      slider.scroll({
+        left: scrollLeft + 150,
+        behavior: 'smooth'
+      })
+    },
   },
   computed: {
+    vault_categories () {
+      return [
+        {
+          name: 'Password',
+          routeName: 'home'
+        },
+        {
+          name: 'Payment',
+          routeName: 'cards'
+        },
+        {
+          name: 'Note',
+          routeName: 'notes'
+        },
+        {
+          name: 'Identity',
+          routeName: 'identities'
+        }
+      ]
+    },
     menu () {
       return [
         {
           label: this.$t('data.parts.vault'),
-          routeName: 'vault',
+          routeName: 'home',
           // icon: 'popup_vault.svg'
           icon: 'folder',
           image: 'vault.png'
@@ -101,12 +176,12 @@ export default {
 </script>
 
 <style lang="scss">
-#popup-header .navigator-item__image{
+#popup-header .navigator-item__image {
   padding: 7.5px 22.5px;
   border-radius: 20px;
 }
 #popup-header .navigator-item:hover .navigator-item__image {
-  background-color: #E4F0E6;
+  background-color: #e4f0e6;
 }
 #popup-header .navigator {
   padding: 12.5px 0px;
@@ -114,12 +189,16 @@ export default {
 a.navigator-item {
   @apply hover:no-underline;
 }
-#popup-header .router-link-exact-active.router-link-active {
+#popup-header .navigator .router-link-exact-active.router-link-active {
   font-weight: 600;
   .navigator-item__image {
-    background-color: #E4F0E6;
+    background-color: #e4f0e6;
   }
 }
-
+#popup-header .slider-container .router-link-exact-active.router-link-active {
+  @apply text-primary;
+  font-weight: 600;
+  background-color: #E4F0E6;
+}
 </style>
 

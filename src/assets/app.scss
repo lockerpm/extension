@@ -388,6 +388,7 @@ input:-webkit-autofill:active {
 #vault-slider ul {
   white-space: nowrap;
   overflow-x: hidden;
+  overflow-y: hidden;
   margin-bottom: 0;
 }
 #vault-slider .catalog-item {
@@ -395,5 +396,20 @@ input:-webkit-autofill:active {
   display: inline-block;
   margin: 0 8px 0 0;
   width: fit-content;
-  padding: 4px 16px;
+  a {
+    border-radius: 28px;
+    padding: 4px 16px;
+  }
+}
+.list-ciphers {
+  @apply bg-white;
+  border-radius: 12px;
+  .cipher-item {
+    @apply flex items-center cursor-pointer h-[62px] px-5 border-black-400;
+  }
+}
+.list-ciphers li:hover {
+  transition: ease-in-out;
+  transition-duration: 200ms;
+  background-color: #f6f6f6;
 }

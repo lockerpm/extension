@@ -1,5 +1,7 @@
 <template>
+<div class="p-4 text-[#A2A3A7]">
   <ListCipher :filter="c => c.type === CipherType['Card']" route-name="cards"/>
+</div>
 </template>
 
 <script>

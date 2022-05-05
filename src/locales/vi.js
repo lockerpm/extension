@@ -604,7 +604,7 @@ module.exports = {
       login: 'Đăng nhập',
       register: 'Đăng ký',
       vault: 'Kho',
-      for_current: 'MẬT KHẨU CHO TRANG WEB HIỆN TẠI',
+      for_current: 'Mật khẩu cho trang web hiện tại',
       no_for_current: 'Không có mật khẩu nào cho trang web này.',
       add_password: 'Thêm mật khẩu'
     },
