@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-top: 180px; padding-bottom: 56px;">
     <div
       v-if="!isLoggedIn"
       class="p-6"
@@ -50,18 +50,32 @@
       </template> -->
       <template>
         <!-- For current website -->
-        <div v-if="searchText.length<2" class="mb-4">
+        <div v-if="searchText.length<2" class="mb-1">
           <div class="mb-4 font-semibold">{{$t('data.home.for_current')}}</div>
           <ul class="list-ciphers">
             <div
               v-if="!loginCiphers.length"
-              class="bg-white text-center py-4"
+              class="bg-white py-2 px-4 cursor-pointer" style="border-radius: 12px"
+              @click="goToAddItem"
             >
-              <p class="mb-2">{{$t('data.home.no_for_current')}}</p>
-              <router-link
+              <!-- <p class="mb-2">{{$t('data.home.no_for_current')}}</p> -->
+              <!-- <router-link
                 :to="{name: 'add-item-create'}"
                 class="uppercase text-primary hover:no-underline"
-              >{{$t('data.home.add_password')}}</router-link>
+              >
+              {{$t('data.home.add_password')}}
+              </router-link> -->
+              <div class="flex">
+                <img src="@/assets/images/icons/icon_default.svg">
+                <div class="ml-4 text-left">
+                  <div class="text-head-6 text-black font-semibold">
+                    {{$t('data.home.add_password')}}
+                  </div>
+                  <div class="text-[14px] text-black-500">
+                    {{$t('data.home.no_for_current')}}
+                  </div>
+                </div>
+              </div>
             </div>
             <cipher-row
               v-for="item in loginCiphers"
@@ -402,6 +416,9 @@ export default Vue.extend({
         break;
       }
     },
+    goToAddItem () {
+      this.$router.push({ name: "add-item-create"});
+    }
   },
 });
 </script>

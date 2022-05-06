@@ -18,7 +18,7 @@
     </router-link>
   </div> -->
   <div
-    v-if="!locked && isLoggedIn && ['home', 'vault'].includes(this.$route.name)"
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'notes', 'identities', 'cards', 'folders'].includes(this.$route.name)"
     id="popup-navigator"
     class="h-10 bg-white fixed bottom-0 flex justify-between"
     style="z-index:1; width: 400px; padding: 12px 16px"

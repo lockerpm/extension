@@ -1,7 +1,7 @@
 <template>
   <div
-    class="relative mx-auto"
-    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
+    class="relative mx-auto bg-white"
+    style="padding-top: 90px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
     <PasswordGenerator />

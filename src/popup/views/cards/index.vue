@@ -1,5 +1,5 @@
 <template>
-<div class="p-4 text-[#A2A3A7]">
+<div class="p-4 text-[#A2A3A7]" style="padding-top: 180px; padding-bottom: 56px;">
   <ListCipher :filter="c => c.type === CipherType['Card']" route-name="cards"/>
 </div>
 </template>

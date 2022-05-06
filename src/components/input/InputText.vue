@@ -170,6 +170,7 @@ export default Vue.extend({
   border: solid 1px #e6e8f4;
   padding-top: 16px;
   background-color: #F3F3F3;
+  border-radius: 12px;
   &.is-hover, &.is-focus {
     @apply border-primary bg-white;
     label {
@@ -219,6 +220,8 @@ export default Vue.extend({
     color: #161922;
     height: 32px;
     background-color: inherit;
+    border-radius: 12px;
+    width: 100%;
   }
   .cs-textarea {
     min-height: 100px;

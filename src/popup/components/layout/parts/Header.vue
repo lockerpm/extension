@@ -1,7 +1,7 @@
 <template>
   <div
     id="popup-header"
-    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'cards', 'identities', 'notes'].includes(this.$route.name)"
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
     class="fixed top-0 bg-white cursor-pointer"
     style="z-index:1; width: 400px;"
   >
@@ -25,7 +25,7 @@
       </router-link>
     </div>
     <div
-      v-if="['home', 'vault', 'settings', 'cards', 'identities', 'notes'].includes(this.$route.name)"
+      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
       class="flex items-center h-[52px] leading-[44px] px-4 pb-4"
       style="border-bottom: 1px solid #C5C6C8"
     >
@@ -35,33 +35,33 @@
         class="h-[25px] mr-3"
         @click="$router.push('/')"
       >
-      <template v-if="['home', 'vault', 'cards', 'identities', 'notes'].includes(this.$route.name)">
-        <el-input
-          :placeholder="$t('data.parts.search')"
-          suffix-icon="el-icon-search"
-          v-model="inputText"
-          @input="handleSearch"
+      <el-input
+        :placeholder="$t('data.parts.search')"
+        suffix-icon="el-icon-search"
+        v-model="inputText"
+        @input="handleSearch"
+      >
+      </el-input>
+      <div
+        style="margin-left: 12px"
+        @click="$router.push({ name: 'add-item-create', params: {  type } })"
+      >
+        <!-- <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i> -->
+        <img
+          class="mt-3"
+          src="@/assets/images/plus-circle.png"
         >
-        </el-input>
-        <div
-          style="margin-left: 12px"
-          @click="$router.push({ name: 'add-item-create' })"
-        >
-          <!-- <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i> -->
-          <img
-            class="mt-3"
-            src="@/assets/images/plus-circle.png"
-          >
-        </div>
-      </template>
+      </div>
     </div>
     <div
+      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
       id="vault-slider"
       class="bg-white"
     >
       <div class="slider-container">
         <span
           id="arrow-left"
+          class="px-4"
           @click="showPre()"
         ><i class="fas fa-angle-left"></i></span>
         <div
@@ -82,9 +82,7 @@
             <!-- <i id="next1" class="fas fa-chevron-right move-right"></i> -->
           </ul>
         </div>
-        <span
-          @click="showNext()"
-        ><i class="fas fa-angle-right"></i></span>
+        <span class="px-4" @click="showNext()"><i class="fas fa-angle-right"></i></span>
       </div>
     </div>
   </div>
@@ -126,6 +124,28 @@ export default {
     },
   },
   computed: {
+    type() {
+      switch (this.$route.name) {
+      case "home":
+        return "Login";
+      case "notes":
+        return "SecureNote";
+      case "cards":
+        return "Card";
+      case "identities":
+        return "Identity";
+      case "crypto-assets":
+        return "CryptoAsset";
+      case "vault":
+        return "Vault";
+      case "shares":
+        return "Shares";
+      case "trash":
+        return "Trash";
+      default:
+        return null;
+      }
+    },
     vault_categories () {
       return [
         {
@@ -143,6 +163,14 @@ export default {
         {
           name: 'Identity',
           routeName: 'identities'
+        },
+        {
+          name: 'Crypto Asset',
+          routeName: 'crypto-assets'
+        },
+        {
+          name: 'Folder',
+          routeName: 'folders'
         }
       ]
     },
@@ -181,6 +209,8 @@ export default {
   border-radius: 20px;
 }
 #popup-header .navigator-item:hover .navigator-item__image {
+  transition: ease-in-out;
+  transition-duration: 200ms;
   background-color: #e4f0e6;
 }
 #popup-header .navigator {
@@ -192,13 +222,17 @@ a.navigator-item {
 #popup-header .navigator .router-link-exact-active.router-link-active {
   font-weight: 600;
   .navigator-item__image {
+    transition: ease-in-out;
+    transition-duration: 200ms;
     background-color: #e4f0e6;
   }
 }
 #popup-header .slider-container .router-link-exact-active.router-link-active {
   @apply text-primary;
+  transition: ease-in-out;
+  transition-duration: 200ms;
   font-weight: 600;
-  background-color: #E4F0E6;
+  background-color: #e4f0e6;
 }
 </style>
 

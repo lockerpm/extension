@@ -102,6 +102,7 @@
 import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
 import Vnodes from "@/components/Vnodes";
+import { CipherView } from 'jslib-common/models/view/cipherView';
 export default Vue.extend(
   {
     components: {
@@ -109,8 +110,8 @@ export default Vue.extend(
     },
     props: {
       item:{
-        type: Object,
-        default: null
+        type: CipherView,
+        default: new CipherView()
       }
     },
     data(){
@@ -123,8 +124,10 @@ export default Vue.extend(
       //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       // }
       addEdit (item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+        console.log(item)
+        // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
         this.$router.push({name: 'add-item-create', params: {data: item}})
+        // this.routerCipher(item)
       },
       fillCipher(){
         this.$emit('do-fill')

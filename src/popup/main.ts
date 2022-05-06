@@ -292,7 +292,7 @@ Vue.mixin({
     clipboardSuccessHandler () {
       this.notify(this.$t('common.copied'), 'success')
     },
-    getIconCipher (cipher, size = 70) {
+    getIconCipher(cipher, size = 70) {
       switch (cipher.type) {
       case CipherType.Login:
         if (cipher.login && cipher.login.uris && cipher.login.uris.length) {
@@ -359,6 +359,13 @@ Vue.mixin({
           params: { id: cipher.id }
         })
         return
+      }
+      if (this.$route.name === "home") {
+        this.$router.push({
+          name: "home-id",
+          params: { id: cipher.id }
+        });
+        return;
       }
       if (this.$route.name === 'vault-folders-folderId') {
         this.$router.push({

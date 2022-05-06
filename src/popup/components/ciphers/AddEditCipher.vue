@@ -1,293 +1,391 @@
 <template>
   <div
-    style="max-width: 400px"
-    class="mx-auto"
+    class="relative mx-auto"
+    style="padding-top: 95px;"
   >
     <div
-      class="relative mx-auto"
-      style="padding-top: 44px;"
+      class="grid grid-cols-3 bg-white px-4 pb-4 fixed top-0"
+      style="z-index: 1; width: 400px; padding-top: 24px"
     >
       <div
-        class="flex items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0"
-        style="z-index: 1; width: 400px"
+        class="menu-icon mr-4 cursor-pointer"
+        style="align-self: center"
+        @click="$router.back()"
       >
-        <div
-          class="menu-icon mr-4"
-          @click="$router.back()"
-        >
-          <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
-        </div>
-        <div>{{cipher.id? $t('common.edit') : $t('data.ciphers.add_cipher')}}</div>
-        <div
-          v-if="cipher.id"
-          @click="putCipher(cipher)"
-        >
-          {{$t('common.update')}}
-        </div>
-        <div
-          v-else
-          @click="postCipher(cipher)"
-        >
-          {{ $t('common.save') }}
-        </div>
+        {{$t('common.cancel')}}
       </div>
-    </div>
-    <div class="text-left px-3 py-5">
-      <el-select
-        v-model="cipher.type"
-        placeholder=""
-        class="w-full mb-3"
-        :change="handleChangeType"
-      >
-        <el-option
-          v-for="(item, index) in typeOptions"
-          :key="index"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-      <ValidationProvider
-        v-slot="{ errors: err }"
-        rules="required"
-        :name="$t('common.item_name')"
-      >
-        <InputText
-          v-model="cipher.name"
-          :label="$t('common.item_name')"
-          class="w-full"
-          :error-text="err && err.length && err[0]"
-          :disabled="isDeleted"
-          required
-        />
-      </ValidationProvider>
-
-      <template v-if="cipher.type === CipherType.Login">
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">
-          {{ $t('data.ciphers.login') }}
+      <div class="text-center text-head-6 font-semibold" style="align-self: center">
+        <div v-if="cipher.id">
+          <Vnodes :vnodes="getIconCipher(cipher, 34)" />
         </div>
-        <InputText
-          v-model="cipher.login.username"
-          label="Email / Username"
-          class="w-full"
-          :disabled="isDeleted"
-        />
-        <template>
-          <InputText
-            v-model="cipher.login.password"
-            :label="$t('data.ciphers.password')"
-            class="w-full"
-            :disabled="isDeleted"
-            is-password
-          />
-          <PasswordStrengthBar
-            :score="passwordStrength.score"
-            class="mt-2"
-          />
-          <div
-            v-if="!isDeleted && !cipher.id"
-            class="text-right"
-          >
-            <el-popover
-              placement="right"
-              width="280"
-              trigger="click"
-              popper-class="locker-pw-generator"
-            >
-              <PasswordGenerator
-                @generated="setPassword"
-                @fill-password="fillPassword"
-              />
-
-              <button
-                slot="reference"
-                class="btn btn-clean !text-primary"
-              >
-                {{ $t('data.ciphers.generate_random_password') }}
-              </button>
-            </el-popover>
-          </div>
-        </template>
-        <template v-for="(item, index) in cipher.login.uris">
-          <InputText
+        {{cipher.id? $t('common.edit') : $t('data.ciphers.add_cipher')}}
+      </div>
+      <button
+        v-if="cipher.id"
+        class="btn btn-primary"
+        style="border-radius: 100px !important; padding: 10px 24px !important"
+        @click="putCipher(cipher)"
+      >
+        {{$t('common.update')}}
+      </button>
+      <button
+        v-else
+        class="btn btn-primary"
+        style="border-radius: 100px !important; padding: 10px 24px !important"
+        @click="postCipher(cipher)"
+      >
+        {{ $t('common.save') }}
+      </button>
+    </div>
+    <div class="p-4">
+      <div class="text-left bg-white p-4" style="border-radius: 16px">
+        <el-select
+          v-if="!cipher.id"
+          v-model="cipher.type"
+          placeholder=""
+          class="w-full mb-3"
+          :change="handleChangeType"
+        >
+          <el-option
+            v-for="(item, index) in typeOptions"
             :key="index"
-            v-model="item.uri"
-            :label="$t('data.ciphers.website_address')"
-            class="w-full"
-            :disabled="isDeleted"
+            :label="item.label"
+            :value="item.value"
           />
-        </template>
-      </template>
-      <template v-if="cipher.type === CipherType.Card">
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.card_details')}}</div>
+        </el-select>
         <ValidationProvider
           v-slot="{ errors: err }"
           rules="required"
-          :name="$t('data.ciphers.card_holder')"
+          :name="$t('common.item_name')"
         >
           <InputText
-            v-model="cipher.card.cardholderName"
-            :label="$t('data.ciphers.card_holder')"
-            class="w-full !mb-2"
+            v-model="cipher.name"
+            :label="$t('common.item_name')"
+            class="w-full"
             :error-text="err && err.length && err[0]"
             :disabled="isDeleted"
             required
           />
         </ValidationProvider>
-        <InputSelect
-          :label="$t('data.ciphers.brand')"
-          :initial-value="cipher.card.brand"
-          class="w-full"
-          :disabled="isDeleted"
-          :options="cardBrandOptions"
-          @change="(v) => cipher.card.brand = v"
-        />
-        <InputText
-          v-model="cipher.card.number"
-          :label="$t('data.ciphers.card_number')"
-          class="w-full"
-          :disabled="isDeleted"
-        />
-        <div class="grid grid-cols-2 gap-2">
+
+        <template v-if="cipher.type === CipherType.Login">
+          <div class="mb-4 text-black-700 text-head-6 font-semibold">
+            {{ $t('data.ciphers.login') }}
+          </div>
+          <InputText
+            v-model="cipher.login.username"
+            label="Email / Username"
+            class="w-full"
+            :disabled="isDeleted"
+          />
+          <template>
+            <InputText
+              v-model="cipher.login.password"
+              :label="$t('data.ciphers.password')"
+              class="w-full"
+              :disabled="isDeleted"
+              is-password
+            />
+            <PasswordStrengthBar
+              :score="passwordStrength.score"
+              class="mt-2"
+            />
+            <div
+              v-if="!isDeleted && !cipher.id"
+              class="text-right"
+            >
+              <el-popover
+                placement="right"
+                width="280"
+                trigger="click"
+                popper-class="locker-pw-generator"
+              >
+                <PasswordGenerator
+                  @generated="setPassword"
+                  @fill-password="fillPassword"
+                />
+
+                <button
+                  slot="reference"
+                  class="btn btn-clean !text-primary"
+                >
+                  {{ $t('data.ciphers.generate_random_password') }}
+                </button>
+              </el-popover>
+            </div>
+          </template>
+          <template v-for="(item, index) in cipher.login.uris">
+            <InputText
+              :key="index"
+              v-model="item.uri"
+              :label="$t('data.ciphers.website_address')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+          </template>
+        </template>
+        <template v-if="cipher.type === CipherType.Card">
+          <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.card_details')}}</div>
+          <ValidationProvider
+            v-slot="{ errors: err }"
+            rules="required"
+            :name="$t('data.ciphers.card_holder')"
+          >
+            <InputText
+              v-model="cipher.card.cardholderName"
+              :label="$t('data.ciphers.card_holder')"
+              class="w-full !mb-2"
+              :error-text="err && err.length && err[0]"
+              :disabled="isDeleted"
+              required
+            />
+          </ValidationProvider>
           <InputSelect
-            :label="$t('data.ciphers.expiration_month')"
-            :initial-value="cipher.card.expMonth"
+            :label="$t('data.ciphers.brand')"
+            :initial-value="cipher.card.brand"
             class="w-full"
             :disabled="isDeleted"
-            :options="cardExpMonthOptions"
-            @change="(v) => cipher.card.expMonth = v"
+            :options="cardBrandOptions"
+            @change="(v) => cipher.card.brand = v"
           />
           <InputText
-            v-model="cipher.card.expYear"
-            :label="$t('data.ciphers.expiration_year')"
-            class="w-full !mb-2"
-            :disabled="isDeleted"
-          />
-        </div>
-        <InputText
-          v-model="cipher.card.code"
-          :label="$t('data.ciphers.cvv')"
-          is-password
-          class="w-full"
-          :disabled="isDeleted"
-        />
-      </template>
-      <template v-if="cipher.type === CipherType.Identity">
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">
-          {{ $t('data.ciphers.personal') }}
-        </div>
-        <div class="grid grid-cols-2 gap-x-2 mb-4">
-          <InputSelect
-            :label="$t('data.ciphers.title')"
-            :initial-value="cipher.identity.title"
-            class="w-full"
-            :disabled="isDeleted"
-            :options="identityTitleOptions"
-            @change="(v) => cipher.identity.title = v"
-          />
-          <InputText
-            v-model="cipher.identity.firstName"
-            :label="$t('data.ciphers.first_name')"
+            v-model="cipher.card.number"
+            :label="$t('data.ciphers.card_number')"
             class="w-full"
             :disabled="isDeleted"
           />
+          <div class="grid grid-cols-2 gap-2">
+            <InputSelect
+              :label="$t('data.ciphers.expiration_month')"
+              :initial-value="cipher.card.expMonth"
+              class="w-full"
+              :disabled="isDeleted"
+              :options="cardExpMonthOptions"
+              @change="(v) => cipher.card.expMonth = v"
+            />
+            <InputText
+              v-model="cipher.card.expYear"
+              :label="$t('data.ciphers.expiration_year')"
+              class="w-full !mb-2"
+              :disabled="isDeleted"
+            />
+          </div>
           <InputText
-            v-model="cipher.identity.lastName"
-            :label="$t('data.ciphers.last_name')"
+            v-model="cipher.card.code"
+            :label="$t('data.ciphers.cvv')"
+            is-password
             class="w-full"
             :disabled="isDeleted"
           />
+        </template>
+        <template v-if="cipher.type === CipherType.Identity">
+          <div class="mb-4 text-black-700 text-head-6 font-semibold">
+            {{ $t('data.ciphers.personal') }}
+          </div>
+          <div class="grid grid-cols-2 gap-x-2 mb-4">
+            <InputSelect
+              :label="$t('data.ciphers.title')"
+              :initial-value="cipher.identity.title"
+              class="w-full"
+              :disabled="isDeleted"
+              :options="identityTitleOptions"
+              @change="(v) => cipher.identity.title = v"
+            />
+            <InputText
+              v-model="cipher.identity.firstName"
+              :label="$t('data.ciphers.first_name')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.lastName"
+              :label="$t('data.ciphers.last_name')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.username"
+              label="Username"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.company"
+              :label="$t('data.ciphers.company')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.email"
+              label="Email"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.phone"
+              :label="$t('data.ciphers.phone')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.ssn"
+              :label="$t('data.ciphers.ssn')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.passportNumber"
+              :label="$t('data.ciphers.passport')"
+              class="w-full"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.licenseNumber"
+              :label="$t('data.ciphers.license')"
+              class="w-full !mb-2"
+              :disabled="isDeleted"
+            />
+          </div>
+          <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.contact_info')}}</div>
+          <div class="grid grid-cols-2 gap-x-2 mb-4">
+            <InputText
+              v-model="cipher.identity.address1"
+              :label="$t('data.ciphers.address') + '1'"
+              class="w-full col-span-2"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.address2"
+              :label="$t('data.ciphers.address') + '2'"
+              class="w-full col-span-2"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.city"
+              :label="$t('data.ciphers.city_town')"
+              class="w-full col-span-2"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.state"
+              :label="$t('data.ciphers.state_province')"
+              class="w-full col-span-2"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.postalCode"
+              :label="$t('data.ciphers.zip')"
+              class="w-full col-span-2"
+              :disabled="isDeleted"
+            />
+            <InputText
+              v-model="cipher.identity.country"
+              :label="$t('data.ciphers.country')"
+              class="w-full col-span-2 !mb-2"
+              :disabled="isDeleted"
+            />
+          </div>
+        </template>
+        <template v-if="cipher.type === 6">
           <InputText
-            v-model="cipher.identity.username"
-            label="Username"
+            v-model="cryptoAccount.username"
+            label="Email / Username"
             class="w-full"
-            :disabled="isDeleted"
           />
+          <template>
+            <InputText
+              v-model="cryptoAccount.password"
+              :label="$t('data.ciphers.password')"
+              class="w-full"
+              :disabled="isDeleted"
+              is-password
+            />
+            <PasswordStrengthBar
+              :score="passwordStrength.score"
+              class="mt-2"
+            />
+            <div
+              v-if="!isDeleted && !cipher.id"
+              class="text-right"
+            >
+              <el-popover
+                placement="right"
+                width="280"
+                trigger="click"
+                popper-class="locker-pw-generator"
+              >
+                <PasswordGenerator @fill="fillPassword" />
+
+                <button
+                  slot="reference"
+                  class="btn btn-clean !text-primary"
+                >
+                  {{ $t('data.ciphers.generate_random_password') }}
+                </button>
+              </el-popover>
+            </div>
+          </template>
+          <div class="my-5 text-black-700 text-head-6 font-semibold">
+            {{ $t('data.ciphers.additional_info') }}
+          </div>
           <InputText
-            v-model="cipher.identity.company"
-            :label="$t('data.ciphers.company')"
-            class="w-full"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.email"
-            label="Email"
-            class="w-full"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.phone"
+            v-model="cryptoAccount.phone"
             :label="$t('data.ciphers.phone')"
             class="w-full"
             :disabled="isDeleted"
           />
           <InputText
-            v-model="cipher.identity.ssn"
-            :label="$t('data.ciphers.ssn')"
+            v-model="cryptoAccount.emailRecovery"
+            :label="$t('data.ciphers.recovery_email')"
             class="w-full"
             :disabled="isDeleted"
           />
           <InputText
-            v-model="cipher.identity.passportNumber"
-            :label="$t('data.ciphers.passport')"
+            v-model="cryptoAccount.uris.uri"
+            :label="$t('data.ciphers.website_address')"
             class="w-full"
             :disabled="isDeleted"
           />
-          <InputText
-            v-model="cipher.identity.licenseNumber"
-            :label="$t('data.ciphers.license')"
-            class="w-full !mb-2"
+        </template>
+        <template v-if="cipher.type === 7">
+          <!-- <InputText
+            v-model="cryptoWallet.seed"
+            :label="$t('data.ciphers.seed')"
+            class="w-full"
             :disabled="isDeleted"
-          />
-        </div>
-        <div class="mb-4 text-black-700 text-head-6 font-semibold">{{$t('data.ciphers.contact_info')}}</div>
-        <div class="grid grid-cols-2 gap-x-2 mb-4">
+            :is-textarea="true"
+            required=""
+          /> -->
+          <ValidationProvider
+            v-slot="{ errors: err }"
+            rules="required"
+            :name="$t('data.ciphers.seed')"
+          >
+            <InputText
+              v-model="cryptoWallet.seed"
+              :label="$t('data.ciphers.seed')"
+              class="w-full !mb-1"
+              :error-text="err && err.length && err[0]"
+              :disabled="isDeleted"
+              required
+              is-textarea=""
+            />
+          </ValidationProvider>
+          <!-- <div
+          class="py-1 px-3 text-xs mb-3"
+          style="background: rgba(242, 232, 135, 0.3);"
+        >
+          {{ $t('data.ciphers.seed_phrase_desc') }}
+        </div> -->
           <InputText
-            v-model="cipher.identity.address1"
-            :label="$t('data.ciphers.address') + '1'"
-            class="w-full col-span-2"
+            v-model="cryptoWallet.email"
+            label="Email"
+            class="w-full"
             :disabled="isDeleted"
+            :is-password="false"
           />
           <InputText
-            v-model="cipher.identity.address2"
-            :label="$t('data.ciphers.address') + '2'"
-            class="w-full col-span-2"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.city"
-            :label="$t('data.ciphers.city_town')"
-            class="w-full col-span-2"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.state"
-            :label="$t('data.ciphers.state_province')"
-            class="w-full col-span-2"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.postalCode"
-            :label="$t('data.ciphers.zip')"
-            class="w-full col-span-2"
-            :disabled="isDeleted"
-          />
-          <InputText
-            v-model="cipher.identity.country"
-            :label="$t('data.ciphers.country')"
-            class="w-full col-span-2 !mb-2"
-            :disabled="isDeleted"
-          />
-        </div>
-      </template>
-      <template v-if="cipher.type === 6">
-        <InputText
-          v-model="cryptoAccount.username"
-          label="Email / Username"
-          class="w-full"
-        />
-        <template>
-          <InputText
-            v-model="cryptoAccount.password"
+            v-model="cipher.cryptoWallet.password"
             :label="$t('data.ciphers.password')"
             class="w-full"
             :disabled="isDeleted"
@@ -317,179 +415,92 @@
               </button>
             </el-popover>
           </div>
-        </template>
-        <div class="my-5 text-black-700 text-head-6 font-semibold">
-          {{ $t('data.ciphers.additional_info') }}
-        </div>
-        <InputText
-          v-model="cryptoAccount.phone"
-          :label="$t('data.ciphers.phone')"
-          class="w-full"
-          :disabled="isDeleted"
-        />
-        <InputText
-          v-model="cryptoAccount.emailRecovery"
-          :label="$t('data.ciphers.recovery_email')"
-          class="w-full"
-          :disabled="isDeleted"
-        />
-        <InputText
-          v-model="cryptoAccount.uris.uri"
-          :label="$t('data.ciphers.website_address')"
-          class="w-full"
-          :disabled="isDeleted"
-        />
-      </template>
-      <template v-if="cipher.type === 7">
-        <!-- <InputText
-            v-model="cryptoWallet.seed"
-            :label="$t('data.ciphers.seed')"
+          <InputText
+            v-model="cryptoWallet.address"
+            :label="$t('data.ciphers.wallet_address')"
             class="w-full"
             :disabled="isDeleted"
-            :is-textarea="true"
-            required=""
-          /> -->
-        <ValidationProvider
-          v-slot="{ errors: err }"
-          rules="required"
-          :name="$t('data.ciphers.seed')"
-        >
-          <InputText
-            v-model="cryptoWallet.seed"
-            :label="$t('data.ciphers.seed')"
-            class="w-full !mb-1"
-            :error-text="err && err.length && err[0]"
-            :disabled="isDeleted"
-            required
-            is-textarea=""
           />
-        </ValidationProvider>
-        <!-- <div
-          class="py-1 px-3 text-xs mb-3"
-          style="background: rgba(242, 232, 135, 0.3);"
-        >
-          {{ $t('data.ciphers.seed_phrase_desc') }}
-        </div> -->
-        <InputText
-          v-model="cryptoWallet.email"
-          label="Email"
-          class="w-full"
-          :disabled="isDeleted"
-          :is-password="false"
-        />
-        <InputText
-          v-model="cipher.cryptoWallet.password"
-          :label="$t('data.ciphers.password')"
-          class="w-full"
-          :disabled="isDeleted"
-          is-password
-        />
-        <PasswordStrengthBar
-          :score="passwordStrength.score"
-          class="mt-2"
-        />
+        </template>
         <div
-          v-if="!isDeleted && !cipher.id"
-          class="text-right"
+          v-if="cipher.type !== CipherType.SecureNote"
+          class="my-5 text-black-700 text-head-6 font-semibold"
         >
-          <el-popover
-            placement="right"
-            width="280"
-            trigger="click"
-            popper-class="locker-pw-generator"
-          >
-            <PasswordGenerator @fill="fillPassword" />
-
-            <button
-              slot="reference"
-              class="btn btn-clean !text-primary"
-            >
-              {{ $t('data.ciphers.generate_random_password') }}
-            </button>
-          </el-popover>
+          {{ $t('data.ciphers.others') }}
         </div>
         <InputText
-          v-model="cryptoWallet.address"
-          :label="$t('data.ciphers.wallet_address')"
+          v-if="cipher.type === 6"
+          v-model="cryptoAccount.notes"
+          :label="$t('data.ciphers.notes')"
           class="w-full"
           :disabled="isDeleted"
+          is-textarea
         />
-      </template>
-      <div
-        v-if="cipher.type !== CipherType.SecureNote"
-        class="my-5 text-black-700 text-head-6 font-semibold"
-      >
-        {{ $t('data.ciphers.others') }}
-      </div>
-      <InputText
-        v-if="cipher.type === 6"
-        v-model="cryptoAccount.notes"
-        :label="$t('data.ciphers.notes')"
-        class="w-full"
-        :disabled="isDeleted"
-        is-textarea
-      />
-      <InputText
-        v-else-if="cipher.type === 7"
-        v-model="cryptoWallet.notes"
-        :label="$t('data.ciphers.notes')"
-        class="w-full"
-        :disabled="isDeleted"
-        is-textarea
-      />
-      <InputText
-        v-else
-        v-model="cipher.notes"
-        :label="$t('data.ciphers.notes')"
-        class="w-full"
-        :disabled="isDeleted"
-        is-textarea
-      />
-      <InputSelectFolder
-        :label="$t('data.folders.select_folder')"
-        :initial-value="cipher.folderId"
-        :options="folders"
-        :disabled="isDeleted"
-        class="w-full"
-        @change="(v) => cipher.folderId = v"
-        @addFolder="addFolder(false)"
-      />
-      <template v-if="ownershipOptions.length">
-        <InputSelectOrg
-          :label="$t('common.ownership')"
-          :initial-value="cipher.organizationId"
-          :options="ownershipOptions"
-          :disabled="isDeleted || !!cipher.id"
+        <InputText
+          v-else-if="cipher.type === 7"
+          v-model="cryptoWallet.notes"
+          :label="$t('data.ciphers.notes')"
           class="w-full"
-          @change="(v) => {
+          :disabled="isDeleted"
+          is-textarea
+        />
+        <InputText
+          v-else
+          v-model="cipher.notes"
+          :label="$t('data.ciphers.notes')"
+          class="w-full"
+          :disabled="isDeleted"
+          is-textarea
+        />
+        <InputSelectFolder
+          :label="$t('data.folders.select_folder')"
+          :initial-value="cipher.folderId"
+          :options="folders"
+          :disabled="isDeleted"
+          class="w-full"
+          @change="(v) => cipher.folderId = v"
+          @addFolder="addFolder(false)"
+        />
+        <template v-if="ownershipOptions.length">
+          <InputSelectOrg
+            :label="$t('common.ownership')"
+            :initial-value="cipher.organizationId"
+            :options="ownershipOptions"
+            :disabled="isDeleted || !!cipher.id"
+            class="w-full"
+            @change="(v) => {
               cipher.organizationId = v;
               handleChangeOrg(v)
             }"
-        />
-        <div
-          v-if="cipher.organizationId"
-          class="form-group"
-        >
-          <div class="flex items-center justify-between" />
-          <label>{{ $t('data.ciphers.folders_team') }}</label>
-          <div class="mb-2">
-            {{ $t('data.ciphers.choose_at_least_folder') }}
-          </div>
-          <el-checkbox-group
-            v-model="cipher.collectionIds"
-            :min="1"
-            :disabled="isDeleted"
+          />
+          <div
+            v-if="cipher.organizationId"
+            class="form-group"
           >
-            <el-checkbox
-              v-for="(item, index) in writeableCollections"
-              :key="index"
-              :label="item.id"
+            <div class="flex items-center justify-between" />
+            <label>{{ $t('data.ciphers.folders_team') }}</label>
+            <div class="mb-2">
+              {{ $t('data.ciphers.choose_at_least_folder') }}
+            </div>
+            <el-checkbox-group
+              v-model="cipher.collectionIds"
+              :min="1"
+              :disabled="isDeleted"
             >
-              {{ item.name }}
-            </el-checkbox>
-          </el-checkbox-group>
-        </div>
-      </template>
+              <el-checkbox
+                v-for="(item, index) in writeableCollections"
+                :key="index"
+                :label="item.id"
+              >
+                {{ item.name }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+        </template>
+      </div>
+      <div v-if="cipher.id" @click="deleteCiphers([cipher.id])" class="text-red mt-4 bg-white cursor-pointer" style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;">
+        <i class="el-icon-delete">&nbsp; Delete</i>
+      </div>
     </div>
     <AddEditFolder
       ref="addEditFolder"
@@ -505,7 +516,7 @@ import { ValidationProvider } from 'vee-validate'
 import { CipherType, } from "jslib-common/enums/cipherType";
 import { SecureNoteType } from "jslib-common/enums/secureNoteType";
 import { Cipher } from 'jslib-common/models/domain/cipher';
-import {SecureNote} from 'jslib-common/models/domain/secureNote';
+import { SecureNote } from 'jslib-common/models/domain/secureNote';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { SecureNoteView } from "jslib-common/models/view/secureNoteView";
@@ -521,6 +532,7 @@ import InputSelect from '@/components/input/InputSelect'
 import InputSelectFolder from '@/components/input/InputSelectFolder'
 import InputSelectOrg from '@/components/input/InputSelectOrg'
 import { BrowserApi } from "@/browser/browserApi";
+import Vnodes from "@/components/Vnodes";
 export default Vue.extend({
   components: {
     PasswordGenerator,
@@ -530,7 +542,8 @@ export default Vue.extend({
     InputSelect,
     InputSelectFolder,
     InputSelectOrg,
-    AddEditFolder
+    AddEditFolder,
+    Vnodes
   },
   props: {
     type: {
@@ -750,7 +763,8 @@ export default Vue.extend({
           this.loading = true
           await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
-          this.$emit('reset-selection')
+          // this.$emit('reset-selection')
+          this.$router.back()
         } catch (e) {
           this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
           console.log(e)

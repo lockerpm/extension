@@ -378,7 +378,7 @@ input:-webkit-autofill:active {
 #vault-slider .slider-container {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 8px 0px;
 }
 #vault-slider .catagories-container {
   position: relative;
@@ -405,10 +405,42 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .cipher-item {
-    @apply flex items-center cursor-pointer h-[62px] px-5 border-black-400;
+    @apply flex items-center cursor-pointer h-[60px] px-5 border-black-400;
   }
 }
 .list-ciphers li:hover {
+  transition: ease-in-out;
+  transition-duration: 200ms;
+  background-color: #f6f6f6;
+}
+.list-folders {
+  @apply bg-white;
+  border-radius: 12px;
+  .folder-item {
+    @apply flex items-center cursor-pointer h-[56px] px-5 border-black-400;
+  }
+}
+.list-folders li:hover {
+  transition: ease-in-out;
+  transition-duration: 200ms;
+  background-color: #f6f6f6;
+}
+#password-generator .generated-password-container {
+  padding: 12px 16px;
+  background-color: #E4F0E6;
+  border-radius: 93px;
+}
+#password-generator .password-generator-options {
+  padding: 16px 20px;
+}
+.popup-setting-wrapper {
+  @apply bg-white;
+  border-radius: 16px;
+  .popup-setting-section {
+    @apply flex items-center cursor-pointer p-4 text-black text-head-6;
+  }
+}
+.popup-setting-wrapper li:hover {
   transition: ease-in-out;
   transition-duration: 200ms;
   background-color: #f6f6f6;

@@ -25,8 +25,64 @@
       @add-cipher="handleAddButton"
     />
     <div v-else>
-      <div class="mt-1 font-semibold mb-4">
-        {{ $tc(`type.${type}`, 2) }} ({{ciphers.length}})
+      <div
+        v-if="!['folders-folderId'].includes(this.$route.name)"
+        class="mt-5 font-semibold mb-4 flex justify-between"
+      >
+        <div>{{ $tc(`type.${type}`, 2) }} ({{ciphers.length}})</div>
+        <div class="flex items-center">
+          <span v-if="orderString==='name_asc'">A-Z &nbsp;</span>
+          <span v-if="orderString==='name_desc'">Z-A &nbsp;</span>
+          <span v-if="orderString==='revisionDate_asc'">First Updated &nbsp;</span>
+          <span v-if="orderString==='revisionDate_desc'">Last Updated &nbsp;</span>
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              <img src="@/assets/images/icons/sort.svg">
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                class="flex items-center justify-between"
+                @click.native="changeSort('name', 'asc')"
+              >
+                <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.ascending') }} &nbsp;</span>
+                <i
+                  v-if="orderString==='name_asc'"
+                  class="fa fa-check"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item
+                class="flex items-center justify-between"
+                @click.native="changeSort('name', 'desc')"
+              >
+                <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.descending') }} &nbsp;</span>
+                <i
+                  v-if="orderString==='name_desc'"
+                  class="fa fa-check"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item
+                class="flex items-center justify-between"
+                @click.native="changeSort('revisionDate', 'asc')"
+              >
+                <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.ascending') }} &nbsp;</span>
+                <i
+                  v-if="orderString==='revisionDate_asc'"
+                  class="fa fa-check"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item
+                class="flex items-center justify-between"
+                @click.native="changeSort('revisionDate', 'desc')"
+              >
+                <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.descending') }} &nbsp;</span>
+                <i
+                  v-if="orderString==='revisionDate_desc'"
+                  class="fa fa-check"
+                />
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
       </div>
       <ul class="list-ciphers">
         <cipher-row
@@ -56,7 +112,7 @@ export default Vue.extend({
   components: {
     Vnodes,
     NoCipher,
-    CipherRow
+    CipherRow,
   },
   props: {
     deleted: {
@@ -79,6 +135,8 @@ export default Vue.extend({
       dataRendered: [],
       renderIndex: 0,
       pageDetails: [],
+      orderField: "revisionDate", // revisionDate
+      orderDirection: "desc",
     };
   },
   async mounted() {
@@ -130,24 +188,9 @@ export default Vue.extend({
     },
   },
   computed: {
-    // type() {
-    //   if(this.ciphers.length){
-    //     const type = this.ciphers[0].type
-    //     switch(type){
-    //     case CipherType.Login:
-    //       return 'Login'
-    //     case CipherType.SecureNote:
-    //       return 'SecureNote'
-    //     case CipherType.Card:
-    //       return 'Card';
-    //     case CipherType.Identity:
-    //       return 'Identity'
-    //     default:
-    //       return 'Login'
-    //     }
-    //   }
-    //   return 'Login'
-    // },
+    orderString() {
+      return `${this.orderField}_${this.orderDirection}`;
+    },
     type() {
       switch (this.routeName) {
       case "home":
@@ -220,20 +263,10 @@ export default Vue.extend({
             checked: false,
           };
         });
+        result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
-        return (
-          orderBy(
-            result,
-            [
-              (c) =>
-                this.orderField === "name"
-                  ? c.name && c.name.toLowerCase()
-                  : c.revisionDate,
-            ],
-            [this.orderDirection]
-          ) || []
-        );
+        return result
       },
       watch: [
         "$store.state.syncedCiphersToggle",
@@ -275,6 +308,10 @@ export default Vue.extend({
     // addEdit (item) {
     //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
     // },
+    changeSort(orderField, orderDirection) {
+      this.orderField = orderField;
+      this.orderDirection = orderDirection;
+    },
     addEdit(item) {
       // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       this.$router.push({ name: "add-item-create", params: { data: item } });
