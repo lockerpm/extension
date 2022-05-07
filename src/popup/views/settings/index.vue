@@ -1,10 +1,9 @@
 <template>
   <div
-    class="text-[#A2A3A7]"
     style="padding-top: 90px; padding-bottom: 32px"
   >
     <Header></Header>
-    <div class="p-4">
+    <div class="p-4 text-[#A2A3A7]">
       <div
         v-for="(cate, index) in menu"
         :key="index"
@@ -15,59 +14,47 @@
             v-for="(item, index) in cate.items"
             :key="index"
             class="popup-setting-section"
-            :class="[item.divided ? 'border-t border-black-400' : '', item.picker ? 'h-auto leading-[32px]': 'h-[44px] leading-[44px]']"
-            @click="openRoute(item)"
+            @click="item.routeName || item.externalUrl ? openRoute(item) : ''"
           >
-            <template v-if="item.action==='vault_timeout'">
-              <div class="w-full py-2">
-                <div>{{item.name}}</div>
-                <el-select
-                  class="w-full"
-                  v-model="user.timeout"
-                  placeholder=""
-                  :disabled="loading"
-                  size="small"
-                  @change="putUser"
-                >
-                  <el-option
-                    v-for="item in vaultTimeouts"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
+
+            <div class="flex-grow">
+              <div v-if="item.info">
+                <img style="height: 24px" src="@/assets/images/logo/logo_black.svg">
               </div>
-            </template>
-            <template v-else-if="item.action==='vault_timeout_action'">
-              <div class="w-full py-2">
-                <div>{{item.name}}</div>
-                <el-select
-                  class="w-full"
-                  v-model="user.timeout_action"
-                  placeholder=""
-                  :disabled="loading"
-                  @change="putUser"
-                  size="small"
-                >
-                  <el-option
-                    v-for="item in vaultTimeoutActions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </div>
-            </template>
-            <template v-else>
-              <div class="flex-grow">
+              <div v-else class="setting-title">
                 {{  item.name  }}
               </div>
+              <div class="setting-desc">
+                {{  item.desc  }}
+              </div>
+            </div>
+            <template v-if="item.routeName">
               <div>
                 <i class="fas fa-chevron-right"></i>
               </div>
             </template>
+            <template v-if="item.switch">
+              <div>
+                <el-switch @change="changeStorage(item.key)" v-model="storage[`${item.key}`]"></el-switch>
+              </div>
+            </template>
+            <template v-if="item.externalUrl">
+              <div>
+                <i class="fas fa-external-link-square-alt" />
+              </div>
+            </template>
           </li>
         </ul>
+      </div>
+      <div class="mt-4">
+        <div class="popup-setting-wrapper p-4 flex justify-between">
+          <div class="text-black">
+            {{$t("data.settings.logged_in_as")}} <span class="font-semibold">{{currentUser.email}}</span>
+          </div>
+          <div class="text-danger cursor-pointer" @click="logout">
+            {{$t("data.settings.logout")}}
+          </div>
+        </div>
       </div>
     </div>
     <Footer></Footer>
@@ -81,6 +68,9 @@ import { BrowserApi } from "@/browser/browserApi";
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
+const enableAutofillKey = 'enableAutofill'
+const showFoldersKey = 'showFolders'
+const hideIconsKey = 'hideIcons'
 export default Vue.extend({
   name: "Settings",
   components: {
@@ -94,6 +84,14 @@ export default Vue.extend({
         this.processMessage(msg, sender, response);
       }
     );
+    const res = await Promise.all([
+      this.$storageService.get(enableAutofillKey),
+      this.$storageService.get(showFoldersKey),
+      this.$storageService.get(hideIconsKey),
+    ])
+    this.storage.enableAutofill = res[0] || true
+    this.storage.showFolders = res[1] || true
+    this.storage.hideIcons = res[2] || false
     this.getUser();
   },
   data() {
@@ -101,8 +99,23 @@ export default Vue.extend({
       user: {},
       loading: false,
       fingerprintDialog: false,
+      storage: {
+        enableAutofill: true,
+        showFolders: true,
+        hideIcons: false
+      }
     };
   },
+  // asyncComputed: {
+  //   enableAutofill: {
+  //     async get() {
+  //       return await this.$storageService.get('enableAutofill');
+  //     },
+  //     watch: [
+  //       "$storageService",
+  //     ]
+  //   }
+  // },
   computed: {
     vaultTimeouts() {
       return [
@@ -124,156 +137,137 @@ export default Vue.extend({
     menu() {
       return [
         {
-          name: this.$t("data.settings.general"),
+          name: this.$t("data.settings.autofill"),
           divided: false,
           items: [
-            {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/vault',
-              externalUrl: "https://locker.io/vault",
-              name: this.$t("data.settings.go_to_web_vault"),
-            },
-            {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/settings/import-export',
-              externalUrl: "https://locker.io/settings/options#import",
-              name: this.$t("data.settings.import_export"),
-            },
-            {
-              icon: "fa-home",
-              routeName: "settings-excluded-domains",
-              name: this.$t("data.settings.excluded_domains"),
-            },
             // {
-            //   icon: 'fa-home',
-            //   routeName: 'settings-support',
-            //   externalUrl: '',
-            //   name: 'Theme (Light/Dark)'
-            // }
-          ],
-        },
-        {
-          name: this.$t("data.settings.security"),
-          divided: true,
-          items: [
-            {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/settings',
-              externalUrl: "https://locker.io/settings/options",
-              name: this.$t("data.settings.vault_timeout"),
-              action: "vault_timeout",
-              picker: true,
-            },
-            {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/settings',
-              externalUrl: "https://locker.io/settings/options",
-              name: this.$t("data.settings.vault_timeout_action"),
-              action: "vault_timeout_action",
-              picker: true,
-            },
+            //   routeName: "",
+            //   externalUrl: "https://locker.io/vault",
+            //   name: this.$t("data.settings.go_to_web_vault"),
+            // },
             // {
-            //   icon: 'fa-home',
-            //   routeName: '',
-            //   externalUrl: '/web.html#/settings/import-export',
-            //   name: 'Two-step Login'
+            //   routeName: "",
+            //   externalUrl: "https://locker.io/settings/options#import",
+            //   name: this.$t("data.settings.import_export"),
             // },
             {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "/web.html#/settings/exclude-domains",
-              action: "fingerprint",
-              name: this.$t("data.settings.fingerprint_phase"),
+              name: this.$t("data.settings.enable_autofill"),
+              desc: this.$t("data.settings.enable_autofill_desc"),
+              switch: true,
+              key: enableAutofillKey,
             },
             {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "",
-              lock: true,
-              name: this.$t("data.settings.lock_now"),
+              routeName: "settings-excluded-domains",
+              name: this.$t("data.settings.excluded_domains"),
+              desc: this.$t("data.settings.excluded_domains_desc"),
             },
           ],
         },
         {
-          name: this.$t("data.settings.account"),
+          name: this.$t("data.settings.options"),
           divided: true,
           items: [
             {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/upgrade/',
-              externalUrl: "https://locker.io/plans",
-              name: this.$t("data.settings.upgrade_to_premium"),
+              name: this.$t("data.settings.vault_timeout"),
+              desc: this.$t("data.settings.vault_timeout_desc"),
+              routeName: "settings-vault-timeout",
             },
             {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/settings?action=change-master-password',
-              externalUrl: "https://locker.io/settings/security",
-              name: this.$t("data.settings.change_master_password"),
+              name: this.$t("data.settings.show_folders"),
+              desc: this.$t("data.settings.show_folders_desc"),
+              switch: true,
+              key: showFoldersKey,
             },
             {
-              icon: "fa-home",
-              routeName: "",
-              // externalUrl: '/web.html#/settings/',
-              externalUrl: "https://locker.io/settings/account",
-              name: this.$t("data.settings.manage_your_account"),
+              name: this.$t("data.settings.hide_icons"),
+              desc: this.$t("data.settings.hide_icons_desc"),
+              switch: true,
+              key: hideIconsKey,
             },
-            {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "/web.html#/settings/",
-              action: "sync_data",
-              name: this.$t("data.settings.sync_data"),
-            },
-            {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "",
-              logout: true,
-              name: this.$t("data.settings.logout"),
-            },
+            // {
+            //   name: this.$t("data.settings.vault_timeout_action"),
+            //   action: "vault_timeout_action",
+            //   picker: true,
+            // },
+            // {
+            //   externalUrl: "/web.html#/settings/exclude-domains",
+            //   action: "fingerprint",
+            //   name: this.$t("data.settings.fingerprint_phase"),
+            // },
+            // {
+            //   lock: true,
+            //   name: this.$t("data.settings.lock_now"),
+            // },
           ],
         },
+        // {
+        //   name: this.$t("data.settings.account"),
+        //   divided: true,
+        //   items: [
+        //     {
+        //       icon: "fa-home",
+        //       routeName: "",
+        //       externalUrl: "https://locker.io/plans",
+        //       name: this.$t("data.settings.upgrade_to_premium"),
+        //     },
+        //     {
+        //       icon: "fa-home",
+        //       routeName: "",
+        //       externalUrl: "https://locker.io/settings/security",
+        //       name: this.$t("data.settings.change_master_password"),
+        //     },
+        //     {
+        //       icon: "fa-home",
+        //       routeName: "",
+        //       externalUrl: "https://locker.io/settings/account",
+        //       name: this.$t("data.settings.manage_your_account"),
+        //     },
+        //     {
+        //       icon: "fa-home",
+        //       routeName: "",
+        //       externalUrl: "/web.html#/settings/",
+        //       action: "sync_data",
+        //       name: this.$t("data.settings.sync_data"),
+        //     },
+        //     {
+        //       icon: "fa-home",
+        //       routeName: "",
+        //       externalUrl: "",
+        //       logout: true,
+        //       name: this.$t("data.settings.logout"),
+        //     },
+        //   ],
+        // },
         {
-          name: this.$t("data.settings.support"),
+          name: this.$t("data.settings.help_feedback"),
           divided: true,
           items: [
+            // {
+            //   externalUrl: "https://cystack.net/about",
+            //   name: this.$t("data.settings.about"),
+            // },
             {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "https://cystack.net/about",
-              name: this.$t("data.settings.about"),
-            },
-            {
-              icon: "fa-home",
-              routeName: "",
               externalUrl: "https://support.locker.io",
               name: this.$t("data.settings.support_center"),
             },
             {
-              icon: "fa-home",
-              routeName: "",
               externalUrl: "https://zo8rr5fc706.typeform.com/to/OotlSyQ7",
               name: this.$t("data.settings.feedback"),
             },
             {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl:
-                "https://chrome.google.com/webstore/detail/cystack-locker-free-passw/cmajindocfndlkpkjnmjpjoilibjgmgh",
-              name: this.$t("data.settings.rate_extension"),
+              routeName: "settings-info",
+              desc: this.$t("data.settings.info_desc", {version: chrome.runtime.getManifest().version}),
+              info: true,
             },
-            {
-              icon: "fa-home",
-              routeName: "",
-              externalUrl: "https://locker.io/contact",
-              name: this.$t("data.settings.contact_us"),
-            },
+            // {
+            //   externalUrl:
+            //     "https://chrome.google.com/webstore/detail/cystack-locker-free-passw/cmajindocfndlkpkjnmjpjoilibjgmgh",
+            //   name: this.$t("data.settings.rate_extension"),
+            // },
+            // {
+            //   externalUrl: "https://locker.io/contact",
+            //   name: this.$t("data.settings.contact_us"),
+            // }
           ],
         },
       ];
@@ -314,7 +308,7 @@ export default Vue.extend({
       switch (msg.command) {
       case "syncCompleted":
         // console.log('sync complete')
-        if (this.$route.path === "/settings/" && msg.successfully) {
+        if (msg.successfully && msg.trigger) {
           this.notify("Syncing complete", "success");
         }
         break;
@@ -352,6 +346,15 @@ export default Vue.extend({
         this.loading = false;
       }
     },
+    async changeStorage(key){
+      if(key === hideIconsKey){
+        this.$store.commit('UPDATE_HIDE_ICONS', this.storage[hideIconsKey])
+      }
+      await this.$storageService.save(
+        key,
+        this.storage[key]
+      )
+    }
   },
 });
 </script>

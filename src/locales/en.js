@@ -89,12 +89,14 @@ module.exports = {
   },
   sidebar: {
     all: 'All',
-    passwords: 'Passwords',
+    passwords: 'Password',
     dashboard: 'Dashboard',
     vault: 'Vault',
-    notes: 'Notes',
-    cards: 'Cards',
-    identities: 'Identities',
+    notes: 'Secure Note',
+    cards: 'Payment',
+    identities: 'Personal Info',
+    cryptoAssets: 'Crypto Asset',
+    folder: 'Folder',
     shares: 'Shares',
     trash: 'Trash',
     users: 'Users',
@@ -313,6 +315,10 @@ module.exports = {
         title: 'Không có mục nào được chia sẻ',
         description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
         btn: 'Thêm danh mục'
+      },
+      common: {
+        title: 'Your saved items will appear here.<br>Start by adding an account that you used every day.',
+        btn: 'Add first item'
       }
     },
     members: {
@@ -571,11 +577,15 @@ module.exports = {
       deauthorize_sessions_failed: 'Something went wrong',
       fingerprint_dialog: 'Your account\'s fingerprint phrase',
       excluded_domains: 'Excluded Domains',
+      excluded_domains_desc: 'List of exclued domains and URLs',
+      excluded_domains_details: 'You turned off autofill for those websites. Remove websites from this list will re-enable autofill for them.',
       general: 'General',
       go_to_web_vault: 'Go to Web Vault',
       import_export: 'Import & Export',
       vault_timeout: 'Vault Timeout',
+      vault_timeout_desc: 'Lock your vault automatically.',
       vault_timeout_action: 'Vault Timeout Action',
+      vault_timeout_details: 'Choose when to lock your vault. You will be asked to enter your Master Password to unlock it when it’s locked.',
       fingerprint_phase: 'Fingerprint Phrase',
       lock_now: 'Lock Now',
       upgrade_to_premium: 'Upgrade to Premium',
@@ -589,7 +599,19 @@ module.exports = {
       feedback: 'Give Feedback',
       support_center: 'Support Center',
       rate_extension: 'Rate the Extension',
-      contact_us: 'Contact us'
+      contact_us: 'Contact us',
+      autofill: 'Autofill',
+      enable_autofill: 'Enable Autofill',
+      enable_autofill_desc: 'Fill logins and items across the web',
+      show_folders: 'Show folders',
+      show_folders_desc: 'Organized your items in folders.',
+      hide_icons: 'Hide webpage icons',
+      hide_icons_desc: 'Hide webpage icons in your vault.',
+      info_desc: 'Extension info version {version}',
+      logged_in_as: 'Logged in as',
+      version: 'Version',
+      term: 'Terms of use',
+      privacy: 'Privacy policy'
     },
     tools: {
       password_generator: 'Password Generator',
@@ -654,7 +676,9 @@ module.exports = {
       generate: 'Generate',
       generator: 'Generator',
       settings: 'Settings',
-      search: 'Search Vault'
+      search: 'Search Vault',
+      open_web_app: 'Open the web app',
+      sync_data: 'Sync your account'
     }
   }
 }

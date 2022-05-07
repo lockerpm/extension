@@ -2,14 +2,13 @@
   <div style="padding-top: 110px; padding-bottom: 56px;">
     <div
       class="grid grid-cols-3 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px"
+      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
     >
       <div
-        class="menu-icon mr-4 cursor-pointer"
-        style="align-self: center"
+        class="menu-icon cursor-pointer"
         @click="$router.back()"
       >
-        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
+        <i class="fas fa-arrow-left text-[20px]"></i> {{$t('common.back')}}
       </div>
       <div class="text-center text-head-6 font-semibold">
         <img src="@/assets/images/icons/icon_folder.svg" class="mx-auto" style="border-radius: 50%">

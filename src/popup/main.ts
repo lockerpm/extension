@@ -69,6 +69,9 @@ Vue.mixin({
     cipherCount () {
       return this.$store.state.cipherCount
     },
+    hideIcons() {
+      return this.$store.state.hideIcons
+    }
   },
   methods: {
     changeLang (value) {
@@ -171,6 +174,8 @@ Vue.mixin({
     async login() {
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const deviceId = await browserStorageService.get("device_id")
+      const hideIcons = await browserStorageService.get('hideIcons')
+      this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       const deviceIdentifier = deviceId || this.randomString();
       if (!deviceId) {
         browserStorageService.save("device_id", deviceIdentifier);
@@ -237,7 +242,7 @@ Vue.mixin({
     //     this.$store.commit("UPDATE_SYNCING", false);
     //   }
     // },
-    async getSyncData () {
+    async getSyncData (trigger=false) {
       this.$store.commit('UPDATE_SYNCING', true)
       const pageSize = 100
       try {
@@ -277,10 +282,10 @@ Vue.mixin({
           }
         })
         // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
-        this.$messagingService.send('syncCompleted', { successfully: true })
+        this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         // console.log('sync completed')
       } catch (e) {
-        this.$messagingService.send('syncCompleted', { successfully: false })
+        this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit('UPDATE_SYNCED_CIPHERS')
       } finally {
         this.$store.commit('UPDATE_SYNCING', false)
@@ -295,9 +300,9 @@ Vue.mixin({
     getIconCipher(cipher, size = 70) {
       switch (cipher.type) {
       case CipherType.Login:
-        if (cipher.login && cipher.login.uris && cipher.login.uris.length) {
+        if (cipher.login && cipher.login.uris && cipher.login.uris.length && !this.hideIcons) {
           try {
-            const domain = extractDomain(cipher.login.uris[0]._uri)
+            const domain = extractDomain(cipher.login.uris[0]._uri || cipher.login.uris[0].uri)
             if (domain) {
               return (this.$createElement(Avatar, {
                 props: {

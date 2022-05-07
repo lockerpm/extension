@@ -94,6 +94,8 @@ module.exports = {
     notes: 'Ghi chú',
     cards: 'Thẻ tín dụng',
     identities: 'Danh tính',
+    cryptoAssets: 'Tài sản Crypto',
+    folder: 'Thư mục',
     shares: 'Chia sẻ',
     trash: 'Thùng rác',
     users: 'Người dùng',
@@ -309,6 +311,10 @@ module.exports = {
         title: 'Không có mục nào được chia sẻ',
         description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
         btn: 'Thêm danh mục'
+      },
+      common: {
+        title: 'Các mục đã lưu của bạn sẽ xuất hiện ở đây. <br> Bắt đầu bằng cách thêm một tài khoản mà bạn đã sử dụng hàng ngày.',
+        btn: 'Thêm mục'
       }
     },
     members: {
@@ -561,11 +567,15 @@ module.exports = {
       english: 'English',
       fingerprint_dialog: 'Cụm từ định danh tài khoản của bạn',
       excluded_domains: 'Không lưu mật khẩu',
+      excluded_domains_desc: 'Danh sách các tên miền không gợi ý lưu mật khẩu',
+      excluded_domains_details: 'Bạn đã tắt tính năng tự động điền cho các trang web đó. Xóa các trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho chúng.',
       general: 'Chung',
       go_to_web_vault: 'Đi tới Web',
       import_export: 'Nhập & Xuất dữ liệu',
       vault_timeout: 'Hẹn giờ khóa',
+      vault_timeout_desc: 'Tự động khóa kho dữ liệu của bạn',
       vault_timeout_action: 'Hành động khi hết giờ',
+      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
       fingerprint_phase: 'Định danh',
       lock_now: 'Khóa ngay',
       upgrade_to_premium: 'Nâng cấp Premium',
@@ -579,7 +589,19 @@ module.exports = {
       feedback: 'Phản hồi',
       support_center: 'Trung tâm hỗ trợ',
       rate_extension: 'Đánh giá Extension',
-      contact_us: 'Liên hệ'
+      contact_us: 'Liên hệ',
+      autofill: 'Tự động điền',
+      enable_autofill: 'Bật Tự động điền',
+      enable_autofill_desc: 'Điền thông tin đăng nhập và các mục trên web',
+      show_folders: 'Hiện thư mục',
+      show_folders_desc: 'Tổ chức các mục trong thư mục.',
+      hide_icons: 'Ẩn icon trang web',
+      hide_icons_desc: 'Ẩn các icon trang web trong kho của bạn',
+      info_desc: 'Thông tin phiên bản {version}',
+      logged_in_as: 'Tài khoản',
+      version: 'Phiên bản',
+      term: 'Điều khoản sử dụng',
+      privacy: 'Chính sách bảo mật'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
@@ -644,7 +666,9 @@ module.exports = {
       generate: 'Tạo Mật khẩu',
       generator: 'Tạo Mật khẩu',
       settings: 'Cài đặt',
-      search: 'Tìm trong kho'
+      search: 'Tìm trong kho',
+      open_web_app: 'Mở phiên bản web',
+      sync_data: 'Đồng bộ tài khoản'
     }
   }
 }

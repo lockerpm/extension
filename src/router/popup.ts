@@ -373,6 +373,22 @@ const routes: Array<RouteConfig> = [
           import(
             /* webpackChunkName: "vault" */ "../popup/views/settings/excluded-domains.vue"
           )
+      },
+      {
+        path: "vault-timeout",
+        name: "settings-vault-timeout",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/vault-timeout.vue"
+          )
+      },
+      {
+        path: "info",
+        name: "settings-info",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/info.vue"
+          )
       }
     ]
   }

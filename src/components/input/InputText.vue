@@ -169,7 +169,7 @@ export default Vue.extend({
   border-radius: 2px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
-  background-color: #F3F3F3;
+  background-color: #fff;
   border-radius: 12px;
   &.is-hover, &.is-focus {
     @apply border-primary bg-white;

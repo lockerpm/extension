@@ -20,8 +20,15 @@
         :score="passwordStrength.score"
       />
       <button
+        v-clipboard:copy="password"
+        v-clipboard:success="clipboardSuccessHandler"
         class="btn btn-primary w-full mt-4"
         style="border-radius: 64px !important"
+      >
+        {{ $t('data.tools.copy_password') }}
+      </button>
+      <button
+        class="btn btn-primary-reserve w-full mt-2"
         @click="savePassword"
       >
         {{ $t('data.tools.save_with_locker') }}

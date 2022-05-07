@@ -49,6 +49,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       currentTeam: {},
       currentPlan: {},
       cipherCount: null,
+      hideIcons: false,
       ...oldStoreParsed
     },
     mutations: {
@@ -135,6 +136,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_CIPHER_COUNT (state, value) {
         state.cipherCount = value
+      },
+      UPDATE_HIDE_ICONS(state, value) {
+        state.hideIcons = value
       }
     },
     actions: {

@@ -437,11 +437,37 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 16px;
   .popup-setting-section {
-    @apply flex items-center cursor-pointer p-4 text-black text-head-6;
+    @apply flex items-center cursor-pointer p-4;
+    .setting-title {
+      @apply text-black text-head-6;
+    }
+    .setting-desc {
+      @apply text-black-500
+    }
+
   }
 }
 .popup-setting-wrapper li:hover {
   transition: ease-in-out;
   transition-duration: 200ms;
   background-color: #f6f6f6;
+}
+.cipher-item .col-actions .btn-icon {
+  visibility: hidden;
+}
+
+.cipher-item:hover .col-actions .btn-icon {
+  transition: ease-in-out;
+  transition-duration: 200ms;
+  visibility: visible !important;
+}
+.timeout-option{
+  @apply flex items-center justify-between p-4;
+}
+.timeout-option:hover {
+  background-color: #F6F6F6;
+}
+.info-section {
+  @apply text-black text-head-6 p-4;
+  border-bottom: 1px solid #A2A3A7;
 }

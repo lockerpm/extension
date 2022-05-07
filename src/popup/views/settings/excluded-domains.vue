@@ -1,79 +1,97 @@
 <template>
   <div
-    class="flex flex-col flex-grow relative h-screen"
-    style="background: #F1F1F1; padding-top: 44px"
+    class="relative h-screen"
+    style="background: #fff; padding-top: 82px"
   >
     <div
-      class="flex items-center cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 left-0 right-0 bg-white"
-      style="z-index: 1"
+      class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"
+      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
     >
       <div
-        class="menu-icon mr-4"
+        class="menu-icon cursor-pointer"
         @click="$router.back()"
       >
-        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.cancel')}}
+        <i class="fas fa-arrow-left text-[20px]"></i> {{$t('common.back')}}
       </div>
-      <div>{{$t('data.settings.excluded_domains')}}</div>
-      <div
+      <div class="col-span-2 text-center text-head-6 font-semibold">
+        {{$t('data.settings.excluded_domains')}}
+      </div>
+      <!-- <div
+        class="cursor-pointer"
+        style="align-self: center; justify-self: right;"
         @click="submit"
       >
         {{ $t('common.save') }}
-      </div>
+      </div> -->
     </div>
-    <div class="mt-4">
-      <template v-for="(domain, index) in excludedDomains">
-        <div
-          :key="index"
-          class="flex items-center hover:bg-[#E4F2E1] bg-white border-b border-black-400"
-          style="padding: 12px 20px;"
-        >
-          <div class="cursor-pointer" @click="removeUri(index)"><i class="el-icon-remove text-danger mr-3"></i></div>
-          <div>
-            <div class="text-black-600">URI {{index + 1}}</div>
-            <!-- <div class="text-black font-semibold">{{domain.uri}}</div> -->
-            <input class="text-lg text-black font-semibold" placeholder="ex. https://google.com" v-model="domain.uri">
+    <div class="p-4">
+      <div class="text-black-500">
+        {{$t('data.settings.excluded_domains_details')}}
+      </div>
+      <div class="mt-3">
+        <template v-for="(domain, index) in excludedDomains">
+          <div
+            :key="index"
+            class="flex justify-between"
+            style="padding: 16px 0px"
+          >
+            <div class="text-head-6">
+              <!-- <div class="text-black-600">URI {{index + 1}}</div> -->
+              <!-- <input
+                class="text-lg text-black font-semibold"
+                placeholder="ex. https://google.com"
+                v-model="domain.uri"
+              > -->
+              {{domain.uri}}
+            </div>
+            <div
+              class="cursor-pointer text-danger font-semibold"
+              @click="removeUri(index)"
+            >{{$t('common.remove')}}</div>
           </div>
-        </div>
-      </template>
-      <div
-        class="flex items-center hover:bg-[#E4F2E1] bg-white border-b border-black-400 cursor-pointer"
-        style="padding: 12px 20px;"
-        @click="addUri"
-      >
-        <div><i class="el-icon-circle-plus text-info mr-3"></i></div>
-        <div>
-           New URI
-        </div>
+        </template>
+        <!-- <div
+          class="flex items-center cursor-pointer"
+          style="padding: 16px 0px;"
+          @click="addUri"
+        >
+          <div><i class="el-icon-circle-plus text-info mr-3"></i></div>
+          <div>
+            New URI
+          </div>
+        </div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { ConstantsService } from 'jslib-common/services/constants.service'
-import { Utils } from 'jslib-common/misc/utils'
+import Vue from "vue";
+import { ConstantsService } from "jslib-common/services/constants.service";
+import { Utils } from "jslib-common/misc/utils";
 export default Vue.extend({
-  data () {
+  data() {
     return {
       excludedDomains: [],
       test: {
-        name: ''
+        name: "",
       },
-      name: ''
-    }
+      name: "",
+    };
   },
-  async mounted () {
-    const savedDomains = await this.$storageService.get(ConstantsService.neverDomainsKey)
+  async mounted() {
+    const savedDomains = await this.$storageService.get(
+      ConstantsService.neverDomainsKey
+    );
     if (savedDomains) {
-      for(const uri of Object.keys(savedDomains)){
-        this.excludedDomains.push({uri: uri, showCurrentUris: false})
+      for (const uri of Object.keys(savedDomains)) {
+        this.excludedDomains.push({ uri: uri, showCurrentUris: false });
       }
     }
   },
   methods: {
     async addUri() {
-      this.excludedDomains.push({ uri: '', showCurrentUris: false });
+      this.excludedDomains.push({ uri: "", showCurrentUris: false });
     },
     async removeUri(i: number) {
       this.excludedDomains.splice(i, 1);
@@ -81,13 +99,13 @@ export default Vue.extend({
     async submit() {
       const savedDomains: { [name: string]: null } = {};
       for (const domain of this.excludedDomains) {
-        if (domain.uri && domain.uri !== '') {
+        if (domain.uri && domain.uri !== "") {
           const validDomain = Utils.getHostname(domain.uri);
           if (!validDomain) {
             // this.platformUtilsService.showToast('error', null,
             //   this.i18nService.t('excludedDomainsInvalidDomain', domain.uri));
             this.notify(
-              `${domain.uri || 'google.com'} is not a valid domain`,
+              `${domain.uri || "google.com"} is not a valid domain`,
               "error"
             );
             return;
@@ -95,9 +113,12 @@ export default Vue.extend({
           savedDomains[validDomain] = null;
         }
       }
-      await this.$storageService.save(ConstantsService.neverDomainsKey, savedDomains);
-      this.$router.push({name: 'settings'});
-    }
-  }
-})
+      await this.$storageService.save(
+        ConstantsService.neverDomainsKey,
+        savedDomains
+      );
+      this.$router.push({ name: "settings" });
+    },
+  },
+});
 </script>

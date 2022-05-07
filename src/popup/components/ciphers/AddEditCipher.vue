@@ -4,17 +4,16 @@
     style="padding-top: 95px;"
   >
     <div
-      class="grid grid-cols-3 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px"
+      class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"
+      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
     >
       <div
         class="menu-icon mr-4 cursor-pointer"
-        style="align-self: center"
         @click="$router.back()"
       >
         {{$t('common.cancel')}}
       </div>
-      <div class="text-center text-head-6 font-semibold" style="align-self: center">
+      <div class="col-span-2 text-center text-head-6 font-semibold">
         <div v-if="cipher.id">
           <Vnodes :vnodes="getIconCipher(cipher, 34)" />
         </div>

@@ -23,14 +23,22 @@
     class="h-10 bg-white fixed bottom-0 flex justify-between"
     style="z-index:1; width: 400px; padding: 12px 16px"
   >
-    <a href="https://locker.io" target="_blank" class="font-semibold" style="color: #005AE4">
-      Open the web app
+    <a
+      href="https://locker.io"
+      target="_blank"
+      class="font-semibold"
+      style="color: #005AE4"
+    >
+      {{$t('data.parts.open_web_app')}}
     </a>
-    <div class="cursor-pointer" @click="syncData">
+    <div
+      class="cursor-pointer"
+      @click="syncData"
+    >
       <span>
         <i class="fas fa-sync-alt"></i>
       </span>
-      Sync your account
+      {{$t('data.parts.sync_data')}}
     </div>
   </div>
 </template>
@@ -48,8 +56,8 @@ export default Vue.extend({
     }
   },
   methods: {
-    syncData(){
-      this.getSyncData()
+    syncData () {
+      this.getSyncData(true)
     }
   },
   computed: {
@@ -87,7 +95,7 @@ export default Vue.extend({
 
 <style>
 #popup-header input {
-  background-color: #E4F0E6;
+  background-color: #e4f0e6;
   height: 36px;
   border-radius: 42px;
   border: 0;
