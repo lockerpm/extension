@@ -109,18 +109,26 @@ body {
 }
 
 .outer-wrapper {
-    padding: 0 10px;
-    border-bottom: 2px solid #268334;
-    display: grid;
-    grid-template-columns: 24px auto 55px;
-    grid-column-gap: 10px;
+    // padding: 0 10px;
+    // border-bottom: 2px solid #268334;
+    // display: grid;
+    // grid-template-columns: 24px auto 55px;
+    // grid-column-gap: 10px;
     box-sizing: border-box;
     min-height: 42px;
 }
-
+.header-wrapper {
+  padding: 0 10px;
+  display: grid;
+  grid-template-columns: 24px auto 55px;
+  grid-column-gap: 10px;
+  min-height: 70px;
+  align-content: center;
+  background-color: #F6F6F6;
+}
 .inner-wrapper {
-    display: grid;
-    grid-template-columns: auto max-content;
+    // display: grid;
+    // grid-template-columns: auto max-content;
 }
 
 .outer-wrapper > *, .inner-wrapper > * {
@@ -147,19 +155,19 @@ img {
     margin-right: 10px;
 }
 
-button:not(.link),
-button:not(.neutral) {
-    background-color: #268334;
-    padding: 5px 15px;
-    border-radius: 3px;
-    color: #ffffff;
-    border: 0;
+// button:not(.link),
+// button:not(.neutral) {
+//     background-color: #268334;
+//     padding: 5px 15px;
+//     border-radius: 3px;
+//     color: #ffffff;
+//     border: 0;
 
-    &:hover {
-        cursor: pointer;
-        background-color: #1c7029;
-    }
-}
+//     &:hover {
+//         cursor: pointer;
+//         background-color: #1c7029;
+//     }
+// }
 
 button.link,
 button.neutral {
@@ -174,16 +182,46 @@ button.neutral {
         text-decoration: underline;
     }
 }
+button.default {
+  background-color: #ffffff;
+  padding: 11px 15px;
+  min-width: 100px;
+  border-radius: 64px;
+  color: #161922;
+  border: 1px solid #161922;
+  &:hover {
+    cursor: pointer;
+  }
+}
+button.primary {
+  background-color: #268334;
+  padding: 12px 15px;
+  min-width: 100px;
+  border-radius: 64px;
+  color: #ffffff;
+  border: 0;
 
+  &:hover {
+    cursor: pointer;
+    background-color: #1c7029;
+  }
+}
+.btn-icon {
+  background-color: transparent !important;
+  padding: 5px 15px;
+  border-radius: 3px;
+  color: #ffffff;
+  border: 0;
+}
 .select-folder[isVaultLocked="true"] {
     display: none
 }
 
-@media screen and (max-width: 768px) {
-    .select-folder {
-        display: none
-    }
-}
+// @media screen and (max-width: 768px) {
+//     .select-folder {
+//         display: none
+//     }
+// }
 
 @media (print) {
     body {
@@ -191,3 +229,33 @@ button.neutral {
     }
 }
 
+.ui-components {
+  padding: 0px 16px 16px;
+}
+.ui-components:first-child {
+  padding-top: 16px;
+}
+input {
+  margin-top: 8px;
+  height: 35px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #AED1B3;
+}
+select {
+  height: 35px;
+  border-radius: 12px;
+  border: 1px solid #AED1B3;
+}
+.ui-components.relative {
+  position: relative;
+  .btn-icon {
+    position: absolute;
+    bottom: 15px;
+    right: 15px
+  }
+}
+.add-buttons, .change-buttons {
+  padding: 16px;
+  float: right;
+}

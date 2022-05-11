@@ -95,6 +95,11 @@ export default Vue.extend({
     },
     async removeUri(i: number) {
       this.excludedDomains.splice(i, 1);
+      await this.submit()
+      this.notify(
+        this.$t("data.notifications.update_settings_success"),
+        "success"
+      );
     },
     async submit() {
       const savedDomains: { [name: string]: null } = {};
@@ -117,7 +122,7 @@ export default Vue.extend({
         ConstantsService.neverDomainsKey,
         savedDomains
       );
-      this.$router.push({ name: "settings" });
+      // this.$router.push({ name: "settings" });
     },
   },
 });

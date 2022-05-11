@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', event => {
             if (inIframe) {
                 return;
             }
-            closeExistingAndOpenBar(msg.data.type, msg.data.typeData);
+            closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.loginInfo);
             sendResponse();
             return true;
         } else if (msg.command === 'closeNotificationBar') {
@@ -645,14 +645,14 @@ document.addEventListener('DOMContentLoaded', event => {
         }, 500);
     }
 
-    function closeExistingAndOpenBar(type: string, typeData: any) {
+    function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
         let barPage = 'notification/bar.html';
         switch (type) {
             case 'add':
-                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked;
+                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + loginInfo.username + '&password=' + loginInfo.password + '&uri=' + loginInfo.uri;
                 break;
             case 'change':
-                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked;
+                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + loginInfo.username + '&password=' + loginInfo.password + '&uri=' + loginInfo.uri;
                 break;
             default:
                 break;
@@ -664,10 +664,10 @@ document.addEventListener('DOMContentLoaded', event => {
         }
 
         closeBar(false);
-        openBar(type, barPage);
+        openBar(type, barPage, loginInfo);
     }
 
-    function openBar(type: string, barPage: string) {
+    function openBar(type: string, barPage: string, loginInfo: object) {
         barType = type;
 
         if (document.body == null) {
@@ -677,24 +677,24 @@ document.addEventListener('DOMContentLoaded', event => {
         const barPageUrl: string = chrome.extension.getURL(barPage);
 
         const iframe = document.createElement('iframe');
-        iframe.style.cssText = 'height: 42px; width: 100%; border: 0; min-height: initial;';
+        iframe.style.cssText = 'height: 320px; width: 450px; border: 0; min-height: initial; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); border-radius: 12px;';
         iframe.id = 'bit-notification-bar-iframe';
         iframe.src = barPageUrl;
 
         const frameDiv = document.createElement('div');
         frameDiv.setAttribute('aria-live', 'polite');
         frameDiv.id = 'bit-notification-bar';
-        frameDiv.style.cssText = 'height: 42px; width: 100%; top: 0; left: 0; padding: 0; position: fixed; ' +
+        frameDiv.style.cssText = 'height: 320px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
             'z-index: 2147483647; visibility: visible;';
         frameDiv.appendChild(iframe);
         document.body.appendChild(frameDiv);
 
         (iframe.contentWindow.location as any) = barPageUrl;
 
-        const spacer = document.createElement('div');
-        spacer.id = 'bit-notification-bar-spacer';
-        spacer.style.cssText = 'height: 42px;';
-        document.body.insertBefore(spacer, document.body.firstChild);
+        // const spacer = document.createElement('div');
+        // spacer.id = 'bit-notification-bar-spacer';
+        // spacer.style.cssText = 'height: 42px;';
+        // document.body.insertBefore(spacer, document.body.firstChild);
     }
 
     function closeBar(explicitClose: boolean) {

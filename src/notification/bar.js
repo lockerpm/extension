@@ -19,21 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(load, 50);
 
     function load() {
-        var closeButton = document.getElementById('close-button'),
-            body = document.querySelector('body'),
+        var body = document.querySelector('body'),
             bodyRect = body.getBoundingClientRect();
 
         // i18n
         body.classList.add('lang-' + lang.slice(0, 2));
 
         document.getElementById('logo-link').title = i18n.appName;
-        closeButton.title = i18n.close;
-        closeButton.setAttribute('aria-label', i18n.close);
 
         if (bodyRect.width < 768) {
             document.querySelector('#template-add .add-save').textContent = i18n.yes;
             document.querySelector('#template-add .never-save').textContent = i18n.never;
-            document.querySelector('#template-add .select-folder').style.display = 'none';
+            // document.querySelector('#template-add .select-folder').style.display = 'none';
             document.querySelector('#template-change .change-save').textContent = i18n.yes;
         } else {
             document.querySelector('#template-add .add-save').textContent = i18n.notificationAddSave;
@@ -41,16 +38,27 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#template-add .select-folder').style.display = 'initial';
             document.querySelector('#template-change .change-save').textContent = i18n.notificationChangeSave;
         }
-
+        document.querySelector('#template-add .select-folder').setAttribute('isVaultLocked', getQueryVariable('isVaultLocked') || false)
         document.querySelector('#template-add .add-text').textContent = i18n.notificationAddDesc;
         document.querySelector('#template-change .change-text').textContent = i18n.notificationChangeDesc;
+        document.querySelector('#template-add .tab-uri').textContent = getQueryVariable('uri');
+        document.querySelector('#template-add .info-username').value = getQueryVariable('username');
+        document.querySelector("#template-add .info-password").value = getQueryVariable('password');
+        document.querySelector('#template-change .tab-uri').textContent = getQueryVariable('uri');
+        document.querySelector('#template-change .info-username').value = getQueryVariable('username');
+        document.querySelector("#template-change .info-password").value = getQueryVariable('password');
 
         if (getQueryVariable('add')) {
             setContent(document.getElementById('template-add'));
 
             var addButton = document.querySelector('#template-add-clone .add-save'),
                 neverButton = document.querySelector('#template-add-clone .never-save');
-
+            var togglePasswordAdd = document.getElementById("toggle-password")
+            var password = document.querySelector('#template-add-clone .info-password')
+            togglePasswordAdd.addEventListener("click", function () {
+              const type = password.getAttribute("type") === "password" ? "text" : "password"
+              password.setAttribute("type", type)
+            })
             addButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 const folderId = document.querySelector('#template-add-clone .select-folder').value;
@@ -79,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else if (getQueryVariable('change')) {
             setContent(document.getElementById('template-change'));
+            var togglePasswordAdd = document.getElementById("toggle-password")
+            var password = document.querySelector('#template-change-clone .info-password')
+            togglePasswordAdd.addEventListener("click", function () {
+              const type = password.getAttribute("type") === "password" ? "text" : "password"
+              password.setAttribute("type", type)
+            })
             var changeButton = document.querySelector('#template-change-clone .change-save');
             changeButton.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -90,7 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setContent(document.getElementById('template-alert'));
             document.getElementById('template-alert-clone').textContent = getQueryVariable('info');
         }
-
+        var closeButton = document.getElementById('close-button')
+        closeButton.title = i18n.close;
+        closeButton.setAttribute('aria-label', i18n.close);
         closeButton.addEventListener('click', (e) => {
             e.preventDefault();
             sendPlatformMessage({

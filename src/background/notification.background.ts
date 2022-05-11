@@ -181,19 +181,19 @@ export default class NotificationBackground {
         });
     }
   
-    async checkNotificationQueue(tab: chrome.tabs.Tab = null): Promise<void> {
+    async checkNotificationQueue(tab: chrome.tabs.Tab = null, loginInfo: object = null): Promise<void> {
         if (this.notificationQueue.length === 0) {
             return;
         }
 
         if (tab != null) {
-            this.doNotificationQueueCheck(tab);
+            this.doNotificationQueueCheck(tab, loginInfo);
             return;
         }
 
         const currentTab = await BrowserApi.getTabFromCurrentWindow();
         if (currentTab != null) {
-            this.doNotificationQueueCheck(currentTab);
+            this.doNotificationQueueCheck(currentTab, loginInfo);
         }
     }
 
@@ -206,7 +206,7 @@ export default class NotificationBackground {
         setTimeout(() => this.cleanupNotificationQueue(), 2 * 60 * 1000); // check every 2 minutes
     }
 
-    private doNotificationQueueCheck(tab: chrome.tabs.Tab): void {
+    private doNotificationQueueCheck(tab: chrome.tabs.Tab, loginInfo: object): void {
         if (tab == null) {
             return;
         }
@@ -215,7 +215,10 @@ export default class NotificationBackground {
         if (tabDomain == null) {
             return;
         }
-
+        loginInfo = {
+          ...loginInfo,
+          uri: tabDomain 
+        }
         for (let i = 0; i < this.notificationQueue.length; i++) {
             if (this.notificationQueue[i].tabId !== tab.id || this.notificationQueue[i].domain !== tabDomain) {
                 continue;
@@ -227,6 +230,7 @@ export default class NotificationBackground {
                     typeData: {
                         isVaultLocked: this.notificationQueue[i].wasVaultLocked,
                     },
+                    loginInfo
                 });
             } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
                 BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
@@ -234,6 +238,7 @@ export default class NotificationBackground {
                     typeData: {
                         isVaultLocked: this.notificationQueue[i].wasVaultLocked,
                     },
+                    loginInfo
                 });
             }
             break;
@@ -250,7 +255,6 @@ export default class NotificationBackground {
 
   private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
       if (!await this.userService.isAuthenticated()) {
-            // console.log('unauthenticated')
             return;
         }
         const loginDomain = Utils.getDomain(loginInfo.url);
@@ -290,7 +294,7 @@ export default class NotificationBackground {
             if (disabledChangePassword) {
                 return;
             }
-            this.pushChangePasswordToQueue(usernameMatches[0].id, loginDomain, loginInfo.password, tab);
+            this.pushChangePasswordToQueue(usernameMatches[0].id, loginDomain, loginInfo.password, loginInfo.username, tab);
         }
     }
 
@@ -308,7 +312,7 @@ export default class NotificationBackground {
             wasVaultLocked: isVaultLocked,
         };
         this.notificationQueue.push(message);
-        await this.checkNotificationQueue(tab);
+      await this.checkNotificationQueue(tab, { username: loginInfo.username, password: loginInfo.password, uri: loginInfo.url});
     }
 
     private async changedPassword(changeData: ChangePasswordRuntimeMessage, tab: chrome.tabs.Tab) {
@@ -318,7 +322,7 @@ export default class NotificationBackground {
         }
 
         if (await this.vaultTimeoutService.isLocked()) {
-            this.pushChangePasswordToQueue(null, loginDomain, changeData.newPassword, tab, true);
+            this.pushChangePasswordToQueue(null, loginDomain, changeData.newPassword, '', tab, true);
             return;
         }
 
@@ -333,11 +337,11 @@ export default class NotificationBackground {
             id = ciphers[0].id;
         }
         if (id != null) {
-            this.pushChangePasswordToQueue(id, loginDomain, changeData.newPassword, tab);
+            this.pushChangePasswordToQueue(id, loginDomain, changeData.newPassword, ciphers[0].login.username, tab);
         }
     }
 
-    private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
+    private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
         // remove any old messages for this tab
         this.removeTabFromNotificationQueue(tab);
         const message: AddChangePasswordQueueMessage = {
@@ -350,7 +354,7 @@ export default class NotificationBackground {
             wasVaultLocked: isVaultLocked,
         };
         this.notificationQueue.push(message);
-        await this.checkNotificationQueue(tab);
+        await this.checkNotificationQueue(tab, {password: newPassword, username, uri: loginDomain});
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
