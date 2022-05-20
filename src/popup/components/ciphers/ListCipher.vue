@@ -89,6 +89,7 @@
           v-for="item in dataRendered"
           :key="item.id"
           :item="item"
+          :organizations="organizations"
           @do-fill="fillCipher(item)"
         >
         </cipher-row>
@@ -201,8 +202,8 @@ export default Vue.extend({
         return "Card";
       case "identities":
         return "Identity";
-      case "crypto-assets":
-        return "CryptoAsset";
+      case "crypto-backups":
+        return "CryptoBackup";
       case "vault":
         return "Vault";
       case "shares":
@@ -276,6 +277,14 @@ export default Vue.extend({
         "orderField",
         "orderDirection",
       ],
+    },
+    organizations: {
+      async get () {
+        const result = await this.$userService.getAllOrganizations()
+        console.log(result)
+        return result
+      },
+      watch: ['$store.state.syncedCiphersToggle']
     },
     folders: {
       async get() {

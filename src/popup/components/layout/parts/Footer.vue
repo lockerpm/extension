@@ -24,7 +24,7 @@
     style="z-index:1; width: 400px; padding: 12px 16px"
   >
     <a
-      href="https://locker.io"
+      href="https://locker.io/vault"
       target="_blank"
       class="font-semibold"
       style="color: #005AE4"

@@ -5,7 +5,7 @@
   >
     <ListCipher
       :filter="c => c.type === 6 || c.type === 7"
-      route-name="crypto-assets"
+      route-name="crypto-backups"
     />
   </div>
 </template>

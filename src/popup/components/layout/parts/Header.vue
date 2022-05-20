@@ -1,7 +1,7 @@
 <template>
   <div
     id="popup-header"
-    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'cards', 'identities', 'notes', 'crypto-backups', 'folders'].includes(this.$route.name)"
     class="fixed top-0 bg-white cursor-pointer"
     style="z-index:1; width: 400px;"
   >
@@ -25,7 +25,7 @@
       </router-link>
     </div>
     <div
-      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
+      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-backups', 'folders'].includes(this.$route.name)"
       class="flex items-center h-[52px] leading-[44px] px-4 pb-4"
       style="border-bottom: 1px solid #C5C6C8"
     >
@@ -54,7 +54,7 @@
       </div>
     </div>
     <div
-      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-assets', 'folders'].includes(this.$route.name)"
+      v-if="['home', 'vault', 'cards', 'identities', 'notes', 'crypto-backups', 'folders'].includes(this.$route.name)"
       id="vault-slider"
       class="bg-white"
     >
@@ -137,8 +137,8 @@ export default {
         return "Card";
       case "identities":
         return "Identity";
-      case "crypto-assets":
-        return "CryptoAsset";
+      case "crypto-backups":
+        return "CryptoBackup";
       case "vault":
         return "Vault";
       case "shares":
@@ -168,8 +168,8 @@ export default {
           routeName: 'identities'
         },
         {
-          name: 'cryptoAssets',
-          routeName: 'crypto-assets'
+          name: 'cryptoBackups',
+          routeName: 'crypto-backups'
         },
         {
           name: 'folder',
@@ -181,7 +181,7 @@ export default {
       return [
         {
           label: this.$t('data.parts.vault'),
-          routeName: ['home', 'cards', 'notes', 'identities', 'crypto-assets', 'folders'].includes(this.$route.name) ? this.$route.name : 'home',
+          routeName: ['home', 'cards', 'notes', 'identities', 'crypto-backups', 'folders'].includes(this.$route.name) ? this.$route.name : 'home',
           // icon: 'popup_vault.svg'
           icon: `<svg width="19" height="20" viewBox="0 0 19 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-left: auto; margin-right: auto">
                   <path d="M0.8125 8.01875V2.51562C0.8125 2.31671 0.891518 2.12595 1.03217 1.9853C1.17282 1.84464 1.36359 1.76562 1.5625 1.76562H16.5625C16.7614 1.76562 16.9522 1.84464 17.0928 1.9853C17.2335 2.12595 17.3125 2.31671 17.3125 2.51562V8.01875C17.3125 15.8937 10.6281 18.5 9.29688 18.9406C9.14564 18.9966 8.97936 18.9966 8.82812 18.9406C7.49688 18.5 0.8125 15.8937 0.8125 8.01875Z" stroke="#161922" stroke-width="1.55859" stroke-linecap="round" stroke-linejoin="round" />

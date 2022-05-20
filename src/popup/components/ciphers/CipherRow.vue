@@ -15,6 +15,13 @@
         <div class="flex-grow overflow-hidden" @click="fillCipher()">
           <div class="text-black font-semibold truncate">
             {{ item.name }}
+            <img
+              v-if="item.organizationId"
+              src="@/assets/images/icons/shares.svg"
+              alt="Shared"
+              :title="$t('common.shared_with_you')"
+              class="inline-block ml-2"
+            >
           </div>
           <div class="truncate">
             {{ item.subTitle }}
@@ -87,11 +94,13 @@
                 </template>
               </el-dropdown-menu>
             </el-dropdown>
-            <button class="btn btn-icon btn-xs hover:text-primary"
-                    @click="addEdit(item)"
-            >
-              <i class="fas fa-pen" />
-            </button>
+            <template v-if="!item.isDeleted && canManageItem(organizations, item)">
+              <button class="btn btn-icon btn-xs hover:text-primary"
+                      @click="addEdit(item)"
+              >
+                <i class="fas fa-pen" />
+              </button>
+            </template>
           </div>
         </div>
       </li>
@@ -112,12 +121,19 @@ export default Vue.extend(
       item:{
         type: CipherView,
         default: new CipherView()
+      },
+      organizations: {
+        type: Array,
+        default: () => []
       }
     },
     data(){
       return {
         CipherType
       }
+    },
+    mounted () {
+      console.log(this.organizations)
     },
     methods: {
       // addEdit (item) {

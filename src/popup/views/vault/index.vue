@@ -241,10 +241,10 @@ export default Vue.extend({
         },
         {
           icon: "fa-gem",
-          routeName: "crypto-assets",
-          label: this.$tc("type.CryptoAsset"),
+          routeName: "crypto-backups",
+          label: this.$tc("type.CryptoBackup"),
           divided: false,
-          name: "cryptoAssets",
+          name: "cryptoBackups",
         },
       ];
     },
@@ -268,16 +268,16 @@ export default Vue.extend({
         this.ciphers &&
         (this.ciphers.filter((c) => c.type === CipherType.Identity) || []);
       const identitiesCount = identities && identities.length;
-      const cryptoAssets =
+      const cryptoBackups =
         this.ciphers &&
         (this.ciphers.filter((c) => c.type === 6 || c.type === 7) || []);
-      const cryptoAssetsCount = cryptoAssets && cryptoAssets.length;
+      const cryptoBackupsCount = cryptoBackups && cryptoBackups.length;
       return {
         passwords: passwordsCount,
         notes: notesCount,
         cards: cardsCount,
         identities: identitiesCount,
-        cryptoAssets: cryptoAssetsCount,
+        cryptoBackups: cryptoBackupsCount,
       };
     },
   },

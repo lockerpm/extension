@@ -75,7 +75,7 @@ module.exports = {
     go_to_website: 'Go to website',
     accept: 'Accept',
     reject: 'Reject',
-    shared_with_you: 'Shared with you in CyStack',
+    shared_with_you: 'Shared in Locker',
     back: 'Back',
     item_name: 'Item name',
     details: 'Details',
@@ -95,7 +95,7 @@ module.exports = {
     notes: 'Secure Note',
     cards: 'Payment',
     identities: 'Personal Info',
-    cryptoAssets: 'Crypto Asset',
+    cryptoBackups: 'Crypto Backup',
     folder: 'Folder',
     shares: 'Shares',
     trash: 'Trash',
@@ -127,7 +127,8 @@ module.exports = {
     incomplete_expiry: "Your card's expiration date is incomplete.",
     invalid_expiry_year: "Your card's expiration year is invalid.",
     invalid_expiry_year_past: "Your card's expiration year is in the past.",
-    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.'
+    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.',
+    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',
@@ -171,11 +172,12 @@ module.exports = {
     3: 'Card | Cards',
     4: 'Identity | Identities',
     0: 'Item | Items',
+    7: 'Crypto Backup | Crypto Backups',
     Login: 'Password | Password',
     SecureNote: 'Note | Notes',
     Card: 'Card | Cards',
     Identity: 'Identity | Identities',
-    CryptoAsset: 'Crypto Asset | Crypto Assets',
+    CryptoBackup: 'Crypto Backup | Crypto Backups',
     Dashboard: 'Item | Items',
     Vault: 'Item | Items',
     Shares: 'Item | Items',
@@ -546,7 +548,12 @@ module.exports = {
       seed: 'Seed phrase',
       seed_phrase_desc: 'Notice: Seed phrase (or recovery phrase, key phrase, etc.) is a phrase that usually contains 12-24 random English words. This is the most sensitive data of your crypto wallet.',
       recovery_email: 'Recovery email',
-      additional_info: 'Additional Information'
+      additional_info: 'Additional Information',
+      private_key: 'Private Key',
+      password_pin: 'Password/PIN',
+      username: 'Username',
+      wallet_app: 'Wallet App',
+      networks: 'Networks'
     },
     settings: {
       account: 'Account',

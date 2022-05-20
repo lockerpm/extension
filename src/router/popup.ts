@@ -196,30 +196,30 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: "/crypto-assets",
+    path: "/crypto-backups",
     beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
         path: "",
-        name: "crypto-assets",
+        name: "crypto-backups",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-assets/index.vue"
+            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/index.vue"
           )
       }
     ]
   },
   {
-    path: "/crypto-assets/:id",
+    path: "/crypto-backups/:id",
     component: Layout,
     children: [
       {
         path: "",
-        name: "crypto-assets-id",
+        name: "crypto-backups-id",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-assets/_id.vue"
+            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/_id.vue"
           )
       }
     ]

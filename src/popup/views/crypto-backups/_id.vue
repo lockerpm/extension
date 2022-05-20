@@ -1,5 +1,5 @@
 <template>
-  <DetailCipher type="CryptoAsset" route-name="crypto-assets" />
+  <DetailCipher type="CryptoBackup" route-name="crypto-backups" />
 </template>
 
 <script>

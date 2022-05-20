@@ -22,12 +22,12 @@
         {{$t('data.settings.version')}} {{version}}
       </div>
       <div class="info-section">
-        <a target="_blank" href="https://cystack.net/terms">
+        <a target="_blank" href="https://locker.io/terms">
           {{$t('data.settings.term')}}
         </a>
       </div>
       <div class="info-section">
-        <a target="_blank" href="https://cystack.net/privacy">
+        <a target="_blank" href="https://locker.io/privacy">
           {{$t('data.settings.privacy')}}
         </a>
       </div>

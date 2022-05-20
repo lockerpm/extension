@@ -21,6 +21,7 @@ import JSLib from '@/popup/services/services'
 import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
+import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 
 Vue.config.productionTip = false
 Vue.use(JSLib)
@@ -297,51 +298,91 @@ Vue.mixin({
     clipboardSuccessHandler () {
       this.notify(this.$t('common.copied'), 'success')
     },
-    getIconCipher(cipher, size = 70) {
+    getIconCipher(cipher, size = 70, defaultIcon = false) {
       switch (cipher.type) {
       case CipherType.Login:
-        if (cipher.login && cipher.login.uris && cipher.login.uris.length && !this.hideIcons) {
+        if (
+          cipher.login &&
+            cipher.login.uris &&
+            cipher.login.uris.length &&
+            !this.hideIcons
+        ) {
           try {
-            const domain = extractDomain(cipher.login.uris[0]._uri || cipher.login.uris[0].uri)
+            const domain = extractDomain(
+              cipher.login.uris[0]._uri || cipher.login.uris[0].uri
+            );
             if (domain) {
-              return (this.$createElement(Avatar, {
-                props: {
-                  src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${size}`,
-                  size,
-                  alt: domain,
-                  shape: 'square'
-                }
-              }, [
-                this.$createElement('img', {
-                  attrs: {
-                    src: require('@/assets/images/icons/icon_Login.svg')
+              return this.$createElement(
+                Avatar,
+                {
+                  props: {
+                    src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${size}`,
+                    size,
+                    alt: domain,
+                    shape: "square"
                   }
-                })
-              ]))
+                },
+                [
+                  this.$createElement("img", {
+                    attrs: {
+                      src: require("@/assets/images/icons/icon_Login.svg")
+                    }
+                  })
+                ]
+              );
             }
           } catch (e) {
-            return this.getIconDefaultCipher('Login', size)
+            return this.getIconDefaultCipher("Login", size);
           }
         }
-        return this.getIconDefaultCipher('Login', size)
+        return this.getIconDefaultCipher("Login", size);
       case CipherType.SecureNote:
-        return this.getIconDefaultCipher('SecureNote', size)
+        return this.getIconDefaultCipher("SecureNote", size);
       case CipherType.Card:
-        return this.getIconDefaultCipher('Card', size)
+        return this.getIconDefaultCipher("Card", size);
       case CipherType.Identity:
-        return this.getIconDefaultCipher('Identity', size)
+        return this.getIconDefaultCipher("Identity", size);
       case 6:
-        return this.getIconDefaultCipher('CryptoAccount', size)
+        return this.getIconDefaultCipher("CryptoAccount", size);
       case 7:
-        return this.getIconDefaultCipher('CryptoWallet', size)
-      case 'Shares':
-        return this.getIconDefaultCipher('Shares', size)
-      case 'Trash':
-        return this.getIconDefaultCipher('Trash', size)
-      case 'Vault':
-        return this.getIconDefaultCipher('Dashboard', size)
+        if (!defaultIcon) {
+          if (cipher.cryptoWallet && cipher.cryptoWallet.walletApp) {
+            try {
+              const selectedApp = WALLET_APP_LIST.find(
+                a => a.alias === cipher.cryptoWallet.walletApp.alias
+              );
+              return this.$createElement(
+                Avatar,
+                {
+                  props: {
+                    src: selectedApp.logo,
+                    size,
+                    alt: selectedApp.name,
+                    shape: "square"
+                  }
+                },
+                [
+                  this.$createElement("img", {
+                    attrs: {
+                      src: require("@/assets/images/icons/icon_CryptoWallet.svg")
+                    }
+                  })
+                ]
+              );
+            } catch (e) {
+              return this.getIconDefaultCipher("CryptoWallet", size);
+            }
+          }
+        }
+        return this.getIconDefaultCipher("CryptoWallet", size);
+      case "Shares":
+        return this.getIconDefaultCipher("Shares", size);
+      case "Trash":
+        return this.getIconDefaultCipher("Trash", size);
+      case "Vault":
+        return this.getIconDefaultCipher("Dashboard", size);
       default:
-        return ''
+        return "";
       }
     },
     getIconDefaultCipher (type, size = 70) {
