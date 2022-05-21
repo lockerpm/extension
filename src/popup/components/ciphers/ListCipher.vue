@@ -89,7 +89,6 @@
           v-for="item in dataRendered"
           :key="item.id"
           :item="item"
-          :organizations="organizations"
           @do-fill="fillCipher(item)"
         >
         </cipher-row>
@@ -102,7 +101,7 @@
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-import Vnodes from "@/components/Vnodes";
+// import Vnodes from "@/components/Vnodes";
 import NoCipher from "@/components/cipher/NoCipher";
 import { BrowserApi } from "@/browser/browserApi";
 const BroadcasterSubscriptionId = "ChildViewComponent";
@@ -111,7 +110,7 @@ import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 export default Vue.extend({
   components: {
-    Vnodes,
+    // Vnodes,
     NoCipher,
     CipherRow,
   },
@@ -277,14 +276,6 @@ export default Vue.extend({
         "orderField",
         "orderDirection",
       ],
-    },
-    organizations: {
-      async get () {
-        const result = await this.$userService.getAllOrganizations()
-        console.log(result)
-        return result
-      },
-      watch: ['$store.state.syncedCiphersToggle']
     },
     folders: {
       async get() {

@@ -50,6 +50,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       currentPlan: {},
       cipherCount: null,
       hideIcons: false,
+      showFolders: true,
+      enableAutofill:  true,
       ...oldStoreParsed
     },
     mutations: {
@@ -139,6 +141,12 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_HIDE_ICONS(state, value) {
         state.hideIcons = value
+      },
+      UPDATE_SHOW_FOLDERS(state, value) {
+        state.showFolders = value
+      },
+      UPDATE_ENABLE_AUTOFILL(state, value) {
+        state.enableAutofill = value
       }
     },
     actions: {

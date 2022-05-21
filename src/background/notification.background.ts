@@ -230,7 +230,8 @@ export default class NotificationBackground {
                     typeData: {
                         isVaultLocked: this.notificationQueue[i].wasVaultLocked,
                     },
-                    loginInfo
+                    loginInfo,
+                    queueMessage: this.notificationQueue[0]
                 });
             } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
                 BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {

@@ -53,7 +53,10 @@ Vue.mixin({
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
         { key: "github", name: "GitHub", color: "#202326" }
-      ]
+      ],
+      enableAutofillKey : 'enableAutofill',
+      showFoldersKey : 'showFolders',
+      hideIconsKey : 'hideIcons'
     };
   },
   computed: {
@@ -72,6 +75,12 @@ Vue.mixin({
     },
     hideIcons() {
       return this.$store.state.hideIcons
+    },
+    showFolders() {
+      return this.$store.state.showFolders
+    },
+    enableAutofill() {
+      return this.$store.state.enableAutofill
     }
   },
   methods: {
@@ -174,9 +183,17 @@ Vue.mixin({
     },
     async login() {
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
-      const deviceId = await browserStorageService.get("device_id")
-      const hideIcons = await browserStorageService.get('hideIcons')
+      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
+        browserStorageService.get("device_id"),
+        browserStorageService.get("hideIcons"),
+        browserStorageService.get("showFolders"),
+        browserStorageService.get("enableAutofill"),
+      ]);
+      // const deviceId = await browserStorageService.get("device_id")
+      // const hideIcons = await browserStorageService.get('hideIcons')
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
+      this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
+      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       const deviceIdentifier = deviceId || this.randomString();
       if (!deviceId) {
         browserStorageService.save("device_id", deviceIdentifier);
@@ -455,8 +472,11 @@ Vue.mixin({
     },
     canManageItem (teams, item) {
       const team = this.getTeam(teams, item.organizationId)
-      if (team.organization_id) {
-        return ['owner', 'admin', 'manager'].includes(team.role)
+      // if (team.organization_id) {
+      //   return ['owner', 'admin', 'manager'].includes(team.role)
+      // }
+      if (team.id) {
+        return [0, 1].includes(team.type);
       }
       return true
     },

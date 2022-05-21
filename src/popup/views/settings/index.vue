@@ -14,7 +14,7 @@
             v-for="(item, index) in cate.items"
             :key="index"
             class="popup-setting-section"
-            @click="item.routeName || item.externalUrl ? openRoute(item) : ''"
+            @click="item.routeName || item.externalUrl ? openRoute(item) : item.lock? lock():''"
           >
 
             <div class="flex-grow">
@@ -89,9 +89,9 @@ export default Vue.extend({
       this.$storageService.get(showFoldersKey),
       this.$storageService.get(hideIconsKey),
     ])
-    this.storage.enableAutofill = res[0] || true
-    this.storage.showFolders = res[1] || true
-    this.storage.hideIcons = res[2] || false
+    this.storage.enableAutofill = res[0] == null ? true : res[0]
+    this.storage.showFolders = res[1] == null ? true : res[1]
+    this.storage.hideIcons = res[2] == null ? false : res[2]
     this.getUser();
   },
   data() {
@@ -172,12 +172,12 @@ export default Vue.extend({
               desc: this.$t("data.settings.vault_timeout_desc"),
               routeName: "settings-vault-timeout",
             },
-            {
-              name: this.$t("data.settings.show_folders"),
-              desc: this.$t("data.settings.show_folders_desc"),
-              switch: true,
-              key: showFoldersKey,
-            },
+            // {
+            //   name: this.$t("data.settings.show_folders"),
+            //   desc: this.$t("data.settings.show_folders_desc"),
+            //   switch: true,
+            //   key: showFoldersKey,
+            // },
             {
               name: this.$t("data.settings.hide_icons"),
               desc: this.$t("data.settings.hide_icons_desc"),
@@ -194,10 +194,10 @@ export default Vue.extend({
             //   action: "fingerprint",
             //   name: this.$t("data.settings.fingerprint_phase"),
             // },
-            // {
-            //   lock: true,
-            //   name: this.$t("data.settings.lock_now"),
-            // },
+            {
+              lock: true,
+              name: this.$t("data.settings.lock_now"),
+            },
           ],
         },
         // {
@@ -349,6 +349,12 @@ export default Vue.extend({
     async changeStorage(key){
       if(key === hideIconsKey){
         this.$store.commit('UPDATE_HIDE_ICONS', this.storage[hideIconsKey])
+      }
+      if(key === showFoldersKey){
+        this.$store.commit('UPDATE_SHOW_FOLDERS', this.storage[showFoldersKey])
+      }
+      if(key === enableAutofillKey){
+        this.$store.commit('UPDATE_ENABLE_AUTOFILL', this.storage[enableAutofillKey])
       }
       await this.$storageService.save(
         key,

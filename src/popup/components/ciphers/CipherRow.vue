@@ -121,10 +121,6 @@ export default Vue.extend(
       item:{
         type: CipherView,
         default: new CipherView()
-      },
-      organizations: {
-        type: Array,
-        default: () => []
       }
     },
     data(){
@@ -132,8 +128,14 @@ export default Vue.extend(
         CipherType
       }
     },
-    mounted () {
-      console.log(this.organizations)
+    asyncComputed: {
+      organizations: {
+        async get () {
+          const result = await this.$userService.getAllOrganizations()
+          return result
+        },
+        watch: ['$store.state.syncedCiphersToggle']
+      }
     },
     methods: {
       // addEdit (item) {

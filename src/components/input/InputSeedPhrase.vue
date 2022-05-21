@@ -45,7 +45,7 @@ export default Vue.extend ({
   },
   data () {
     return {
-      wordCount: this.editMode ? Math.max(this.value.trim().split(' ').length, MIN_WORD_COUNT) : MIN_WORD_COUNT,
+      wordCount: this.editMode ? Math.max(this.value.trimEnd().split(' ').length, MIN_WORD_COUNT) : MIN_WORD_COUNT,
       maxWidth: 0
     }
   },
