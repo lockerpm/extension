@@ -56,6 +56,15 @@
           </div>
         </div>
       </div>
+      <div class="mt-4 flex items-center justify-center">
+          <div v-if="locale==='vi'">
+            Một sản phẩm của
+          </div>
+          <div v-else>
+            A product of
+          </div>
+          <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack">
+        </div>
     </div>
     <Footer></Footer>
     <Fingerprint ref="fingerprintDialog" />

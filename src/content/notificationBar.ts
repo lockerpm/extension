@@ -108,7 +108,11 @@ document.addEventListener('DOMContentLoaded', event => {
                         const elPosition = inputWithLogo[
                           i
                         ].inputEl.getBoundingClientRect();
-                        closeInformMenu(false, elPosition);
+                        const elOffset = {
+                          left: getOffsetLeft(inputWithLogo[i].inputEl),
+                          top: getOffsetTop(inputWithLogo[i].inputEl)
+                        };
+                        closeInformMenu(false, elPosition, elOffset);
                       }
                     }
                   }
@@ -118,7 +122,11 @@ document.addEventListener('DOMContentLoaded', event => {
                         const elPosition = inputWithLogo[
                           i
                         ].inputEl.getBoundingClientRect();
-                        closeInformMenu(false, elPosition);
+                        const elOffset = {
+                          left: getOffsetLeft(inputWithLogo[i].inputEl),
+                          top: getOffsetTop(inputWithLogo[i].inputEl)
+                        };
+                        closeInformMenu(false, elPosition, elOffset);
                       }
                     }
                   }
@@ -157,7 +165,11 @@ document.addEventListener('DOMContentLoaded', event => {
           }
           for (const logoField of inputWithLogo) {
             const elPosition = logoField.inputEl.getBoundingClientRect();
-            closeInformMenu(false, elPosition);
+            const elOffset = {
+              left: getOffsetLeft(logoField.inputEl),
+              top: getOffsetTop(logoField.inputEl)
+            };
+            closeInformMenu(false, elPosition, elOffset);
           }
           sendResponse();
           return true;
@@ -307,7 +319,11 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       for (const logoField of inputWithLogo) {
         const elPosition = logoField.inputEl.getBoundingClientRect();
-        closeInformMenu(false, elPosition);
+        const elOffset = {
+          left: getOffsetLeft(logoField.inputEl),
+          top: getOffsetTop(logoField.inputEl)
+        };
+        closeInformMenu(false, elPosition, elOffset);
       }
     }
   
@@ -368,7 +384,11 @@ document.addEventListener('DOMContentLoaded', event => {
     function resizeInformMenu(sizeData: any) {
       for (const logoField of inputWithLogo) {
         const elPosition = logoField.inputEl.getBoundingClientRect();
-        const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+        const elOffset = {
+          left: getOffsetLeft(logoField.inputEl),
+          top: getOffsetTop(logoField.inputEl)
+        };
+        const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
         if (menuEl) {
           if (sizeData) {
             menuEl.style.height = sizeData.height
@@ -378,8 +398,8 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       }
     }
-    function closeInformMenu(explicitClose: boolean, elPosition: any) {
-      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+    function closeInformMenu(explicitClose: boolean, elPosition: any, elOffset: any) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
       if (menuEl != null) {
         menuEl.parentElement.removeChild(menuEl);
       }
@@ -391,10 +411,14 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     function openInformMenu(inputEl: any, type: string = 'password') {
       const elPosition = inputEl.getBoundingClientRect();
+      const elOffset = {
+        left: getOffsetLeft(inputEl),
+        top: getOffsetTop(inputEl)
+      }
       if (document.body == null) {
         return;
       }
-      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
+      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left)) != null) {
         // closeInformMenu(false, elPosition)
         return;
       }
@@ -404,8 +428,8 @@ document.addEventListener('DOMContentLoaded', event => {
 
       const iframe = document.createElement("iframe");
       iframe.style.cssText =
-        `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
-        position: fixed;
+        `top: ${elOffset.top + elPosition.height + 10}px; left: ${elOffset.left}px;
+        position: absolute;
         height: 244px; 
         width: 320px;
         border: 0;
@@ -430,7 +454,7 @@ document.addEventListener('DOMContentLoaded', event => {
         margin: 0px !important;
         padding: 0px !important;
       `;
-      iframe.id = "cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left);
+      iframe.id = "cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left);
 
       iframe.src = barPageUrl;
 
@@ -783,5 +807,23 @@ document.addEventListener('DOMContentLoaded', event => {
 
     function sendPlatformMessage(msg: any) {
         chrome.runtime.sendMessage(msg);
+    }
+    function getOffsetTop(elem) {
+      var offsetLeft = 0;
+      do {
+        if (!isNaN(elem.offsetTop)) {
+          offsetLeft += elem.offsetTop;
+        }
+      } while ((elem = elem.offsetParent));
+      return offsetLeft;
+    }
+    function getOffsetLeft(elem) {
+      var offsetLeft = 0;
+      do {
+        if (!isNaN(elem.offsetLeft)) {
+          offsetLeft += elem.offsetLeft;
+        }
+      } while ((elem = elem.offsetParent));
+      return offsetLeft;
     }
 });
