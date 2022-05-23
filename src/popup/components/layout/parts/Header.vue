@@ -10,7 +10,7 @@
         :to="{name: item.routeName}"
         v-for="item in menu"
         :key="item.routeName"
-        class="text-center text-[16px] navigator-item"
+        class="text-center text-[16px] navigator-item text-black"
       >
         <div class="navigator-item__image" v-html="item.icon">
           <!-- <i :class="`fas fa-${item.icon}`"></i> -->
@@ -75,7 +75,7 @@
               :key="index"
               class="catalog-item landing-transition text-12 font-weight-700 text-uppercase"
             >
-              <router-link :to="{name: item.routeName}">
+              <router-link :to="{name: item.routeName}" class="text-black">
                 {{ $t(`sidebar.${item.name}`) }}
               </router-link>
             </li>
@@ -232,7 +232,10 @@ export default {
 
 <style lang="scss">
 #popup-header .navigator-item__image {
-  padding: 7.5px 22.5px;
+      width: 64px;
+    margin-left: auto;
+    margin-right: auto;
+  padding: 7.5px 0px;
   border-radius: 20px;
 }
 #popup-header .navigator-item:hover .navigator-item__image {

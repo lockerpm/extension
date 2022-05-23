@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', event => {
     let observeDomTimeout: number = null;
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register']);
+    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập']);
     const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', event => {
                       setFillLogo(msg.data.usernameFields[i], "username")
                     );
                   }
+                  inputWithLogo = inputWithLogo.filter(e => e != null)
                   document.onclick = check;
                   function check(e) {
                     const target = e && e.target;
@@ -349,6 +350,7 @@ document.addEventListener('DOMContentLoaded', event => {
               height: 20px;
               min-width: 20px;
               position: absolute;
+              z-index: 1;
               left: ${elPosition.left - containerPosition.left +  elPosition.width - 30}px;
               top: ${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`;
 
