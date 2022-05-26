@@ -81,14 +81,20 @@ document.addEventListener('DOMContentLoaded', event => {
                   !domains.hasOwnProperty(window.location.hostname)
                 ) {
                   for (let i = 0; i < msg.data.passwordFields.length; i++) {
-                    inputWithLogo.push(
-                      setFillLogo(msg.data.passwordFields[i], "password")
-                    );
+                    try {
+                      inputWithLogo.push(
+                        setFillLogo(msg.data.passwordFields[i], "password")
+                      );
+                    } catch (error) {
+                    }
                   }
                   for (let i = 0; i < msg.data.usernameFields.length; i++) {
-                    inputWithLogo.push(
-                      setFillLogo(msg.data.usernameFields[i], "username")
-                    );
+                    try {
+                      inputWithLogo.push(
+                        setFillLogo(msg.data.usernameFields[i], "username")
+                      );
+                    } catch (error) {
+                    }
                   }
                   inputWithLogo = inputWithLogo.filter(e => e != null)
                   document.onclick = check;
@@ -335,7 +341,7 @@ document.addEventListener('DOMContentLoaded', event => {
       if (!inputEl) {
         inputEl = document.getElementsByName(el.htmlName)[0]
       }
-      if (getComputedStyle(inputEl).display !== 'none') {
+      if (inputEl && getComputedStyle(inputEl).display !== 'none') {
         const elPosition = inputEl.getBoundingClientRect();
         let relativeContainer = inputEl.parentElement
         while (getComputedStyle(relativeContainer).position !== 'relative') {
