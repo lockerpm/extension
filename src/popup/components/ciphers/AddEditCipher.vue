@@ -443,6 +443,21 @@
           :disabled="isDeleted"
           is-textarea
         />
+
+        <!-- CUSTOM FIELDS -->
+        <div
+          class="my-5 text-black-700 text-head-6 font-semibold"
+        >
+          {{ $t('data.ciphers.custom_fields') }}
+        </div>
+        <InputCustomFields
+          v-model="cipher.fields"
+          :edit-mode="cipher.id ? true : false"
+          class="w-full"
+          style="margin-bottom: 12px"
+          @set-fields="setFields"
+        />
+        
         <InputSelectFolder
           :label="$t('data.folders.select_folder')"
           :initial-value="cipher.folderId"
@@ -505,6 +520,7 @@ import Vue from 'vue'
 import { Dialog } from 'element-ui'
 import { ValidationProvider } from 'vee-validate'
 import { CipherType, } from "jslib-common/enums/cipherType";
+import {FieldType} from "jslib-common/enums/fieldType"
 import { SecureNoteType } from "jslib-common/enums/secureNoteType";
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
@@ -515,6 +531,7 @@ import { IdentityView } from "jslib-common/models/view/identityView";
 import { CardView } from "jslib-common/models/view/cardView";
 import { LoginUriView } from "jslib-common/models/view/loginUriView";
 import { LoginView } from "jslib-common/models/view/loginView";
+import { FieldView } from "jslib-common/models/view/fieldView";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import PasswordGenerator from '@/components/password/PasswordGenerator'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
@@ -525,6 +542,7 @@ import InputSelectOrg from '@/components/input/InputSelectOrg'
 import InputSelectCryptoWallet from '@/components/input/InputSelectCryptoWallet'
 import InputSelectCryptoNetworks from '@/components/input/InputSelectCryptoNetworks'
 import InputSeedPhrase from '@/components/input/InputSeedPhrase'
+import InputCustomFields from '@/components/input/InputCustomFields.vue'
 import { BrowserApi } from "@/browser/browserApi";
 import Vnodes from "@/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
@@ -544,7 +562,8 @@ export default Vue.extend({
     Vnodes,
     InputSelectCryptoWallet,
     InputSelectCryptoNetworks,
-    InputSeedPhrase
+    InputSeedPhrase,
+    InputCustomFields
   },
   props: {
     type: {
@@ -613,7 +632,11 @@ export default Vue.extend({
       }
       if (this.data.type === 7) {
         this.cryptoWallet = this.data.cryptoWallet
-        console.log(this.cryptoWallet)
+        // console.log(this.cryptoWallet)
+      }
+      if (this.data.fields == null) {
+        this.data.fields = [new FieldView()]
+        this.data.fields[0].type = FieldType.Text
       }
       this.cipher = new Cipher({ ...this.data }, true)
       this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
@@ -853,6 +876,8 @@ export default Vue.extend({
       this.cipher.identity = new IdentityView()
       this.cipher.secureNote = new SecureNoteView()
       this.cipher.secureNote.type = SecureNoteType.Generic
+      this.cipher.fields = [new FieldView()]
+      this.cipher.fields[0].type = FieldType.Text
       this.cipher.folderId = this.$route.params.folderId || null
       this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
       if (this.cipher.organizationId) {
@@ -911,6 +936,17 @@ export default Vue.extend({
     },
     setSeed (v) {
       this.cryptoWallet.seed = v
+    },
+    setFields (v) {
+      if (v.remove) {
+        this.cipher.fields.splice(v.index, 1)
+      } else if (v.index != null) {
+        this.cipher.fields[v.index].value = v.value.value
+        this.cipher.fields[v.index].name = v.value.name
+        this.cipher.fields[v.index].type = v.value.type != null ? v.value.type : this.cipher.fields[v.index].type
+      } else {
+        this.cipher.fields.push(v.value)
+      }
     }
   }
 }

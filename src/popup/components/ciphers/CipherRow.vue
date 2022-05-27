@@ -91,6 +91,18 @@
                   >
                     {{ $t('common.copy') }} {{ $t('data.ciphers.wallet_address') }}
                   </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.privateKey"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.private_key') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.password"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.password_pin') }}
+                  </el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </el-dropdown>

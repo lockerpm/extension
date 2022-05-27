@@ -374,6 +374,9 @@ input:-webkit-autofill:active {
     background-color: transparent;
     border-color: transparent;
   }
+  .el-date-editor .el-input__inner {
+    padding-left: 35px;
+  }
 }
 #vault-slider .slider-container {
   display: flex;

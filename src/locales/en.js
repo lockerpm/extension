@@ -553,7 +553,15 @@ module.exports = {
       password_pin: 'Password/PIN',
       username: 'Username',
       wallet_app: 'Wallet App',
-      networks: 'Networks'
+      networks: 'Networks',
+      custom_fields: 'Custom fields',
+      new_custom_field: 'New custom field',
+      field_name: 'Field name',
+      value: 'Value',
+      text: 'Text',
+      hidden: 'Hidden',
+      date: 'Date',
+      monthYear: 'Month/Year'
     },
     settings: {
       account: 'Account',

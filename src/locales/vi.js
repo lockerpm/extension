@@ -548,7 +548,15 @@ module.exports = {
       password_pin: 'Mật khẩu/PIN',
       username: 'Tên người dùng',
       wallet_app: 'Ví Blockchain',
-      networks: 'Mạng Blockchain'
+      networks: 'Mạng Blockchain',
+      custom_fields: 'Trường tùy chỉnh',
+      new_custom_field: 'Trường tùy chỉnh mới',
+      field_name: 'Tên trường',
+      value: 'Giá trị',
+      text: 'Văn bản',
+      hidden: 'Mật khẩu',
+      date: 'Ngày',
+      monthYear: 'Tháng/Năm'
     },
     settings: {
       account: 'Tài khoản',
