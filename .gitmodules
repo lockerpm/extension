@@ -1,4 +1,4 @@
-[submodule "jslib"]
-	path = jslib
-	url = https://github.com/bitwarden/jslib
-	branch = master
+# [submodule "jslib"]
+# 	path = jslib
+# 	url = https://github.com/bitwarden/jslib
+# 	branch = master
