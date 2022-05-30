@@ -167,8 +167,6 @@ export default Vue.extend ({
       this.setNativeInputLabel()
     }
   },
-  created () {
-  },
   mounted () {
     if (this.isPassword) {
       this.type = 'password'

@@ -547,6 +547,7 @@ import { BrowserApi } from "@/browser/browserApi";
 import Vnodes from "@/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
+import { Utils } from 'jslib-common/misc/utils';
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7
 export default Vue.extend({
@@ -635,20 +636,26 @@ export default Vue.extend({
         // console.log(this.cryptoWallet)
       }
       if (this.data.fields == null) {
-        this.data.fields = [new FieldView()]
-        this.data.fields[0].type = FieldType.Text
+        this.data.fields = []
+        // this.data.fields[0].type = FieldType.Text
       }
       this.cipher = new Cipher({ ...this.data }, true)
       this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
     } else if (CipherType[this.type]) {
       this.newCipher(this.type, this.data)
+      if(this.type === 'Login'){
+        const url = (await BrowserApi.getTabFromCurrentWindow()).url
+        this.cipher.name = Utils.getDomain(url);
+        this.cipher.login.uris[0].uri = url
+      }
     } else {
       this.newCipher('Login', this.data)
       if (this.password) {
         this.cipher.login.password = this.password
       }
-      this.cipher.name = (await BrowserApi.getTabFromCurrentWindow()).url;
-      this.cipher.login.uris[0].uri = this.cipher.name
+      const url = (await BrowserApi.getTabFromCurrentWindow()).url
+      this.cipher.name = Utils.getDomain(url);
+      this.cipher.login.uris[0].uri = url
     }
   },
   watch: {
@@ -794,6 +801,7 @@ export default Vue.extend({
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         // this.$emit('updated-cipher')
         // this.$router.push({ name: 'vault' })
+        this.$router.back()
       } catch (e) {
         console.log(e)
         this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
@@ -876,8 +884,8 @@ export default Vue.extend({
       this.cipher.identity = new IdentityView()
       this.cipher.secureNote = new SecureNoteView()
       this.cipher.secureNote.type = SecureNoteType.Generic
-      this.cipher.fields = [new FieldView()]
-      this.cipher.fields[0].type = FieldType.Text
+      this.cipher.fields = []
+      // this.cipher.fields[0].type = FieldType.Text
       this.cipher.folderId = this.$route.params.folderId || null
       this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
       if (this.cipher.organizationId) {

@@ -389,6 +389,7 @@ export default class RuntimeBackground {
         this.platformUtilsService.copyToClipboard(msg.identifier, {
           window: window
         });
+        break;
       case "loginWithGG":
         chrome.identity.launchWebAuthFlow(
           {
