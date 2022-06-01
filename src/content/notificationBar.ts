@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', event => {
             if (inIframe) {
                 return;
             }
-            closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage);
+            closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
             sendResponse();
             return true;
         } else if (msg.command === 'closeNotificationBar') {
@@ -718,10 +718,10 @@ document.addEventListener('DOMContentLoaded', event => {
         let barPage = 'notification/bar.html';
         switch (type) {
             case 'add':
-                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + loginInfo.username + '&password=' + loginInfo.password + '&uri=' + loginInfo.uri;
+                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
                 break;
             case 'change':
-                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + loginInfo.username + '&password=' + loginInfo.password + '&uri=' + loginInfo.uri;
+                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
                 break;
             default:
                 break;

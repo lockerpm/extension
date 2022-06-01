@@ -238,9 +238,11 @@ button.primary {
 input {
   margin-top: 8px;
   height: 35px;
-  width: 100%;
+  width: 95%;
   border-radius: 12px;
   border: 1px solid #AED1B3;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 select {
   height: 35px;
@@ -258,4 +260,15 @@ select {
 .add-buttons, .change-buttons {
   padding: 16px;
   float: right;
+}
+.header-text-wrapper {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tab-uri {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
