@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
       var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
       var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
       var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
-      usePasswordButton.addEventListener('click', useGeneratedPassword);
+      usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
       showPasswordButton.addEventListener('click', () => {
         var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
         inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
         var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
         var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
-        usePasswordButton.addEventListener('click', useGeneratedPassword);
+        usePasswordButton.addEventListener('click', function () { useGeneratedPassword ('input')});
         showPasswordButton.addEventListener('click', () => {
           var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
           inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
@@ -291,8 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
       ambiguous: ambiguousEl.checked
     }
   }
-  function useGeneratedPassword () {
-    const password = document.getElementById('generated_password').textContent
+  function useGeneratedPassword (type = 'div') {
+    let password = ''
+    if (type === 'input') {
+      password = document.querySelector('#template-generated-password-clone .generated-password').value
+    } else {
+      password = document.getElementById('generated_password').textContent
+    }
     sendPlatformMessage({
       command: 'informMenuUsePassword',
       password: password
