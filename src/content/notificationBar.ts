@@ -362,6 +362,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
           inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
           logo.addEventListener("click", () => {
+            console.log(1)
             openInformMenu(inputEl, type);
           });
           return {
@@ -465,7 +466,6 @@ document.addEventListener('DOMContentLoaded', event => {
       iframe.id = "cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left);
 
       iframe.src = barPageUrl;
-
       // const frameDiv = document.createElement("div");
       // frameDiv.setAttribute("aria-live", "polite");
       // frameDiv.id = "cs-inform-menu-bar";
@@ -475,9 +475,7 @@ document.addEventListener('DOMContentLoaded', event => {
       //   z-index: 2147483647; visibility: visible;`
       // frameDiv.appendChild(iframe);
       document.body.appendChild(iframe);
-
       (iframe.contentWindow.location as any) = barPageUrl;
-
       // const spacer = document.createElement("div");
       // spacer.id = "inform-menu-spacer";
       // spacer.style.cssText = "height: 42px;";
