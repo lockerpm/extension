@@ -74,7 +74,7 @@ module.exports = {
     go_to_website: 'Đi tới trang web',
     accept: 'Đồng ý',
     reject: 'Từ chối',
-    shared_with_you: 'Được chia sẻ với bạn trong CyStack',
+    shared_with_you: 'Được chia sẻ trong Locker',
     back: 'Trở lại',
     item_name: 'Tên mục',
     details: 'Chi tiết',
@@ -94,6 +94,8 @@ module.exports = {
     notes: 'Ghi chú',
     cards: 'Thẻ tín dụng',
     identities: 'Danh tính',
+    cryptoBackups: 'Tài sản Crypto',
+    folder: 'Thư mục',
     shares: 'Chia sẻ',
     trash: 'Thùng rác',
     users: 'Người dùng',
@@ -124,7 +126,8 @@ module.exports = {
     incomplete_expiry: 'Vui lòng nhập đầy đủ ngày hết hạn.',
     invalid_expiry_year: 'Vui lòng nhập chính xác năm hết hạn.',
     invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.',
-    autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.'
+    autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.',
+    5002: 'Đã đạt đến số lượng tối đa của {type}. Vui lòng kiểm tra Thùng rác của bạn nếu có.'
   },
   master_password: {
     create_success: 'Mật khẩu tổng đã được tạo',
@@ -167,10 +170,12 @@ module.exports = {
     3: 'Thẻ | Thẻ',
     4: 'Định danh | Định danh',
     0: 'Mục | Mục',
+    7: 'Tài sản Crypto | Tài sản Crypto',
     Login: 'Mật khẩu | Mật khẩu',
     SecureNote: 'Ghi chú | Notes',
     Card: 'Thẻ | Thẻ',
     Identity: 'Định danh | Định danh',
+    CryptoBackup: 'Tài sản Crypto | Tài sản Crypto',
     Dashboard: 'Item | Items',
     Vault: 'Mục | Mục',
     Shares: 'Mục | Mục',
@@ -308,6 +313,10 @@ module.exports = {
         title: 'Không có mục nào được chia sẻ',
         description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
         btn: 'Thêm danh mục'
+      },
+      common: {
+        title: 'Các mục đã lưu của bạn sẽ xuất hiện ở đây. <br> Bắt đầu bằng cách thêm một tài khoản mà bạn đã sử dụng hàng ngày.',
+        btn: 'Thêm mục'
       }
     },
     members: {
@@ -530,7 +539,24 @@ module.exports = {
       generate_random_password: 'Tạo mật khẩu ngẫu nhiên',
       show_password: 'HIện mật khẩu',
       card_details: 'Chi tiết thẻ',
-      contact_info: 'Thông tin liên lạc'
+      contact_info: 'Thông tin liên lạc',
+      wallet_address: 'Địa chỉ ví',
+      seed: 'Chuỗi seed',
+      recovery_email: 'Email khôi phục',
+      additional_info: 'Thông tin thêm',
+      private_key: 'Khóa bí mật',
+      password_pin: 'Mật khẩu/PIN',
+      username: 'Tên người dùng',
+      wallet_app: 'Ví Blockchain',
+      networks: 'Mạng Blockchain',
+      custom_fields: 'Trường tùy chỉnh',
+      new_custom_field: 'Trường tùy chỉnh mới',
+      field_name: 'Tên trường',
+      value: 'Giá trị',
+      text: 'Văn bản',
+      hidden: 'Mật khẩu',
+      date: 'Ngày',
+      monthYear: 'Tháng/Năm'
     },
     settings: {
       account: 'Tài khoản',
@@ -556,11 +582,15 @@ module.exports = {
       english: 'English',
       fingerprint_dialog: 'Cụm từ định danh tài khoản của bạn',
       excluded_domains: 'Không lưu mật khẩu',
+      excluded_domains_desc: 'Danh sách các tên miền không gợi ý lưu mật khẩu',
+      excluded_domains_details: 'Bạn đã tắt tính năng tự động điền cho các trang web đó. Xóa các trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho chúng.',
       general: 'Chung',
       go_to_web_vault: 'Đi tới Web',
       import_export: 'Nhập & Xuất dữ liệu',
       vault_timeout: 'Hẹn giờ khóa',
+      vault_timeout_desc: 'Tự động khóa kho dữ liệu của bạn',
       vault_timeout_action: 'Hành động khi hết giờ',
+      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
       fingerprint_phase: 'Định danh',
       lock_now: 'Khóa ngay',
       upgrade_to_premium: 'Nâng cấp Premium',
@@ -574,7 +604,19 @@ module.exports = {
       feedback: 'Phản hồi',
       support_center: 'Trung tâm hỗ trợ',
       rate_extension: 'Đánh giá Extension',
-      contact_us: 'Liên hệ'
+      contact_us: 'Liên hệ',
+      autofill: 'Tự động điền',
+      enable_autofill: 'Bật Tự động điền',
+      enable_autofill_desc: 'Điền thông tin đăng nhập và các mục trên web',
+      show_folders: 'Hiện thư mục',
+      show_folders_desc: 'Tổ chức các mục trong thư mục.',
+      hide_icons: 'Ẩn icon trang web',
+      hide_icons_desc: 'Ẩn các icon trang web trong kho của bạn',
+      info_desc: 'Thông tin phiên bản {version}',
+      logged_in_as: 'Tài khoản',
+      version: 'Phiên bản',
+      term: 'Điều khoản sử dụng',
+      privacy: 'Chính sách bảo mật'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
@@ -599,7 +641,7 @@ module.exports = {
       login: 'Đăng nhập',
       register: 'Đăng ký',
       vault: 'Kho',
-      for_current: 'MẬT KHẨU CHO TRANG WEB HIỆN TẠI',
+      for_current: 'Mật khẩu cho trang web hiện tại',
       no_for_current: 'Không có mật khẩu nào cho trang web này.',
       add_password: 'Thêm mật khẩu'
     },
@@ -637,8 +679,11 @@ module.exports = {
       current: 'Hiện tại',
       vault: 'Kho',
       generate: 'Tạo Mật khẩu',
+      generator: 'Tạo Mật khẩu',
       settings: 'Cài đặt',
-      search: 'Tìm trong kho'
+      search: 'Tìm trong kho',
+      open_web_app: 'Mở phiên bản web',
+      sync_data: 'Đồng bộ tài khoản'
     }
   }
 }

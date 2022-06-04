@@ -60,7 +60,7 @@ export default class NotificationBackground {
                 await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
                 break;
             case 'bgGetDataForTab':
-                await this.getDataForTab(sender.tab, msg.responseCommand);
+                await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
                 break;
             case 'bgCloseNotificationBar':
                 await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
@@ -104,13 +104,20 @@ export default class NotificationBackground {
                     case 'notificationBar':
                         // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
-                        const passwordFields = this.autofillService.getPasswordsFields(msg.details);
-                        // console.log('login forms: ', forms)
-                        // console.log('card forms: ', testCardForms)
+                        let passwordFields = [];
+                        let usernameFields = [];
+                        for (const form of forms) {
+                          for (const password of form.passwords) {
+                            passwordFields.push(password)
+                          }
+                          usernameFields.push(form.username)
+                        }
+                        // console.log( forms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
                             forms: forms,
-                            passwordFields: passwordFields
+                            passwordFields: passwordFields,
+                            usernameFields: usernameFields
                         });
                       //  await BrowserApi.tabSendMessageData(msg.tab, 'informMenuPageDetails', {
                       //       details: msg.details,
@@ -129,6 +136,32 @@ export default class NotificationBackground {
                     break;
                 }
                 await this.startAutofillPage(cipher)
+                break;
+            case 'informMenuUsePassword':
+                const tab = await BrowserApi.getTabFromCurrentWindow();
+                if (tab == null) {
+                  return;
+                }
+                await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
+                  password: msg.password
+                });
+                break;
+            case 'bgGeneratePassword':
+                const tab_ = await BrowserApi.getTabFromCurrentWindow();
+                if (tab_ == null) {
+                  return;
+                }
+                if(msg.responseCommand === 'informMenuGetGeneratedPasswordNoOptions'){
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", { width: '400px', height: '180px'
+                    }); 
+                }
+                else {
+                  await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {width: '320px', height: '407px'});
+                }
+                break;
+            case 'informMenuTurnOff':
+                await this.turnOffAutofill(sender.tab)
+                break;
             default:
                 break;
         }
@@ -148,19 +181,19 @@ export default class NotificationBackground {
         });
     }
   
-    async checkNotificationQueue(tab: chrome.tabs.Tab = null): Promise<void> {
+    async checkNotificationQueue(tab: chrome.tabs.Tab = null, loginInfo: object = null): Promise<void> {
         if (this.notificationQueue.length === 0) {
             return;
         }
 
         if (tab != null) {
-            this.doNotificationQueueCheck(tab);
+            this.doNotificationQueueCheck(tab, loginInfo);
             return;
         }
 
         const currentTab = await BrowserApi.getTabFromCurrentWindow();
         if (currentTab != null) {
-            this.doNotificationQueueCheck(currentTab);
+            this.doNotificationQueueCheck(currentTab, loginInfo);
         }
     }
 
@@ -173,7 +206,7 @@ export default class NotificationBackground {
         setTimeout(() => this.cleanupNotificationQueue(), 2 * 60 * 1000); // check every 2 minutes
     }
 
-    private doNotificationQueueCheck(tab: chrome.tabs.Tab): void {
+    private doNotificationQueueCheck(tab: chrome.tabs.Tab, loginInfo: object): void {
         if (tab == null) {
             return;
         }
@@ -182,7 +215,10 @@ export default class NotificationBackground {
         if (tabDomain == null) {
             return;
         }
-
+        loginInfo = {
+          ...loginInfo,
+          uri: tabDomain 
+        }
         for (let i = 0; i < this.notificationQueue.length; i++) {
             if (this.notificationQueue[i].tabId !== tab.id || this.notificationQueue[i].domain !== tabDomain) {
                 continue;
@@ -194,6 +230,8 @@ export default class NotificationBackground {
                     typeData: {
                         isVaultLocked: this.notificationQueue[i].wasVaultLocked,
                     },
+                    loginInfo,
+                    queueMessage: this.notificationQueue[0]
                 });
             } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
                 BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
@@ -201,6 +239,7 @@ export default class NotificationBackground {
                     typeData: {
                         isVaultLocked: this.notificationQueue[i].wasVaultLocked,
                     },
+                    loginInfo
                 });
             }
             break;
@@ -217,7 +256,6 @@ export default class NotificationBackground {
 
   private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
       if (!await this.userService.isAuthenticated()) {
-            // console.log('unauthenticated')
             return;
         }
         const loginDomain = Utils.getDomain(loginInfo.url);
@@ -257,7 +295,7 @@ export default class NotificationBackground {
             if (disabledChangePassword) {
                 return;
             }
-            this.pushChangePasswordToQueue(usernameMatches[0].id, loginDomain, loginInfo.password, tab);
+            this.pushChangePasswordToQueue(usernameMatches[0].id, loginDomain, loginInfo.password, loginInfo.username, tab);
         }
     }
 
@@ -275,7 +313,7 @@ export default class NotificationBackground {
             wasVaultLocked: isVaultLocked,
         };
         this.notificationQueue.push(message);
-        await this.checkNotificationQueue(tab);
+      await this.checkNotificationQueue(tab, { username: loginInfo.username, password: loginInfo.password, uri: loginInfo.url});
     }
 
     private async changedPassword(changeData: ChangePasswordRuntimeMessage, tab: chrome.tabs.Tab) {
@@ -285,7 +323,7 @@ export default class NotificationBackground {
         }
 
         if (await this.vaultTimeoutService.isLocked()) {
-            this.pushChangePasswordToQueue(null, loginDomain, changeData.newPassword, tab, true);
+            this.pushChangePasswordToQueue(null, loginDomain, changeData.newPassword, '', tab, true);
             return;
         }
 
@@ -300,11 +338,11 @@ export default class NotificationBackground {
             id = ciphers[0].id;
         }
         if (id != null) {
-            this.pushChangePasswordToQueue(id, loginDomain, changeData.newPassword, tab);
+            this.pushChangePasswordToQueue(id, loginDomain, changeData.newPassword, ciphers[0].login.username, tab);
         }
     }
 
-    private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
+    private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
         // remove any old messages for this tab
         this.removeTabFromNotificationQueue(tab);
         const message: AddChangePasswordQueueMessage = {
@@ -317,7 +355,7 @@ export default class NotificationBackground {
             wasVaultLocked: isVaultLocked,
         };
         this.notificationQueue.push(message);
-        await this.checkNotificationQueue(tab);
+        await this.checkNotificationQueue(tab, {password: newPassword, username, uri: loginDomain});
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
@@ -444,19 +482,63 @@ export default class NotificationBackground {
         }
     }
 
-    private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string) {
+  private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
+        const otherTypes: CipherType[] = []
         const responseData: any = {};
         // console.log(tab)
         if (responseCommand === 'notificationBarGetFoldersList') {
             responseData.folders = await this.folderService.getAllDecrypted();
         }
-        if (responseCommand === 'informMenuGetCiphersList') {
-          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+        if (responseCommand === 'informMenuGetCiphersForCurrentTab') {
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null
+          }
+          else {
+            try {
+              responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+            } catch (error) {
+              responseData.ciphers = null
+            }
+          }
+        }
+        if (responseCommand === 'informMenuGetCiphers'){
+          if (type === CipherType.Card) {
+            otherTypes.push(CipherType.Card)
+          }
+          if (type === CipherType.Identity) {
+            otherTypes.push(CipherType.Identity);
+          }
+          const isAuthed = await this.userService.isAuthenticated();
+          if (!isAuthed) {
+            responseData.ciphers = null;
+          } else {
+            try {
+              if (type === CipherType.Login) {
+                responseData.ciphers = await this.cipherService.getAllDecrypted();
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === CipherType.Login)
+              } else {
+                responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(
+                  tab.url,
+                  otherTypes
+                ); 
+                responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
+              }
+            } catch (error) {
+              responseData.ciphers = null;
+            }
+          }
         }
         await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     }
 
     private async allowPersonalOwnership(): Promise<boolean> {
         return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
+    }
+  
+    private async turnOffAutofill(tab: chrome.tabs.Tab) {
+      BrowserApi.tabSendMessageData(tab, "closeInformMenu");
+      const hostname = Utils.getHostname(tab.url);
+      await this.cipherService.saveNeverDomain(hostname);
     }
 }

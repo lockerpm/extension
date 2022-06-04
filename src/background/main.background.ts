@@ -475,15 +475,15 @@ export default class MainBackground {
             title: this.i18nService.t('copyPassword'),
         });
 
-        if (await this.userService.canAccessPremium()) {
-            await this.contextMenusCreate({
-                type: 'normal',
-                id: 'copy-totp',
-                parentId: 'root',
-                contexts: ['all'],
-                title: this.i18nService.t('copyVerificationCode'),
-            });
-        }
+        // if (await this.userService.canAccessPremium()) {
+        //     await this.contextMenusCreate({
+        //         type: 'normal',
+        //         id: 'copy-totp',
+        //         parentId: 'root',
+        //         contexts: ['all'],
+        //         title: this.i18nService.t('copyVerificationCode'),
+        //     });
+        // }
 
         await this.contextMenusCreate({
             type: 'separator',

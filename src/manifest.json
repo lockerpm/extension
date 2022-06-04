@@ -101,7 +101,7 @@
     "matches": [
       "https://*.demo.cystack.net:3011/*",
       "https://*.locker.io/*",
-      "https://*.id.cystack.net/"
+      "https://*.id.locker.io/"
     ]
   },
   "sidebar_action": {

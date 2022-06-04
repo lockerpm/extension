@@ -11,6 +11,9 @@ export default Vue.extend({
   components: {
     AddEditCipher
   },
+  mounted() {
+    console.log(this.type)
+  },
   computed: {
     type(){
       return this.$route.params.type

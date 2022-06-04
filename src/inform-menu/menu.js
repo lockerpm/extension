@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(load, 50);
 
   function load () {
-    const responseCiphersCommand = 'informMenuGetCiphersList';
+    const responseCiphersCommand = 'informMenuGetCiphersForCurrentTab';
+    const responseSomethingElse = 'informMenuGetCiphers'
     const responseGeneratePassword = 'informMenuGetGeneratedPassword'
+    const responseGeneratePasswordNoOptions = 'informMenuGetGeneratedPasswordNoOptions'
     const btnDropdown = document.getElementById('dropdownOptions')
     btnDropdown.onclick = function () {
       changeMenuContent()
@@ -14,13 +16,62 @@ document.addEventListener('DOMContentLoaded', () => {
         fillMenuWithCiphers(msg.data.ciphers);
       }
       if (msg.command === responseGeneratePassword && msg.data) {
-        showGeneratedPassword(msg.data.password)
+        showGeneratedPassword(msg.data)
+      }
+      if (msg.command === responseGeneratePasswordNoOptions && msg.data) {
+        showGeneratedPasswordNoOptions(msg.data)
+      }
+      if (msg.command === responseSomethingElse && msg.data) {
+        fillMenuWithCiphers(msg.data.ciphers)
       }
     });
-    sendPlatformMessage({
-      command: 'bgGetDataForTab',
-      responseCommand: responseCiphersCommand
-    });
+    if (getQueryVariable('generate')) {
+      document.getElementById('header-title').innerHTML = 'Password Generator'
+      setContent(document.getElementById('template-generated-password'));
+      var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
+      var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
+      var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
+      usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
+      showPasswordButton.addEventListener('click', () => {
+        var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
+        inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
+      });
+      showOptionsButton.addEventListener('click', getPasswordGeneration);
+      sendPlatformMessage({
+        command: 'bgGeneratePassword',
+        responseCommand: responseGeneratePasswordNoOptions
+      });
+    }
+    else {
+      setContent(document.getElementById('template-list-ciphers'));
+      sendPlatformMessage({
+        command: 'bgGetDataForTab',
+        responseCommand: responseCiphersCommand
+      });
+    }
+  }
+  function getQueryVariable (variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (pair[0] === variable) {
+        return pair[1];
+      }
+    }
+
+    return null;
+  }
+  function setContent (element) {
+    const content = document.getElementById('content');
+    while (content.firstChild) {
+      content.removeChild(content.firstChild);
+    }
+
+    var newElement = element.cloneNode(true);
+    newElement.id = newElement.id + '-clone';
+    content.appendChild(newElement);
   }
   function sendPlatformMessage (msg) {
     chrome.runtime.sendMessage(msg);
@@ -28,13 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function fillMenuWithCiphers (ciphers) {
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
     if (listContainer != null) {
+      if (ciphers == null) {
+        listContainer.innerHTML = '<div class="cs-inform-no-ciphers">Vault is locked.</div>'
+        return
+      }
       if (!ciphers.length) {
-        listContainer.innerHTML = 'No passwords found for this site.'
+        listContainer.innerHTML = '<div class="cs-inform-no-ciphers">No passwords found for this site.</div>'
         return
       }
       for (let i = 0; i < ciphers.length; i++) {
         const cipherRow = document.createElement("div");
-        cipherRow.textContent = ciphers[i].login.username
+        cipherRow.textContent = getSubTitle(ciphers[i])
         cipherRow.setAttribute('id', ciphers[i].id)
         cipherRow.classList.add('selection-item')
         listContainer.appendChild(cipherRow)
@@ -43,62 +98,98 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+    function getSubTitle (cipher) {
+      let subTitle = ''
+      if (cipher.type === 1) {
+        subTitle = cipher.login.username
+      }
+      else if (cipher.type === 3) {
+        if (cipher.card._subTitle == null) {
+          let _subTitle = this.brand;
+          if (cipher.card.number != null && cipher.card.number.length >= 4) {
+            if (cipher.card._subTitle != null && cipher.card._subTitle !== '') {
+              _subTitle += ', ';
+            } else {
+              _subTitle = '';
+            }
+
+            // Show last 5 on amex, last 4 for all others
+            const count = cipher.card.number.length >= 5 && cipher.card.number.match(new RegExp('^3[47]')) != null ? 5 : 4;
+            _subTitle += ('*' + cipher.card.number.substr(cipher.card.number.length - count));
+          }
+          subTitle = _subTitle
+        }
+        subTitle = cipher.card._subTitle
+      }
+      else if (cipher.type === 4) {
+        let _subTitle = ''
+        if (cipher.identity._subTitle == null && (cipher.identity.firstName != null || cipher.identity.lastName != null)) {
+          _subTitle = '';
+          if (cipher.identity.firstName != null) {
+            _subTitle = cipher.identity.firstName;
+          }
+          if (cipher.identity.lastName != null) {
+            if (_subTitle !== '') {
+              _subTitle += ' ';
+            }
+            _subTitle += cipher.identity.lastName;
+          }
+          subTitle = _subTitle
+        }
+        subTitle = cipher.identity._subTitle
+      }
+      return subTitle
+    }
   }
   function changeMenuContent () {
-    const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
-    if (listContainer) {
-      const optionsContainer = '<div class="dropdown-options-list"><div id="OPTION_GENPASS" class="dropdown-option">Generate Password</div></div>'
-      listContainer.parentElement.innerHTML = optionsContainer
+    const optionsContainer = document.getElementById('template-dropdown-options-clone');
+    if (!optionsContainer) {
+      setContent(document.getElementById('template-dropdown-options'))
       document.getElementById('OPTION_GENPASS').onclick = getPasswordGeneration
+      document.getElementById('OPTION_FILLELSE').onclick = getSomethingElseToFill
+      document.getElementById('OPTION_TURNOFF').addEventListener('click', (e) => {
+        e.preventDefault();
+        sendPlatformMessage({
+          command: 'informMenuTurnOff'
+        });
+      });
     }
     else {
-      const mainContainer = document.getElementsByTagName('main')[0]
-      mainContainer.innerHTML = '<div class="cs-list-withScroll"></div>'
-      sendPlatformMessage({
-        command: 'bgGetDataForTab',
-        responseCommand: 'informMenuGetCiphersList'
-      });
+      // document.getElementById('header-title').innerHTML = 'Saved Login'
+      // const mainContainer = document.getElementsByTagName('main')[0]
+      // mainContainer.innerHTML = '<div class="cs-list-withScroll"></div>'
+      // sendPlatformMessage({
+      //   command: 'bgGetDataForTab',
+      //   responseCommand: 'informMenuGetCiphersForCurrentTab'
+      // });
+      if (getQueryVariable('generate')) {
+        document.getElementById('header-title').innerHTML = 'Password Generator'
+        setContent(document.getElementById('template-generated-password'));
+        var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
+        var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
+        var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
+        usePasswordButton.addEventListener('click', function () { useGeneratedPassword ('input')});
+        showPasswordButton.addEventListener('click', () => {
+          var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
+          inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
+        });
+        showOptionsButton.addEventListener('click', getPasswordGeneration);
+        sendPlatformMessage({
+          command: 'bgGeneratePassword',
+          responseCommand: 'informMenuGetGeneratedPasswordNoOptions'
+        });
+      }
+      else {
+        setContent(document.getElementById('template-list-ciphers'));
+        sendPlatformMessage({
+          command: 'bgGetDataForTab',
+          responseCommand: 'informMenuGetCiphersForCurrentTab'
+        });
+      }
     }
   }
   function getPasswordGeneration () {
-    const passwordGenerationContainer = 
-    `<div class="cs-generate-password">
-      <div class="cs-generate-password-password">
-      </div>
-      <div>
-        <button onclick="useGeneratedPassword">
-          Use this password
-        </button>
-      </div>
-      <div class="cs-generate-password-options">
-        <div class="cs-ui-components">
-          <input id="password_length_slider" max="64" min="8" step="1" type="range" value="16">
-        </div>
-        <hr>
-        <label class="cs-generator-checkbox ui-components">
-          <input type="checkbox" id="checkbox_use_upper" class="ui-components" checked>
-          <span>Use uppercase letters (A-Z)</span>
-        </label>
-        <label class="cs-generator-checkbox ui-components">
-          <input type="checkbox" id="checkbox_use_lower" class="ui-components" checked>
-          <span>Use lowercase letters (A-Z)</span>
-        </label>
-        <label class="cs-generator-checkbox ui-components">
-          <input type="checkbox" id="checkbox_use_digits" class="ui-components" checked>
-          <span>Use digits (0-9)</span>
-        </label>
-        <label class="cs-generator-checkbox ui-components">
-          <input type="checkbox" id="checkbox_use_symbols" class="ui-components" checked>
-          <span>Use symbols (@!$%*)</span>
-        </label>
-        <label class="cs-generator-checkbox ui-components">
-          <input type="checkbox" id="checkbox_avoid_ambiguous" class="ui-components">
-          <span>Avoid ambiguous characters</span>
-        </label>
-      </div>
-    </div>`
-    const mainContainer = document.getElementsByTagName('main')[0]
-    mainContainer.innerHTML = passwordGenerationContainer
+    setContent(document.getElementById('template-generate-password'))
     document.getElementById('header-title').innerHTML = 'Password Generator'
     const passwordSlider = document.getElementById('password_length_slider')
     const checkboxArray = ['password_length_slider', 'checkbox_use_upper', 'checkbox_use_lower', 'checkbox_use_digits', 'checkbox_use_symbols', 'checkbox_avoid_ambiguous']
@@ -107,6 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('')
       }
     }
+    document.getElementById('button_use_password').onclick = useGeneratedPassword
+    document.getElementById('button_regenerate').onclick = bgGeneratePassword
     for (let i = 0; i < checkboxArray.length; i++){
       const checkboxEl = document.getElementById(checkboxArray[i])
       if (checkboxEl) {
@@ -115,8 +208,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     bgGeneratePassword()
   }
-  function showGeneratedPassword (password) {
-    document.getElementsByClassName('cs-generate-password-password')[0].textContent = password
+  function getSomethingElseToFill () {
+    const responseCiphersCommand = 'informMenuGetCiphers'
+    document.getElementById('header-title').innerHTML = 'What should be here?'
+    const mainContainer = document.getElementsByTagName('main')[0]
+    // mainContainer.innerHTML = allCategoriesContainer
+    setContent(document.getElementById('template-categories-list'))
+    const categorySelections = ['selection_password', 'selection_card', 'selection_identity']
+    for (let i = 0; i < categorySelections.length; i++) {
+      const checkboxEl = document.getElementById(categorySelections[i])
+      if (checkboxEl) {
+        checkboxEl.addEventListener('click', (e) => {
+          e.preventDefault();
+          sendPlatformMessage({
+            command: 'bgGetDataForTab',
+            type: i===0?1:i===1?3:4,
+            responseCommand: responseCiphersCommand
+          });
+          const cipherListContainer = `<div class="cs-list-withScroll"></div>`
+          mainContainer.innerHTML = cipherListContainer
+        });
+      }
+    }
+  }
+  function showGeneratedPasswordNoOptions (passwordData) {
+    document.querySelector('#template-generated-password-clone .generated-password').value = passwordData.password
+  }
+  function showGeneratedPassword (passwordData) { 
+    let color = '#000000'
+    let textStrength = ''
+    switch (passwordData.passwordStrength.score) {
+    case 4:
+      color = '#3DB249'
+      textStrength = 'Strong'
+      break;
+    case 3:
+      color = '#0363C2'
+      textStrength = 'Good'
+      break;
+    case 2:
+      color = '#FF9800'
+      textStrength = 'Medium'
+      break;
+    case 1:
+    case 0:
+      color = '#F54F64'
+      textStrength = 'Weak'
+      break;
+    default:
+      break;
+      
+    }
+    document.getElementById('password_strength').style.color = color
+    document.getElementById('password_strength_text').innerHTML = textStrength
+    document.getElementById('password_length').innerHTML = passwordData.password.length
+    document.getElementById('generated_password').innerHTML = passwordData.password
   }
   function bgGeneratePassword () {
     const generateOptions = getGeneratePasswordOptions()
@@ -144,5 +290,17 @@ document.addEventListener('DOMContentLoaded', () => {
       special: specialEl.checked,
       ambiguous: ambiguousEl.checked
     }
+  }
+  function useGeneratedPassword (type = 'div') {
+    let password = ''
+    if (type === 'input') {
+      password = document.querySelector('#template-generated-password-clone .generated-password').value
+    } else {
+      password = document.getElementById('generated_password').textContent
+    }
+    sendPlatformMessage({
+      command: 'informMenuUsePassword',
+      password: password
+    })
   }
 })

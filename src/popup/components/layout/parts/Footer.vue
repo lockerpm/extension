@@ -1,5 +1,5 @@
 <template>
-  <div
+  <!-- <div
     v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator'].includes(this.$route.name)"
     id="popup-navigator"
     class="h-auto grid grid-cols-4 bg-white fixed bottom-0"
@@ -16,6 +16,30 @@
       </div>
       {{item.label}}
     </router-link>
+  </div> -->
+  <div
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'notes', 'identities', 'cards', 'folders'].includes(this.$route.name)"
+    id="popup-navigator"
+    class="h-10 bg-white fixed bottom-0 flex justify-between"
+    style="z-index:1; width: 400px; padding: 12px 16px"
+  >
+    <a
+      href="https://locker.io/vault"
+      target="_blank"
+      class="font-semibold"
+      style="color: #005AE4"
+    >
+      {{$t('data.parts.open_web_app')}}
+    </a>
+    <div
+      class="cursor-pointer"
+      @click="syncData"
+    >
+      <span>
+        <i class="fas fa-sync-alt"></i>
+      </span>
+      {{$t('data.parts.sync_data')}}
+    </div>
   </div>
 </template>
 
@@ -29,6 +53,11 @@ export default Vue.extend({
   asyncComputed: {
     async locked () {
       return await this.$vaultTimeoutService.isLocked()
+    }
+  },
+  methods: {
+    syncData () {
+      this.getSyncData(true)
     }
   },
   computed: {
@@ -66,7 +95,10 @@ export default Vue.extend({
 
 <style>
 #popup-header input {
-  height: 32px;
+  background-color: #e4f0e6;
+  height: 36px;
+  border-radius: 42px;
+  border: 0;
 }
 #popup-navigator .router-link-exact-active.router-link-active {
   color: #268334;

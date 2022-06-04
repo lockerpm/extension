@@ -1,9 +1,5 @@
 <template>
-  <div 
-    class="relative mx-auto"
-    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
-  >
-    <Header></Header>
+  <div style="padding-top: 180px; padding-bottom: 56px;">
     <div
       v-if="!isLoggedIn"
       class="p-6"
@@ -37,9 +33,12 @@
         </button>
       </div>
     </div>
-    <div v-else v-loading="loading">
-      <template v-if="searchText.length>1">
-        <ul>
+    <div
+      v-else
+      class="p-4 text-[#A2A3A7]"
+    >
+      <!-- <template v-if="searchText.length>1">
+        <ul class="list-ciphers">
           <cipher-row
             v-for="item in ciphers"
             :key="item.id"
@@ -48,196 +47,104 @@
           >
           </cipher-row>
         </ul>
-      </template>
-      <ul
-        v-else
-        class=""
-      >
-        <div class="uppercase px-3 mt-4 mb-1">{{$t('data.home.for_current')}} ({{loginCiphers.length}})</div>
-        <div
-          v-if="!loginCiphers.length"
-          class="bg-white text-center py-4"
-        >
-          <p class="mb-2">{{$t('data.home.no_for_current')}}</p>
-          <router-link
-            :to="{name: 'add-item-create'}"
-            class="uppercase text-primary hover:no-underline"
-          >{{$t('data.home.add_password')}}</router-link>
+      </template> -->
+      <template>
+        <!-- For current website -->
+        <div v-if="searchText.length<2" class="mb-1">
+          <div class="mb-4 font-semibold">{{$t('data.home.for_current')}}</div>
+          <ul class="list-ciphers">
+            <div
+              v-if="!loginCiphers.length"
+              class="bg-white py-2 px-4 cursor-pointer" style="border-radius: 12px"
+              @click="goToAddItem"
+            >
+              <!-- <p class="mb-2">{{$t('data.home.no_for_current')}}</p> -->
+              <!-- <router-link
+                :to="{name: 'add-item-create'}"
+                class="uppercase text-primary hover:no-underline"
+              >
+              {{$t('data.home.add_password')}}
+              </router-link> -->
+              <div class="flex">
+                <img src="@/assets/images/icons/icon_default.svg">
+                <div class="ml-4 text-left">
+                  <div class="text-head-6 text-black font-semibold">
+                    {{$t('data.home.add_password')}}
+                  </div>
+                  <div class="text-[14px] text-black-500">
+                    {{$t('data.home.no_for_current')}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <cipher-row
+              v-for="item in loginCiphers"
+              :key="item.id"
+              :item="item"
+              @do-fill="fillCipher(item)"
+            >
+            </cipher-row>
+          </ul>
         </div>
-        <li
-          v-for="item in loginCiphers"
-          :key="item.id"
-          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click.self="fillCipher(item)"
-        >
 
-          <div
-            class="text-[34px] mr-3 flex-shrink-0"
-            :class="{'filter grayscale': item.isDeleted}"
-            @click="fillCipher(item)"
-          >
-            <Vnodes :vnodes="getIconCipher(item, 34)" />
-          </div>
-          <div
-            class="flex-grow"
-            @click="fillCipher(item)"
-          >
-            <div class="text-black font-semibold truncate flex items-center">
-              {{ item.name }}
-            </div>
-            <div>
-              {{ item.subTitle }}
-            </div>
-          </div>
-          <div>
-            <div class="col-actions">
-              <button
-                v-if="item.login.canLaunch"
-                class="btn btn-icon btn-xs hover:text-primary"
-                :title="`Launch ${item.login.uri}`"
-                @click="openNewTab(item.login.uri)"
-              >
-                <i class="fas fa-external-link-square-alt" />
-              </button>
-              <el-dropdown
-                trigger="click"
-                :hide-on-click="false"
-              >
-                <button class="btn btn-icon btn-xs hover:text-primary">
-                  <i class="fas fa-clone" />
-                </button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.username"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.username') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    v-clipboard:copy="item.login.password"
-                    v-clipboard:success="clipboardSuccessHandler"
-                  >
-                    {{ $t('common.copy') }} {{ $t('common.password') }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <button
-                class="btn btn-icon btn-xs hover:text-primary"
-                @click="addEdit(item)"
-              >
-                <i class="fas fa-pen" />
-              </button>
-            </div>
-          </div>
-        </li>
-        <div
+        <!-- All Passwords -->
+        <ListCipher
+          :filter="c => c.type === CipherType['Login']"
+          route-name="home"
+        />
+
+        <!-- <div
           v-if="cardCiphers.length"
-          class="uppercase px-3 mt-4 mb-1"
-        >{{$tc('type.Card', 2)}} ({{cardCiphers.length}})</div>
-        <li
-          v-for="item in cardCiphers"
-          :key="item.id"
-          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click.self="fillCipher(item)"
+          class="mt-4 mb-1"
         >
-          <div
-            class="text-[34px] mr-3 flex-shrink-0"
-            :class="{'filter grayscale': item.isDeleted}"
-            @click="fillCipher(item)"
+          {{$tc('type.Card', 2)}} ({{cardCiphers.length}})
+        </div>
+        <ul class="list-ciphers">
+          <cipher-row
+            v-for="item in cardCiphers"
+            :key="item.id"
+            :item="item"
+            @do-fill="fillCipher(item)"
           >
-            <Vnodes :vnodes="getIconCipher(item, 34)" />
-          </div>
-          <div
-            class="flex-grow"
-            @click="fillCipher(item)"
-          >
-            <div class="text-black font-semibold truncate flex items-center">
-              {{ item.name }}
-            </div>
-            <div>
-              {{ item.subTitle }}
-            </div>
-          </div>
-          <div>
-            <div class="col-actions">
-              <button
-                class="btn btn-icon btn-xs hover:text-primary"
-                @click="addEdit(item)"
-              >
-                <i class="fas fa-pen" />
-              </button>
-            </div>
-          </div>
-        </li>
+          </cipher-row>
+        </ul>
         <div
           v-if="identityCiphers.length"
-          class="uppercase px-3 mt-4 mb-1"
-        >{{$tc('type.Identity', 2)}} ({{identityCiphers.length}})</div>
-        <li
-          v-for="item in identityCiphers"
-          :key="item.id"
-          class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
-          @click.self="fillCipher(item)"
+          class="mt-4 mb-1"
         >
-          <div
-            class="text-[34px] mr-3 flex-shrink-0"
-            :class="{'filter grayscale': item.isDeleted}"
-            @click="fillCipher(item)"
+          {{$tc('type.Identity', 2)}} ({{identityCiphers.length}})
+        </div>
+        <ul class="list-ciphers">
+          <cipher-row
+            v-for="item in identityCiphers"
+            :key="item.id"
+            :item="item"
+            @do-fill="fillCipher(item)"
           >
-            <Vnodes :vnodes="getIconCipher(item, 34)" />
-          </div>
-          <div
-            class="flex-grow"
-            @click="fillCipher(item)"
-          >
-            <div class="text-black font-semibold truncate flex items-center">
-              {{ item.name }}
-            </div>
-            <div>
-              {{ item.subTitle }}
-            </div>
-          </div>
-          <div>
-            <div class="col-actions">
-              <button
-                class="btn btn-icon btn-xs hover:text-primary"
-                @click="addEdit(item)"
-              >
-                <i class="fas fa-pen" />
-              </button>
-            </div>
-          </div>
-        </li>
-      </ul>
+          </cipher-row>
+        </ul> -->
+      </template>
     </div>
-    <Footer></Footer>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import orderBy from "lodash/orderBy";
-import groupBy from "lodash/groupBy";
 import { BrowserApi } from "@/browser/browserApi";
 import { Utils } from "jslib-common/misc/utils";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { ConstantsService } from "jslib-common/services/constants.service";
-import { StorageService } from "jslib-common/abstractions/storage.service";
 import BrowserStorageService from "@/services/browserStorage.service";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
-import Vnodes from "@/components/Vnodes";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
-import Header from "@/popup/components/layout/parts/Header";
-import Footer from "@/popup/components/layout/parts/Footer";
+import ListCipher from "@/popup/components/ciphers/ListCipher";
 const BroadcasterSubscriptionId = "CurrentTabComponent";
 export default Vue.extend({
   name: "Home",
   components: {
-    Vnodes,
     CipherRow,
-    Header,
-    Footer
+    ListCipher,
   },
   data() {
     return {
@@ -257,7 +164,7 @@ export default Vue.extend({
       totpTimeout: null,
       loadedTimeout: null,
       searchTimeout: null,
-      loading: true
+      loading: false,
     };
   },
   async mounted() {
@@ -280,36 +187,52 @@ export default Vue.extend({
   destroyed() {
     window.clearTimeout(this.loadedTimeout);
   },
-  watch: {
-    ciphers () {
-      if (this.ciphers) {
-        this.loading = false
-      }
-      window.setTimeout(() => {
-        this.load();
-      }, 500);
-    }
-  },
-  asyncComputed: {
-    ciphers: {
-      async get() {
-        const deletedFilter = (c) => {
-          return c.isDeleted === false;
-        };
-        const result = await this.$searchService.searchCiphers(this.searchText,[null, deletedFilter],null) || []
+  // watch: {
+  //   ciphers() {
+  //     if (this.ciphers) {
+  //       this.loading = false;
+  //     }
+  //     window.setTimeout(() => {
+  //       this.load();
+  //     }, 500);
+  //   },
+  // },
+  // asyncComputed: {
+  //   ciphers: {
+  //     async get() {
+  //       const deletedFilter = (c) => {
+  //         return c.isDeleted === false;
+  //       };
+  //       const result =
+  //         (await this.$searchService.searchCiphers(
+  //           this.searchText,
+  //           [null, deletedFilter],
+  //           null
+  //         )) || [];
 
-        return (orderBy(result,[c => this.orderField === "name"? c.name && c.name.toLowerCase() : c.revisionDate,], [this.orderDirection]) || [])
-      },
-      watch: [
-        "$store.state.syncedCiphersToggle",
-        "deleted",
-        "searchText",
-        "filter",
-        "orderField",
-        "orderDirection",
-      ],
-    },
-  },
+  //       return (
+  //         orderBy(
+  //           result,
+  //           [
+  //             (c) =>
+  //               this.orderField === "name"
+  //                 ? c.name && c.name.toLowerCase()
+  //                 : c.revisionDate,
+  //           ],
+  //           [this.orderDirection]
+  //         ) || []
+  //       );
+  //     },
+  //     watch: [
+  //       "$store.state.syncedCiphersToggle",
+  //       "deleted",
+  //       "searchText",
+  //       "filter",
+  //       "orderField",
+  //       "orderDirection",
+  //     ],
+  //   },
+  // },
   methods: {
     openLogin() {
       // const url = `${
@@ -431,10 +354,7 @@ export default Vue.extend({
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
         // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-        this.notify(
-          this.$t('errors.autofill'),
-          "error"
-        );
+        this.notify(this.$t("errors.autofill"), "error");
         return;
       }
       // console.log(this.pageDetails)
@@ -462,10 +382,7 @@ export default Vue.extend({
           }
         }
       } catch (e) {
-        this.notify(
-          this.$t('errors.autofill'),
-          "error"
-        );
+        this.notify(this.$t("errors.autofill"), "error");
         // this.notify(e, 'warning')
       }
     },
@@ -499,6 +416,9 @@ export default Vue.extend({
         break;
       }
     },
+    goToAddItem () {
+      this.$router.push({ name: "add-item-create"});
+    }
   },
 });
 </script>

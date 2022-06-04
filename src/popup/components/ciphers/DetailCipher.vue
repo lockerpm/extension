@@ -170,6 +170,86 @@
           :text="cipher.identity.country"
         />
       </template>
+      <template v-if="cipher.type === 6 && cipher.cryptoAccount">
+        <TextHaveCopy
+          label="Email / Username"
+          :text="cipher.cryptoAccount.username"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.password')"
+          :text="cipher.cryptoAccount.password"
+          :view-password="cipher.viewPassword"
+          should-hide
+        />
+        <div class="grid md:grid-cols-6 cipher-item">
+          <div class="">{{ $t('data.ciphers.password_security') }}</div>
+          <div class="col-span-4 font-semibold">
+            <PasswordStrength :score="passwordStrength.score" />
+          </div>
+        </div>
+        <div
+          v-if="cipher.cryptoAccount.uris"
+          class="grid md:grid-cols-6 cipher-item"
+        >
+          <div class="">{{ $t('data.ciphers.website_address') }}</div>
+          <div class="col-span-4 font-semibold">
+            {{ cipher.cryptoAccount.uris.uri }}
+          </div>
+          <div class="text-right">
+            <button
+              class="btn btn-icon btn-xs btn-action"
+              :title="$t('common.go_to_website')"
+              @click="openNewTab(cipher.cryptoAccount.uris.uri)"
+            >
+              <i class="fas fa-external-link-square-alt" />
+            </button>
+          </div>
+        </div>
+        <TextHaveCopy
+          :label="$t('data.ciphers.phone')"
+          :text="cipher.cryptoAccount.phone"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.recovery_email')"
+          :text="cipher.cryptoAccount.emailRecovery"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.cryptoAccount.notes"
+          :text-area="true"
+        />
+      </template>
+      <template v-if="cipher.type === 7 && cipher.cryptoWallet">
+        <TextHaveCopy
+          label="Email"
+          :text="cipher.cryptoWallet.email"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.password')"
+          :text="cipher.cryptoWallet.password"
+          :view-password="cipher.viewPassword"
+          should-hide
+        />
+        <div class="grid md:grid-cols-6 cipher-item">
+          <div class="">{{ $t('data.ciphers.password_security') }}</div>
+          <div class="col-span-4 font-semibold">
+            <PasswordStrength :score="passwordStrength.score" />
+          </div>
+        </div>
+        <TextHaveCopy
+          :label="$t('data.ciphers.wallet_address')"
+          :text="cipher.cryptoWallet.address"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.seed')"
+          :text="cipher.cryptoWallet.seed"
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.cryptoWallet.notes"
+          :text-area="true"
+        />
+      </template>
       <TextHaveCopy
         :label="$t('data.ciphers.notes')"
         :text="cipher.notes"
@@ -271,6 +351,10 @@ export default Vue.extend({
     passwordStrength () {
       if (this.cipher.login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
+      } else if (this.cipher.cryptoAccount) {
+        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
+      } else if (this.cipher.cryptoWallet) {
+        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
       }
       return {}
     }
@@ -281,7 +365,27 @@ export default Vue.extend({
         const deletedFilter = c => {
           return c.isDeleted === false
         }
-        return await this.$searchService.searchCiphers('', [null, deletedFilter], null) || []
+        const result = await this.$searchService.searchCiphers('', [null, deletedFilter], null) || []
+        result.map(item => {
+          if (item.type === CipherType.CryptoAccount) {
+            try {
+              item.cryptoAccount = JSON.parse(item.notes)
+              // item.notes = item.cryptoAccount ? item.cryptoAccount.notes : null
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          if (item.type === CipherType.CryptoWallet) {
+            try {
+              item.cryptoWallet = JSON.parse(item.notes)
+              // item.notes = item.cryptoWallet ? item.cryptoWallet.notes : ''
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          return item
+        })
+        return result
       },
       watch: ['$store.state.syncedCiphersToggle']
     },

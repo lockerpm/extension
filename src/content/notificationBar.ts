@@ -2,7 +2,7 @@ import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
 
 document.addEventListener('DOMContentLoaded', event => {
-    if (window.location.hostname.indexOf('id.cystack.net') > -1) {
+    if (window.location.hostname.indexOf('id.locker.io') > -1) {
         return;
     }
 
@@ -17,12 +17,14 @@ document.addEventListener('DOMContentLoaded', event => {
     let observeDomTimeout: number = null;
     const inIframe = isInIframe();
     const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create']);
+    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập']);
+    const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
     const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
     const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
-
+    let inputWithLogo: any[] = []
+    let isSignUp = false
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', event => {
             if (inIframe) {
                 return;
             }
-            closeExistingAndOpenBar(msg.data.type, msg.data.typeData);
+            closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
             sendResponse();
             return true;
         } else if (msg.command === 'closeNotificationBar') {
@@ -68,12 +70,85 @@ document.addEventListener('DOMContentLoaded', event => {
             sendResponse();
             return true;
         } else if (msg.command === 'notificationBarPageDetails') {
-          console.log(msg.data)
             pageDetails.push(msg.data.details);
             watchForms(msg.data.forms);
-            // for (let i = 0; i < msg.data.passwordFields.length; i++){
-            //   setFillLogo(msg.data.passwordFields[i].htmlID);
-            // }
+            chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
+              if (autofillObj.enableAutofill === false) return;
+              chrome.storage.local.get("neverDomains", (ndObj: any) => {
+                const domains = ndObj.neverDomains;
+                if (
+                  domains == null ||
+                  !domains.hasOwnProperty(window.location.hostname)
+                ) {
+                  for (let i = 0; i < msg.data.passwordFields.length; i++) {
+                    try {
+                      inputWithLogo.push(
+                        setFillLogo(msg.data.passwordFields[i], "password")
+                      );
+                    } catch (error) {
+                    }
+                  }
+                  for (let i = 0; i < msg.data.usernameFields.length; i++) {
+                    try {
+                      inputWithLogo.push(
+                        setFillLogo(msg.data.usernameFields[i], "username")
+                      );
+                    } catch (error) {
+                    }
+                  }
+                  inputWithLogo = inputWithLogo.filter(e => e != null)
+                  document.onclick = check;
+                  function check(e) {
+                    const target = e && e.target;
+                    let check = false;
+                    for (let i = 0; i < inputWithLogo.length; i++) {
+                      if (
+                        checkParent(target, inputWithLogo[i].inputEl) ||
+                        checkParent(target, inputWithLogo[i].logo)
+                      ) {
+                        check = true;
+                        closeOtherMenu(i);
+                      }
+                    }
+                    if (!check) {
+                      for (let i = 0; i < inputWithLogo.length; i++) {
+                        const elPosition = inputWithLogo[
+                          i
+                        ].inputEl.getBoundingClientRect();
+                        const elOffset = {
+                          left: getOffsetLeft(inputWithLogo[i].inputEl),
+                          top: getOffsetTop(inputWithLogo[i].inputEl)
+                        };
+                        closeInformMenu(false, elPosition, elOffset);
+                      }
+                    }
+                  }
+                  function closeOtherMenu(indexClick) {
+                    for (let i = 0; i < inputWithLogo.length; i++) {
+                      if (i !== indexClick) {
+                        const elPosition = inputWithLogo[
+                          i
+                        ].inputEl.getBoundingClientRect();
+                        const elOffset = {
+                          left: getOffsetLeft(inputWithLogo[i].inputEl),
+                          top: getOffsetTop(inputWithLogo[i].inputEl)
+                        };
+                        closeInformMenu(false, elPosition, elOffset);
+                      }
+                    }
+                  }
+                  function checkParent(t, elm) {
+                    while (t.parentNode) {
+                      if (t === elm) {
+                        return true;
+                      }
+                      t = t.parentNode;
+                    }
+                    return false;
+                  }
+                }
+              });
+            })
             sendResponse();
             return true;
         }
@@ -82,6 +157,29 @@ document.addEventListener('DOMContentLoaded', event => {
             watchForms(msg.data.forms);
             sendResponse();
             return true;
+        }
+        else if (msg.command === 'informMenuPassword') {
+          useGeneratedPassword(msg.data.password)
+          // console.log(msg.data.password)
+          // console.log(passwordFields)
+        }
+        else if (msg.command === "resizeInformMenu") {
+          resizeInformMenu(msg.data)
+        }
+        else if (msg.command === "closeInformMenu") {
+          if (inIframe) {
+            return;
+          }
+          for (const logoField of inputWithLogo) {
+            const elPosition = logoField.inputEl.getBoundingClientRect();
+            const elOffset = {
+              left: getOffsetLeft(logoField.inputEl),
+              top: getOffsetTop(logoField.inputEl)
+            };
+            closeInformMenu(false, elPosition, elOffset);
+          }
+          sendResponse();
+          return true;
         }
     }
 
@@ -188,7 +286,7 @@ document.addEventListener('DOMContentLoaded', event => {
     }
 
   
-    function watchForms(forms: any[]) {
+  function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
         }
@@ -220,49 +318,97 @@ document.addEventListener('DOMContentLoaded', event => {
         });
     }
     
-    function setFillLogo(htmlID) {
-      const logo = document.createElement("span");
-      logo.id = 'logo-' + htmlID
-      const passwordInput = document.getElementById(htmlID);
-      logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
-              height: 20px;
-              width: 20px;
-              right: 10px !important;
-              position: absolute;
-              top: 11px`;
-      passwordInput.parentNode.insertBefore(
-        logo,
-        passwordInput.nextElementSibling
-      );
-      const elPosition = passwordInput.getBoundingClientRect();
-      logo.addEventListener("click", () => {
-        openInformMenu(elPosition);
-      });
-      document.onclick = check;
-      function check(e) {
-        const target = e && e.target;
-
-        // Nav Menu
-        if (!checkParent(target, passwordInput)) {
-          // click NOT on the menu
-          // close inform menu
-          if (!checkParent(target, logo)) {
-           closeInformMenu(false, elPosition); 
-          }
+    function useGeneratedPassword(password) {
+      for (const logoField of inputWithLogo) {
+        if (logoField.type === 'password') {
+          logoField.inputEl.value = password;
         }
       }
-      function checkParent(t, elm) {
-        while (t.parentNode) {
-          if (t === elm) {
-            return true;
-          }
-          t = t.parentNode;
-        }
-        return false;
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
+        const elOffset = {
+          left: getOffsetLeft(logoField.inputEl),
+          top: getOffsetTop(logoField.inputEl)
+        };
+        closeInformMenu(false, elPosition, elOffset);
       }
     }
-    function closeInformMenu(explicitClose: boolean, elPosition: any) {
-      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left));
+  
+    function setFillLogo(el, type='password') {
+      const logo = document.createElement("span");
+      logo.id = 'cs-logo-' + (el.htmlID || el.htmlName)
+      let inputEl = document.getElementById(el.htmlID);
+      if (!inputEl) {
+        inputEl = document.getElementsByName(el.htmlName)[0]
+      }
+      if (inputEl && getComputedStyle(inputEl).display !== 'none') {
+        const elPosition = inputEl.getBoundingClientRect();
+        let relativeContainer = inputEl.parentElement
+        while (getComputedStyle(relativeContainer).position !== 'relative') {
+          relativeContainer = relativeContainer.parentElement
+          if (relativeContainer === null || relativeContainer.tagName.toLowerCase() === 'html') {
+            break;
+          }
+        }
+        if (relativeContainer) {
+          const containerPosition = relativeContainer.getBoundingClientRect();
+          logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+              height: 20px;
+              min-width: 20px;
+              position: absolute;
+              z-index: 1;
+              left: ${elPosition.left - containerPosition.left +  elPosition.width - 30}px;
+              top: ${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`;
+
+          inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
+          logo.addEventListener("click", () => {
+            console.log(1)
+            openInformMenu(inputEl, type);
+          });
+          return {
+            logo,
+            inputEl,
+            type
+          };
+        }
+
+        // if (containerStyle.position === 'relative') {
+        //   logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+        //         height: 20px;
+        //         min-width: 20px;
+        //         position: absolute;
+        //         left: ${elPosition.width - 30}px;
+        //         top: ${(elPosition.height - 20) / 2}px`;
+        // } else {
+        //     logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+        //         height: 20px;
+        //         min-width: 20px;
+        //         position: absolute;
+        //         top: ${elPosition.top + (elPosition.height - 20) / 2}px;
+        //         left: ${elPosition.left + elPosition.width - 25}px;`;
+        // }
+      }
+      return null
+    }
+    function resizeInformMenu(sizeData: any) {
+      for (const logoField of inputWithLogo) {
+        const elPosition = logoField.inputEl.getBoundingClientRect();
+        const elOffset = {
+          left: getOffsetLeft(logoField.inputEl),
+          top: getOffsetTop(logoField.inputEl)
+        };
+        const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
+        if (menuEl) {
+          if (sizeData) {
+            menuEl.style.height = sizeData.height
+            menuEl.style.width = sizeData.width
+          }
+          // menuEl.style.height = '407px'
+        }
+      }
+    }
+    function closeInformMenu(explicitClose: boolean, elPosition: any, elOffset: any) {
+      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
       if (menuEl != null) {
         menuEl.parentElement.removeChild(menuEl);
       }
@@ -272,22 +418,28 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
     }
-    function openInformMenu(elPosition: any) {
+    function openInformMenu(inputEl: any, type: string = 'password') {
+      const elPosition = inputEl.getBoundingClientRect();
+      const elOffset = {
+        left: getOffsetLeft(inputEl),
+        top: getOffsetTop(inputEl)
+      }
       if (document.body == null) {
         return;
       }
-      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left)) != null) {
+      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left)) != null) {
+        // closeInformMenu(false, elPosition)
         return;
       }
       const barPageUrl: string = chrome.extension.getURL(
-        "inform-menu/menu.html"
+        "inform-menu/menu.html" + `${isSignUp && type ==='password' ? "?generate=1" : "?ciphers=1"}`
       );
 
       const iframe = document.createElement("iframe");
       iframe.style.cssText =
-        `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
-        position: fixed;
-        height: 200px; 
+        `top: ${elOffset.top + elPosition.height + 10}px; left: ${elOffset.left}px;
+        position: absolute;
+        height: 244px; 
         width: 320px;
         border: 0;
         min-height: initial;
@@ -311,21 +463,19 @@ document.addEventListener('DOMContentLoaded', event => {
         margin: 0px !important;
         padding: 0px !important;
       `;
-      iframe.id = "cs-inform-menu-iframe-" + Math.round(elPosition.top) + '' + Math.round(elPosition.left);
+      iframe.id = "cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left);
 
       iframe.src = barPageUrl;
-
       // const frameDiv = document.createElement("div");
       // frameDiv.setAttribute("aria-live", "polite");
       // frameDiv.id = "cs-inform-menu-bar";
       // frameDiv.style.cssText =
-      //   "height: 42px; width: 100%; top: 0; left: 0; padding: 0; position: fixed; " +
-      //   "z-index: 2147483647; visibility: visible;";
+      //   `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
+      //   height: 200px; width: 320px; padding: 0; position: fixed;
+      //   z-index: 2147483647; visibility: visible;`
       // frameDiv.appendChild(iframe);
       document.body.appendChild(iframe);
-
       (iframe.contentWindow.location as any) = barPageUrl;
-
       // const spacer = document.createElement("div");
       // spacer.id = "inform-menu-spacer";
       // spacer.style.cssText = "height: 42px;";
@@ -337,6 +487,13 @@ document.addEventListener('DOMContentLoaded', event => {
         form.addEventListener('submit', formSubmitted, false);
         const submitButton = getSubmitButton(form, logInButtonNames);
         if (submitButton != null) {
+            const buttonText = getButtonText(submitButton);
+            const matches = Array.from(signUpButtonNames)
+              .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
+            if (matches.length>0) {
+              isSignUp = true;
+            }
+            // console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }
@@ -555,14 +712,14 @@ document.addEventListener('DOMContentLoaded', event => {
         }, 500);
     }
 
-    function closeExistingAndOpenBar(type: string, typeData: any) {
+    function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
         let barPage = 'notification/bar.html';
         switch (type) {
             case 'add':
-                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked;
+                barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
                 break;
             case 'change':
-                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked;
+                barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
                 break;
             default:
                 break;
@@ -574,10 +731,10 @@ document.addEventListener('DOMContentLoaded', event => {
         }
 
         closeBar(false);
-        openBar(type, barPage);
+        openBar(type, barPage, loginInfo);
     }
 
-    function openBar(type: string, barPage: string) {
+    function openBar(type: string, barPage: string, loginInfo: object) {
         barType = type;
 
         if (document.body == null) {
@@ -587,24 +744,24 @@ document.addEventListener('DOMContentLoaded', event => {
         const barPageUrl: string = chrome.extension.getURL(barPage);
 
         const iframe = document.createElement('iframe');
-        iframe.style.cssText = 'height: 42px; width: 100%; border: 0; min-height: initial;';
+        iframe.style.cssText = 'height: 320px; width: 450px; border: 0; min-height: initial; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); border-radius: 12px;';
         iframe.id = 'bit-notification-bar-iframe';
         iframe.src = barPageUrl;
 
         const frameDiv = document.createElement('div');
         frameDiv.setAttribute('aria-live', 'polite');
         frameDiv.id = 'bit-notification-bar';
-        frameDiv.style.cssText = 'height: 42px; width: 100%; top: 0; left: 0; padding: 0; position: fixed; ' +
+        frameDiv.style.cssText = 'height: 320px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
             'z-index: 2147483647; visibility: visible;';
         frameDiv.appendChild(iframe);
         document.body.appendChild(frameDiv);
 
         (iframe.contentWindow.location as any) = barPageUrl;
 
-        const spacer = document.createElement('div');
-        spacer.id = 'bit-notification-bar-spacer';
-        spacer.style.cssText = 'height: 42px;';
-        document.body.insertBefore(spacer, document.body.firstChild);
+        // const spacer = document.createElement('div');
+        // spacer.id = 'bit-notification-bar-spacer';
+        // spacer.style.cssText = 'height: 42px;';
+        // document.body.insertBefore(spacer, document.body.firstChild);
     }
 
     function closeBar(explicitClose: boolean) {
@@ -656,5 +813,23 @@ document.addEventListener('DOMContentLoaded', event => {
 
     function sendPlatformMessage(msg: any) {
         chrome.runtime.sendMessage(msg);
+    }
+    function getOffsetTop(elem) {
+      var offsetLeft = 0;
+      do {
+        if (!isNaN(elem.offsetTop)) {
+          offsetLeft += elem.offsetTop;
+        }
+      } while ((elem = elem.offsetParent));
+      return offsetLeft;
+    }
+    function getOffsetLeft(elem) {
+      var offsetLeft = 0;
+      do {
+        if (!isNaN(elem.offsetLeft)) {
+          offsetLeft += elem.offsetLeft;
+        }
+      } while ((elem = elem.offsetParent));
+      return offsetLeft;
     }
 });

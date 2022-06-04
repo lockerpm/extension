@@ -8,7 +8,7 @@
 import Vue from 'vue'
 export default Vue.extend( {
   created () {
-    if(this.$route.query.source === 'id.cystack.net'){
+    if(this.$route.query.source === 'id.locker.io'){
       this.notify('Locker has been logged in. Now you can use Locker extension by clicking the icon from toolbar', 'success')
     }
   },

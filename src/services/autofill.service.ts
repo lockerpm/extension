@@ -31,13 +31,19 @@ const UsernameFieldNames: string[] = [
   'username', 'user name', 'email', 'email address', 'e-mail', 'e-mail address', 'userid', 'user id',
   'customer id', 'login id',
   // German
-  'benutzername', 'benutzer name', 'email adresse', 'e-mail adresse', 'benutzerid', 'benutzer id'];
+  'benutzername', 'benutzer name', 'email adresse', 'e-mail adresse', 'benutzerid', 'benutzer id',
+  // Vietnamese
+  'tên đăng nhập', 'tài khoản'
+
+];
 
 const FirstnameFieldNames: string[] = [
   // English
   'f-name', 'first-name', 'given-name', 'first-n', 'first',
   // German
   'vorname',
+  // Vietnamese
+  'tên'
 ];
 
 const LastnameFieldNames: string[] = [
@@ -45,6 +51,8 @@ const LastnameFieldNames: string[] = [
   'l-name', 'last-name', 's-name', 'surname', 'family-name', 'family-n', 'last-n', 'last',
   // German
   'nachname', 'familienname',
+  // Vietnamese
+  'họ'
 ];
 
 const ExcludedAutofillTypes: string[] = ['radio', 'checkbox', 'hidden', 'file', 'button', 'image', 'reset', 'search'];
@@ -136,12 +144,17 @@ export default class AutofillService implements AutofillServiceInterface {
   getPasswordsFields(pageDetails: AutofillPageDetails): any[] {
     return this.loadPasswordFields(pageDetails, true, true, false, false);
   }
+  getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
+    return this.loadPasswordFields(pageDetails, true, true, false, true);
+  }
+  // getUsernameFields(pageDetails: AutofillPageDetails): any[] {
+  //   return this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
+  // }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
     // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
-    console.log(passwordFields)
     if (passwordFields.length === 0) {
       return formData;
     }

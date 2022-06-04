@@ -75,7 +75,7 @@ module.exports = {
     go_to_website: 'Go to website',
     accept: 'Accept',
     reject: 'Reject',
-    shared_with_you: 'Shared with you in CyStack',
+    shared_with_you: 'Shared in Locker',
     back: 'Back',
     item_name: 'Item name',
     details: 'Details',
@@ -92,9 +92,11 @@ module.exports = {
     passwords: 'Passwords',
     dashboard: 'Dashboard',
     vault: 'Vault',
-    notes: 'Notes',
+    notes: 'Secure Notes',
     cards: 'Cards',
     identities: 'Identities',
+    cryptoBackups: 'Crypto Backups',
+    folder: 'Folder',
     shares: 'Shares',
     trash: 'Trash',
     users: 'Users',
@@ -125,7 +127,8 @@ module.exports = {
     incomplete_expiry: "Your card's expiration date is incomplete.",
     invalid_expiry_year: "Your card's expiration year is invalid.",
     invalid_expiry_year_past: "Your card's expiration year is in the past.",
-    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.'
+    autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.',
+    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',
@@ -169,10 +172,12 @@ module.exports = {
     3: 'Card | Cards',
     4: 'Identity | Identities',
     0: 'Item | Items',
+    7: 'Crypto Backup | Crypto Backups',
     Login: 'Password | Password',
     SecureNote: 'Note | Notes',
     Card: 'Card | Cards',
     Identity: 'Identity | Identities',
+    CryptoBackup: 'Crypto Backup | Crypto Backups',
     Dashboard: 'Item | Items',
     Vault: 'Item | Items',
     Shares: 'Item | Items',
@@ -312,6 +317,10 @@ module.exports = {
         title: 'Không có mục nào được chia sẻ',
         description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
         btn: 'Thêm danh mục'
+      },
+      common: {
+        title: 'Your saved items will appear here.<br>Start by adding an account that you used every day.',
+        btn: 'Add first item'
       }
     },
     members: {
@@ -534,7 +543,25 @@ module.exports = {
       generate_random_password: 'Generate random password',
       show_password: 'Show password',
       card_details: 'Card Information',
-      contact_info: 'Contact Information'
+      contact_info: 'Contact Information',
+      wallet_address: 'Wallet Address',
+      seed: 'Seed phrase',
+      seed_phrase_desc: 'Notice: Seed phrase (or recovery phrase, key phrase, etc.) is a phrase that usually contains 12-24 random English words. This is the most sensitive data of your crypto wallet.',
+      recovery_email: 'Recovery email',
+      additional_info: 'Additional Information',
+      private_key: 'Private Key',
+      password_pin: 'Password/PIN',
+      username: 'Username',
+      wallet_app: 'Wallet App',
+      networks: 'Networks',
+      custom_fields: 'Custom fields',
+      new_custom_field: 'New custom field',
+      field_name: 'Field name',
+      value: 'Value',
+      text: 'Text',
+      hidden: 'Hidden',
+      date: 'Date',
+      monthYear: 'Month/Year'
     },
     settings: {
       account: 'Account',
@@ -565,11 +592,15 @@ module.exports = {
       deauthorize_sessions_failed: 'Something went wrong',
       fingerprint_dialog: 'Your account\'s fingerprint phrase',
       excluded_domains: 'Excluded Domains',
+      excluded_domains_desc: 'List of exclued domains and URLs',
+      excluded_domains_details: 'You turned off autofill for those websites. Remove websites from this list will re-enable autofill for them.',
       general: 'General',
       go_to_web_vault: 'Go to Web Vault',
       import_export: 'Import & Export',
       vault_timeout: 'Vault Timeout',
+      vault_timeout_desc: 'Lock your vault automatically.',
       vault_timeout_action: 'Vault Timeout Action',
+      vault_timeout_details: 'Choose when to lock your vault. You will be asked to enter your Master Password to unlock it when it’s locked.',
       fingerprint_phase: 'Fingerprint Phrase',
       lock_now: 'Lock Now',
       upgrade_to_premium: 'Upgrade to Premium',
@@ -583,7 +614,19 @@ module.exports = {
       feedback: 'Give Feedback',
       support_center: 'Support Center',
       rate_extension: 'Rate the Extension',
-      contact_us: 'Contact us'
+      contact_us: 'Contact us',
+      autofill: 'Autofill',
+      enable_autofill: 'Enable Autofill',
+      enable_autofill_desc: 'Fill logins and items across the web',
+      show_folders: 'Show folders',
+      show_folders_desc: 'Organized your items in folders.',
+      hide_icons: 'Hide webpage icons',
+      hide_icons_desc: 'Hide webpage icons in your vault.',
+      info_desc: 'Extension info version {version}',
+      logged_in_as: 'Logged in as',
+      version: 'Version',
+      term: 'Terms of use',
+      privacy: 'Privacy policy'
     },
     tools: {
       password_generator: 'Password Generator',
@@ -608,7 +651,7 @@ module.exports = {
       login: 'Login',
       register: 'Register',
       vault: 'Vault',
-      for_current: 'PASSWORDS FOR CURRENT WEBSITE',
+      for_current: 'For this website',
       no_for_current: 'There is no saved passwords for this site.',
       add_password: 'Add a password'
     },
@@ -646,8 +689,11 @@ module.exports = {
       current: 'Current',
       vault: 'Vault',
       generate: 'Generate',
+      generator: 'Generator',
       settings: 'Settings',
-      search: 'Search Vault'
+      search: 'Search Vault',
+      open_web_app: 'Open the web app',
+      sync_data: 'Sync your account'
     }
   }
 }
