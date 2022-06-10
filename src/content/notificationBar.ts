@@ -362,7 +362,6 @@ document.addEventListener('DOMContentLoaded', event => {
 
           inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
           logo.addEventListener("click", () => {
-            console.log(1)
             openInformMenu(inputEl, type);
           });
           return {

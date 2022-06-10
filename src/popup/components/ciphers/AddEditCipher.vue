@@ -90,7 +90,7 @@
               class="mt-2"
             />
             <div
-              v-if="!isDeleted && !cipher.id"
+              v-if="!isDeleted"
               class="text-right"
             >
               <el-popover
@@ -635,6 +635,13 @@ export default Vue.extend({
         this.cryptoWallet = this.data.cryptoWallet
         // console.log(this.cryptoWallet)
       }
+      if (this.data.type === CipherType.Login && this.data.login && this.data.login.uris == null) {
+        this.data.login.uris = [{
+          match: null,
+          uri: null
+        }]
+      }
+
       if (this.data.fields == null) {
         this.data.fields = []
         // this.data.fields[0].type = FieldType.Text

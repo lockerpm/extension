@@ -99,8 +99,6 @@ export default {
   },
   watch: {
   },
-  created () {
-  },
   mounted () {
     this.$nextTick(() => {
       this.value = this.initialValue
