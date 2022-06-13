@@ -229,7 +229,7 @@ Vue.mixin({
         this.$router.push({ name: 'home' })
       } catch (e) {
         console.log(e)
-        this.notify(this.$t('data.notifications.authentication_failed'), 'warning')
+        this.notify(this.$t("errors.invalid_master_password"), "error");
       }
     },
     async clearKeys () {
