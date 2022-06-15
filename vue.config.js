@@ -48,7 +48,7 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        'jslib-common': path.resolve(__dirname, 'jslib/common/src'),
+        'jslib-common': path.resolve(__dirname, 'core/common/src'),
         'jslib/angular': path.resolve(__dirname, 'jslib/angular/src'),
       }
     },
