@@ -652,7 +652,7 @@ module.exports = {
       register: 'Register',
       vault: 'Vault',
       for_current: 'For this website',
-      no_for_current: 'There is no saved passwords for this site.',
+      no_for_current: 'No saved passwords for this site.',
       add_password: 'Add a password'
     },
     login: {
