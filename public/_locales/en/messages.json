@@ -1807,5 +1807,41 @@
   },
   "personalVaultExportPolicyInEffect": {
     "message": "One or more organization policies prevents you from exporting your personal vault."
+  },
+  "informMenuSavedLogin": {
+    "message": "Saved Login"
+  },
+  "informMenuVaultLocked": {
+    "message": "Vault is locked"
+  },
+  "informMenuLoginNow": {
+    "message": "Login now"
+  }, 
+  "informMenuGeneratePassword": {
+    "message": "Generate Password"
+  },
+  "informMenuTurnOff": {
+    "message": "Turn off for this page"
+  },
+  "informMenuFillStElse": {
+    "message": "Fill something else"
+  },
+  "informMenuUsePassword": {
+    "message": "Use this password"
+  },
+  "informMenuLength": {
+    "message": "Length"
+  },
+  "informMenuUseUpper": {
+    "message": "Use uppercase letters (A-Z)"
+  },
+  "informMenuUseLower": {
+    "message": "Use lowercase letters (a-z)"
+  },
+  "informMenuUseDigits": {
+    "message": "Use digits (0-9)"
+  },
+  "informMenuUseSymbols": {
+    "message": "Use symbols (@!$%*)"
   }
 }

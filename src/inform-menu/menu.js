@@ -77,10 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage(msg);
   }
   function fillMenuWithCiphers (ciphers) {
+    setContent(document.getElementById('template-list-ciphers'));
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
     if (listContainer != null) {
       if (ciphers == null) {
-        listContainer.innerHTML = '<div class="cs-inform-no-ciphers">Vault is locked.</div>'
+        // listContainer.innerHTML = '<div class="cs-inform-no-ciphers">Vault is locked.</div>'
+        setContent(document.getElementById('template-vault-locked'));
+        document.getElementById('btn-inform-login').addEventListener('click', (e) => {
+          e.preventDefault();
+          sendPlatformMessage({
+            command: 'informMenuLogin'
+          });
+        });
         return
       }
       if (!ciphers.length) {
@@ -180,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
       else {
+        document.getElementById('header-title').innerHTML = 'Saved Login'
         setContent(document.getElementById('template-list-ciphers'));
         sendPlatformMessage({
           command: 'bgGetDataForTab',

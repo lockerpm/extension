@@ -30,7 +30,7 @@ export default class RuntimeBackground {
   private pageDetailsToAutoFill: any[] = [];
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
-
+  private lockedVaultPendingInformMenu: any[] = []
   constructor(private main: MainBackground, private autofillService: AutofillService,
               private platformUtilsService: BrowserPlatformUtilsService,
               private storageService: StorageService, private i18nService: I18nService,
@@ -70,10 +70,10 @@ export default class RuntimeBackground {
       case "unlocked":
         let item: LockedVaultPendingNotificationsItem;
 
-        if (this.lockedVaultPendingNotifications.length > 0) {
+        if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
           await BrowserApi.closeLoginTab();
 
-          item = this.lockedVaultPendingNotifications.pop();
+          item = this.lockedVaultPendingNotifications.pop() || this.lockedVaultPendingInformMenu.pop();
           if (item.commandToRetry.sender?.tab?.id) {
             await BrowserApi.focusSpecifiedTab(
               item.commandToRetry.sender.tab.id
@@ -97,6 +97,9 @@ export default class RuntimeBackground {
         // console.log(msg.data);
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
+      case "addToLockedVaultPendingInformMenu":
+        this.lockedVaultPendingInformMenu.push(msg.data);
+        break
       case "logout":
         await this.main.logout(msg.expired);
         break;

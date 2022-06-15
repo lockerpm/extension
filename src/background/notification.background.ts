@@ -93,7 +93,6 @@ export default class NotificationBackground {
                     await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
                     return;
                 }
-                // console.log('vault unlocked')
                 await this.saveOrUpdateCredentials(sender.tab, msg.folder);
                 break;
             case 'bgNeverSave':
@@ -136,6 +135,21 @@ export default class NotificationBackground {
                     break;
                 }
                 await this.startAutofillPage(cipher)
+                break;
+            case 'informMenuLogin':
+                if (await this.vaultTimeoutService.isLocked()) {
+                  const retryMessage: any = {
+                    commandToRetry: {
+                        msg: msg,
+                        sender: sender,
+                    },
+                    target: 'notification.background',
+                  };
+                  await BrowserApi.tabSendMessageData(sender.tab, 'addToLockedVaultPendingInformMenu', retryMessage);
+                  await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
+                  return
+                } 
+                await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
                 break;
             case 'informMenuUsePassword':
                 const tab = await BrowserApi.getTabFromCurrentWindow();
