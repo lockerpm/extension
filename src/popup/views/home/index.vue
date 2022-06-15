@@ -55,7 +55,7 @@
           <ul class="list-ciphers">
             <div
               v-if="!loginCiphers.length"
-              class="bg-white py-2 px-4 cursor-pointer" style="border-radius: 12px"
+              class="bg-white py-2 px-5 cursor-pointer" style="border-radius: 12px"
               @click="goToAddItem"
             >
               <!-- <p class="mb-2">{{$t('data.home.no_for_current')}}</p> -->
@@ -66,7 +66,13 @@
               {{$t('data.home.add_password')}}
               </router-link> -->
               <div class="flex">
-                <img src="@/assets/images/icons/icon_default.svg">
+                <!-- <img src="@/assets/images/icons/icon_default.svg"> -->
+                <div
+                  class="text-[34px] mr-3 flex-shrink-0"
+                >
+                  <Vnodes :vnodes="getCurrentSiteIcon()" />
+                </div>
+                
                 <div class="ml-4 text-left">
                   <div class="text-head-6 text-black font-semibold">
                     {{$t('data.home.add_password')}}
@@ -139,12 +145,16 @@ import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 import ListCipher from "@/popup/components/ciphers/ListCipher";
+import Vnodes from "@/components/Vnodes";
+import { Avatar } from "element-ui";
+import extractDomain from "extract-domain";
 const BroadcasterSubscriptionId = "CurrentTabComponent";
 export default Vue.extend({
   name: "Home",
   components: {
     CipherRow,
     ListCipher,
+    Vnodes
   },
   data() {
     return {
@@ -280,7 +290,6 @@ export default Vue.extend({
         // this.loaded = true;
         return;
       }
-
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
       // console.log("popup send cmd: collectPageDetails");
@@ -418,6 +427,41 @@ export default Vue.extend({
     },
     goToAddItem () {
       this.$router.push({ name: "add-item-create"});
+    },
+    getCurrentSiteIcon() {
+      try {
+        const domain = extractDomain(
+          this.url
+        );
+        if (domain) {
+          return this.$createElement(
+            Avatar,
+            {
+              props: {
+                src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${34}`,
+                size: 34,
+                alt: domain,
+                shape: "square"
+              }
+            },
+            [
+              this.$createElement("img", {
+                attrs: {
+                  src: require("@/assets/images/icons/icon_default.svg")
+                }
+              })
+            ]
+          );
+        }
+      } catch (e) {
+        return this.$createElement('img', {
+          attrs: {
+            src: require(`@/assets/images/icons/icon_default.svg`),
+            style: `height: 34px`,
+            class: 'rounded mx-auto'
+          }
+        })
+      }
     }
   },
 });

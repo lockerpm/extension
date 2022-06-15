@@ -1,4 +1,5 @@
 jslib
+core
 src/background
 src/browser
 src/services

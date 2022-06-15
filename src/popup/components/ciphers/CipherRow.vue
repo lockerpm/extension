@@ -24,7 +24,7 @@
             >
           </div>
           <div class="truncate">
-            {{ item.subTitle }}
+            {{ item.type === 7 && item.cryptoWallet ? item.cryptoWallet.username : item.subTitle }}
           </div>
         </div>
         <div>

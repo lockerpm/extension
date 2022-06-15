@@ -324,7 +324,7 @@ export default class AutofillService implements AutofillServiceInterface {
       if (!options.skipLastUsed) {
         this.cipherService.updateLastUsedDate(options.cipher.id);
       }
-
+      // console.log(fillScript)
       BrowserApi.tabSendMessage(tab, {
         command: 'fillForm',
         fillScript: fillScript,

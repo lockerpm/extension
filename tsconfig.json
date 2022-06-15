@@ -19,7 +19,7 @@
         "./src/*"
       ],
       "jslib-common/*": [
-        "./jslib/common/src/*"
+        "./core/common/src/*"
       ],
       "jslib-angular/*": [
         "./jslib/angular/src/*"
