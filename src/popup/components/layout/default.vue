@@ -1,19 +1,30 @@
 <template>
-  <div>
+  <div
+    class="relative mx-auto"
+    style="background: #E4F0E6; min-height: 600px; max-width: 400px"
+  >
+    <Header></Header>
     <router-view v-if="wrapperType === 'component'" />
     <slot v-if="wrapperType === 'wrapper'"></slot>
+    <Footer></Footer>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import { CipherType } from 'jslib-common/enums/cipherType';
+import Header from "@/popup/components/layout/parts/Header";
+import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
   props: {
     wrapperType: {
       type: String,
       default: 'component'
     }
+  },
+  components: {
+    Header,
+    Footer
   },
   data () {
     return {

@@ -48,6 +48,7 @@ module.exports = {
         DEFAULT: '#268334',
         hover: '#1C7029',
         400: '#E4F2E1',
+        100: '#E4F0E6',
         ...colors.green
       },
       white: colors.white,

@@ -1,42 +1,113 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Locker</title>
     <meta charset="utf-8" />
-</head>
-<body>
-  <div class="outer-wrapper">
-    <div class="logo">
-      <a href="https://locker.io" target="_blank" id="logo-link">
-        <!-- <img id="logo" alt="Bitwarden" /> -->
-        <img id="logo" alt="Locker"
-          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAqCAYAAADf/ynVAAAAAXNSR0IArs4c6QAACEBJREFUWEftmAlUVNcZx++9b5mFGVZlUwoiKEGBAcNajwZwa5I2nlBFTaKAbWLtqUYCxjanbaI9TTVKuiS2anOS2lNNUNSAGtmTKotLgoqy2mGIIIJBkAyzveX23MfMhI4UGAM2OaePmTnDm3fv/d3v3u+73/eHAAAEABDBf15Q4amY5uGrClL5ucxU+6qDVVOVQS5TFAEKN4Uvq2LcGZZWIYaSIQoyAABobY4BAFgUsCBwvJEzCgNmvfmuecDcY7hr6vzyzuBN/R29Tt9t1A52m9r6b/d3AgA4x7FJH1KHKpXK2zXUJdInxOtRr2CPGDd/dZjSSxnAujDuFEsBCMljGGBx2BsDgDH5cOiW/AuB1EZ6I9vb+gPGQOBEYDFwekOfsXOg88umL7R9db03+i/2aHuvGu8aO6Qn52+M3T9zQWC63JV1pWgKiCIGIi8AgRcBFiQQYs2h4aFtSNv3EaCG38IAD72km7YpQAghghQEiEaAYhBACEnjCSbeeONc+7GP82rXw+dPrsYiucmJEhOZIPkbetmXaAyCB/oZk8u2EGRciqEoMuLxn5x6BGYeXcETY08yxHjIMVl6nuMtRbnFMTCrYCVZKtvmHU8Hk/UMAYMCL3CFOWc094FhjEViXkD2wRhLiQXMsyqG1tV0fHTpnbpsrzlT5i/cnHCAN/IiRJB4uzPXKGAYAEpGAUQhIHACEDlxVFsSMJkrSzeXaA9X5tWs8Z3r+9gPdqZUcgZuAsEwwIiGsO/mQKOhz9Dl6qMOVfuoAgRexI6WwyIWSOSAGGC5G8u0lOmOVOyuWjU9xm/J4zuSP5pQMNvsS16vWqP9RHc4bm3krnnPReYa+sw8RUHaviYYAEbJAERDYNFzgFHQoKVcm1+xuyY9IMZv6fd2JJ+ZFLDyXTVZrRXav8VnavJiVs/dbOw3cxACyY2Jk1A0gi3lbQcHuvXaGQnT0/yjfCMaT7e8X7GndvUkg1Vltlbo3ovP0LwZs2bui6Z7FpFR0ojESc7Ei4ycRgWbSuJ6tb0XF26O/3vUivBn6481SXtsAsGi7V5pW8ryXUNgceui8uIyNFu6rvc01+7/bKPMg/VZsDH+PZmKZYteKVty63JPZUpO4qG5T4WtqD/+MMEyovbEZ0Znt9V0nD+5rSxBrQZeTx9I65CrZfITPy9P7b7aXZH8UuIHEcvDVv5PwNrPd14q3Fqa4OYjD1z+hyeuP0ww6XC9bymtFrOCxcr95IHpbz7R9H+wrIKV30SLSWfltxos3rr5Gx7CHrMU5pwZJY5ZN7+utvNC0cul8S4uLj4/fGeZ7mGAFeUOpT0CKUhG8sq4DE12Z113/T/fqFopn6L0X/TK/NNylUxmC7DJOYmHIiY+wFqKthZHwcz8FRZIQcYRzHYkGfqlQ5wi5yTJ1aQjKbskvrel98JkHEk8J5iPbSnWwLX/eHqAUTJqnhN5hStLV+6uWd9cpj2YkBW9J3rVnE1WMCm7IDk6xVDw6pGGN/o6BhpmLwvZEBQ/Lb7hZPPXP8RJGkVByBn5wQ+3nIqA6fue1Kl9VYG8mefkbjKmePvZ9Laqz/Njn436Xey6iJcHHdMeAAAjpwGkEOAME5j2kHyQQXCw13D7cHbhI/Dx7Y9VTI/xT+aMHE+xFN11radKf3uw1TPEI27KDPdw3jJyoiiVYyLAMilRlPIxkigufdBEkWwTVsGgrut3LhZuLY2D0elzfhW3TvOaZdAiQAgpWk5LtR5vFoBgEcaXWpe2fVC5p3qVf7TPoid/k1r6IImiIGBe6S6jruQ3vlX91083QS9/ddj3f7/sMqIhS0pSUuCStBkhgEhhOlo1ITmMmqVvfNx+ouwv57JmzJmWuvgXC49wRudzfpKusy4MVZhTuqCr4c5ZKS9NeSnh8OwlIasM9xzS6PHUOBCQosXCm/lBSCGGUdCqEWWDUfqyQd262l1btK08iUQAAgbdvN2C0/YuvQYRZEQRj1m2OY5BeiEahSRliCOJGaPOkNTjAiOn6A9zixO7G+/WAgAoAkZilDBr8YwfpeZ+94CJ5PhDCo5zl02hcFJWEHmRU3opmOr9n756Ob/hNRuPrQIncYonldGjz0XlGvqMHKKQ83DOTQVIUJ4KpulMqxQHAQCEg5xEQzKUVSIgluPn/zR2X+TysOcNfSbOqn05Odz4HrdB/atSV1j827NpVo1O0tdsQLaeCCTxQiFpw7y3NWnhG439Jh5AEo8nUNvAgFTLgouHnG4taztauvMcsRSxknS4DIcZPkU73Lw1Edtj10b+0mLgMBYwfgAt4j7TSVobhEDuKkP1J5r3ndt7YYODGmlvM5LKY4cLTQnOXPCz2D8jGsks5GSg0FcV+fhWzP4UkT9plqIQg8D5d+u2XTnauNO6Qvblc7TQfxtCcgjvMM/E5Oykg56B7iGme2YBDAXe8ctW0tKJgkItowd7jT2f/PH8+s8vdJ60et9XaqUDxVgDSHDAFXimvJD01uxFwas5Iw94iyCgoVRo9AAlYAHRiGJVDGiv7Syp3lvzQv9tk87qffxojccCI22lOEe+hKYEZSRkxuxSeSunmgbMktI90t6zaWwyFUuZ9Rb9pUP1v64/3pRnBbH393XBbN4reazCUxGQkBn9+qzUoGeID1kMHNnQkkBNBD9yMQoaEeFXV3vz1MV3P8vtbdc3WvcT6ctRuh+RbzwWG97QPtvvaLwXa56JetUvfGoSUZyJyCep0CwFvrjRe6Xu/Ws7tNUdBdbGQ1vCictZMNI1sRxpJ9UK4ctCfxzx1KwXVT6qmYY+063G0y1vXy5o/BMAwOSslYZz/xsHXMrksAZ/BQAAAABJRU5ErkJggg==" />
-      </a>
+  </head>
+  <body>
+    <div class="outer-wrapper">
+      <div id="content"></div>
     </div>
-    <div id="content"></div>
-    <div>
-      <button type="button" class="neutral" id="close-button">
-        <!-- <img id="close" alt="Close" /> -->
-        <img id="close" alt="X"
-          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeBAMAAADJHrORAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAABJQTFRFAAAAMzMzMzMzMzMzMzMzMzMzbxxq5QAAAAZ0Uk5TAECg/2CfwOuXQgAAAJVJREFUeJxVkdEJwzAMRNXgAQpZINAu0Fz7b3AHyP7T1MrppNQfMuI9sE42s7vp3Lws7+zHMcsDPdqGz8SAhAEctgIhNDhiDYyNVw+8p5ZYgrCExBS+iSmgMIXCEhJTKMy+Yobf//BF0Hv9gp8lcPKRAifPPSiYBAULoXJTWHNyJy/f917vbv4fCtZOslSwcZLKMf/zB2MLKtNp5GuwAAAAAElFTkSuQmCC" />
-      </button>
-    </div>
-  </div>
-  <div id="templates" style="display: none;">
-    <div class="inner-wrapper" id="template-add">
-      <div class="add-text"></div>
-      <div class="add-buttons">
-        <button type="button" class="never-save link"></button>
-        <select class="select-folder" isVaultLocked="false"></select>
-        <button type="button" class="add-save"></button>
+    <div id="templates" style="display: none;">
+      <div class="inner-wrapper" id="template-add">
+        <div class="header-wrapper">
+          <div class="logo">
+            <a href="https://locker.io" target="_blank" id="logo-link">
+              <!-- <img id="logo" alt="Bitwarden" /> -->
+              <img
+                id="logo"
+                alt="Locker"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAK+SURBVHgBtVbNTxNBFH8zpQVKKy1NAD8OSxOj8WDwpJ7EG57wHzDhLxA9eircOPbkFY2a4MFEPHmzvcHJ+hE1aUJXhdCila2UtvRjx/em3bLd7i5tE3/JZHffvPm9NzPvYxm4QFGUUKnKl5hgcwBCESiSEww0lKVQtsGE73U2+0114mB2wulpRRHMsyZAzEEvYOwJ170rdoY8VsHU2eiS4GwdXy9D75gVrLEYCIaPj4oHm44GJs9FY/hYxTEC/YPWzI+dCcPR4UHSELIOzwHi1lVe/xB4Rz0wOuHrkNfKDSj/qUKtVO+yhKQPc3vb8bYBOnOd8/cgIETf0dtTMHU1BOPn/TDk94Ab6qUGFHZLkHmXg+xHzRBrXPiu0Z1w+kLymEEud4PkkYvBU8kJpEO6M+iUCSHBamv0wsl7JF908s6Mna28HL2AIpDCnAvG79oplPNV+PzqRwd5v8AceoBHxBbclIj4704Jfm7+hn6ByXgLdyBm3ZRK+WMZMYMAj0nh5sv9D1D4aRr+yLDMg0ExhEMFo4i1UDcdyYXrEfmk3BjgqDTOgKlWaQEvdTTig9l7M20Z5YYbKBCsQO4UXXLSOkGRU7fxlnZj7MgMypdMYh+6ITZ41ad31R+KnNSzDPSK1AtVrrGCeoWnommVQHBiDiz3UMxV5LYnr4wD99rHAnm+9TgNv74UuiexR+T20k9ti50ZFEU371+Sd2JGPn0IH57be04dj+vNYifjr1jUtEAgTJrzVl2KnEwi1zQ2MSzL79c3u/Bp/btjVKHOo1w2/bb1foLJ6egySmLgAOoN0qhND2hDwMp+dnvZ+OzIIGx3CWx7BTRyA2y6ml7T5XBwWyPPkXzVLO5KUeqpwbHxl4JDGFe51qkTbpbABnPHOJbOORc0/y6onLMFWRRbQcBk9jNVCJH0j+hxVVU1J45/+1ojsgsyM/cAAAAASUVORK5CYII="
+              />
+            </a>
+          </div>
+          <div class="header-text-wrapper">
+            <div class="tab-uri">example.com</div>
+            <div class="add-text" style="margin-top: 8px;"></div>
+          </div>
+          <div>
+            <button type="button" class="neutral" id="close-button">
+              <!-- <img id="close" alt="Close" /> -->
+              <img
+                id="close"
+                alt="X"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeBAMAAADJHrORAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAABJQTFRFAAAAMzMzMzMzMzMzMzMzMzMzbxxq5QAAAAZ0Uk5TAECg/2CfwOuXQgAAAJVJREFUeJxVkdEJwzAMRNXgAQpZINAu0Fz7b3AHyP7T1MrppNQfMuI9sE42s7vp3Lws7+zHMcsDPdqGz8SAhAEctgIhNDhiDYyNVw+8p5ZYgrCExBS+iSmgMIXCEhJTKMy+Yobf//BF0Hv9gp8lcPKRAifPPSiYBAULoXJTWHNyJy/f917vbv4fCtZOslSwcZLKMf/zB2MLKtNp5GuwAAAAAElFTkSuQmCC"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="login-info">
+          <div class="ui-components">
+            <div>Login</div>
+            <input class="info-username" disabled>
+          </div>
+          <div class="ui-components relative">
+            <div>Password</div>
+            <input class="info-password" type="password" disabled>
+            <button id="toggle-password" class="btn-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5.25C4.5 5.25 1.5 12 1.5 12C1.5 12 4.5 18.75 12 18.75C19.5 18.75 22.5 12 22.5 12C22.5 12 19.5 5.25 12 5.25Z" stroke="#161922" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75Z" stroke="#161922" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="add-buttons">
+          <select class="select-folder" isVaultLocked="false"></select>
+          <button type="button" class="never-save default"></button>
+          <button type="button" class="add-save primary"></button>
+        </div>
+      </div>
+      <div class="inner-wrapper" id="template-change">
+        <!-- <div class="change-text"></div>
+        <div class="change-buttons">
+          <button type="button" class="change-save"></button>
+        </div> -->
+        <div class="header-wrapper">
+          <div class="logo">
+            <a href="https://locker.io" target="_blank" id="logo-link">
+              <!-- <img id="logo" alt="Bitwarden" /> -->
+              <img
+                id="logo"
+                alt="Locker"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAK+SURBVHgBtVbNTxNBFH8zpQVKKy1NAD8OSxOj8WDwpJ7EG57wHzDhLxA9eircOPbkFY2a4MFEPHmzvcHJ+hE1aUJXhdCila2UtvRjx/em3bLd7i5tE3/JZHffvPm9NzPvYxm4QFGUUKnKl5hgcwBCESiSEww0lKVQtsGE73U2+0114mB2wulpRRHMsyZAzEEvYOwJ170rdoY8VsHU2eiS4GwdXy9D75gVrLEYCIaPj4oHm44GJs9FY/hYxTEC/YPWzI+dCcPR4UHSELIOzwHi1lVe/xB4Rz0wOuHrkNfKDSj/qUKtVO+yhKQPc3vb8bYBOnOd8/cgIETf0dtTMHU1BOPn/TDk94Ab6qUGFHZLkHmXg+xHzRBrXPiu0Z1w+kLymEEud4PkkYvBU8kJpEO6M+iUCSHBamv0wsl7JF908s6Mna28HL2AIpDCnAvG79oplPNV+PzqRwd5v8AceoBHxBbclIj4704Jfm7+hn6ByXgLdyBm3ZRK+WMZMYMAj0nh5sv9D1D4aRr+yLDMg0ExhEMFo4i1UDcdyYXrEfmk3BjgqDTOgKlWaQEvdTTig9l7M20Z5YYbKBCsQO4UXXLSOkGRU7fxlnZj7MgMypdMYh+6ITZ41ad31R+KnNSzDPSK1AtVrrGCeoWnommVQHBiDiz3UMxV5LYnr4wD99rHAnm+9TgNv74UuiexR+T20k9ti50ZFEU371+Sd2JGPn0IH57be04dj+vNYifjr1jUtEAgTJrzVl2KnEwi1zQ2MSzL79c3u/Bp/btjVKHOo1w2/bb1foLJ6egySmLgAOoN0qhND2hDwMp+dnvZ+OzIIGx3CWx7BTRyA2y6ml7T5XBwWyPPkXzVLO5KUeqpwbHxl4JDGFe51qkTbpbABnPHOJbOORc0/y6onLMFWRRbQcBk9jNVCJH0j+hxVVU1J45/+1ojsgsyM/cAAAAASUVORK5CYII="
+              />
+            </a>
+          </div>
+          <div class="header-text-wrapper">
+            <div class="tab-uri">example.com</div>
+            <div class="change-text" style="margin-top: 8px;"></div>
+          </div>
+          <div>
+            <button type="button" class="neutral" id="close-button">
+              <img
+                id="close"
+                alt="X"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeBAMAAADJHrORAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAABJQTFRFAAAAMzMzMzMzMzMzMzMzMzMzbxxq5QAAAAZ0Uk5TAECg/2CfwOuXQgAAAJVJREFUeJxVkdEJwzAMRNXgAQpZINAu0Fz7b3AHyP7T1MrppNQfMuI9sE42s7vp3Lws7+zHMcsDPdqGz8SAhAEctgIhNDhiDYyNVw+8p5ZYgrCExBS+iSmgMIXCEhJTKMy+Yobf//BF0Hv9gp8lcPKRAifPPSiYBAULoXJTWHNyJy/f917vbv4fCtZOslSwcZLKMf/zB2MLKtNp5GuwAAAAAElFTkSuQmCC"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="login-info">
+          <div class="ui-components">
+            <div>Login</div>
+            <input class="info-username" disabled>
+          </div>
+          <div class="ui-components relative">
+            <div>Password</div>
+            <input class="info-password" type="password" disabled>
+            <button id="toggle-password" class="btn-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5.25C4.5 5.25 1.5 12 1.5 12C1.5 12 4.5 18.75 12 18.75C19.5 18.75 22.5 12 22.5 12C22.5 12 19.5 5.25 12 5.25Z" stroke="#161922" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75Z" stroke="#161922" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="change-buttons">
+          <button type="button" class="change-save primary"></button>
+        </div>
       </div>
     </div>
-    <div class="inner-wrapper" id="template-change">
-      <div class="change-text"></div>
-      <div class="change-buttons">
-        <button type="button" class="change-save"></button>
-      </div>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

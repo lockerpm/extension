@@ -139,9 +139,9 @@ export default Vue.extend({
   @apply mb-2.5 last:mb-6;
   display: flex;
   position: relative;
-  border-radius: 2px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
+  border-radius: 12px;
   &.is-hover, &.is-focus {
     @apply border-primary;
     label {

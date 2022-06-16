@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import storePromise from "../store/index";
-import Home from '../popup/views/home.vue'
+import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
 Vue.use(VueRouter)
 
@@ -14,6 +14,19 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "home",
         component: Home
+      }
+    ]
+  },
+  {
+    path: "/home/:id",
+    beforeEnter: VaultGuard,
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "home-id",
+        component: () =>
+          import(/* webpackChunkName: "vault" */ "../popup/views/home/_id.vue")
       }
     ]
   },
@@ -183,33 +196,72 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: "/crypto-assets",
+    path: "/crypto-backups",
     beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
         path: "",
-        name: "crypto-assets",
+        name: "crypto-backups",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-assets/index.vue"
+            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/index.vue"
           )
       }
     ]
   },
   {
-    path: "/crypto-assets/:id",
+    path: "/crypto-backups/:id",
     component: Layout,
     children: [
       {
         path: "",
-        name: "crypto-assets-id",
+        name: "crypto-backups-id",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-assets/_id.vue"
+            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/_id.vue"
           )
       }
     ]
+  },
+  {
+    path: "/folders",
+    beforeEnter: VaultGuard,
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "folders",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/folders/index.vue"
+          )
+      }
+    ]
+  },
+  {
+    path: "/folders/:folderId",
+    beforeEnter: VaultGuard,
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "folders-folderId",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/folders/_folderId/index.vue"
+          )
+      }
+    ]
+  },
+  {
+    path: "/folders/:folderId/:id",
+    name: "folders-folderId-id",
+    beforeEnter: VaultGuard,
+    component: () =>
+      import(
+        /* webpackChunkName: "vault" */ "../popup/views/folders/_folderId/_id.vue"
+      )
   },
   {
     path: "/vault/folders/:folderId",
@@ -247,23 +299,46 @@ const routes: Array<RouteConfig> = [
         /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
       )
   },
-  {
-    path: "/add_item/create",
-    name: "add-item-create",
-    beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
-      )
-  },
+  // {
+  //   path: "/add_item/create",
+  //   name: "add-item-create",
+  //   beforeEnter: VaultGuard,
+  //   component: () =>
+  //     import(
+  //       /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
+  //     )
+  // },
+  // {
+  //   path: "/add_item",
+  //   name: "add-item",
+  //   beforeEnter: VaultGuard,
+  //   component: () =>
+  //     import(
+  //       /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
+  //     )
+  // },
   {
     path: "/add_item",
-    name: "add-item",
+    component: Layout,
     beforeEnter: VaultGuard,
-    component: () =>
-      import(
-        /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
-      )
+    children: [
+      {
+        path: "",
+        name: "add_item",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
+          )
+      },
+      {
+        path: "create",
+        name: "add-item-create",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
+          )
+      }
+    ]
   },
   {
     path: "/generator",
@@ -297,6 +372,22 @@ const routes: Array<RouteConfig> = [
         component: () =>
           import(
             /* webpackChunkName: "vault" */ "../popup/views/settings/excluded-domains.vue"
+          )
+      },
+      {
+        path: "vault-timeout",
+        name: "settings-vault-timeout",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/vault-timeout.vue"
+          )
+      },
+      {
+        path: "info",
+        name: "settings-info",
+        component: () =>
+          import(
+            /* webpackChunkName: "vault" */ "../popup/views/settings/info.vue"
           )
       }
     ]

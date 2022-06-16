@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div class="uppercase px-3 mt-4 mb-3">{{$t('data.tools.password_generator_desc')}}</div>
-    <div class="p-5 bg-white">
-      <div class="flex items-center justify-between mb-8">
-        <div class="text-[20px] flex-grow truncate leading-[2rem]">
+  <div id="password-generator">
+    <!-- <div class="uppercase px-3 mt-4 mb-3">{{$t('data.tools.password_generator_desc')}}</div> -->
+    <div class="p-4 mt-3">
+      <div class="flex items-center justify-between mb-1 generated-password-container">
+        <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
         </div>
         <div class="ml-4">
@@ -19,12 +19,11 @@
         v-if="password"
         :score="passwordStrength.score"
       />
-    </div>
-    <div class="p-5">
       <button
         v-clipboard:copy="password"
         v-clipboard:success="clipboardSuccessHandler"
-        class="btn btn-primary w-full"
+        class="btn btn-primary w-full mt-4"
+        style="border-radius: 64px !important"
       >
         {{ $t('data.tools.copy_password') }}
       </button>
@@ -34,12 +33,21 @@
       >
         {{ $t('data.tools.save_with_locker') }}
       </button>
-      <!-- <button class="btn btn-clean w-full" @click="toggle = !toggle">
-        {{ $t('data.tools.show_options') }} <i class="fa fa-chevron-down" />
-      </button> -->
     </div>
-    <div class="uppercase px-3 mb-3">{{ $t('data.tools.password_options') }}</div>
-    <div class="locker-pw-generator-options mb-2">
+    <!-- <div class="mt-4 mb-8">
+      <button
+        v-clipboard:copy="password"
+        v-clipboard:success="clipboardSuccessHandler"
+        class="btn btn-primary w-full"
+      >
+        {{ $t('data.tools.copy_password') }}
+      </button>
+      <button class="btn btn-clean w-full" @click="toggle = !toggle">
+        {{ $t('data.tools.show_options') }} <i class="fa fa-chevron-down" />
+      </button>
+    </div> -->
+    <!-- <div class="uppercase px-3 mb-3">{{ $t('data.tools.password_options') }}</div> -->
+    <div class="password-generator-options">
       <div class="generator-option">
         <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
         <el-slider
@@ -173,6 +181,6 @@ export default {
 </script>
 <style>
 .generator-option {
-  @apply mb-2 w-full px-5 py-2 bg-white;
+  @apply mb-2 w-full py-2;
 }
 </style>

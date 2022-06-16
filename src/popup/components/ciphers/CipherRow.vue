@@ -2,7 +2,7 @@
   <div>
     <li
         v-if="item.id"
-        class="flex items-center hover:bg-[#E4F2E1] bg-white cursor-pointer h-[62px] px-5 border-b border-black-400"
+        class="cipher-item"
         @click.self="fillCipher()"
       >
         <div
@@ -13,11 +13,18 @@
             <Vnodes :vnodes="getIconCipher(item, 34)" />
           </div>
         <div class="flex-grow overflow-hidden" @click="fillCipher()">
-          <div class="text-black w-[200px] font-semibold truncate flex items-center">
+          <div class="text-black font-semibold truncate">
             {{ item.name }}
+            <img
+              v-if="item.organizationId"
+              src="@/assets/images/icons/shares.svg"
+              alt="Shared"
+              :title="$t('common.shared_with_you')"
+              class="inline-block ml-2"
+            >
           </div>
           <div class="truncate">
-            {{ item.subTitle }}
+            {{ item.type === 7 && item.cryptoWallet ? item.cryptoWallet.username : item.subTitle }}
           </div>
         </div>
         <div>
@@ -30,7 +37,7 @@
               >
                 <i class="fas fa-external-link-square-alt" />
             </button>
-            <el-dropdown v-if="!item.isDeleted" trigger="click" :hide-on-click="false">
+            <el-dropdown v-if="!item.isDeleted && [CipherType.Login, CipherType.SecureNote, 6, 7].includes(item.type)" trigger="click" :hide-on-click="false">
               <button class="btn btn-icon btn-xs hover:text-primary">
                 <i class="fas fa-clone" />
               </button>
@@ -57,7 +64,7 @@
                     {{ $t('common.copy') }} {{ $t('common.note') }}
                   </el-dropdown-item>
                 </template>
-                <template v-if="item.type === 6">
+                <template v-if="item.type === 6 && item.cryptoAccount">
                   <el-dropdown-item
                     v-clipboard:copy="item.cryptoAccount.username"
                     v-clipboard:success="clipboardSuccessHandler"
@@ -71,7 +78,7 @@
                     {{ $t('common.copy') }} {{ $t('common.password') }}
                   </el-dropdown-item>
                 </template>
-                <template v-if="item.type === 7">
+                <template v-if="item.type === 7 && item.cryptoWallet">
                   <el-dropdown-item
                     v-clipboard:copy="item.cryptoWallet.seed"
                     v-clipboard:success="clipboardSuccessHandler"
@@ -84,14 +91,28 @@
                   >
                     {{ $t('common.copy') }} {{ $t('data.ciphers.wallet_address') }}
                   </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.privateKey"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.private_key') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-clipboard:copy="item.cryptoWallet.password"
+                    v-clipboard:success="clipboardSuccessHandler"
+                  >
+                    {{ $t('common.copy') }} {{ $t('data.ciphers.password_pin') }}
+                  </el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </el-dropdown>
-            <button class="btn btn-icon btn-xs hover:text-primary"
-                    @click="addEdit(item)"
-            >
-              <i class="fas fa-pen" />
-            </button>
+            <template v-if="!item.isDeleted && canManageItem(organizations, item)">
+              <button class="btn btn-icon btn-xs hover:text-primary"
+                      @click="addEdit(item)"
+              >
+                <i class="fas fa-pen" />
+              </button>
+            </template>
           </div>
         </div>
       </li>
@@ -102,6 +123,7 @@
 import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
 import Vnodes from "@/components/Vnodes";
+import { CipherView } from 'jslib-common/models/view/cipherView';
 export default Vue.extend(
   {
     components: {
@@ -109,8 +131,8 @@ export default Vue.extend(
     },
     props: {
       item:{
-        type: Object,
-        default: null
+        type: CipherView,
+        default: new CipherView()
       }
     },
     data(){
@@ -118,13 +140,24 @@ export default Vue.extend(
         CipherType
       }
     },
+    asyncComputed: {
+      organizations: {
+        async get () {
+          const result = await this.$userService.getAllOrganizations()
+          return result
+        },
+        watch: ['$store.state.syncedCiphersToggle']
+      }
+    },
     methods: {
       // addEdit (item) {
       //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       // }
       addEdit (item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+        console.log(item)
+        // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
         this.$router.push({name: 'add-item-create', params: {data: item}})
+        // this.routerCipher(item)
       },
       fillCipher(){
         this.$emit('do-fill')

@@ -21,6 +21,7 @@ import JSLib from '@/popup/services/services'
 import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
+import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 
 Vue.config.productionTip = false
 Vue.use(JSLib)
@@ -52,7 +53,10 @@ Vue.mixin({
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
         { key: "github", name: "GitHub", color: "#202326" }
-      ]
+      ],
+      enableAutofillKey : 'enableAutofill',
+      showFoldersKey : 'showFolders',
+      hideIconsKey : 'hideIcons'
     };
   },
   computed: {
@@ -69,6 +73,15 @@ Vue.mixin({
     cipherCount () {
       return this.$store.state.cipherCount
     },
+    hideIcons() {
+      return this.$store.state.hideIcons
+    },
+    showFolders() {
+      return this.$store.state.showFolders
+    },
+    enableAutofill() {
+      return this.$store.state.enableAutofill
+    }
   },
   methods: {
     changeLang (value) {
@@ -170,7 +183,17 @@ Vue.mixin({
     },
     async login() {
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
-      const deviceId = await browserStorageService.get("device_id")
+      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
+        browserStorageService.get("device_id"),
+        browserStorageService.get("hideIcons"),
+        browserStorageService.get("showFolders"),
+        browserStorageService.get("enableAutofill"),
+      ]);
+      // const deviceId = await browserStorageService.get("device_id")
+      // const hideIcons = await browserStorageService.get('hideIcons')
+      this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
+      this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
+      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       const deviceIdentifier = deviceId || this.randomString();
       if (!deviceId) {
         browserStorageService.save("device_id", deviceIdentifier);
@@ -206,7 +229,7 @@ Vue.mixin({
         this.$router.push({ name: 'home' })
       } catch (e) {
         console.log(e)
-        this.notify(this.$t('data.notifications.authentication_failed'), 'warning')
+        this.notify(this.$t("errors.invalid_master_password"), "error");
       }
     },
     async clearKeys () {
@@ -237,7 +260,7 @@ Vue.mixin({
     //     this.$store.commit("UPDATE_SYNCING", false);
     //   }
     // },
-    async getSyncData () {
+    async getSyncData (trigger=false) {
       this.$store.commit('UPDATE_SYNCING', true)
       const pageSize = 100
       try {
@@ -277,10 +300,10 @@ Vue.mixin({
           }
         })
         // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
-        this.$messagingService.send('syncCompleted', { successfully: true })
+        this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         // console.log('sync completed')
       } catch (e) {
-        this.$messagingService.send('syncCompleted', { successfully: false })
+        this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit('UPDATE_SYNCED_CIPHERS')
       } finally {
         this.$store.commit('UPDATE_SYNCING', false)
@@ -292,51 +315,91 @@ Vue.mixin({
     clipboardSuccessHandler () {
       this.notify(this.$t('common.copied'), 'success')
     },
-    getIconCipher (cipher, size = 70) {
+    getIconCipher(cipher, size = 70, defaultIcon = false) {
       switch (cipher.type) {
       case CipherType.Login:
-        if (cipher.login && cipher.login.uris && cipher.login.uris.length) {
+        if (
+          cipher.login &&
+            cipher.login.uris &&
+            cipher.login.uris.length &&
+            !this.hideIcons
+        ) {
           try {
-            const domain = extractDomain(cipher.login.uris[0]._uri)
+            const domain = extractDomain(
+              cipher.login.uris[0]._uri || cipher.login.uris[0].uri
+            );
             if (domain) {
-              return (this.$createElement(Avatar, {
-                props: {
-                  src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${size}`,
-                  size,
-                  alt: domain,
-                  shape: 'square'
-                }
-              }, [
-                this.$createElement('img', {
-                  attrs: {
-                    src: require('@/assets/images/icons/icon_Login.svg')
+              return this.$createElement(
+                Avatar,
+                {
+                  props: {
+                    src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${size}`,
+                    size,
+                    alt: domain,
+                    shape: "square"
                   }
-                })
-              ]))
+                },
+                [
+                  this.$createElement("img", {
+                    attrs: {
+                      src: require("@/assets/images/icons/icon_Login.svg")
+                    }
+                  })
+                ]
+              );
             }
           } catch (e) {
-            return this.getIconDefaultCipher('Login', size)
+            return this.getIconDefaultCipher("Login", size);
           }
         }
-        return this.getIconDefaultCipher('Login', size)
+        return this.getIconDefaultCipher("Login", size);
       case CipherType.SecureNote:
-        return this.getIconDefaultCipher('SecureNote', size)
+        return this.getIconDefaultCipher("SecureNote", size);
       case CipherType.Card:
-        return this.getIconDefaultCipher('Card', size)
+        return this.getIconDefaultCipher("Card", size);
       case CipherType.Identity:
-        return this.getIconDefaultCipher('Identity', size)
+        return this.getIconDefaultCipher("Identity", size);
       case 6:
-        return this.getIconDefaultCipher('CryptoAccount', size)
+        return this.getIconDefaultCipher("CryptoAccount", size);
       case 7:
-        return this.getIconDefaultCipher('CryptoWallet', size)
-      case 'Shares':
-        return this.getIconDefaultCipher('Shares', size)
-      case 'Trash':
-        return this.getIconDefaultCipher('Trash', size)
-      case 'Vault':
-        return this.getIconDefaultCipher('Dashboard', size)
+        if (!defaultIcon) {
+          if (cipher.cryptoWallet && cipher.cryptoWallet.walletApp) {
+            try {
+              const selectedApp = WALLET_APP_LIST.find(
+                a => a.alias === cipher.cryptoWallet.walletApp.alias
+              );
+              return this.$createElement(
+                Avatar,
+                {
+                  props: {
+                    src: selectedApp.logo,
+                    size,
+                    alt: selectedApp.name,
+                    shape: "square"
+                  }
+                },
+                [
+                  this.$createElement("img", {
+                    attrs: {
+                      src: require("@/assets/images/icons/icon_CryptoWallet.svg")
+                    }
+                  })
+                ]
+              );
+            } catch (e) {
+              return this.getIconDefaultCipher("CryptoWallet", size);
+            }
+          }
+        }
+        return this.getIconDefaultCipher("CryptoWallet", size);
+      case "Shares":
+        return this.getIconDefaultCipher("Shares", size);
+      case "Trash":
+        return this.getIconDefaultCipher("Trash", size);
+      case "Vault":
+        return this.getIconDefaultCipher("Dashboard", size);
       default:
-        return ''
+        return "";
       }
     },
     getIconDefaultCipher (type, size = 70) {
@@ -359,6 +422,13 @@ Vue.mixin({
           params: { id: cipher.id }
         })
         return
+      }
+      if (this.$route.name === "home") {
+        this.$router.push({
+          name: "home-id",
+          params: { id: cipher.id }
+        });
+        return;
       }
       if (this.$route.name === 'vault-folders-folderId') {
         this.$router.push({
@@ -402,8 +472,11 @@ Vue.mixin({
     },
     canManageItem (teams, item) {
       const team = this.getTeam(teams, item.organizationId)
-      if (team.organization_id) {
-        return ['owner', 'admin', 'manager'].includes(team.role)
+      // if (team.organization_id) {
+      //   return ['owner', 'admin', 'manager'].includes(team.role)
+      // }
+      if (team.id) {
+        return [0, 1].includes(team.type);
       }
       return true
     },

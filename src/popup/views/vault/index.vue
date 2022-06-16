@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #F1F1F1; padding-bottom: 56px; padding-top: 44px; min-height: 600px; max-width: 400px"
+    style="background: #E4F0E6; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
     <div v-loading="loading">
@@ -129,48 +129,66 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from "vue";
 import orderBy from "lodash/orderBy";
-import groupBy from 'lodash/groupBy';
-import { BrowserApi } from '@/browser/browserApi';
-import { CipherType } from 'jslib-common/enums/cipherType';
+import groupBy from "lodash/groupBy";
+import { BrowserApi } from "@/browser/browserApi";
+import { CipherType } from "jslib-common/enums/cipherType";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
-const BroadcasterSubscriptionId = 'ChildViewComponent';
+const BroadcasterSubscriptionId = "ChildViewComponent";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({
   components: {
     CipherRow,
     Header,
-    Footer
+    Footer,
   },
-  data () {
+  data() {
     return {
       CipherType,
       noFolderCiphers: [],
       loading: true,
       dataRendered: [],
       renderIndex: 0,
-      pageDetails: []
-    }
+      pageDetails: [],
+    };
   },
-  async mounted () {
+  async mounted() {
     window.onscroll = () => {
-      const bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight + 500 >= document.documentElement.scrollHeight
+      const bottomOfWindow =
+        Math.max(
+          window.pageYOffset,
+          document.documentElement.scrollTop,
+          document.body.scrollTop
+        ) +
+          window.innerHeight +
+          500 >=
+        document.documentElement.scrollHeight;
 
       if (bottomOfWindow) {
-        this.renderIndex += 50
-        if (this.searchText.length <= 1 && this.renderIndex <= this.noFolderCiphers.length) {
-          this.dataRendered = this.dataRendered.concat(this.noFolderCiphers.slice(this.renderIndex, this.renderIndex + 50))
+        this.renderIndex += 50;
+        if (
+          this.searchText.length <= 1 &&
+          this.renderIndex <= this.noFolderCiphers.length
+        ) {
+          this.dataRendered = this.dataRendered.concat(
+            this.noFolderCiphers.slice(this.renderIndex, this.renderIndex + 50)
+          );
         }
-        if (this.searchText.length > 1 && this.renderIndex <= this.ciphers.length) {
-          this.dataRendered = this.dataRendered.concat(this.ciphers.slice(this.renderIndex, this.renderIndex + 50))
+        if (
+          this.searchText.length > 1 &&
+          this.renderIndex <= this.ciphers.length
+        ) {
+          this.dataRendered = this.dataRendered.concat(
+            this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
+          );
         }
       }
-    }
-    await this.loadPageDetails()
+    };
+    await this.loadPageDetails();
     chrome.runtime.onMessage.addListener(
       (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
         switch (msg.command) {
@@ -188,177 +206,229 @@ export default Vue.extend({
           break;
         }
       }
-    )
+    );
   },
   computed: {
-    menu () {
+    menu() {
       return [
         {
-          icon: 'fa-key',
-          routeName: 'passwords',
-          label: this.$tc('type.Login'),
+          icon: "fa-key",
+          routeName: "passwords",
+          label: this.$tc("type.Login"),
           divided: false,
-          name: 'passwords'
+          name: "passwords",
         },
         {
-          icon: 'fa-sticky-note',
-          routeName: 'notes',
-          label: this.$tc('type.SecureNote'),
+          icon: "fa-sticky-note",
+          routeName: "notes",
+          label: this.$tc("type.SecureNote"),
           divided: false,
-          name: 'notes'
+          name: "notes",
         },
         {
-          icon: 'fa-credit-card',
-          routeName: 'cards',
-          label: this.$tc('type.Card'),
+          icon: "fa-credit-card",
+          routeName: "cards",
+          label: this.$tc("type.Card"),
           divided: false,
-          name: 'cards'
+          name: "cards",
         },
         {
-          icon: 'fa-id-card',
-          routeName: 'identities',
-          label: this.$tc('type.Identity'),
+          icon: "fa-id-card",
+          routeName: "identities",
+          label: this.$tc("type.Identity"),
           divided: false,
-          name: 'identities'
+          name: "identities",
         },
         {
-          icon: 'fa-gem',
-          routeName: 'crypto-assets',
-          label: this.$tc('type.CryptoAsset'),
+          icon: "fa-gem",
+          routeName: "crypto-backups",
+          label: this.$tc("type.CryptoBackup"),
           divided: false,
-          name: 'cryptoAssets'
-        }
-      ]
+          name: "cryptoBackups",
+        },
+      ];
     },
-    filteredCollection () {
-      return groupBy(this.collections, 'organizationId')
+    filteredCollection() {
+      return groupBy(this.collections, "organizationId");
     },
-    ciphersCount () {
-      const passwords = this.ciphers && (this.ciphers.filter(c => c.type === CipherType.Login) || [])
-      const passwordsCount = passwords && passwords.length
-      const notes = this.ciphers && (this.ciphers.filter(c => c.type === CipherType.SecureNote) || [])
-      const notesCount = notes && notes.length
-      const cards = this.ciphers && (this.ciphers.filter(c => c.type === CipherType.Card) || [])
-      const cardsCount = cards && cards.length
-      const identities = this.ciphers && (this.ciphers.filter(c => c.type === CipherType.Identity) || [])
-      const identitiesCount = identities && identities.length
-      const cryptoAssets = this.ciphers && (this.ciphers.filter(c => c.type === 6 || c.type === 7) || [])
-      const cryptoAssetsCount = cryptoAssets && cryptoAssets.length
+    ciphersCount() {
+      const passwords =
+        this.ciphers &&
+        (this.ciphers.filter((c) => c.type === CipherType.Login) || []);
+      const passwordsCount = passwords && passwords.length;
+      const notes =
+        this.ciphers &&
+        (this.ciphers.filter((c) => c.type === CipherType.SecureNote) || []);
+      const notesCount = notes && notes.length;
+      const cards =
+        this.ciphers &&
+        (this.ciphers.filter((c) => c.type === CipherType.Card) || []);
+      const cardsCount = cards && cards.length;
+      const identities =
+        this.ciphers &&
+        (this.ciphers.filter((c) => c.type === CipherType.Identity) || []);
+      const identitiesCount = identities && identities.length;
+      const cryptoBackups =
+        this.ciphers &&
+        (this.ciphers.filter((c) => c.type === 6 || c.type === 7) || []);
+      const cryptoBackupsCount = cryptoBackups && cryptoBackups.length;
       return {
         passwords: passwordsCount,
         notes: notesCount,
         cards: cardsCount,
         identities: identitiesCount,
-        cryptoAssets: cryptoAssetsCount
-      }
-    }
+        cryptoBackups: cryptoBackupsCount,
+      };
+    },
   },
   watch: {
-    ciphers () {
+    ciphers() {
       if (this.ciphers) {
-        this.loading = false
+        this.loading = false;
       }
-    }
+    },
   },
   asyncComputed: {
     ciphers: {
-      async get () {
-        const deletedFilter = c => {
-          return c.isDeleted === false
-        }
-        let result = await this.$searchService.searchCiphers(this.searchText, [null, deletedFilter], null) || []
+      async get() {
+        const deletedFilter = (c) => {
+          return c.isDeleted === false;
+        };
+        let result =
+          (await this.$searchService.searchCiphers(
+            this.searchText,
+            [null, deletedFilter],
+            null
+          )) || [];
         // remove ciphers generated by authenticator
-        result = result.filter(cipher => [CipherType.Login, CipherType.SecureNote, CipherType.Card, CipherType.Identity, 6, 7].includes(cipher.type))
-        result.map(item => {
+        result = result.filter((cipher) =>
+          [
+            CipherType.Login,
+            CipherType.SecureNote,
+            CipherType.Card,
+            CipherType.Identity,
+            6,
+            7,
+          ].includes(cipher.type)
+        );
+        result.map((item) => {
           if (item.type === 6) {
             try {
-              item.cryptoAccount = JSON.parse(item.notes)
+              item.cryptoAccount = JSON.parse(item.notes);
               // item.notes = item.cryptoAccount ? item.cryptoAccount.notes : ''
             } catch (error) {
-              console.log(error)
+              console.log(error);
             }
           }
           if (item.type === 7) {
             try {
-              item.cryptoWallet = JSON.parse(item.notes)
+              item.cryptoWallet = JSON.parse(item.notes);
               // item.notes = item.cryptoWallet ? item.cryptoWallet.notes : ''
             } catch (error) {
-              console.log(error)
+              console.log(error);
             }
           }
           return {
             ...item,
-            checked: false
-          }
-        })
-        this.noFolderCiphers = result.filter(c => c.folderId === null).filter(c => c.collectionIds && c.collectionIds.length === 0)
-        this.dataRendered = this.searchText.length > 1 ? result.slice(0, 50) : this.noFolderCiphers.slice(0, 50)
-        this.renderIndex = 0
-        return orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
+            checked: false,
+          };
+        });
+        this.noFolderCiphers = result
+          .filter((c) => c.folderId === null)
+          .filter((c) => c.collectionIds && c.collectionIds.length === 0);
+        this.dataRendered =
+          this.searchText.length > 1
+            ? result.slice(0, 50)
+            : this.noFolderCiphers.slice(0, 50);
+        this.renderIndex = 0;
+        return (
+          orderBy(
+            result,
+            [
+              (c) =>
+                this.orderField === "name"
+                  ? c.name && c.name.toLowerCase()
+                  : c.revisionDate,
+            ],
+            [this.orderDirection]
+          ) || []
+        );
       },
-      watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "deleted",
+        "searchText",
+        "filter",
+        "orderField",
+        "orderDirection",
+      ],
     },
     folders: {
-      async get () {
-        let folders = await this.$folderService.getAllDecrypted() || []
-        folders = folders.filter(f => f.id)
-        folders.forEach(f => {
-          const ciphers = this.ciphers && (this.ciphers.filter(c => c.folderId === f.id) || [])
-          f.ciphersCount = ciphers && ciphers.length
-        })
-        return folders
+      async get() {
+        let folders = (await this.$folderService.getAllDecrypted()) || [];
+        folders = folders.filter((f) => f.id);
+        folders.forEach((f) => {
+          const ciphers =
+            this.ciphers &&
+            (this.ciphers.filter((c) => c.folderId === f.id) || []);
+          f.ciphersCount = ciphers && ciphers.length;
+        });
+        return folders;
       },
-      watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
+      watch: ["searchText", "orderField", "orderDirection", "ciphers"],
     },
     collections: {
-      async get () {
-        let collections = await this.$collectionService.getAllDecrypted() || []
-        collections = collections.filter(f => f.id)
-        collections.forEach(f => {
-          const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
-          f.ciphersCount = ciphers && ciphers.length
-        })
+      async get() {
+        let collections =
+          (await this.$collectionService.getAllDecrypted()) || [];
+        collections = collections.filter((f) => f.id);
+        collections.forEach((f) => {
+          const ciphers =
+            this.ciphers &&
+            (this.ciphers.filter((c) => c.collectionIds.includes(f.id)) || []);
+          f.ciphersCount = ciphers && ciphers.length;
+        });
         if (!this.$store.state.syncing) {
-          this.loading = false
+          this.loading = false;
         }
-        return collections
+        return collections;
       },
-      watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
-    }
+      watch: ["searchText", "orderField", "orderDirection", "ciphers"],
+    },
   },
   methods: {
-    openRoute (item) {
+    openRoute(item) {
       if (item.externalUrl) {
-        this.$platformUtilsService.launchUri(item.externalUrl)
+        this.$platformUtilsService.launchUri(item.externalUrl);
       } else {
-        this.$router.push({ name: item.routeName })
+        this.$router.push({ name: item.routeName });
       }
     },
-    async test () {
-      const test = await BrowserApi.getTabFromCurrentWindow()
-      console.log(test)
+    async test() {
+      const test = await BrowserApi.getTabFromCurrentWindow();
+      console.log(test);
     },
-    routerFolder (item) {
+    routerFolder(item) {
       this.$router.push({
-        name: 'vault-folders-folderId',
-        params: { folderId: item.id }
-      })
+        name: "vault-folders-folderId",
+        params: { folderId: item.id },
+      });
     },
-    routerCollection (item) {
-      if (item.id === 'unassigned') {
+    routerCollection(item) {
+      if (item.id === "unassigned") {
         this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId',
-          params: { teamId: item.organizationId, tfolderId: item.id }
-        })
+          name: "vault-teams-teamId-tfolders-tfolderId",
+          params: { teamId: item.organizationId, tfolderId: item.id },
+        });
       } else {
         this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId',
-          params: { teamId: item.organizationId, tfolderId: item.id }
-        })
+          name: "vault-teams-teamId-tfolders-tfolderId",
+          params: { teamId: item.organizationId, tfolderId: item.id },
+        });
       }
     },
-    addEdit (item) {
-      this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
+    addEdit(item) {
+      this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
     },
     async loadPageDetails() {
       this.pageDetails = [];
@@ -367,7 +437,7 @@ export default Vue.extend({
         return;
       }
       BrowserApi.tabSendMessage(this.tab, {
-        command: 'collectPageDetails',
+        command: "collectPageDetails",
         tab: this.tab,
         sender: BroadcasterSubscriptionId,
       });
@@ -388,10 +458,7 @@ export default Vue.extend({
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
         // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
-        this.notify(
-          this.$t('errors.autofill'),
-          "error"
-        );
+        this.notify(this.$t("errors.autofill"), "error");
         return;
       }
 
@@ -419,12 +486,9 @@ export default Vue.extend({
           }
         }
       } catch (e) {
-        this.notify(
-          this.$t('errors.autofill'),
-          "error"
-        )
+        this.notify(this.$t("errors.autofill"), "error");
       }
     }
-  }
-})
+  },
+});
 </script>
