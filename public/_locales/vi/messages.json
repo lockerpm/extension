@@ -1752,5 +1752,62 @@
   },
   "emailVerificationRequiredDesc": {
     "message": "You must verify your email to use this feature. You can verify your email in the web vault."
+  },
+  "informMenuSavedLogin": {
+    "message": "Tài khoản đã lưu"
+  },
+  "informMenuVaultLocked": {
+    "message": "Kho bí mật đã khóa."
+  },
+  "informMenuLoginNow": {
+    "message": "Đăng nhập"
+  },
+  "informMenuGeneratePassword": {
+    "message": "Tạo mật khẩu mạnh"
+  },
+  "informMenuTurnOff": {
+    "message": "Tắt cho trang này"
+  },
+  "informMenuFillStElse": {
+    "message": "Điền mục khác"
+  },
+  "informMenuUsePassword": {
+    "message": "Sử dụng mật khẩu"
+  },
+  "informMenuLength": {
+    "message": "Độ dài"
+  },
+  "informMenuUseUpper": {
+    "message": "Sử dụng chữ in hoa (A-Z)"
+  },
+  "informMenuUseLower": {
+    "message": "Sử dụng chữ in thường (a-z)"
+  },
+  "informMenuUseDigits": {
+    "message": "Sử dụng số (0-9)"
+  },
+  "informMenuUseSymbols": {
+    "message": "Sử dụng ký tự đặc biệt (@!$%*)"
+  },
+  "inforMenuAvoidAmbiguous": {
+    "message": "Tránh các ký tự dễ nhầm lẫn"
+  },
+  "informMenuPasswordGenerator": {
+    "message": "Tạo mật khẩu"
+  },
+  "informMenuNoPassword": {
+    "message": "Không có tài khoản được lưu cho trang hiện tại."
+  },
+  "informMenuFillStElseTitle": {
+    "message": "Loại thông tin mà bạn muốn điền?"
+  },
+  "informMenuCategoryPassword": {
+    "message": "Mật khẩu"
+  },
+  "informMenuCategoryCard": {
+    "message": "Thẻ thanh toán"
+  },
+  "informMenuCategoryPersonalInfo": {
+    "message": "Thông tin cá nhân"
   }
 }

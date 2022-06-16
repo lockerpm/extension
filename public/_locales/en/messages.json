@@ -1843,5 +1843,26 @@
   },
   "informMenuUseSymbols": {
     "message": "Use symbols (@!$%*)"
+  },
+  "inforMenuAvoidAmbiguous": {
+    "message": "Avoid Ambiguous Characters"
+  },
+  "informMenuPasswordGenerator": {
+    "message": "Password Generator"
+  },
+  "informMenuNoPassword": {
+    "message": "No passwords found for this site."
+  },
+  "informMenuFillStElseTitle": {
+    "message": "What should be here?"
+  },
+  "informMenuCategoryPassword": {
+    "message": "Password"
+  },
+  "informMenuCategoryCard": {
+    "message": "Payment Card"
+  },
+  "informMenuCategoryPersonalInfo": {
+    "message": "Personal Information"
   }
 }
