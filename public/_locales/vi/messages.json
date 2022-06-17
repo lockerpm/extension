@@ -1775,7 +1775,7 @@
     "message": "Sử dụng mật khẩu"
   },
   "informMenuLength": {
-    "message": "Độ dài"
+    "message": "Độ dài:"
   },
   "informMenuUseUpper": {
     "message": "Sử dụng chữ in hoa (A-Z)"
@@ -1809,5 +1809,17 @@
   },
   "informMenuCategoryPersonalInfo": {
     "message": "Thông tin cá nhân"
+  },
+  "informMenuScoreStrong": {
+    "message": "Mạnh"
+  },
+  "informMenuScoreGood": {
+    "message": "Tốt"
+  },
+  "informMenuScoreMedium": {
+    "message": "Trung bình"
+  },
+  "informMenuScoreWeak": {
+    "message": "Yếu"
   }
 }

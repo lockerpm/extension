@@ -750,7 +750,7 @@ document.addEventListener('DOMContentLoaded', event => {
         const frameDiv = document.createElement('div');
         frameDiv.setAttribute('aria-live', 'polite');
         frameDiv.id = 'bit-notification-bar';
-        frameDiv.style.cssText = 'height: 320px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
+        frameDiv.style.cssText = 'height: 325px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
             'z-index: 2147483647; visibility: visible;';
         frameDiv.appendChild(iframe);
         document.body.appendChild(frameDiv);

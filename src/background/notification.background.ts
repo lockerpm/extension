@@ -60,7 +60,10 @@ export default class NotificationBackground {
                 await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
                 break;
             case 'bgGetDataForTab':
-                await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
+                await Promise.all([
+                  this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
+                  BrowserApi.tabSendMessageData(sender.tab, "resizeInformMenu", { width: '320px', height: '244px'})
+                ])
                 break;
             case 'bgCloseNotificationBar':
                 await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
@@ -175,6 +178,13 @@ export default class NotificationBackground {
                 break;
             case 'informMenuTurnOff':
                 await this.turnOffAutofill(sender.tab)
+                break;
+            case 'bgResizeInformMenu':
+                const tab__ = await BrowserApi.getTabFromCurrentWindow();
+                if (tab__ == null) {
+                  return;
+                }
+                await BrowserApi.tabSendMessageData(tab__, "resizeInformMenu", {width: msg.data?.width, height: msg.data?.height});
                 break;
             default:
                 break;

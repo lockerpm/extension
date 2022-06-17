@@ -453,6 +453,13 @@ export default Vue.extend({
             ]
           );
         }
+        return this.$createElement('img', {
+          attrs: {
+            src: require(`@/assets/images/icons/icon_default.svg`),
+            style: `height: 34px`,
+            class: 'rounded mx-auto'
+          }
+        })
       } catch (e) {
         return this.$createElement('img', {
           attrs: {

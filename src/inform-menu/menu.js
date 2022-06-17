@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
   i18n.informMenuCategoryPassword = chrome.i18n.getMessage('informMenuCategoryPassword')
   i18n.informMenuCategoryCard = chrome.i18n.getMessage('informMenuCategoryCard')
   i18n.informMenuCategoryPersonalInfo = chrome.i18n.getMessage('informMenuCategoryPersonalInfo')
+  i18n.informMenuScoreStrong = chrome.i18n.getMessage('informMenuScoreStrong')
+  i18n.informMenuScoreGood = chrome.i18n.getMessage('informMenuScoreGood')
+  i18n.informMenuScoreMedium = chrome.i18n.getMessage('informMenuScoreMedium')
+  i18n.informMenuScoreWeak = chrome.i18n.getMessage('informMenuScoreWeak')
 
   setTimeout(load, 50);
 
@@ -48,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDropdown = document.getElementById('dropdownOptions')
     btnDropdown.onclick = function () {
       changeMenuContent()
+    }
+    document.getElementById('inform-logo').onclick = function () {
+      goToStartPage()
     }
     chrome.runtime.onMessage.addListener((msg) => {
       if (msg.command === responseCiphersCommand && msg.data) {
@@ -190,8 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function changeMenuContent () {
     const optionsContainer = document.getElementById('template-dropdown-options-clone');
+    // const showOptions = document.getElementById('template-list-ciphers-clone') || document.getElementById('template-categories-list-clone') || document.getElementById('template-vault-locked-clone') || document.getElementById('template-generate-password-clone')
     if (!optionsContainer) {
       setContent(document.getElementById('template-dropdown-options'))
+      sendPlatformMessage({
+        command: 'bgResizeInformMenu',
+        data: {width: '320px', height: '244px'}
+      });
       document.getElementById('OPTION_GENPASS').onclick = getPasswordGeneration
       document.getElementById('OPTION_FILLELSE').onclick = getSomethingElseToFill
       document.getElementById('OPTION_TURNOFF').addEventListener('click', (e) => {
@@ -202,13 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     else {
-      // document.getElementById('header-title').innerHTML = 'Saved Login'
-      // const mainContainer = document.getElementsByTagName('main')[0]
-      // mainContainer.innerHTML = '<div class="cs-list-withScroll"></div>'
-      // sendPlatformMessage({
-      //   command: 'bgGetDataForTab',
-      //   responseCommand: 'informMenuGetCiphersForCurrentTab'
-      // });
       if (getQueryVariable('generate')) {
         document.getElementById('header-title').innerHTML = chrome.i18n.getMessage("informMenuPasswordGenerator")
         setContent(document.getElementById('template-generated-password'));
@@ -236,6 +241,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+  function goToStartPage () {
+    if (getQueryVariable('generate')) {
+      document.getElementById('header-title').innerHTML = chrome.i18n.getMessage("informMenuPasswordGenerator")
+      setContent(document.getElementById('template-generated-password'));
+      var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
+      var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
+      var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
+      usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
+      showPasswordButton.addEventListener('click', () => {
+        var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
+        inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
+      });
+      showOptionsButton.addEventListener('click', getPasswordGeneration);
+      sendPlatformMessage({
+        command: 'bgGeneratePassword',
+        responseCommand: 'informMenuGetGeneratedPasswordNoOptions'
+      });
+    }
+    else {
+      document.getElementById('header-title').innerHTML = i18n.informMenuSavedLogin
+      setContent(document.getElementById('template-list-ciphers'));
+      sendPlatformMessage({
+        command: 'bgGetDataForTab',
+        responseCommand: 'informMenuGetCiphersForCurrentTab'
+      });
+    }
+  } 
   function getPasswordGeneration () {
     setContent(document.getElementById('template-generate-password'))
     document.getElementById('header-title').innerHTML = chrome.i18n.getMessage("informMenuPasswordGenerator")
@@ -288,20 +320,20 @@ document.addEventListener('DOMContentLoaded', () => {
     switch (passwordData.passwordStrength.score) {
     case 4:
       color = '#3DB249'
-      textStrength = 'Strong'
+      textStrength = i18n.informMenuScoreStrong
       break;
     case 3:
       color = '#0363C2'
-      textStrength = 'Good'
+      textStrength = i18n.informMenuScoreGood
       break;
     case 2:
       color = '#FF9800'
-      textStrength = 'Medium'
+      textStrength = i18n.informMenuScoreMedium
       break;
     case 1:
     case 0:
       color = '#F54F64'
-      textStrength = 'Weak'
+      textStrength = i18n.informMenuScoreWeak
       break;
     default:
       break;

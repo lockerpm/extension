@@ -1830,7 +1830,7 @@
     "message": "Use this password"
   },
   "informMenuLength": {
-    "message": "Length"
+    "message": "Length:"
   },
   "informMenuUseUpper": {
     "message": "Use uppercase letters (A-Z)"
@@ -1864,5 +1864,17 @@
   },
   "informMenuCategoryPersonalInfo": {
     "message": "Personal Information"
+  },
+  "informMenuScoreStrong": {
+    "message": "Strong"
+  },
+  "informMenuScoreGood": {
+    "message": "Good"
+  },
+  "informMenuScoreMedium": {
+    "message": "Medium"
+  },
+  "informMenuScoreWeak": {
+    "message": "Weak"
   }
 }
