@@ -60,10 +60,15 @@ export default class NotificationBackground {
                 await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
                 break;
             case 'bgGetDataForTab':
-                await Promise.all([
-                  this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
-                  BrowserApi.tabSendMessageData(sender.tab, "resizeInformMenu", { width: '320px', height: '244px'})
-                ])
+                if (msg.responseCommand ==='informMenuGetCiphersForCurrentTab') {
+                  await Promise.all([
+                    this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
+                    BrowserApi.tabSendMessageData(sender.tab, "resizeInformMenu", { width: '320px', height: '244px'})
+                  ])
+                }
+                else {
+                  await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
+                }
                 break;
             case 'bgCloseNotificationBar':
                 await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
