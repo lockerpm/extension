@@ -487,7 +487,10 @@ Vue.mixin({
       }
       return true
     },
-    openNewTab (link) {
+    openNewTab(link) {
+      if (!link.match(/^https?:\/\//i)) {
+        link = "http://" + link;
+      }
       window.open(link, '_blank')
     },
     sanitizeUrl (connectionUrl) {
