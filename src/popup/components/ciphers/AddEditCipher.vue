@@ -785,7 +785,6 @@ export default Vue.extend({
       }
     },
     async putCipher (cipher) {
-      console.log(this.cipher)
       try {
         const type_ = this.cipher.type
         console.log(this.cipher.type)
@@ -810,8 +809,11 @@ export default Vue.extend({
         // this.$router.push({ name: 'vault' })
         this.$router.back()
       } catch (e) {
-        console.log(e)
-        this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
+        if (e.response && e.response.data && e.response.data.code === '3003') {
+          this.notify(this.$t('errors.3003'), 'error')
+        } else {
+          this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning') 
+        }
       } finally {
         this.loading = false
       }

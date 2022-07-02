@@ -127,7 +127,10 @@ module.exports = {
     invalid_expiry_year: 'Vui lòng nhập chính xác năm hết hạn.',
     invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.',
     autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.',
-    5002: 'Đã đạt đến số lượng tối đa của {type}. Vui lòng kiểm tra Thùng rác của bạn nếu có.'
+    5001: 'Bạn không thể xóa nhiều hơn 10000 mục tại 1 thời điểm.',
+    5002: 'Đã đạt đến số lượng tối đa của {type}. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục.',
+    7012: 'Gói Family chỉ bao gồm 6 thành viên.',
+    3003: 'Mục chia sẻ đã bị khóa. Vui lòng nâng cấp gói của bạn.'
   },
   master_password: {
     create_success: 'Mật khẩu tổng đã được tạo',

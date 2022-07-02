@@ -128,7 +128,10 @@ module.exports = {
     invalid_expiry_year: "Your card's expiration year is invalid.",
     invalid_expiry_year_past: "Your card's expiration year is in the past.",
     autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.',
-    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.'
+    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.',
+    5001: 'You can not delete more than 10000 items at a time.',
+    7012: 'The plan only accepts 6 members including you',
+    3003: 'This team was locked. Please upgrade your plan'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',

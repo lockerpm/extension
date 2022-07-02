@@ -318,7 +318,7 @@ export default class NotificationBackground {
 
             this.pushAddLoginToQueue(loginDomain, loginInfo, tab);
 
-        } else if (usernameMatches.length === 1 && usernameMatches[0].login.password !== loginInfo.password) {
+        } else if (usernameMatches.length >= 1 && usernameMatches[0].login.password !== loginInfo.password) {
             const disabledChangePassword = await this.storageService.get<boolean>(
                 ConstantsService.disableChangedPasswordNotificationKey);
             if (disabledChangePassword) {
@@ -463,8 +463,18 @@ export default class NotificationBackground {
           "Authorization": "Bearer " + csToken,
           "Content-Type": "application/json; charset=utf-8"
         };
-        const data = new CipherRequest(cipher)
+      const data = new CipherRequest(cipher)
+      try {
         await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, {headers: headers})
+      } catch (e) {
+        if (e.response && e.response.data && e.response.data.code === '5002') {
+          window.alert(
+            window.navigator.language === "vi"
+              ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
+              : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
+          );
+        }
+      }
     }
 
     private async getDecryptedCipherById(cipherId: string) {
@@ -486,8 +496,11 @@ export default class NotificationBackground {
               "Authorization": "Bearer " + csToken,
               "Content-Type": "application/json; charset=utf-8"
             };
-            const data = new CipherRequest(newCipher)
+          const data = new CipherRequest(newCipher)
+          try {
             await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
+          } catch (e) {
+          }
         }
     }
 

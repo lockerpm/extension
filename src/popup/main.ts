@@ -285,21 +285,36 @@ Vue.mixin({
           await this.$syncService.syncSettings(userId, res.domains);
           await this.$syncService.syncPolicies(res.policies);
           await this.$syncService.setLastSync(new Date());
-          this.$store.commit('UPDATE_SYNCED_CIPHERS')
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           if (page * pageSize >= this.cipherCount) {
             break
           }
           page += 1
         }
-        // delete cached cipher if it is not in sync data
-        const decryptedCipherCache = this.$cipherService.decryptedCipherCache
-        decryptedCipherCache.forEach(function (cipher, i) {
-          const syncIndex = allCiphers.findIndex(c => c.id === cipher.id)
-          if (syncIndex < 0) {
-            decryptedCipherCache.splice(i, 1)
+
+        // Clear deleted ciphers in local storage
+        const deletedIds = [];
+        const cipherIds = allCiphers.map(c => c.id);
+        const storageRes = await this.$storageService.get(`ciphers_${userId}`);
+        for (const id in { ...storageRes }) {
+          if (!cipherIds.includes(id)) {
+            delete storageRes[id];
+            deletedIds.push(id);
           }
-        })
+        }
+        await this.$storageService.save(`ciphers_${userId}`, storageRes);
+
+        // delete cached cipher if it is not in sync data
+        this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
+        // const decryptedCipherCache = this.$cipherService.decryptedCipherCache
+        // decryptedCipherCache.forEach(function (cipher, i) {
+        //   const syncIndex = allCiphers.findIndex(c => c.id === cipher.id)
+        //   if (syncIndex < 0) {
+        //     decryptedCipherCache.splice(i, 1)
+        //   }
+        // })
         // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         // console.log('sync completed')
       } catch (e) {

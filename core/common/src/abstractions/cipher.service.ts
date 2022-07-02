@@ -58,4 +58,5 @@ export abstract class CipherService {
     restoreManyWithServer: (ids: string[]) => Promise<any>;
     replaceSome: (ciphers: { [id: string]: CipherData; }) => Promise<any>;
     updateDecryptedCache: (ciphers: CipherView[]) => void;
+    csDeleteFromDecryptedCache: (ids: string[]) => void;
 }
