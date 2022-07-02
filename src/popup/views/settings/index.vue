@@ -63,7 +63,9 @@
           <div v-else>
             A product of
           </div>
-          <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack">
+          <a href="https://cystack.net" target="_blank">
+            <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack"/>
+          </a>
         </div>
     </div>
     <Footer></Footer>
