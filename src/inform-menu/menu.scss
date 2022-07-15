@@ -117,12 +117,16 @@ button.neutral {
 }
 .selection-item, .dropdown-option {
   cursor: pointer;
-  padding: 16px;
-  font-size: 16px;
+  padding: 12px;
+  font-size: 14px;
+  color: #072245;
   text-overflow: ellipsis;
   overflow: hidden;
   &:hover {
     background-color: #E4F0E6;
+  }
+  .selection-item__title {
+    font-weight: 600;
   }
 }
 .selection-category {

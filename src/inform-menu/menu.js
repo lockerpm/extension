@@ -143,9 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       for (let i = 0; i < ciphers.length; i++) {
         const cipherRow = document.createElement("div");
-        cipherRow.textContent = getSubTitle(ciphers[i])
+        // cipherRow.textContent = getSubTitle(ciphers[i])
         cipherRow.setAttribute('id', ciphers[i].id)
         cipherRow.classList.add('selection-item')
+        
+        const cipherTitle = document.createElement("div")
+        cipherTitle.classList.add("selection-item__title")
+        cipherTitle.textContent = ciphers[i].name
+        cipherRow.appendChild(cipherTitle)
+
+        const cipherSubtitle = document.createElement("div")
+        cipherSubtitle.textContent = getSubTitle(ciphers[i])
+        cipherRow.appendChild(cipherSubtitle)
+
         listContainer.appendChild(cipherRow)
         cipherRow.onclick = function () {
           sendPlatformMessage({ command: 'informMenuFillCipher', id: cipherRow.id })
