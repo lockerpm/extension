@@ -36,6 +36,9 @@ Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
 if (process.env.NODE_ENV==='development') {
   require('@/assets/buildtw.css')
 }
+// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+//   console.log(request, sender)
+// });
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@/assets/tailwind.css'

@@ -1470,6 +1470,11 @@ export class ApiService implements ApiServiceAbstraction {
         }
         return accessToken;
     }
+    
+    async getActiveCsToken(): Promise<string> {
+        let accessToken = await this.tokenService.getCsToken();
+        return accessToken;
+    }
 
     fetch(request: Request): Promise<Response> {
         if (request.method === 'GET') {

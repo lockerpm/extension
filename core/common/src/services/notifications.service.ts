@@ -59,8 +59,8 @@ export class NotificationsService implements NotificationsServiceAbstraction {
         }
 
         this.signalrConnection = new signalR.HubConnectionBuilder()
-            .withUrl(this.url + '/hub', {
-                accessTokenFactory: () => this.apiService.getActiveBearerToken(),
+            .withUrl(this.url + '/ws/cystack_platform/pm/sync', {
+                accessTokenFactory: () => this.apiService.getActiveCsToken(),
                 skipNegotiation: true,
                 transport: signalR.HttpTransportType.WebSockets,
             })

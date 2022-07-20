@@ -119,10 +119,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
-import Vnodes from "@/components/Vnodes";
+import Vnodes from "../../../components/Vnodes.vue";
 import { CipherView } from 'jslib-common/models/view/cipherView';
 export default Vue.extend(
   {

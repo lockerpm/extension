@@ -134,7 +134,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 import { BrowserApi } from "@/browser/browserApi";
 import { Utils } from "jslib-common/misc/utils";
@@ -143,9 +143,9 @@ import { ConstantsService } from "jslib-common/services/constants.service";
 import BrowserStorageService from "@/services/browserStorage.service";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
-import CipherRow from "@/popup/components/ciphers/CipherRow";
-import ListCipher from "@/popup/components/ciphers/ListCipher";
-import Vnodes from "@/components/Vnodes";
+import CipherRow from "../../components/ciphers/CipherRow.vue";
+import ListCipher from "../../components/ciphers/ListCipher.vue";
+import Vnodes from "../../../components/Vnodes.vue";
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 const BroadcasterSubscriptionId = "CurrentTabComponent";
@@ -179,7 +179,7 @@ export default Vue.extend({
   },
   async mounted() {
     chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      (msg, sender, response) => {
         this.processMessage(msg, sender, response);
       }
     );
@@ -299,11 +299,11 @@ export default Vue.extend({
         sender: BroadcasterSubscriptionId,
       });
 
-      const otherTypes: CipherType[] = [];
-      const dontShowCards = await new BrowserStorageService().get<boolean>(
+      const otherTypes = [];
+      const dontShowCards = await new BrowserStorageService().get(
         ConstantsService.dontShowCardsCurrentTab
       );
-      const dontShowIdentities = await new BrowserStorageService().get<boolean>(
+      const dontShowIdentities = await new BrowserStorageService().get(
         ConstantsService.dontShowIdentitiesCurrentTab
       );
       if (!dontShowCards) {
@@ -347,7 +347,7 @@ export default Vue.extend({
       // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
       this.$router.push({ name: "add-item-create", params: { data: item } });
     },
-    async fillCipher(cipher: CipherView) {
+    async fillCipher(cipher) {
       // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
@@ -395,17 +395,15 @@ export default Vue.extend({
         // this.notify(e, 'warning')
       }
     },
-    async processMessage(msg: any, sender: any, sendResponse: any) {
+    async processMessage(msg, sender, sendResponse) {
       // console.log(
       //   `popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`
       // );
       switch (msg.command) {
       case "syncCompleted":
-        // if (this.loaded) {
-        //   window.setTimeout(() => {
-        //     this.load();
-        //   }, 500);
-        // }
+        if (msg.successfully && msg.trigger) {
+          this.notify("Syncing complete", "success");
+        }
         window.setTimeout(() => {
           this.load();
         }, 500);

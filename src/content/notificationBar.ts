@@ -352,13 +352,20 @@ document.addEventListener('DOMContentLoaded', event => {
         }
         if (relativeContainer) {
           const containerPosition = relativeContainer.getBoundingClientRect();
-          logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
+          logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIYSURBVHgBtVW/UxpREN7dECYlZcrrTRG6dLl0dpHJD5JKYpp0kjIVoUuXpLPSsxMdB+wsobODQnr+hNNKcXjrfngycJzenTN8M9ws7+3b3fd291umR1Bvb5QuqbjNyr4qeUTqRVshMw9s7aQo3NmpHIwessFJiz/aX7wb1T1V9SkDmDh4LtxMciTxhe/t6vbYuX5W44CS1nBm67haj+89m/+zdfy5Ydp/THxB+YEz6+Wva9RvDXtLDhB5ZDwzmGlg3ysTS7NFJb9cfXXRPxyeTXXwwZvjiguKGSAi75xzvomN2FZYFCkjJ9Mc3DhtxI1blXSRPHoaSiiSaRCIHkmKa1iSe+x4P75uTjtWtl1KAYqkZmUuY6cblI4w+hEL/1dedpwEccW6WKLep6vqT3FSoZywZ34rdpXXtCKYbQ9JzlU5OeEJrRjmgEe0OoRI8ohWBDBuQSfas3v4Kap/nWhIOQE6F1cY/8ugW7qfBVYZDdbJZoYz5GxWSFDpYHh045uoYRXdXI5KfWs0n1LBQWBcVIA4Yf5mDbFAdnnmQQJCi74JYUrXg9Z5aBR7beJ6HivkrEmZ3lC8lxz/2vvQOp05AMDf5U9rxmVpCZ8D00tabtTm7sfD2VxZmGj9o2EXw8JERJV3qoWIfN74XQwJqBmF88T9th7JVC0oEuQxSBj6/NhBOBKjczBuRIrRc/AIDYoeQpmjEh+ycQu0iN6gRPquawAAAABJRU5ErkJggg==');
               height: 20px;
               min-width: 20px;
+              background-position: center;
+              background-size: contain;
               position: absolute;
               z-index: 1;
-              left: ${elPosition.left - containerPosition.left +  elPosition.width - 30}px;
-              top: ${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`;
+              left: ${elPosition.left -
+                containerPosition.left +
+                elPosition.width -
+                30}px;
+              top: ${elPosition.top -
+                containerPosition.top +
+                (elPosition.height - 20) / 2}px`;
 
           inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
           logo.addEventListener("click", () => {

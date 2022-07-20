@@ -15,6 +15,7 @@ const Keys = {
 
 export class TokenService implements TokenServiceAbstraction {
     token: string;
+    csToken: string;
     decodedToken: any;
     refreshToken: string;
     clientId: string;
@@ -73,6 +74,15 @@ export class TokenService implements TokenServiceAbstraction {
 
         this.token = await this.storageService.get<string>(Keys.accessToken);
         return this.token;
+    }
+    
+    async getCsToken(): Promise<string> {
+        if (this.csToken != null) {
+            return this.csToken;
+        }
+
+        this.csToken = await this.storageService.get<string>("cs_token");
+        return this.csToken;
     }
 
     async setRefreshToken(refreshToken: string): Promise<any> {

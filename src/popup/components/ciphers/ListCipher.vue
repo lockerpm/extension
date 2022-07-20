@@ -97,7 +97,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
@@ -162,7 +162,7 @@ export default Vue.extend({
       }
     };
     chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      (msg, sender, response) => {
         switch (msg.command) {
         case "collectPageDetailsResponse":
           if (msg.sender === BroadcasterSubscriptionId) {
@@ -172,6 +172,7 @@ export default Vue.extend({
               details: msg.details,
             };
             this.pageDetails.push(pageDetailsObj);
+            response()
           }
           break;
         default:
@@ -334,7 +335,7 @@ export default Vue.extend({
         sender: BroadcasterSubscriptionId,
       });
     },
-    async fillCipher(cipher: CipherView) {
+    async fillCipher(cipher) {
       // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&

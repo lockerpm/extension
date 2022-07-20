@@ -29,6 +29,8 @@ import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNoti
 import { NotificationQueueMessageType } from './models/notificationQueueMessageType';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import axios from 'axios';
+import { CipherData } from 'jslib-common/models/data/cipherData';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 export default class NotificationBackground {
 
     private notificationQueue: (AddLoginQueueMessage | AddChangePasswordQueueMessage)[] = [];
@@ -465,7 +467,12 @@ export default class NotificationBackground {
         };
       const data = new CipherRequest(cipher)
       try {
-        await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, {headers: headers})
+        const res = await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, { headers: headers })
+
+        const cipherResponse = new CipherResponse({ ...data, id: res.data?res.data.id:'' })
+        const userId = await this.userService.getUserId();
+        const cipherData = new CipherData(cipherResponse, userId)
+        this.cipherService.upsert(cipherData)
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           window.alert(

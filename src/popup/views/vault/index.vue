@@ -78,7 +78,7 @@
             </div>
           </li>
         </template>
-        <template
+        <!-- <template
           v-for="(value, key) in filteredCollection"
           class="flex items-center hover:bg-[#E4F2E1] hover:text-primary bg-white cursor-pointer h-[44px] leading-[44px] px-5"
         >
@@ -93,7 +93,6 @@
             @click="routerCollection(item)"
           >
             <div class="menu-icon mr-4">
-              <!-- <i class="fas fa-folder text-[20px]"></i> -->
               <img
                 src="@/assets/images/icons/folder.svg"
                 alt=""
@@ -112,7 +111,7 @@
               <i class="fas fa-chevron-right"></i>
             </div>
           </li>
-        </template>
+        </template> -->
         <div class="uppercase px-3 mt-4 mb-1">{{$t('type.no_folder')}} ({{noFolderCiphers.length}})</div>
         <cipher-row
           v-for="item in dataRendered"
@@ -128,15 +127,15 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import groupBy from "lodash/groupBy";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
-import CipherRow from "@/popup/components/ciphers/CipherRow";
-import Header from "@/popup/components/layout/parts/Header";
-import Footer from "@/popup/components/layout/parts/Footer";
+import CipherRow from "../../components/ciphers/CipherRow.vue";
+import Header from "../../components/layout/parts/Header.vue";
+import Footer from "../../components/layout/parts/Footer.vue";
 const BroadcasterSubscriptionId = "ChildViewComponent";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
@@ -190,7 +189,7 @@ export default Vue.extend({
     };
     await this.loadPageDetails();
     chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      (msg, sender, response) => {
         switch (msg.command) {
         case "collectPageDetailsResponse":
           if (msg.sender === BroadcasterSubscriptionId) {
@@ -200,6 +199,7 @@ export default Vue.extend({
               details: msg.details,
             };
             this.pageDetails.push(pageDetailsObj);
+            response()
           }
           break;
         default:
@@ -442,7 +442,7 @@ export default Vue.extend({
         sender: BroadcasterSubscriptionId,
       });
     },
-    async fillCipher(cipher: CipherView) {
+    async fillCipher(cipher) {
       // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
