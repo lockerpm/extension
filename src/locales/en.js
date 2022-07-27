@@ -150,7 +150,7 @@ module.exports = {
     re_password: 'Re-Enter new Master Password',
     change_btn: 'Change password',
     enter_password: 'Enter Master Password',
-    enter_password_desc: 'Enter your Master Password',
+    enter_password_desc: 'Enter your Master Password to unlock',
     enter_password_title: 'Login',
     get_hint: 'Get master password hint',
     continue: 'Continue',
@@ -660,7 +660,7 @@ module.exports = {
     },
     login: {
       login: 'Login',
-      login_desc: 'Login with CyStack ID to use Locker',
+      login_desc: 'Login with Locker ID to use Locker',
       verify: 'Verify your identity',
       authentication_app: 'Authentication App',
       have_code: 'I have a code',
@@ -686,7 +686,7 @@ module.exports = {
       confirm_pass: 'Confirm Master Password',
       hint_pass: 'Master password hint (optional)',
       create_btn: 'Create password',
-      note: 'Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.'
+      note: 'Note: Locker cannot view, store, or re-issue Master Password in case you forget or lose it.'
     },
     parts: {
       current: 'Current',

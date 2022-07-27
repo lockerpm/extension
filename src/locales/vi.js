@@ -572,7 +572,7 @@ module.exports = {
       timeout_desc: 'Tự động khóa ứng dụng sau một khoảng thời gian không hoạt động',
       timeout_action: 'Hành động',
       timeout_action_1: 'Khi khóa, bạn sẽ được yêu cầu nhập Mật khẩu chính để truy cập lại.',
-      timeout_action_2: 'Khi đăng xuất, bạn cần đăng nhập lại tài khoản CyStack và Mật khẩu chính để truy cập lại.',
+      timeout_action_2: 'Khi đăng xuất, bạn cần đăng nhập lại tài khoản Locker và Mật khẩu chính để truy cập lại.',
       security: 'Bảo mật',
       change_master_password: 'Đổi Mật khẩu chính',
       emergency_access: 'Liên hệ khẩn cấp',
@@ -650,7 +650,7 @@ module.exports = {
     },
     login: {
       login: 'Đăng nhập',
-      login_desc: 'Đăng nhập bằng CyStack ID để sử dụng Locker',
+      login_desc: 'Đăng nhập bằng Locker ID để sử dụng Locker',
       verify: 'Xác minh danh tính của bạn',
       authentication_app: 'Ứng dụng xác thực',
       have_code: 'Tôi đã có code',
@@ -676,7 +676,7 @@ module.exports = {
       confirm_pass: 'Xác nhận mật khẩu',
       hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
       create_btn: 'Tạo mật khẩu',
-      note: 'Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Mật khẩu chính trong trường hợp bạn quên hoặc đánh mất.'
+      note: 'Lưu ý: Locker không thể xem, không thể lưu trữ, cũng như không thể cấp lại Mật khẩu chính trong trường hợp bạn quên hoặc đánh mất.'
     },
     parts: {
       current: 'Hiện tại',

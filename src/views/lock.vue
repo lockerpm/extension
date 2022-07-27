@@ -7,7 +7,7 @@
       <div class="md:w-[410px] md:mx-0 mx-5 border border-black-200 rounded py-[2.8125rem] px-6 text-center">
         <template v-if="step===1">
           <div class="text-head-4 font-semibold mb-2.5">
-            {{ $t('master_password.enter_password_desc') }}
+            {{ $t('master_password.enter_password_title') }}
           </div>
           <div class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}
