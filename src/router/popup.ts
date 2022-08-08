@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import storePromise from "../store/index";
 import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
+import i18n from '@/locales/i18n';
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -403,7 +404,8 @@ async function VaultGuard(to, from, next) {
   console.log(to.path, from.path)
   const store = await storePromise;
   if (store.state.isLoggedIn === true) {
-    await store.dispatch("LoadCurrentUser");
+    const res = await store.dispatch("LoadCurrentUser");
+    i18n.locale = res.language
     await store.dispatch("LoadCurrentUserPw");
     if (store.state.userPw.is_pwd_manager === false) {
       console.log("Dieu huong set-master-password");

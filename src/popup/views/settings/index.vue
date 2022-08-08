@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="mt-4 flex items-center justify-center">
-          <div v-if="locale==='vi'">
+          <div v-if="language==='vi'">
             Một sản phẩm của
           </div>
           <div v-else>
@@ -79,6 +79,7 @@ import { BrowserApi } from "@/browser/browserApi";
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import Header from "../../components/layout/parts/Header.vue";
 import Footer from "../../components/layout/parts/Footer.vue";
+import i18n from '@/locales/i18n';
 const enableAutofillKey = 'enableAutofill'
 const showFoldersKey = 'showFolders'
 const hideIconsKey = 'hideIcons'
@@ -90,11 +91,11 @@ export default Vue.extend({
     Footer,
   },
   async mounted() {
-    chrome.runtime.onMessage.addListener(
-      (msg, sender, response) => {
-        this.processMessage(msg, sender, response);
-      }
-    );
+    // chrome.runtime.onMessage.addListener(
+    //   (msg, sender, response) => {
+    //     this.processMessage(msg, sender, response);
+    //   }
+    // );
     const res = await Promise.all([
       this.$storageService.get(enableAutofillKey),
       this.$storageService.get(showFoldersKey),
@@ -206,6 +207,9 @@ export default Vue.extend({
         },
       ];
     },
+    language () {
+      return i18n.locale
+    }
   },
   methods: {
     openRoute(item) {

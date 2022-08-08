@@ -3,7 +3,7 @@
     style="padding-top: 180px; padding-bottom: 56px;"
     class="p-4 text-[#A2A3A7]"
   >
-    <div class="mt-5 font-semibold mb-4">
+    <div v-if="folders" class="mt-5 font-semibold mb-4">
       {{ $t('type.folder') }} ({{folders.length}})
     </div>
     <ul class="list-folders">
@@ -38,26 +38,26 @@
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-      folders: []
-    }
-  },
+import Vue from "vue";
+export default Vue.extend({
   asyncComputed: {
     folders: {
       async get () {
-        let folders = (await this.$folderService.getAllDecrypted()) || [];
-        folders = folders.filter((f) => f.id);
+        let results = []
+        try {
+          results = await this.$folderService.getAllDecrypted() || [];
+        } catch (error) {
+          results = []
+        }
+        results = results.filter((f) => f.id);
         // folders.forEach((f) => {
         //   const ciphers =
         //     this.ciphers &&
         //     (this.ciphers.filter((c) => c.folderId === f.id) || []);
         //   f.ciphersCount = ciphers && ciphers.length;
         // });
-        return folders;
-      },
-      watch: ["ciphers"],
+        return results;
+      }
     },
   },
   methods: {
@@ -68,7 +68,7 @@ export default {
       });
     },
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

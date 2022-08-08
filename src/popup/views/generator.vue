@@ -15,11 +15,7 @@ import PasswordGenerator from '@/popup/components/password/PasswordGenerator'
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
-  components: { PasswordGenerator, Header, Footer },
-  data() {
-    return {}
-  },
-  mounted: {}
+  components: { PasswordGenerator, Header, Footer }
 })
 </script>
 

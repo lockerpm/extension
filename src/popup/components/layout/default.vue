@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #E4F0E6; min-height: 600px; max-width: 400px"
+    style="background: #E8E8E9; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
     <router-view v-if="wrapperType === 'component'" />

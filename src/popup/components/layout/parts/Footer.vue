@@ -94,12 +94,6 @@ export default Vue.extend({
 </script>
 
 <style>
-#popup-header input {
-  background-color: #e4f0e6;
-  height: 36px;
-  border-radius: 42px;
-  border: 0;
-}
 #popup-navigator .router-link-exact-active.router-link-active {
   color: #268334;
 }
