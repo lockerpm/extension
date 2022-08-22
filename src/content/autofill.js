@@ -747,6 +747,7 @@
 
         // do a fill by opid operation
         function doFillByOpId(opId, op) {
+          // console.log(`doFillByOpId: ${opId} ${op}`)
             var el = getElementByOpId(opId);
             return el ? (fillTheElement(el, op), [el]) : null;
         }

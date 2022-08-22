@@ -265,12 +265,13 @@ export default class NotificationBackground {
                     queueMessage: this.notificationQueue[0]
                 });
             } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
-                BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
-                    type: 'change',
-                    typeData: {
-                        isVaultLocked: this.notificationQueue[i].wasVaultLocked,
-                    },
-                    loginInfo
+                BrowserApi.tabSendMessageData(tab, "openNotificationBar", {
+                  type: "change",
+                  typeData: {
+                    isVaultLocked: this.notificationQueue[i].wasVaultLocked
+                  },
+                  loginInfo,
+                  queueMessage: this.notificationQueue[0]
                 });
             }
             break;
@@ -379,6 +380,7 @@ export default class NotificationBackground {
         const message: AddChangePasswordQueueMessage = {
             type: NotificationQueueMessageType.changePassword,
             cipherId: cipherId,
+            username,
             newPassword: newPassword,
             domain: loginDomain,
             tabId: tab.id,

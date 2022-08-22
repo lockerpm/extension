@@ -6,7 +6,16 @@
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
         </div>
-        <div class="ml-4">
+        <!-- <div class="ml-4">
+          <button
+            class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
+            v-clipboard:copy="password"
+            v-clipboard:success="clipboardSuccessHandler"
+          >
+            <i class="fas fa-copy" />
+          </button>
+        </div> -->
+        <div class="ml-2">
           <button
             class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
             @click="regenerate"
@@ -23,7 +32,6 @@
         v-clipboard:copy="password"
         v-clipboard:success="clipboardSuccessHandler"
         class="btn btn-primary w-full mt-4"
-        style="border-radius: 64px !important"
       >
         {{ $t('data.tools.copy_password') }}
       </button>
@@ -181,6 +189,6 @@ export default {
 </script>
 <style>
 .generator-option {
-  @apply mb-2 w-full py-2;
+  @apply w-full py-2;
 }
 </style>

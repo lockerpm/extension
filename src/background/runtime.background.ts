@@ -16,6 +16,7 @@ import { SettingsService } from 'jslib-common/abstractions/settings.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { TokenService } from 'jslib-common/abstractions/token.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
+import { SyncService } from 'jslib-common/abstractions/sync.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -36,7 +37,7 @@ export default class RuntimeBackground {
               private storageService: StorageService, private i18nService: I18nService,
               private notificationsService: NotificationsService, private systemService: SystemService,
               private environmentService: EnvironmentService, private messagingService: MessagingService, 
-              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService,
+              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService, private syncService: SyncService,
               private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService, private passwordGenerator: PasswordGenerationService) {
 
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
@@ -220,18 +221,20 @@ export default class RuntimeBackground {
         //     console.log(error);
         //   }
         // }
-        // const userId = await this.userService.getUserId();
+        // const currentUserId = await this.userService.getUserId();
         await Promise.all([
           this.cryptoService.clearKeys(),
-          this.storageService.remove("cs_token")
-          // this.folderService.clear(userId),
-          // this.collectionService.clear(userId),
+          this.storageService.remove("cs_token"),
 
-          // this.cipherService.clear(userId),
-          // this.settingsService.clear(userId),
-          // this.policyService.clear(userId),
+          // Clear old data
+          // this.syncService.setLastSync(new Date(0)),
+          // this.folderService.clear(currentUserId),
+          // this.collectionService.clear(currentUserId),
+          // this.cipherService.clear(currentUserId),
+          // this.settingsService.clear(currentUserId),
+          // this.policyService.clear(currentUserId),
           // this.tokenService.clearToken(),
-          // this.userService.clear(),
+          // this.userService.clear()
         ]);
         try {
           await this.storageService.save("cs_token", msg.token);

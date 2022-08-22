@@ -44,14 +44,14 @@
       >
       </el-input>
       <div
-        style="margin-left: 12px"
+        style="margin-left: 12px; display: flex;"
         @click="$router.push({ name: 'add-item-create', params: {  type } })"
       >
-        <!-- <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i> -->
-        <img
+        <i class="el-icon-plus text-primary text-head-5 font-semibold"></i>
+        <!-- <img
           class="mt-3"
           src="@/assets/images/plus-circle.png"
-        >
+        > -->
       </div>
     </div>
     <div
@@ -271,13 +271,13 @@ a.navigator-item:hover {
   transition: ease-in-out;
   transition-duration: 200ms;
   font-weight: 600;
-  background-color: #E8E8E9;
+  background-color: #F6F6F6;
 } 
 #popup-header input {
-  background-color: #E8E8E9;
+  background-color: #F6F6F6;
   height: 36px;
   border-radius: 42px;
-  border: 0;
+  border: 1px solid #E8E8E9;
 }
 </style>
 
