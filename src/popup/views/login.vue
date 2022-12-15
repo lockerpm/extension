@@ -323,11 +323,14 @@ export default Vue.extend({
   },
   methods: {
     openLogin() {
-      const url = `${
+      let url = `${
         process.env.VUE_APP_ID_URL
       }/login?SERVICE_URL=${encodeURIComponent(
         "/sso"
       )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
+      if (process.env.VUE_APP_ENVIRONMENT == 'dev') {
+        url += '&ENVIRONMENT=dev'
+      }
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
       const thisWindow = window.open("", "_self");
@@ -418,11 +421,13 @@ export default Vue.extend({
       // else if(provider === 'github'){
       //   chrome.runtime.sendMessage({ command: 'loginWithGithub', provider });
       // }
-      const url = `${process.env.VUE_APP_ID_URL
+      let url = `${process.env.VUE_APP_ID_URL
       }/login?SERVICE_URL=${encodeURIComponent(
         "/sso"
       )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
-
+      if (process.env.VUE_APP_ENVIRONMENT == 'dev') {
+        url += '&ENVIRONMENT=dev'
+      }
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
       const thisWindow = window.open("", "_self");
