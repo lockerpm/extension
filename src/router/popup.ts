@@ -4,6 +4,8 @@ import storePromise from "../store/index";
 import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
 import i18n from '@/locales/i18n';
+import sentryConfig from './index'
+
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -400,6 +402,9 @@ const router = new VueRouter({
   base: '/popup.html',
   routes
 })
+
+sentryConfig(router);
+
 async function VaultGuard(to, from, next) {
   console.log(to.path, from.path)
   const store = await storePromise;

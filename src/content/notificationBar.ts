@@ -285,8 +285,7 @@ document.addEventListener('DOMContentLoaded', event => {
         });
     }
 
-  
-  function watchForms(forms: any[]) {
+    function watchForms(forms: any[]) {
         if (forms == null || forms.length === 0) {
             return;
         }

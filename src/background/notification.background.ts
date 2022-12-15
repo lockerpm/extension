@@ -254,7 +254,6 @@ export default class NotificationBackground {
             if (this.notificationQueue[i].tabId !== tab.id || this.notificationQueue[i].domain !== tabDomain) {
                 continue;
             }
-
             if (this.notificationQueue[i].type === NotificationQueueMessageType.addLogin) {
                 BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
                     type: 'add',
