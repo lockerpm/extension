@@ -32,14 +32,26 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
-  constructor(private main: MainBackground, private autofillService: AutofillService,
-              private platformUtilsService: BrowserPlatformUtilsService,
-              private storageService: StorageService, private i18nService: I18nService,
-              private notificationsService: NotificationsService, private systemService: SystemService,
-              private environmentService: EnvironmentService, private messagingService: MessagingService, 
-              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService, private syncService: SyncService,
-              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService, private passwordGenerator: PasswordGenerationService) {
-
+  constructor(
+    private main: MainBackground,
+    private autofillService: AutofillService,
+    private platformUtilsService: BrowserPlatformUtilsService,
+    private storageService: StorageService,
+    private i18nService: I18nService,
+    private notificationsService: NotificationsService,
+    private systemService: SystemService,
+    private environmentService: EnvironmentService,
+    private messagingService: MessagingService, 
+    private cryptoService: CryptoService,
+    private cipherService: CipherService,
+    private folderService: FolderService,
+    private collectionService: CollectionService,
+    private userService: UserService,
+    private settingsService: SettingsService,
+    private policyService: PolicyService,
+    private tokenService: TokenService,
+    private passwordGenerator: PasswordGenerationService
+  ) {
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
       this.onInstalledReason = details.reason;

@@ -1,5 +1,13 @@
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
+import {
+    OBSERVE_IGNORED_ELEMENTS,
+    CANCEL_BUTTON_NAMES,
+    LOGIN_BUTTON_NAMES,
+    SIGN_UP_BUTTON_NAMES,
+    CHANGE_PASSWORD_BUTTON_NAMES,
+    CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
+} from '@/constants/index'
 
 document.addEventListener('DOMContentLoaded', event => {
     if (window.location.hostname.indexOf('id.locker.io') > -1) {
@@ -11,20 +19,21 @@ document.addEventListener('DOMContentLoaded', event => {
     let barType: string = null;
     let pageHref: string = null;
     let observer: MutationObserver = null;
-    const observeIgnoredElements = new Set(['a', 'i', 'b', 'strong', 'span', 'code', 'br', 'img', 'small', 'em', 'hr']);
     let domObservationCollectTimeout: number = null;
     let collectIfNeededTimeout: number = null;
     let observeDomTimeout: number = null;
-    const inIframe = isInIframe();
-    const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập']);
-    const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
-    const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
-    const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
     let inputWithLogo: any[] = []
     let isSignUp = false
+    const inIframe = isInIframe();
+    const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
+    const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
+    const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
+    const signUpButtonNames = new Set(SIGN_UP_BUTTON_NAMES);
+    const changePasswordButtonNames = new Set(CHANGE_PASSWORD_BUTTON_NAMES);
+    const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES);
+
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -160,8 +169,6 @@ document.addEventListener('DOMContentLoaded', event => {
         }
         else if (msg.command === 'informMenuPassword') {
           useGeneratedPassword(msg.data.password)
-          // console.log(msg.data.password)
-          // console.log(passwordFields)
         }
         else if (msg.command === "resizeInformMenu") {
           resizeInformMenu(msg.data)
@@ -490,7 +497,9 @@ document.addEventListener('DOMContentLoaded', event => {
     function listen(form: HTMLFormElement) {
         form.removeEventListener('submit', formSubmitted, false);
         form.addEventListener('submit', formSubmitted, false);
-        const submitButton = getSubmitButton(form, logInButtonNames);
+        const submitButton = getSubmitButton(form, loginButtonNames);
+        // console.log('submitButton', submitButton);
+        // console.log(form);
         if (submitButton != null) {
             const buttonText = getButtonText(submitButton);
             const matches = Array.from(signUpButtonNames)
@@ -498,7 +507,6 @@ document.addEventListener('DOMContentLoaded', event => {
             if (matches.length>0) {
               isSignUp = true;
             }
-            // console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }
@@ -650,9 +658,7 @@ document.addEventListener('DOMContentLoaded', event => {
         if (wrappingEl == null) {
             return null;
         }
-        // console.log(wrappingEl)
         const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-        // console.log(wrappingElIsForm)
         let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
             'button[type="submit"]') as HTMLElement;
         if (submitButton == null && wrappingElIsForm) {
@@ -819,6 +825,7 @@ document.addEventListener('DOMContentLoaded', event => {
     function sendPlatformMessage(msg: any) {
         chrome.runtime.sendMessage(msg);
     }
+
     function getOffsetTop(elem) {
       var offsetLeft = 0;
       do {
@@ -828,6 +835,7 @@ document.addEventListener('DOMContentLoaded', event => {
       } while ((elem = elem.offsetParent));
       return offsetLeft;
     }
+
     function getOffsetLeft(elem) {
       var offsetLeft = 0;
       do {
