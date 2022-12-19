@@ -111,7 +111,6 @@ export default class NotificationBackground {
             case 'collectPageDetailsResponse':
                 switch (msg.sender) {
                     case 'notificationBar':
-                        // console.log(msg.details)
                         const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
                         let passwordFields = [];
                         let usernameFields = [];
@@ -121,17 +120,12 @@ export default class NotificationBackground {
                           }
                           usernameFields.push(form.username)
                         }
-                        // console.log( forms)
                         await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
                             details: msg.details,
                             forms: forms,
                             passwordFields: passwordFields,
                             usernameFields: usernameFields
                         });
-                      //  await BrowserApi.tabSendMessageData(msg.tab, 'informMenuPageDetails', {
-                      //       details: msg.details,
-                      //       passwordFields: passwordFields,
-                      //   });
                         break;
                     default:
                         break;
@@ -208,7 +202,7 @@ export default class NotificationBackground {
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,
-            sender: 'informMenu',
+            sender: 'informMenu'
         });
     }
   
@@ -459,8 +453,6 @@ export default class NotificationBackground {
         }
 
         const cipher = await this.cipherService.encrypt(model);
-        // console.log("notificationBar createNewCipher");
-        // await this.cipherService.saveWithServer(cipher);
         const csToken = await this.main.storageService.get<string>("cs_token");
         const headers = {
           "Authorization": "Bearer " + csToken,
@@ -497,8 +489,6 @@ export default class NotificationBackground {
         if (cipher != null && cipher.type === CipherType.Login) {
             cipher.login.password = newPassword;
             const newCipher = await this.cipherService.encrypt(cipher);
-            // await this.cipherService.saveWithServer(newCipher);
-            // console.log('notificationBar updateCipher')
             const csToken = await this.main.storageService.get<string>("cs_token");
             const headers = {
               "Authorization": "Bearer " + csToken,

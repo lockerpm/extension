@@ -42,6 +42,7 @@
     */
 
     function collect(document, undefined) {
+        console.log(document);
         // START MODIFICATION
         var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
         // END MODIFICATION
@@ -251,17 +252,15 @@
 
                 return op;
             });
-
             // get all the form fields
             var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+                el.id = `locker-id-${elIndex}`;
                 var field = {},
                     opId = '__' + elIndex,
                     elMaxLen = -1 == el.maxLength ? 999 : el.maxLength;
-
                 if (!elMaxLen || 'number' === typeof elMaxLen && isNaN(elMaxLen)) {
                     elMaxLen = 999;
                 }
-
                 theDoc.elementsByOPID[opId] = el;
                 el.opid = opId;
                 field.opid = opId;
@@ -331,11 +330,6 @@
                 if (el.form) {
                     field.form = getElementAttrValue(el.form, 'opid');
                 }
-
-                // START MODIFICATION
-                //addProp(field, 'fakeTested', checkIfFakeTested(field, el), false);
-                // END MODIFICATION
-
                 return field;
             });
 
@@ -1021,11 +1015,10 @@
     End 1Password Extension
     */
 
-  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.command === 'collectPageDetails') {
+    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+        if (msg.command === 'collectPageDetails') {
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
-            // console.log(pageDetailsObj)
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,

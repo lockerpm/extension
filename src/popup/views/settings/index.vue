@@ -91,11 +91,6 @@ export default Vue.extend({
     Footer,
   },
   async mounted() {
-    // chrome.runtime.onMessage.addListener(
-    //   (msg, sender, response) => {
-    //     this.processMessage(msg, sender, response);
-    //   }
-    // );
     const res = await Promise.all([
       this.$storageService.get(enableAutofillKey),
       this.$storageService.get(showFoldersKey),
@@ -118,16 +113,6 @@ export default Vue.extend({
       }
     };
   },
-  // asyncComputed: {
-  //   enableAutofill: {
-  //     async get() {
-  //       return await this.$storageService.get('enableAutofill');
-  //     },
-  //     watch: [
-  //       "$storageService",
-  //     ]
-  //   }
-  // },
   computed: {
     vaultTimeouts() {
       return [

@@ -36,7 +36,7 @@ export class PopupUtilsService {
 
     popOut(win: Window, href: string = null): void {
 
-        if (href === null) {
+        if (!href) {
             href = win.location.href;
         }
 

@@ -151,7 +151,6 @@ export default class AutofillService implements AutofillServiceInterface {
   //   return this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
   // }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
-    // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
