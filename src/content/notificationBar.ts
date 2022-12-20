@@ -348,6 +348,7 @@ document.addEventListener('DOMContentLoaded', event => {
             background-size: contain;
             z-index: 1000 !important;
             background-color: #fff;
+            border-radius: 50%;
             cursor: pointer;
             left: ${elPosition.left -
               containerPosition.left +
@@ -372,7 +373,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
     function closeInformMenu(inputEl: any) {
       const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
-      if (menuEl != null) {
+      if (menuEl) {
         menuEl.parentElement.removeChild(menuEl);
       }
     }

@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
     if (listContainer != null) {
       if (ciphers == null) {
-        // listContainer.innerHTML = '<div class="cs-inform-no-ciphers">Vault is locked.</div>'
         setContent(document.getElementById('template-vault-locked'));
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
@@ -207,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function changeMenuContent () {
     const optionsContainer = document.getElementById('template-dropdown-options-clone');
-    // const showOptions = document.getElementById('template-list-ciphers-clone') || document.getElementById('template-categories-list-clone') || document.getElementById('template-vault-locked-clone') || document.getElementById('template-generate-password-clone')
     if (!optionsContainer) {
       setContent(document.getElementById('template-dropdown-options'))
       sendPlatformMessage({

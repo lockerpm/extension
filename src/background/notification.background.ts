@@ -132,7 +132,6 @@ export default class NotificationBackground {
                 }
                 break;
             case 'informMenuFillCipher':
-              // console.log(msg)
                 const ciphers = await this.cipherService.getAllDecrypted();
                 const cipher = ciphers.find(c => c.id === msg.id);
                 if (cipher == null) {
