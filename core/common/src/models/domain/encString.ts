@@ -43,7 +43,7 @@ export class EncString {
             return;
         }
 
-        const headerPieces = this.encryptedString.split('.');
+        const headerPieces = this.encryptedString ? this.encryptedString.split('.') : [];
         let encPieces: string[] = null;
 
         if (headerPieces.length === 2) {
@@ -54,7 +54,7 @@ export class EncString {
                 return;
             }
         } else {
-            encPieces = this.encryptedString.split('|');
+            encPieces = this.encryptedString ? this.encryptedString.split('|') : [];
             this.encryptionType = encPieces.length === 3 ? EncryptionType.AesCbc128_HmacSha256_B64 :
                 EncryptionType.AesCbc256_B64;
         }

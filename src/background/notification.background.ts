@@ -55,7 +55,7 @@ export default class NotificationBackground {
 
     async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
         switch (msg.command) {
-          case 'unlockCompleted':
+            case 'unlockCompleted':
                 if (msg.data.target !== 'notification.background') {
                     return;
                 }
@@ -91,7 +91,6 @@ export default class NotificationBackground {
             case 'bgAddSave':
             case 'bgChangeSave':
                 if (await this.vaultTimeoutService.isLocked()) {
-                    // console.log('vault locked');
                     const retryMessage: LockedVaultPendingNotificationsItem = {
                         commandToRetry: {
                             msg: msg,
@@ -186,6 +185,19 @@ export default class NotificationBackground {
                 }
                 await BrowserApi.tabSendMessageData(tab__, "resizeInformMenu", {width: msg.data?.width, height: msg.data?.height});
                 break;
+            case 'barFormChange':
+                const currentTab = await BrowserApi.getTabFromCurrentWindow();
+                const notificationQueueIndex = this.notificationQueue.findIndex((n) => currentTab && n.tabId === currentTab.id);
+                if (notificationQueueIndex > -1) {
+                    this.notificationQueue[notificationQueueIndex]
+                    if (msg.username) {
+                        this.notificationQueue[notificationQueueIndex].username = msg.username;
+                    } else if (msg.password) {
+                        this.notificationQueue[notificationQueueIndex].password = msg.password
+                    } else if (msg.newPassword) {
+                        this.notificationQueue[notificationQueueIndex].newPassword = msg.newPassword
+                    } 
+                }
             default:
                 break;
         }
@@ -278,7 +290,7 @@ export default class NotificationBackground {
         }
     }
 
-  private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
+    private async addLogin(loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab) {
       if (!await this.userService.isAuthenticated()) {
             return;
         }
@@ -384,7 +396,6 @@ export default class NotificationBackground {
     }
 
     private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
-        // console.log('saveOrUpdateCredentials')
         for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
             const queueMessage = this.notificationQueue[i];
             if (queueMessage.tabId !== tab.id ||
@@ -396,7 +407,6 @@ export default class NotificationBackground {
             if (tabDomain != null && tabDomain !== queueMessage.domain) {
                 continue;
             }
-
             this.notificationQueue.splice(i, 1);
             BrowserApi.tabSendMessageData(tab, 'closeNotificationBar');
 
@@ -428,6 +438,7 @@ export default class NotificationBackground {
 
                 await this.createNewCipher(message, folderId);
             }
+
         }
     }
 
@@ -495,7 +506,10 @@ export default class NotificationBackground {
             };
           const data = new CipherRequest(newCipher)
           try {
-            await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
+            const cipherResponse = await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, {headers: headers})
+            const userId = await this.userService.getUserId();
+            const cipherData = new CipherData({ ...cipherResponse, ...data, id: cipher.id }, userId);
+            this.cipherService.upsert(cipherData)
           } catch (e) {
           }
         }
@@ -521,10 +535,9 @@ export default class NotificationBackground {
         }
     }
 
-  private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
+    private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
         const otherTypes: CipherType[] = []
         const responseData: any = {};
-        // console.log(tab)
         if (responseCommand === 'notificationBarGetFoldersList') {
             responseData.folders = await this.folderService.getAllDecrypted();
         }

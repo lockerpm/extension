@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       for (let i = 0; i < ciphers.length; i++) {
         const cipherRow = document.createElement("div");
-        // cipherRow.textContent = getSubTitle(ciphers[i])
         cipherRow.setAttribute('id', ciphers[i].id)
         cipherRow.classList.add('selection-item')
         
@@ -300,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseCiphersCommand = 'informMenuGetCiphers'
     document.getElementById('header-title').innerHTML = i18n.informMenuFillStElseTitle
     const mainContainer = document.getElementsByTagName('main')[0]
-    // mainContainer.innerHTML = allCategoriesContainer
     setContent(document.getElementById('template-categories-list'))
     const categorySelections = ['selection_password', 'selection_card', 'selection_identity']
     for (let i = 0; i < categorySelections.length; i++) {
