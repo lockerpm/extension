@@ -37,17 +37,6 @@
       v-else
       class="p-4 text-[#A2A3A7]"
     >
-      <!-- <template v-if="searchText.length>1">
-        <ul class="list-ciphers">
-          <cipher-row
-            v-for="item in ciphers"
-            :key="item.id"
-            :item="item"
-            @do-fill="fillCipher(item)"
-          >
-          </cipher-row>
-        </ul>
-      </template> -->
       <template>
         <!-- For current website -->
         <div v-if="searchText.length<2" class="mb-1">
@@ -58,15 +47,7 @@
               class="bg-white py-2 px-5 cursor-pointer" style="border-radius: 12px"
               @click="goToAddItem"
             >
-              <!-- <p class="mb-2">{{$t('data.home.no_for_current')}}</p> -->
-              <!-- <router-link
-                :to="{name: 'add-item-create'}"
-                class="uppercase text-primary hover:no-underline"
-              >
-              {{$t('data.home.add_password')}}
-              </router-link> -->
               <div class="flex">
-                <!-- <img src="@/assets/images/icons/icon_default.svg"> -->
                 <div
                   class="text-[34px] mr-3 flex-shrink-0"
                 >
@@ -98,37 +79,6 @@
           :filter="c => c.type === CipherType['Login']"
           route-name="home"
         />
-
-        <!-- <div
-          v-if="cardCiphers.length"
-          class="mt-4 mb-1"
-        >
-          {{$tc('type.Card', 2)}} ({{cardCiphers.length}})
-        </div>
-        <ul class="list-ciphers">
-          <cipher-row
-            v-for="item in cardCiphers"
-            :key="item.id"
-            :item="item"
-            @do-fill="fillCipher(item)"
-          >
-          </cipher-row>
-        </ul>
-        <div
-          v-if="identityCiphers.length"
-          class="mt-4 mb-1"
-        >
-          {{$tc('type.Identity', 2)}} ({{identityCiphers.length}})
-        </div>
-        <ul class="list-ciphers">
-          <cipher-row
-            v-for="item in identityCiphers"
-            :key="item.id"
-            :item="item"
-            @do-fill="fillCipher(item)"
-          >
-          </cipher-row>
-        </ul> -->
       </template>
     </div>
   </div>
@@ -141,7 +91,6 @@ import { Utils } from "jslib-common/misc/utils";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { ConstantsService } from "jslib-common/services/constants.service";
 import BrowserStorageService from "@/services/browserStorage.service";
-import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import CipherRow from "../../components/ciphers/CipherRow.vue";
 import ListCipher from "../../components/ciphers/ListCipher.vue";
@@ -183,7 +132,6 @@ export default Vue.extend({
         this.processMessage(msg, sender, response);
       }
     );
-    // await this.load();
     if (!this.$syncService.syncInProgress) {
       await this.load();
     } else {
@@ -197,63 +145,8 @@ export default Vue.extend({
   destroyed() {
     window.clearTimeout(this.loadedTimeout);
   },
-  // watch: {
-  //   ciphers() {
-  //     if (this.ciphers) {
-  //       this.loading = false;
-  //     }
-  //     window.setTimeout(() => {
-  //       this.load();
-  //     }, 500);
-  //   },
-  // },
-  // asyncComputed: {
-  //   ciphers: {
-  //     async get() {
-  //       const deletedFilter = (c) => {
-  //         return c.isDeleted === false;
-  //       };
-  //       const result =
-  //         (await this.$searchService.searchCiphers(
-  //           this.searchText,
-  //           [null, deletedFilter],
-  //           null
-  //         )) || [];
-
-  //       return (
-  //         orderBy(
-  //           result,
-  //           [
-  //             (c) =>
-  //               this.orderField === "name"
-  //                 ? c.name && c.name.toLowerCase()
-  //                 : c.revisionDate,
-  //           ],
-  //           [this.orderDirection]
-  //         ) || []
-  //       );
-  //     },
-  //     watch: [
-  //       "$store.state.syncedCiphersToggle",
-  //       "deleted",
-  //       "searchText",
-  //       "filter",
-  //       "orderField",
-  //       "orderDirection",
-  //     ],
-  //   },
-  // },
   methods: {
     openLogin() {
-      // const url = `${
-      //   process.env.VUE_APP_ID_URL
-      // }/login?SERVICE_URL=${encodeURIComponent(
-      //   "/sso"
-      // )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      // this.$platformUtilsService.launchUri(url);
-      // BrowserApi.reloadOpenWindows();
-      // const thisWindow = window.open("", "_self");
-      // thisWindow.close();
       this.$router.push({ name: "login" });
     },
     openRegister() {
@@ -265,7 +158,6 @@ export default Vue.extend({
       this.$platformUtilsService.launchUri(url);
     },
     openVault() {
-      // this.$platformUtilsService.launchUri("/web.html#/vault");
       this.$platformUtilsService.launchUri("https://locker.io/vault");
     },
     openLock() {
@@ -287,12 +179,10 @@ export default Vue.extend({
         this.url = tab.url;
       } else {
         this.loginCiphers = [];
-        // this.loaded = true;
         return;
       }
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
-      // console.log("popup send cmd: collectPageDetails");
       BrowserApi.tabSendMessage(tab, {
         command: "collectPageDetails",
         tab: tab,
@@ -344,11 +234,9 @@ export default Vue.extend({
       this.loaded = true;
     },
     addEdit(item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
       this.$router.push({ name: "add-item-create", params: { data: item } });
     },
     async fillCipher(cipher) {
-      // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
@@ -362,16 +250,13 @@ export default Vue.extend({
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
-        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         this.notify(this.$t("errors.autofill"), "error");
         return;
       }
-      // console.log(this.pageDetails)
       try {
         this.totpCode = await this.$autofillService.doAutoFill({
           cipher: cipher,
           pageDetails: this.pageDetails,
-          doc: window.document,
           fillNewPassword: true,
         });
         if (this.totpCode != null) {
@@ -386,19 +271,14 @@ export default Vue.extend({
           ) {
             BrowserApi.closePopup(window);
           } else {
-            // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
             setTimeout(() => BrowserApi.closePopup(window), 50);
           }
         }
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");
-        // this.notify(e, 'warning')
       }
     },
     async processMessage(msg, sender, sendResponse) {
-      // console.log(
-      //   `popup.home processMessage, sender: ${msg.sender}, cmd: ${msg.command}`
-      // );
       switch (msg.command) {
       case "syncCompleted":
         if (msg.successfully && msg.trigger) {
@@ -409,7 +289,6 @@ export default Vue.extend({
         }, 500);
         break;
       case "collectPageDetailsResponse":
-        // console.log("home: collectPageDetails");
         if (msg.sender === BroadcasterSubscriptionId) {
           const pageDetailsObj = {
             frameId: sender.frameId,

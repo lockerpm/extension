@@ -53,11 +53,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             var addButton = document.querySelector('#template-add-clone .add-save'),
                 neverButton = document.querySelector('#template-add-clone .never-save');
-            var togglePasswordAdd = document.getElementById("toggle-password")
-            var password = document.querySelector('#template-add-clone .info-password')
-            togglePasswordAdd.addEventListener("click", function () {
-              const type = password.getAttribute("type") === "password" ? "text" : "password"
-              password.setAttribute("type", type)
+                const username = document.querySelector('#template-add-clone .info-username')
+                username.addEventListener('input', (e) => {
+                    e.preventDefault();
+                    sendPlatformMessage({
+                        command: 'barFormChange',
+                        username: e.target.value,
+                    });
+                });
+                const password = document.querySelector('#template-add-clone .info-password')
+                password.addEventListener('input', (e) => {
+                    e.preventDefault();
+                    sendPlatformMessage({
+                        command: 'barFormChange',
+                        password: e.target.value,
+                    });
+                });
+                const togglePasswordAdd = document.getElementById("toggle-password")
+                togglePasswordAdd.addEventListener("click", function () {
+                const type = password.getAttribute("type") === "password" ? "text" : "password"
+                password.setAttribute("type", type)
             })
             addButton.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -88,7 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (getQueryVariable('change')) {
             setContent(document.getElementById('template-change'));
             var togglePasswordAdd = document.getElementById("toggle-password")
+            var username = document.querySelector('#template-change-clone .info-username')
+            username.addEventListener('input', (e) => {
+                e.preventDefault();
+                sendPlatformMessage({
+                    command: 'barFormChange',
+                    username: e.target.value,
+                });
+            });
             var password = document.querySelector('#template-change-clone .info-password')
+            password.addEventListener('input', (e) => {
+                e.preventDefault();
+                sendPlatformMessage({
+                    command: 'barFormChange',
+                    newPassword: e.target.value,
+                });
+            });
             togglePasswordAdd.addEventListener("click", function () {
               const type = password.getAttribute("type") === "password" ? "text" : "password"
               password.setAttribute("type", type)
@@ -154,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const select = document.querySelector('#template-add-clone .select-folder');
         select.appendChild(new Option(chrome.i18n.getMessage('selectFolder'), null, true));
         folders.forEach((folder) => {
-            //Select "No Folder" (id=null) folder by default
             select.appendChild(new Option(folder.name, folder.id || '', false));
         });
     }

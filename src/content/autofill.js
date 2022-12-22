@@ -1,47 +1,7 @@
 !(function () {
-    /*
-    1Password Extension
-
-    Lovingly handcrafted by Dave Teare, Michael Fey, Rad Azzouz, and Roustem Karimov.
-    Copyright (c) 2014 AgileBits. All rights reserved.
-
-    ================================================================================
-
-    Copyright (c) 2014 AgileBits Inc.
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-    */
-
-    /*
-    MODIFICATIONS FROM ORIGINAL
-
-    1. Populate isFirefox
-    2. Remove isChrome and isSafari since they are not used.
-    3. Unminify and format to meet Mozilla review requirements.
-    4. Remove unnecessary input types from getFormElements query selector and limit number of elements returned.
-    5. Remove fakeTested prop.
-    6. Rename com.agilebits.* stuff to com.bitwarden.*
-    7. Remove "some useful globals" on window
-    8. Add ability to autofill span[data-bwautofill] elements
-    */
-
     function collect(document, undefined) {
+        // chrome.storage.local.clear();
+        // console.log(document);
         // START MODIFICATION
         var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
         // END MODIFICATION
@@ -251,17 +211,15 @@
 
                 return op;
             });
-
             // get all the form fields
             var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+                el.id = `locker-id-${elIndex}`;
                 var field = {},
                     opId = '__' + elIndex,
                     elMaxLen = -1 == el.maxLength ? 999 : el.maxLength;
-
                 if (!elMaxLen || 'number' === typeof elMaxLen && isNaN(elMaxLen)) {
                     elMaxLen = 999;
                 }
-
                 theDoc.elementsByOPID[opId] = el;
                 el.opid = opId;
                 field.opid = opId;
@@ -331,11 +289,6 @@
                 if (el.form) {
                     field.form = getElementAttrValue(el.form, 'opid');
                 }
-
-                // START MODIFICATION
-                //addProp(field, 'fakeTested', checkIfFakeTested(field, el), false);
-                // END MODIFICATION
-
                 return field;
             });
 
@@ -348,7 +301,7 @@
 
                 var originalValue = el.value;
                 // click it
-                !el || el && 'function' !== typeof el.click || el.click();
+                // !el || el && 'function' !== typeof el.click || el.click();
                 focusElement(el, false);
 
                 el.dispatchEvent(doEventOnElement(el, 'keydown'));
@@ -357,7 +310,7 @@
 
                 el.value !== originalValue && (el.value = originalValue);
 
-                el.click && el.click();
+                // el.click && el.click();
                 f.postFakeTestVisible = isElementVisible(el);
                 f.postFakeTestViewable = isElementViewable(el);
                 f.postFakeTestType = el.type;
@@ -775,7 +728,7 @@
         function doFocusByOpId(opId) {
             var el = getElementByOpId(opId)
             if (el) {
-                'function' === typeof el.click && el.click(),
+                // 'function' === typeof el.click && el.click(),
                     'function' === typeof el.focus && doFocusElement(el, true);
             }
 
@@ -793,7 +746,7 @@
             query = selectAllFromDoc(query);
             return Array.prototype.map.call(Array.prototype.slice.call(query), function (el) {
                 clickElement(el);
-                'function' === typeof el.click && el.click();
+                // 'function' === typeof el.click && el.click();
                 'function' === typeof el.focus && doFocusElement(el, true);
                 return [el];
             }, this);
@@ -834,6 +787,7 @@
                             theEl.value = op;
                         });
                 }
+
             }
         }
 
@@ -882,7 +836,6 @@
         // set value of the given element
         function setValueForElement(el) {
             var valueToSet = el.value;
-            clickElement(el);
             doFocusElement(el, false);
             el.dispatchEvent(normalizeEvent(el, 'keydown'));
             el.dispatchEvent(normalizeEvent(el, 'keypress'));
@@ -909,10 +862,13 @@
 
         // click on an element
         function clickElement(el) {
+            const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.id}`);
+            if (menuEl) {
+                menuEl.parentElement.removeChild(menuEl);
+            }
             if (!el || el && 'function' !== typeof el.click) {
                 return false;
             }
-            el.click();
             return true;
         }
 
@@ -928,7 +884,7 @@
         function touchAllFields() {
             getAllFields().forEach(function (el) {
                 setValueForElement(el);
-                el.click && el.click();
+                // el.click && el.click();
                 setValueForElementByEvent(el);
             });
         }
@@ -1011,7 +967,6 @@
         }
 
         doFill(fillScript);
-
         return JSON.stringify({
             success: true
         });
@@ -1021,11 +976,10 @@
     End 1Password Extension
     */
 
-  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.command === 'collectPageDetails') {
+    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+        if (msg.command === 'collectPageDetails') {
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
-            // console.log(pageDetailsObj)
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,

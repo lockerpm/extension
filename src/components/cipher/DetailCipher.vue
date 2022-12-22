@@ -274,22 +274,6 @@ export default Vue.extend({
     deleteCiphers (ids) {
       this.$refs.addEditCipherDialog.deleteCiphers(ids)
     },
-    async getCipher () {
-      // this.folders = await this.getFolders()
-      // this.axios.get(`cystack_platform/pm/ciphers/${this.$route.params.id}`)
-      //   .then(async res => {
-      //     res = new CipherResponse(res)
-      //     const cipher = new Cipher(res, false)
-      //     this.cipher = await cipher.decrypt()
-      //     if (this.cipher.type === CipherType.Login) {
-      //       this.passwordStrength = this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
-      //     }
-      //   })
-      //   .catch(e => {
-      //     console.log(e)
-      //     // this.$router.push({ name: 'passwords' })
-      //   })
-    },
     checkPassword: debounce(function (password) {
       return this.$passwordGenerationService.passwordStrength(String(password), ['cystack']) || {}
     }, 600),

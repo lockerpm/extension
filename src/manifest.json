@@ -5,6 +5,7 @@
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "permissions": [
+    "activeTab",
     "tabs",
     "contextMenus",
     "storage",
@@ -46,6 +47,7 @@
         "https://*/*",
         "file:///*"
       ],
+      "match_origin_as_fallback": true,
       "run_at": "document_start"
     },
     {

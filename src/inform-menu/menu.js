@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
     if (listContainer != null) {
       if (ciphers == null) {
-        // listContainer.innerHTML = '<div class="cs-inform-no-ciphers">Vault is locked.</div>'
         setContent(document.getElementById('template-vault-locked'));
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
@@ -143,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       for (let i = 0; i < ciphers.length; i++) {
         const cipherRow = document.createElement("div");
-        // cipherRow.textContent = getSubTitle(ciphers[i])
         cipherRow.setAttribute('id', ciphers[i].id)
         cipherRow.classList.add('selection-item')
         
@@ -207,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function changeMenuContent () {
     const optionsContainer = document.getElementById('template-dropdown-options-clone');
-    // const showOptions = document.getElementById('template-list-ciphers-clone') || document.getElementById('template-categories-list-clone') || document.getElementById('template-vault-locked-clone') || document.getElementById('template-generate-password-clone')
     if (!optionsContainer) {
       setContent(document.getElementById('template-dropdown-options'))
       sendPlatformMessage({
@@ -302,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseCiphersCommand = 'informMenuGetCiphers'
     document.getElementById('header-title').innerHTML = i18n.informMenuFillStElseTitle
     const mainContainer = document.getElementsByTagName('main')[0]
-    // mainContainer.innerHTML = allCategoriesContainer
     setContent(document.getElementById('template-categories-list'))
     const categorySelections = ['selection_password', 'selection_card', 'selection_identity']
     for (let i = 0; i < categorySelections.length; i++) {

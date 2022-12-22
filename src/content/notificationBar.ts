@@ -1,5 +1,13 @@
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
+import {
+    OBSERVE_IGNORED_ELEMENTS,
+    CANCEL_BUTTON_NAMES,
+    LOGIN_BUTTON_NAMES,
+    SIGN_UP_BUTTON_NAMES,
+    CHANGE_PASSWORD_BUTTON_NAMES,
+    CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
+} from '@/constants/index'
 
 document.addEventListener('DOMContentLoaded', event => {
     if (window.location.hostname.indexOf('id.locker.io') > -1) {
@@ -11,20 +19,21 @@ document.addEventListener('DOMContentLoaded', event => {
     let barType: string = null;
     let pageHref: string = null;
     let observer: MutationObserver = null;
-    const observeIgnoredElements = new Set(['a', 'i', 'b', 'strong', 'span', 'code', 'br', 'img', 'small', 'em', 'hr']);
     let domObservationCollectTimeout: number = null;
     let collectIfNeededTimeout: number = null;
     let observeDomTimeout: number = null;
-    const inIframe = isInIframe();
-    const cancelButtonNames = new Set(['cancel', 'close', 'back']);
-    const logInButtonNames = new Set(['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập']);
-    const signUpButtonNames = new Set(['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']);
-    const changePasswordButtonNames = new Set(['save password', 'update password', 'change password', 'change']);
-    const changePasswordButtonContainsNames = new Set(['pass', 'change', 'contras', 'senha']);
     let disabledAddLoginNotification = false;
     let disabledChangedPasswordNotification = false;
     let inputWithLogo: any[] = []
     let isSignUp = false
+    const inIframe = !window || window.self !== window.top;
+    const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
+    const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
+    const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
+    const signUpButtonNames = new Set(SIGN_UP_BUTTON_NAMES);
+    const changePasswordButtonNames = new Set(CHANGE_PASSWORD_BUTTON_NAMES);
+    const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES);
+
     chrome.storage.local.get('neverDomains', (ndObj: any) => {
         const domains = ndObj.neverDomains;
         if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
@@ -112,28 +121,14 @@ document.addEventListener('DOMContentLoaded', event => {
                     }
                     if (!check) {
                       for (let i = 0; i < inputWithLogo.length; i++) {
-                        const elPosition = inputWithLogo[
-                          i
-                        ].inputEl.getBoundingClientRect();
-                        const elOffset = {
-                          left: getOffsetLeft(inputWithLogo[i].inputEl),
-                          top: getOffsetTop(inputWithLogo[i].inputEl)
-                        };
-                        closeInformMenu(false, elPosition, elOffset);
+                        closeInformMenu(inputWithLogo[i].inputEl);
                       }
                     }
                   }
                   function closeOtherMenu(indexClick) {
                     for (let i = 0; i < inputWithLogo.length; i++) {
                       if (i !== indexClick) {
-                        const elPosition = inputWithLogo[
-                          i
-                        ].inputEl.getBoundingClientRect();
-                        const elOffset = {
-                          left: getOffsetLeft(inputWithLogo[i].inputEl),
-                          top: getOffsetTop(inputWithLogo[i].inputEl)
-                        };
-                        closeInformMenu(false, elPosition, elOffset);
+                        closeInformMenu(inputWithLogo[i].inputEl);
                       }
                     }
                   }
@@ -160,34 +155,28 @@ document.addEventListener('DOMContentLoaded', event => {
         }
         else if (msg.command === 'informMenuPassword') {
           useGeneratedPassword(msg.data.password)
-          // console.log(msg.data.password)
-          // console.log(passwordFields)
         }
         else if (msg.command === "resizeInformMenu") {
-          resizeInformMenu(msg.data)
+          for (const logoField of inputWithLogo) {
+            const elPosition = logoField.inputEl.getBoundingClientRect();
+            const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
+            if (menuEl) {
+              if (msg.data) {
+                menuEl.style.height = msg.data.height
+                menuEl.style.width = elPosition.width
+              }
+            }
+          }
         }
         else if (msg.command === "closeInformMenu") {
           if (inIframe) {
             return;
           }
           for (const logoField of inputWithLogo) {
-            const elPosition = logoField.inputEl.getBoundingClientRect();
-            const elOffset = {
-              left: getOffsetLeft(logoField.inputEl),
-              top: getOffsetTop(logoField.inputEl)
-            };
-            closeInformMenu(false, elPosition, elOffset);
+            closeInformMenu(logoField.inputEl);
           }
           sendResponse();
           return true;
-        }
-    }
-
-    function isInIframe() {
-        try {
-            return window.self !== window.top;
-        } catch {
-            return true;
         }
     }
 
@@ -241,7 +230,12 @@ document.addEventListener('DOMContentLoaded', event => {
                         window.clearTimeout(domObservationCollectTimeout);
                     }
 
-                    domObservationCollectTimeout = window.setTimeout(collect, 1000);
+                    domObservationCollectTimeout = window.setTimeout(() => {
+                        sendPlatformMessage({
+                            command: 'bgCollectPageDetails',
+                            sender: 'notificationBar',
+                        });
+                    }, 1000);
                 }
             });
 
@@ -264,7 +258,10 @@ document.addEventListener('DOMContentLoaded', event => {
                 observer = null;
             }
 
-            collect();
+            sendPlatformMessage({
+                command: 'bgCollectPageDetails',
+                sender: 'notificationBar',
+            });
 
             if (observeDomTimeout != null) {
                 window.clearTimeout(observeDomTimeout);
@@ -276,13 +273,6 @@ document.addEventListener('DOMContentLoaded', event => {
             window.clearTimeout(collectIfNeededTimeout);
         }
         collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
-    }
-
-    function collect() {
-        sendPlatformMessage({
-            command: 'bgCollectPageDetails',
-            sender: 'notificationBar',
-        });
     }
 
     function watchForms(forms: any[]) {
@@ -324,12 +314,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       }
       for (const logoField of inputWithLogo) {
-        const elPosition = logoField.inputEl.getBoundingClientRect();
-        const elOffset = {
-          left: getOffsetLeft(logoField.inputEl),
-          top: getOffsetTop(logoField.inputEl)
-        };
-        closeInformMenu(false, elPosition, elOffset);
+        closeInformMenu(logoField);
       }
     }
   
@@ -341,6 +326,9 @@ document.addEventListener('DOMContentLoaded', event => {
         inputEl = document.getElementsByName(el.htmlName)[0]
       }
       if (inputEl && getComputedStyle(inputEl).display !== 'none') {
+        inputEl.addEventListener("click", () => {
+            openInformMenu(inputEl, type);
+        });
         const elPosition = inputEl.getBoundingClientRect();
         let relativeContainer = inputEl.parentElement
         while (getComputedStyle(relativeContainer).position !== 'relative') {
@@ -351,21 +339,24 @@ document.addEventListener('DOMContentLoaded', event => {
         }
         if (relativeContainer) {
           const containerPosition = relativeContainer.getBoundingClientRect();
-          logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVFSURBVHgB7Zy9UiNHEMd7WpSoukhv4HV8AacnsMicHSqOD0cIuMAZ8ARA5sw4c4B1S8aHOd09wYnMGXJw8S1voHKVXXXi1OPu/RD6WH2tdpddaX9VYlntAto/3T0zPT2jIEYOa2uFf+GF0aZ2CUF/p0EZGuCVc1UbvXcrS2ndBFRNPjYI1AOiapyXL+sQIwoiRkT5h5YrSsFrrbWIUYAZUUrVtaaLPObqv5cvLYiQSATqE6UEEeKJVV2/MSECQhXIFgbyB0BwCCFYypRYgGDmAS/CtKpQBHpmYfqxhaqWr08hBGYW6G1tu0Sk3w0G2WfHQsTdWYN6YIFcqzl2rSaxIKizb/j11Cx/aEIAAgn0c23baJH+lECrGYaVR1wNEpsQpkRcqkV0nyJxBEM+8/6fm2swJVMJtF/bOiAitpxnD8RBKGgFtb3bralCQm7SG/duN49Bwy+Qfn4s/vQS7q8+301y80QxSCxHkz6DuUIdVdevxj7TWIHEb8U0YQ7hbsDquG7ASIGc1koCcipjziQ0uXUrjmrdhgZp6ec4TXnyxOEMwB0SrnovreECgsHPSJ8q/KzDblgadsHuBCa0KVeovpyvP7kGNyAlCI6xRMv8rHDkd9HXgqSvk/QecpgQ6EP7mX3wFcgZWy0W3L975+dqAwLZ/Z109ZLDwkDKD3hNj0DSarGHVyAgkrziw6n34oRZA9LFQb8V9QRpjug7fDAgIJw9vKuuX59457vvNw3VyTmngoJrRSfeG30uFtx65ogeK+oItHe7XVnQ2NMPW9FyxTvpuJhSeoc7XEnAYjf93jupcFxEoi8QIzLZwAd7nGZbkATnqGcf0oRo4bmZLVCLoAQZPXhuZrtYvO6lTP4fPXS9cQAJHO95bmYLFKd78fTxxXn5qu6dc4aPuxY6eQNingUWN8O3N/5jkAyx6hfcQKBOU0cuVlCKLLQiAzJ84Tl/AxFwBTKGgAYCJS9AJgVu3VfYxVQm0AgwG3+NxJh66nnRyAQaQybQGFCqSSFjGFZmQSNQGpqoQKctsR4fqJpIqif1kNEFz5X9jUqjBRm+KIUW5pDqkOGLLH3AR3i0+PtAFaDzjtQOLUl57P77rUZcWcV2u73GU0zG0zuUyLGgO0sMbsoVPvKhBDHAf/hA6imSjqz/kKPdDyL8akJGD4S5uhxtgcTNPJPKcNzLdMvyOjOrcbrZGIy9282nSSiK3x099xI6Qw3XzbLWzJ76flp71hHIXuxB8Btk9BSE9tQH0VLrDCkfeKaTffcHdo+TzjnASjLqISbGIkSz+42e0fysVuT2pY69F8e1tM25XZh9NdMD6Q6xogXNEVnd1XEeAwKJFfEQfxcWDJ5i9n1m34TZ+cZlnd1lYQK2PKs8s9+1oZX2Ovd4omj5dRKnhRRBobvwW5NsUhC4ObDkWYddHLmYxS1/m+vFLNxqFc0gi1kE+UH2zTLMKZxz3jXHrGMdm7R3fFMdwbxB6uiPN9cfxt020ZLM++vPfxU3Xip2yBLMB6fVN9cTLS+dalm4syBW/wpphi2nujF+KabH1Ovm3SWashoobYG7KfF0WHM+jEAbCzitW7o2FuDWatWMY2MBQf4Qp0eKaehMymckbBXNgDvCzL65yc12iTChm5vw8GFal+ontP2D9m44zYFqJwFC2RkJGXQH3dCkm1A3WLJj0zeqPJNQoQrjEdkeZrK8ylniEMcWXfBRUsZhCtP5/RAxTosHpRDFkhmYRpSidBO5QP24Qf2VU6QtNdq6oLVU2g5uE2h/BWiQpgcpJMjxXNUj/GdFLUo3/wML11LelAerTQAAAABJRU5ErkJggg==');
-              height: 20px;
-              min-width: 20px;
-              background-position: center;
-              background-size: contain;
-              position: absolute;
-              z-index: 1;
-              left: ${elPosition.left -
-                containerPosition.left +
-                elPosition.width -
-                30}px;
-              top: ${elPosition.top -
-                containerPosition.top +
-                (elPosition.height - 20) / 2}px`;
-
+          logo.style.cssText = `
+            position: absolute;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVFSURBVHgB7Zy9UiNHEMd7WpSoukhv4HV8AacnsMicHSqOD0cIuMAZ8ARA5sw4c4B1S8aHOd09wYnMGXJw8S1voHKVXXXi1OPu/RD6WH2tdpddaX9VYlntAto/3T0zPT2jIEYOa2uFf+GF0aZ2CUF/p0EZGuCVc1UbvXcrS2ndBFRNPjYI1AOiapyXL+sQIwoiRkT5h5YrSsFrrbWIUYAZUUrVtaaLPObqv5cvLYiQSATqE6UEEeKJVV2/MSECQhXIFgbyB0BwCCFYypRYgGDmAS/CtKpQBHpmYfqxhaqWr08hBGYW6G1tu0Sk3w0G2WfHQsTdWYN6YIFcqzl2rSaxIKizb/j11Cx/aEIAAgn0c23baJH+lECrGYaVR1wNEpsQpkRcqkV0nyJxBEM+8/6fm2swJVMJtF/bOiAitpxnD8RBKGgFtb3bralCQm7SG/duN49Bwy+Qfn4s/vQS7q8+301y80QxSCxHkz6DuUIdVdevxj7TWIHEb8U0YQ7hbsDquG7ASIGc1koCcipjziQ0uXUrjmrdhgZp6ec4TXnyxOEMwB0SrnovreECgsHPSJ8q/KzDblgadsHuBCa0KVeovpyvP7kGNyAlCI6xRMv8rHDkd9HXgqSvk/QecpgQ6EP7mX3wFcgZWy0W3L975+dqAwLZ/Z109ZLDwkDKD3hNj0DSarGHVyAgkrziw6n34oRZA9LFQb8V9QRpjug7fDAgIJw9vKuuX59457vvNw3VyTmngoJrRSfeG30uFtx65ogeK+oItHe7XVnQ2NMPW9FyxTvpuJhSeoc7XEnAYjf93jupcFxEoi8QIzLZwAd7nGZbkATnqGcf0oRo4bmZLVCLoAQZPXhuZrtYvO6lTP4fPXS9cQAJHO95bmYLFKd78fTxxXn5qu6dc4aPuxY6eQNingUWN8O3N/5jkAyx6hfcQKBOU0cuVlCKLLQiAzJ84Tl/AxFwBTKGgAYCJS9AJgVu3VfYxVQm0AgwG3+NxJh66nnRyAQaQybQGFCqSSFjGFZmQSNQGpqoQKctsR4fqJpIqif1kNEFz5X9jUqjBRm+KIUW5pDqkOGLLH3AR3i0+PtAFaDzjtQOLUl57P77rUZcWcV2u73GU0zG0zuUyLGgO0sMbsoVPvKhBDHAf/hA6imSjqz/kKPdDyL8akJGD4S5uhxtgcTNPJPKcNzLdMvyOjOrcbrZGIy9282nSSiK3x099xI6Qw3XzbLWzJ76flp71hHIXuxB8Btk9BSE9tQH0VLrDCkfeKaTffcHdo+TzjnASjLqISbGIkSz+42e0fysVuT2pY69F8e1tM25XZh9NdMD6Q6xogXNEVnd1XEeAwKJFfEQfxcWDJ5i9n1m34TZ+cZlnd1lYQK2PKs8s9+1oZX2Ovd4omj5dRKnhRRBobvwW5NsUhC4ObDkWYddHLmYxS1/m+vFLNxqFc0gi1kE+UH2zTLMKZxz3jXHrGMdm7R3fFMdwbxB6uiPN9cfxt020ZLM++vPfxU3Xip2yBLMB6fVN9cTLS+dalm4syBW/wpphi2nujF+KabH1Ovm3SWashoobYG7KfF0WHM+jEAbCzitW7o2FuDWatWMY2MBQf4Qp0eKaehMymckbBXNgDvCzL65yc12iTChm5vw8GFal+ontP2D9m44zYFqJwFC2RkJGXQH3dCkm1A3WLJj0zeqPJNQoQrjEdkeZrK8ylniEMcWXfBRUsZhCtP5/RAxTosHpRDFkhmYRpSidBO5QP24Qf2VU6QtNdq6oLVU2g5uE2h/BWiQpgcpJMjxXNUj/GdFLUo3/wML11LelAerTQAAAABJRU5ErkJggg==');
+            height: 20px;
+            min-width: 20px;
+            background-position: center;
+            background-size: contain;
+            z-index: 1000 !important;
+            background-color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            left: ${elPosition.left -
+              containerPosition.left +
+              elPosition.width -
+              30}px;
+            top: ${elPosition.top -
+              containerPosition.top +
+              (elPosition.height - 20) / 2}px`;
           inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
           logo.addEventListener("click", () => {
             openInformMenu(inputEl, type);
@@ -376,64 +367,24 @@ document.addEventListener('DOMContentLoaded', event => {
             type
           };
         }
-
-        // if (containerStyle.position === 'relative') {
-        //   logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
-        //         height: 20px;
-        //         min-width: 20px;
-        //         position: absolute;
-        //         left: ${elPosition.width - 30}px;
-        //         top: ${(elPosition.height - 20) / 2}px`;
-        // } else {
-        //     logo.style.cssText = `background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJCSURBVHgBpVVNTxNRFD1vOqXO2JahRSnCooXITu1Od+rWDfwBk7LTlfgT3LFDf4Ekrk3UhdGVYae7YmIwftAxWO0ES0epLUKZ57tPpsy8Dq2Ek7R5c999592Pc2cYIpDP5632H60EsKsAL3JhIjsDbPFf9jQ83ax+Xo46y1TDmYnpEuN8CRwW+sPmGrunEsdCZONTS4xjUSxPYTAs4TuXTI1Yv5uNlz2EkgxYiDppZhOImzr22vtR21eCpDJlmabHH9J6eNJE4foY0hMGzEwCuhlKAp3WPn5WW2hv7aK22kDtrSvtIv15Sl8Snh2fquCg8MWbBUxezvaQUHRGdihk//qmjvKjiv/omgmvoFF0PpmPdn1X/nxQRPVP2xgAqQxdFHZW3fEPG1tDcERKYxcHNdwHv6aD8+JR2xuvf4Axhv8FB7ukQUn3hMhr/XZHZ9I4LnTIcTqMcq/VQVpIh5A9n0LugiWbEgXyVWDrokhlUccuIemKdNi9UeiQ9Bg3Yj2EvgZ9MPBVTcztStBY/7iNyisn5Ej686P2QT7kGyLk2pNYfHT4fcxjtxCY3821XzKikUISUSCyd483lOhgO7X1+diO6+6kTmcczjAXdCDSjpgOItXi/3pHE7P2rIoPz7/1XKJxdrfZbJS7IhMvh/vi4Y7qSC+GmRvn5OgRUUQjKLoHzvf1hYP1IY4i7YcgGSHUulaz8SKVzHwRXjQ91gAmV6R5W9RtUbkgGrncdMljmGXKJ0CMl6gTXzES3rJt26567i/C7OMyDBzr7gAAAABJRU5ErkJggg==');
-        //         height: 20px;
-        //         min-width: 20px;
-        //         position: absolute;
-        //         top: ${elPosition.top + (elPosition.height - 20) / 2}px;
-        //         left: ${elPosition.left + elPosition.width - 25}px;`;
-        // }
       }
       return null
     }
-    function resizeInformMenu(sizeData: any) {
-      for (const logoField of inputWithLogo) {
-        const elPosition = logoField.inputEl.getBoundingClientRect();
-        const elOffset = {
-          left: getOffsetLeft(logoField.inputEl),
-          top: getOffsetTop(logoField.inputEl)
-        };
-        const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
-        if (menuEl) {
-          if (sizeData) {
-            menuEl.style.height = sizeData.height
-            menuEl.style.width = sizeData.width
-          }
-          // menuEl.style.height = '407px'
-        }
-      }
-    }
-    function closeInformMenu(explicitClose: boolean, elPosition: any, elOffset: any) {
-      const menuEl = document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left));
-      if (menuEl != null) {
+
+    function closeInformMenu(inputEl: any) {
+      const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+      if (menuEl) {
         menuEl.parentElement.removeChild(menuEl);
       }
-
-
-      if (!explicitClose) {
-        return;
-      }
     }
+
     function openInformMenu(inputEl: any, type: string = 'password') {
       const elPosition = inputEl.getBoundingClientRect();
-      const elOffset = {
-        left: getOffsetLeft(inputEl),
-        top: getOffsetTop(inputEl)
-      }
+      const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
       if (document.body == null) {
         return;
       }
-      if (document.getElementById("cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left)) != null) {
-        // closeInformMenu(false, elPosition)
+      if (document.getElementById(iframeId) != null) {
         return;
       }
       const barPageUrl: string = chrome.extension.getURL(
@@ -442,10 +393,11 @@ document.addEventListener('DOMContentLoaded', event => {
 
       const iframe = document.createElement("iframe");
       iframe.style.cssText =
-        `top: ${elOffset.top + elPosition.height + 10}px; left: ${elOffset.left}px;
+        `top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
+        left: ${getOffsetLeft(inputEl)}px;
         position: absolute;
-        height: 244px; 
-        width: 320px;
+        height: 244px;
+        width: ${elPosition.width}px !important;
         border: 0;
         min-height: initial;
         padding: 0;
@@ -468,29 +420,16 @@ document.addEventListener('DOMContentLoaded', event => {
         margin: 0px !important;
         padding: 0px !important;
       `;
-      iframe.id = "cs-inform-menu-iframe-" + Math.round(elOffset.top) + '' + Math.round(elOffset.left);
-
+      iframe.id = iframeId;
       iframe.src = barPageUrl;
-      // const frameDiv = document.createElement("div");
-      // frameDiv.setAttribute("aria-live", "polite");
-      // frameDiv.id = "cs-inform-menu-bar";
-      // frameDiv.style.cssText =
-      //   `top: ${elPosition.top + elPosition.height + 10}px; left: ${elPosition.left}px;
-      //   height: 200px; width: 320px; padding: 0; position: fixed;
-      //   z-index: 2147483647; visibility: visible;`
-      // frameDiv.appendChild(iframe);
       document.body.appendChild(iframe);
       (iframe.contentWindow.location as any) = barPageUrl;
-      // const spacer = document.createElement("div");
-      // spacer.id = "inform-menu-spacer";
-      // spacer.style.cssText = "height: 42px;";
-      // document.body.insertBefore(spacer, document.body.firstChild);
     }
   
     function listen(form: HTMLFormElement) {
         form.removeEventListener('submit', formSubmitted, false);
         form.addEventListener('submit', formSubmitted, false);
-        const submitButton = getSubmitButton(form, logInButtonNames);
+        const submitButton = getSubmitButton(form, loginButtonNames);
         if (submitButton != null) {
             const buttonText = getButtonText(submitButton);
             const matches = Array.from(signUpButtonNames)
@@ -498,7 +437,6 @@ document.addEventListener('DOMContentLoaded', event => {
             if (matches.length>0) {
               isSignUp = true;
             }
-            // console.log(isSignUp)
             submitButton.removeEventListener('click', formSubmitted, false);
             submitButton.addEventListener('click', formSubmitted, false);
         }
@@ -650,9 +588,7 @@ document.addEventListener('DOMContentLoaded', event => {
         if (wrappingEl == null) {
             return null;
         }
-        // console.log(wrappingEl)
         const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-        // console.log(wrappingElIsForm)
         let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
             'button[type="submit"]') as HTMLElement;
         if (submitButton == null && wrappingElIsForm) {
@@ -762,11 +698,6 @@ document.addEventListener('DOMContentLoaded', event => {
         document.body.appendChild(frameDiv);
 
         (iframe.contentWindow.location as any) = barPageUrl;
-
-        // const spacer = document.createElement('div');
-        // spacer.id = 'bit-notification-bar-spacer';
-        // spacer.style.cssText = 'height: 42px;';
-        // document.body.insertBefore(spacer, document.body.firstChild);
     }
 
     function closeBar(explicitClose: boolean) {
@@ -819,6 +750,7 @@ document.addEventListener('DOMContentLoaded', event => {
     function sendPlatformMessage(msg: any) {
         chrome.runtime.sendMessage(msg);
     }
+
     function getOffsetTop(elem) {
       var offsetLeft = 0;
       do {
@@ -828,6 +760,7 @@ document.addEventListener('DOMContentLoaded', event => {
       } while ((elem = elem.offsetParent));
       return offsetLeft;
     }
+
     function getOffsetLeft(elem) {
       var offsetLeft = 0;
       do {

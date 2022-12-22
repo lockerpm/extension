@@ -359,7 +359,6 @@ export default Vue.extend({
         this.totpCode = await this.$autofillService.doAutoFill({
           cipher: cipher,
           pageDetails: this.pageDetails,
-          doc: window.document,
           fillNewPassword: true,
         });
         if (this.totpCode != null) {

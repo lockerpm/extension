@@ -42,13 +42,6 @@
           </el-checkbox>
         </el-checkbox-group>
       </div>
-      <!-- <div v-if="cipher.type===CipherType.Login">
-        <label class="font-semibold">{{ $t('data.ciphers.show_password') }}</label>
-        <el-checkbox
-          v-model="cipher.viewPassword"
-        >
-        </el-checkbox>
-      </div> -->
     </div>
     <div slot="footer" class="dialog-footer flex items-center text-left">
       <div class="flex-grow" />

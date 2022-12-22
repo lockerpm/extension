@@ -32,14 +32,26 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
-  constructor(private main: MainBackground, private autofillService: AutofillService,
-              private platformUtilsService: BrowserPlatformUtilsService,
-              private storageService: StorageService, private i18nService: I18nService,
-              private notificationsService: NotificationsService, private systemService: SystemService,
-              private environmentService: EnvironmentService, private messagingService: MessagingService, 
-              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService, private syncService: SyncService,
-              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService, private passwordGenerator: PasswordGenerationService) {
-
+  constructor(
+    private main: MainBackground,
+    private autofillService: AutofillService,
+    private platformUtilsService: BrowserPlatformUtilsService,
+    private storageService: StorageService,
+    private i18nService: I18nService,
+    private notificationsService: NotificationsService,
+    private systemService: SystemService,
+    private environmentService: EnvironmentService,
+    private messagingService: MessagingService, 
+    private cryptoService: CryptoService,
+    private cipherService: CipherService,
+    private folderService: FolderService,
+    private collectionService: CollectionService,
+    private userService: UserService,
+    private settingsService: SettingsService,
+    private policyService: PolicyService,
+    private tokenService: TokenService,
+    private passwordGenerator: PasswordGenerationService
+  ) {
     // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
       this.onInstalledReason = details.reason;
@@ -64,7 +76,6 @@ export default class RuntimeBackground {
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    // console.log(`runtimeBackground processMessage: ${msg} - sender: ${sender} - data: ${msg.data}`);
     // console.log(msg)
     switch (msg.command) {
       case "loggedIn":
@@ -95,7 +106,6 @@ export default class RuntimeBackground {
         }
         break;
       case "addToLockedVaultPendingNotifications":
-        // console.log(msg.data);
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
       case "addToLockedVaultPendingInformMenu":
@@ -202,39 +212,9 @@ export default class RuntimeBackground {
         } catch {}
         break;
       case "cs-authResult":
-        // console.log(msg.referrer);
-        // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
-        //     return;
-        // }
-        // const token = await this.storageService.get("cs_token");
-        // if (token) {
-        //   try {
-        //     const myHeaders = {
-        //       headers: { Authorization: `Bearer ${token}` }
-        //     };
-        //     await axios.post(
-        //       `${process.env.VUE_APP_BASE_API_URL}/users/logout`,
-        //       {},
-        //       myHeaders
-        //     );
-        //   } catch (error) {
-        //     console.log(error);
-        //   }
-        // }
-        // const currentUserId = await this.userService.getUserId();
         await Promise.all([
           this.cryptoService.clearKeys(),
           this.storageService.remove("cs_token"),
-
-          // Clear old data
-          // this.syncService.setLastSync(new Date(0)),
-          // this.folderService.clear(currentUserId),
-          // this.collectionService.clear(currentUserId),
-          // this.cipherService.clear(currentUserId),
-          // this.settingsService.clear(currentUserId),
-          // this.policyService.clear(currentUserId),
-          // this.tokenService.clearToken(),
-          // this.userService.clear()
         ]);
         try {
           await this.storageService.save("cs_token", msg.token);
@@ -268,10 +248,6 @@ export default class RuntimeBackground {
         ]);
         break;
       case "locker-authResult":
-        // console.log(msg.referrer);
-        // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
-        //     return;
-        // }
         const myHeaders = {
           headers: { Authorization: `Bearer ${msg.token}` }
         };
@@ -299,10 +275,6 @@ export default class RuntimeBackground {
                 ...oldStoreParsed,
                 isLoggedIn: true
               });
-              // console.log({
-              //   ...oldStoreParsed,
-              //   isLoggedIn: true
-              // });
               sendResponse({ success: true });
             });
         } catch (e) {
@@ -363,7 +335,6 @@ export default class RuntimeBackground {
       this.platformUtilsService.copyToClipboard(totpCode, { window: window });
     }
 
-    // reset
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
   }

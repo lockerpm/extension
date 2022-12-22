@@ -392,7 +392,7 @@ export default class MainBackground {
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,
-            sender: sender,
+            sender: sender
         }, options);
     }
 
