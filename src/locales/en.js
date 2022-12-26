@@ -692,6 +692,7 @@ module.exports = {
       current: 'Current',
       vault: 'Vault',
       generate: 'Generate',
+      otp: 'OTP',
       generator: 'Generator',
       settings: 'Settings',
       search: 'Search Vault',

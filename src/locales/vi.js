@@ -682,6 +682,7 @@ module.exports = {
       current: 'Hiện tại',
       vault: 'Kho',
       generate: 'Tạo Mật khẩu',
+      otp: 'OTP',
       generator: 'Tạo Mật khẩu',
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
