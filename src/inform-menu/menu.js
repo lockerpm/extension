@@ -26,9 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
   i18n.informMenuScoreWeak = chrome.i18n.getMessage('informMenuScoreWeak')
 
   const responseCiphersCommand = 'informMenuGetCiphersForCurrentTab';
-  const responseSomethingElse = 'informMenuGetCiphers'
-  const responseGeneratePassword = 'informMenuGetGeneratedPassword'
-  const responseGeneratePasswordNoOptions = 'informMenuGetGeneratedPasswordNoOptions'
+  const responseSomethingElse = 'informMenuGetCiphers';
+  const responseGeneratePassword = 'informMenuGetGeneratedPassword';
+  const responseGeneratePasswordNoOptions = 'informMenuGetGeneratedPasswordNoOptions';
+  const generatePasswordOptions = 'setGeneratePasswordOptions';
 
   setTimeout(load, 50);
 
@@ -69,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (msg.command === responseSomethingElse && msg.data) {
         fillMenuWithCiphers(msg.data.ciphers)
+      }
+      if (msg.command === generatePasswordOptions && msg.data) {
+        setGeneratePasswordOptions(msg.data.options)
       }
     });
     if (getQueryVariable('generate')) {
@@ -287,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     document.getElementById('button_use_password').addEventListener('click', () => {
-      useGeneratedPassword
+      useGeneratedPassword()
     })
     document.getElementById('button_regenerate').addEventListener('click', () => {
       bgGeneratePassword(true)
@@ -350,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       default:
         break;
-
     }
     document.getElementById('password_strength').style.color = color
     document.getElementById('password_strength_text').innerHTML = textStrength
@@ -366,6 +369,22 @@ document.addEventListener('DOMContentLoaded', () => {
       options: generateOptions
     });
   }
+
+  function setGeneratePasswordOptions(options) {
+    const lengthEl = document.getElementById('password_length_slider')
+    const uppercaseEl = document.getElementById('checkbox_use_upper')
+    const lowercaseEl = document.getElementById('checkbox_use_lower')
+    const numberEl = document.getElementById('checkbox_use_digits')
+    const specialEl = document.getElementById('checkbox_use_symbols')
+    const ambiguousEl = document.getElementById('checkbox_avoid_ambiguous')
+    lengthEl.value = Number(options.length);
+    uppercaseEl.checked = options.uppercase;
+    lowercaseEl.checked = options.lowercase;
+    numberEl.checked = options.number;
+    specialEl.checked = options.special;
+    ambiguousEl.checked = options.ambiguous;
+  }
+
   function getGeneratePasswordOptions() {
     const lengthEl = document.getElementById('password_length_slider')
     const uppercaseEl = document.getElementById('checkbox_use_upper')
