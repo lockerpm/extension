@@ -370,6 +370,8 @@ export default class RuntimeBackground {
     }
     if (!options) {
       options = inputOptions || (await this.passwordGenerator.getOptions())[0]
+    } else {
+      await BrowserApi.tabSendMessageData(tab, 'setGeneratePasswordOptions', { options });
     }
     if (!password) {
       password = await this.passwordGenerator.generatePassword(options);
