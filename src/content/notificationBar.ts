@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       }
       for (const logoField of inputWithLogo) {
-        closeInformMenu(logoField);
+        closeInformMenu(logoField.inputEl);
       }
     }
   
