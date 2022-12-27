@@ -18,6 +18,7 @@ import { TokenService } from 'jslib-common/abstractions/token.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
 import { CipherData } from 'jslib-common/models/data/cipherData';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { PassService } from 'jslib-common/abstractions/pass.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -51,9 +52,9 @@ export default class RuntimeBackground {
     private settingsService: SettingsService,
     private policyService: PolicyService,
     private tokenService: TokenService,
-    private passwordGenerator: PasswordGenerationService
+    private passwordGenerator: PasswordGenerationService,
+    private passService: PassService,
   ) {
-    // onInstalled listener must be wired up before anything else, so we do it in the ctor
     chrome.runtime.onInstalled.addListener((details: any) => {
       this.onInstalledReason = details.reason;
     });
@@ -184,7 +185,7 @@ export default class RuntimeBackground {
         }
         break;
       case "bgGeneratePassword":
-        this.generatePassword(sender.tab, msg.responseCommand, msg.options);
+        this.generatePassword(sender.tab, msg.responseCommand, msg.options, msg.isReplace);
       case "authResult":
         const vaultUrl = this.environmentService.getWebVaultUrl();
 
@@ -375,18 +376,31 @@ export default class RuntimeBackground {
     }
   }
 
-  private async generatePassword(tab, responseCommand, inputOptions) {
-    const options = inputOptions || (await this.passwordGenerator.getOptions())[0]
+  private async generatePassword(tab, responseCommand, inputOptions, isReplace) {
+    const oldGeneratePassword = await this.passService.getGeneratePassword();
+    let password = '';
+    let options = null;
+    if (oldGeneratePassword && !isReplace && tab.id === oldGeneratePassword.tab.id) {
+      password = oldGeneratePassword.password;
+      options = oldGeneratePassword.options
+    }
+    if (!options) {
+      options = inputOptions || (await this.passwordGenerator.getOptions())[0]
+    } else {
+      await BrowserApi.tabSendMessageData(tab, 'setGeneratePasswordOptions', { options });
+    }
+    if (!password) {
+      password = await this.passwordGenerator.generatePassword(options);
+    }
     if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
       options.lowercase = true
     }
-    const responseData: any = {};
-    // const options = (await this.passwordGenerator.getOptions())[0];
-    const password = await this.passwordGenerator.generatePassword(options);
     let passwordStrength: any = {}
     if (password) {
       passwordStrength = this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
     }
+    await this.passService.setInformation(password, options, tab)
+    const responseData: any = {};
     responseData.password = password
     responseData.passwordStrength = passwordStrength
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);

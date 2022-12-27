@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
   i18n.informMenuScoreMedium = chrome.i18n.getMessage('informMenuScoreMedium')
   i18n.informMenuScoreWeak = chrome.i18n.getMessage('informMenuScoreWeak')
 
+  const responseCiphersCommand = 'informMenuGetCiphersForCurrentTab';
+  const responseSomethingElse = 'informMenuGetCiphers';
+  const responseGeneratePassword = 'informMenuGetGeneratedPassword';
+  const responseGeneratePasswordNoOptions = 'informMenuGetGeneratedPasswordNoOptions';
+  const generatePasswordOptions = 'setGeneratePasswordOptions';
+
   setTimeout(load, 50);
 
   function load() {
@@ -45,10 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#template-categories-list .category-password').textContent = i18n.informMenuCategoryPassword
     document.querySelector('#template-categories-list .category-card').textContent = i18n.informMenuCategoryCard
     document.querySelector('#template-categories-list .category-personal-info').textContent = i18n.informMenuCategoryPersonalInfo
-    const responseCiphersCommand = 'informMenuGetCiphersForCurrentTab';
-    const responseSomethingElse = 'informMenuGetCiphers'
-    const responseGeneratePassword = 'informMenuGetGeneratedPassword'
-    const responseGeneratePasswordNoOptions = 'informMenuGetGeneratedPasswordNoOptions'
     const btnDropdown = document.getElementById('dropdownOptions')
     btnDropdown.onclick = function () {
       changeMenuContent()
@@ -65,6 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (msg.command === responseGeneratePasswordNoOptions && msg.data) {
         showGeneratedPasswordNoOptions(msg.data)
+      }
+      if (msg.command === responseSomethingElse && msg.data) {
+        fillMenuWithCiphers(msg.data.ciphers)
+      }
+      if (msg.command === generatePasswordOptions && msg.data) {
+        setGeneratePasswordOptions(msg.data.options)
       }
     });
     if (getQueryVariable('generate')) {
@@ -232,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showOptionsButton.addEventListener('click', getPasswordGeneration);
         sendPlatformMessage({
           command: 'bgGeneratePassword',
-          responseCommand: 'informMenuGetGeneratedPasswordNoOptions'
+          responseCommand: responseGeneratePasswordNoOptions
         });
       }
       else {
@@ -260,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showOptionsButton.addEventListener('click', getPasswordGeneration);
       sendPlatformMessage({
         command: 'bgGeneratePassword',
-        responseCommand: 'informMenuGetGeneratedPasswordNoOptions'
+        responseCommand: responseGeneratePasswordNoOptions
       });
     }
     else {
@@ -282,18 +290,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('')
       }
     }
-    document.getElementById('button_use_password').onclick = useGeneratedPassword
-    document.getElementById('button_regenerate').onclick = bgGeneratePassword
+    document.getElementById('button_use_password').addEventListener('click', () => {
+      useGeneratedPassword()
+    })
+    document.getElementById('button_regenerate').addEventListener('click', () => {
+      bgGeneratePassword(true)
+    })
     for (let i = 0; i < checkboxArray.length; i++) {
       const checkboxEl = document.getElementById(checkboxArray[i])
       if (checkboxEl) {
-        checkboxEl.onchange = bgGeneratePassword
+        checkboxEl.addEventListener('change', () => {
+          bgGeneratePassword(true)
+        })
       }
     }
     bgGeneratePassword()
   }
   function getSomethingElseToFill() {
-    const responseSomethingElse = 'informMenuGetCiphers'
     document.getElementById('header-title').innerHTML = i18n.informMenuFillStElseTitle
     const mainContainer = document.getElementsByTagName('main')[0]
     setContent(document.getElementById('template-categories-list'))
@@ -340,21 +353,37 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       default:
         break;
-
     }
     document.getElementById('password_strength').style.color = color
     document.getElementById('password_strength_text').innerHTML = textStrength
     document.getElementById('password_length').innerHTML = passwordData.password.length
     document.getElementById('generated_password').innerHTML = passwordData.password
   }
-  function bgGeneratePassword() {
+  function bgGeneratePassword(isReplace = false) {
     const generateOptions = getGeneratePasswordOptions()
     sendPlatformMessage({
       command: 'bgGeneratePassword',
-      responseCommand: 'informMenuGetGeneratedPassword',
+      responseCommand: responseGeneratePassword,
+      isReplace,
       options: generateOptions
     });
   }
+
+  function setGeneratePasswordOptions(options) {
+    const lengthEl = document.getElementById('password_length_slider')
+    const uppercaseEl = document.getElementById('checkbox_use_upper')
+    const lowercaseEl = document.getElementById('checkbox_use_lower')
+    const numberEl = document.getElementById('checkbox_use_digits')
+    const specialEl = document.getElementById('checkbox_use_symbols')
+    const ambiguousEl = document.getElementById('checkbox_avoid_ambiguous')
+    lengthEl.value = Number(options.length);
+    uppercaseEl.checked = options.uppercase;
+    lowercaseEl.checked = options.lowercase;
+    numberEl.checked = options.number;
+    specialEl.checked = options.special;
+    ambiguousEl.checked = options.ambiguous;
+  }
+
   function getGeneratePasswordOptions() {
     const lengthEl = document.getElementById('password_length_slider')
     const uppercaseEl = document.getElementById('checkbox_use_upper')

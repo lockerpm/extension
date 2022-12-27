@@ -18,6 +18,7 @@ import { ExportService } from 'jslib-common/services/export.service';
 import { FileUploadService } from 'jslib-common/services/fileUpload.service';
 import { FolderService } from 'jslib-common/services/folder.service';
 import { NotificationsService } from 'jslib-common/services/notifications.service';
+import { PassService } from 'jslib-common/services/pass.service';
 import { PasswordGenerationService } from '@/services/passwordGeneration.service';
 import { ImportService } from 'jslib-common/services/import.service';
 import { PolicyService } from 'jslib-common/services/policy.service';
@@ -49,6 +50,7 @@ import { I18nService as I18nServiceAbstraction } from 'jslib-common/abstractions
 import { LogService as LogServiceAbstraction } from 'jslib-common/abstractions/log.service';
 import { MessagingService as MessagingServiceAbstraction } from 'jslib-common/abstractions/messaging.service';
 import { NotificationsService as NotificationsServiceAbstraction } from 'jslib-common/abstractions/notifications.service';
+import { PassService as PassServiceAbstraction } from 'jslib-common/abstractions/pass.service';
 import { PasswordGenerationService as PasswordGenerationServiceAbstraction } from 'jslib-common/abstractions/passwordGeneration.service';
 import { ImportService as ImportServiceAbstraction } from 'jslib-common/abstractions/import.service';
 import { PlatformUtilsService as PlatformUtilsServiceAbstraction } from 'jslib-common/abstractions/platformUtils.service';
@@ -111,6 +113,7 @@ export default class MainBackground {
   collectionService: CollectionServiceAbstraction;
   vaultTimeoutService: VaultTimeoutServiceAbstraction;
   syncService: SyncServiceAbstraction;
+  passService: PassServiceAbstraction;
   passwordGenerationService: PasswordGenerationServiceAbstraction;
   importService: ImportServiceAbstraction;
   totpService: TotpServiceAbstraction;
@@ -218,6 +221,7 @@ export default class MainBackground {
       this.logService, async (expired: boolean) => await this.logout(expired));
     this.eventService = new EventService(this.storageService, this.apiService, this.userService,
       this.cipherService, this.logService);
+    this.passService = new PassService(this.storageService);
     this.passwordGenerationService = new PasswordGenerationService(this.cryptoService, this.storageService,
       this.policyService);
     this.totpService = new TotpService(this.storageService, this.cryptoFunctionService, this.logService);
@@ -249,7 +253,7 @@ export default class MainBackground {
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
       this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
       this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
-      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService);
+      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService);
     this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
       this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
       this.platformUtilsService);
