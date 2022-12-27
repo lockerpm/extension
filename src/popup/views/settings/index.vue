@@ -1,6 +1,6 @@
 <template>
   <div
-    style="padding-top: 90px; padding-bottom: 32px"
+    class="settings-body"
   >
     <Header></Header>
     <div class="p-4 text-[#A2A3A7]">
@@ -8,7 +8,7 @@
         v-for="(cate, index) in menu"
         :key="index"
       >
-        <p class="uppercase px-3 mt-4 mb-1 font-semibold">{{cate.name}}</p>
+        <p class="uppercase px-3 mb-1 font-semibold">{{cate.name}}</p>
         <ul class="popup-setting-wrapper">
           <li
             v-for="(item, index) in cate.items"

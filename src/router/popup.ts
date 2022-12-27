@@ -385,7 +385,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "otp",
         component: () =>
-          import("../popup/views/otp.vue")
+          import("../popup/views/otp/index.vue")
       }
     ]
   },

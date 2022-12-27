@@ -1,6 +1,6 @@
 <template>
   <div id="popup-header"
-    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'otp', 'cards', 'identities', 'notes', 'crypto-backups', 'folders'].includes(this.$route.name)"
+    v-if="!locked && isLoggedIn && ['home', 'vault', 'settings', 'generator', 'otp','cards', 'identities', 'notes', 'crypto-backups', 'folders'].includes(this.$route.name)"
     class="fixed top-0 bg-white cursor-pointer" style="z-index:1; width: 400px;">
     <div class="h-auto grid grid-cols-4 bg-white navigator">
       <router-link v-for="item in menu" :to="{ name: item.routeName }" :key="item.routeName"

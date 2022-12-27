@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top: 180px; padding-bottom: 56px;">
+  <div class="vault-body">
     <div
       v-if="!isLoggedIn"
       class="p-6"

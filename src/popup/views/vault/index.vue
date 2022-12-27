@@ -78,40 +78,6 @@
             </div>
           </li>
         </template>
-        <!-- <template
-          v-for="(value, key) in filteredCollection"
-          class="flex items-center hover:bg-[#E4F2E1] hover:text-primary bg-white cursor-pointer h-[44px] leading-[44px] px-5"
-        >
-          <div
-            class="uppercase px-3 mt-4 mb-1"
-            :key="key"
-          >{{ getTeam(teams, key).name }}</div>
-          <li
-            v-for="item in value"
-            :key="item.id"
-            class="flex items-center hover:bg-[#E4F2E1] hover:text-primary bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
-            @click="routerCollection(item)"
-          >
-            <div class="menu-icon mr-4">
-              <img
-                src="@/assets/images/icons/folder.svg"
-                alt=""
-                class=""
-              >
-            </div>
-            <div class="flex-grow flex justify-between mr-2">
-              <div class="w-[200px] truncate">
-                {{item.name }}
-              </div>
-              <div>
-                {{ item.ciphersCount }} {{$tc('type.Vault', item.ciphersCount)}}
-              </div>
-            </div>
-            <div>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </li>
-        </template> -->
         <div class="uppercase px-3 mt-4 mb-1">{{$t('type.no_folder')}} ({{noFolderCiphers.length}})</div>
         <cipher-row
           v-for="item in dataRendered"
@@ -315,7 +281,6 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-              // item.notes = item.cryptoAccount ? item.cryptoAccount.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -323,7 +288,6 @@ export default Vue.extend({
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-              // item.notes = item.cryptoWallet ? item.cryptoWallet.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -443,7 +407,6 @@ export default Vue.extend({
       });
     },
     async fillCipher(cipher) {
-      // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
@@ -457,7 +420,6 @@ export default Vue.extend({
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
-        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         this.notify(this.$t("errors.autofill"), "error");
         return;
       }

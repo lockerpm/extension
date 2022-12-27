@@ -30,4 +30,18 @@ export default Vue.extend({
 </script>
 
 <style>
+.vault-body {
+  position: absolute !important;
+  top: 180px !important;
+  bottom: 56px !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
+.settings-body {
+  position: absolute !important;
+  top: 98px !important;
+  bottom: 0px !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
 </style>
