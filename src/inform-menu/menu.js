@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       goToStartPage()
     }
     chrome.runtime.onMessage.addListener((msg) => {
-      if (msg.command === responseCiphersCommand && msg.data) {
+      if ((msg.command === responseCiphersCommand || msg.command === responseSomethingElse) && msg.data) {
         fillMenuWithCiphers(msg.data.ciphers);
       }
       if (msg.command === responseGeneratePassword && msg.data) {
@@ -307,7 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bgGeneratePassword()
   }
   function getSomethingElseToFill() {
-    const responseCiphersCommand = 'informMenuGetCiphers'
     document.getElementById('header-title').innerHTML = i18n.informMenuFillStElseTitle
     const mainContainer = document.getElementsByTagName('main')[0]
     setContent(document.getElementById('template-categories-list'))
@@ -320,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sendPlatformMessage({
             command: 'bgGetDataForTab',
             type: i === 0 ? 1 : i === 1 ? 3 : 4,
-            responseCommand: responseCiphersCommand
+            responseCommand: responseSomethingElse
           });
           const cipherListContainer = `<div class="cs-list-withScroll"></div>`
           mainContainer.innerHTML = cipherListContainer

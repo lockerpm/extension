@@ -36,9 +36,6 @@ Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
 if (process.env.NODE_ENV==='development') {
   require('@/assets/buildtw.css')
 }
-// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-//   console.log(request, sender)
-// });
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@/assets/tailwind.css'
@@ -120,7 +117,7 @@ Vue.mixin({
             llll: 'ddd, D MMM YYYY HH:mm'
           },
           week: {
-            dow: 1 // Monday is the first day of the week.
+            dow: 1
           }
         })
       } else {
@@ -159,9 +156,7 @@ Vue.mixin({
       this.$folderService.clearCache()
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
-      // this.$searchService.clearIndex()
       this.$router.push({ name: 'lock' })
-      // this.$platformUtilsService.launchUri("/web.html#/lock");
     },
     randomString () {
       return nanoid()
@@ -192,8 +187,6 @@ Vue.mixin({
         browserStorageService.get("showFolders"),
         browserStorageService.get("enableAutofill"),
       ]);
-      // const deviceId = await browserStorageService.get("device_id")
-      // const hideIcons = await browserStorageService.get('hideIcons')
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
@@ -202,7 +195,6 @@ Vue.mixin({
         browserStorageService.save("device_id", deviceIdentifier);
       }
       try {
-        // console.log('login')
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
@@ -213,9 +205,7 @@ Vue.mixin({
           device_type: this.$platformUtilsService.getDevice(),
           device_identifier: deviceIdentifier
         })
-        // this.$messagingService.send('loggedIn')
         chrome.runtime.sendMessage({command: 'loggedIn'})
-        // console.log(res)
         await this.$tokenService.setTokens(res.access_token, res.refresh_token)
         await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
         await this.$cryptoService.setKey(key)
@@ -226,9 +216,7 @@ Vue.mixin({
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
-        // this.$messagingService.send('unlocked')
         chrome.runtime.sendMessage({ command: "unlocked" });
-        // this.$router.push({ path: this.$store.state.currentPath === '/lock' ? '/vault' : this.$store.state.currentPath })
         this.$router.push({ name: 'home' })
       } catch (e) {
         console.log(e)
@@ -238,31 +226,6 @@ Vue.mixin({
     async clearKeys () {
       await this.$cryptoService.clearKeys()
     },
-    // async getSyncData() {
-    //   this.$store.commit("UPDATE_SYNCING", true);
-    //   try {
-    //     this.$messagingService.send("syncStarted");
-    //     let res = await this.axios.get("cystack_platform/pm/sync");
-    //     res = new SyncResponse(res);
-
-    //     const userId = await this.$userService.getUserId();
-    //     await this.$syncService.syncProfile(res.profile);
-    //     await this.$syncService.syncFolders(userId, res.folders);
-    //     await this.$syncService.syncCollections(res.collections);
-    //     await this.$syncService.syncCiphers(userId, res.ciphers);
-    //     await this.$syncService.syncSends(userId, res.sends);
-    //     await this.$syncService.syncSettings(userId, res.domains);
-    //     await this.$syncService.syncPolicies(res.policies);
-    //     await this.$syncService.setLastSync(new Date());
-    //     this.$messagingService.send("syncCompleted", { successfully: true });
-    //     this.$store.commit("UPDATE_SYNCED_CIPHERS");
-    //   } catch (e) {
-    //     this.$messagingService.send("syncCompleted", { successfully: false });
-    //     this.$store.commit("UPDATE_SYNCED_CIPHERS");
-    //   } finally {
-    //     this.$store.commit("UPDATE_SYNCING", false);
-    //   }
-    // },
     async getSyncData (trigger=false) {
       this.$store.commit('UPDATE_SYNCING', true)
       const pageSize = 100
@@ -273,7 +236,6 @@ Vue.mixin({
         this.$messagingService.send('syncStarted')
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          // console.log('sync')
           let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
           if (res.count && res.count.ciphers) {
             this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
@@ -295,7 +257,6 @@ Vue.mixin({
           page += 1
         }
 
-        // Clear deleted ciphers in local storage
         const deletedIds = [];
         const cipherIds = allCiphers.map(c => c.id);
         const storageRes = await this.$storageService.get(`ciphers_${userId}`);
@@ -307,19 +268,9 @@ Vue.mixin({
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
 
-        // delete cached cipher if it is not in sync data
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        // const decryptedCipherCache = this.$cipherService.decryptedCipherCache
-        // decryptedCipherCache.forEach(function (cipher, i) {
-        //   const syncIndex = allCiphers.findIndex(c => c.id === cipher.id)
-        //   if (syncIndex < 0) {
-        //     decryptedCipherCache.splice(i, 1)
-        //   }
-        // })
-        // this.$myCipherService.decryptedCipherCache(decryptedCipherCache)
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
-        // console.log('sync completed')
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit('UPDATE_SYNCED_CIPHERS')
@@ -479,7 +430,6 @@ Vue.mixin({
         name = 'identities'
         break
       }
-      // console.log(cipher.id)
       this.$router.push({
         name: name + '-id',
         params: { id: cipher.id }
@@ -490,9 +440,6 @@ Vue.mixin({
     },
     canManageItem (teams, item) {
       const team = this.getTeam(teams, item.organizationId)
-      // if (team.organization_id) {
-      //   return ['owner', 'admin', 'manager'].includes(team.role)
-      // }
       if (team.id) {
         return [0, 1].includes(team.type);
       }

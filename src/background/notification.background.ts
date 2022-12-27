@@ -67,8 +67,7 @@ export default class NotificationBackground {
             this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
             BrowserApi.tabSendMessageData(sender.tab, "resizeInformMenu", { width: '320px', height: '244px' })
           ])
-        }
-        else {
+        } else {
           await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
         }
         break;
@@ -125,6 +124,9 @@ export default class NotificationBackground {
               passwordFields: passwordFields,
               usernameFields: usernameFields
             });
+
+            this.autofillFirstPage(sender.tab);
+
             break;
           default:
             break;
@@ -201,6 +203,19 @@ export default class NotificationBackground {
         }
       default:
         break;
+    }
+  }
+
+  private async autofillFirstPage(tab: chrome.tabs.Tab) {
+    try {
+      if (this.cipherService && tab.url) {
+        const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url);
+        const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
+        if (loginCiphers.length === 1) {
+          await this.startAutofillPage(loginCiphers[0])
+        }
+      }
+    } catch (error) {
     }
   }
 
@@ -507,9 +522,10 @@ export default class NotificationBackground {
       };
       const data = new CipherRequest(newCipher)
       try {
-        const cipherResponse = await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, { headers: headers })
+        const res = await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, { headers: headers })
+        const cipherResponse = new CipherResponse(res.data)
         const userId = await this.userService.getUserId();
-        const cipherData = new CipherData({ ...cipherResponse, ...data, id: cipher.id }, userId);
+        const cipherData = new CipherData(cipherResponse, userId);
         this.cipherService.upsert(cipherData)
       } catch (e) {
       }
@@ -582,6 +598,7 @@ export default class NotificationBackground {
         }
       }
     }
+    responseData.ciphers = this.cipherService.sortCiphers(responseData.ciphers || [])
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
   }
 

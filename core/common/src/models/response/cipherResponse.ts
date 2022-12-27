@@ -30,6 +30,8 @@ export class CipherResponse extends BaseResponse {
     passwordHistory: PasswordHistoryResponse[];
     collectionIds: string[];
     deletedDate: string;
+    lastUseDate: number;
+    numUse: number;
     reprompt: CipherRepromptType;
 
     constructor(response: any) {
@@ -51,6 +53,8 @@ export class CipherResponse extends BaseResponse {
         this.revisionDate = this.getResponseProperty('RevisionDate');
         this.collectionIds = this.getResponseProperty('CollectionIds');
         this.deletedDate = this.getResponseProperty('DeletedDate');
+        this.lastUseDate = this.getResponseProperty('LastUseDate');
+        this.numUse = this.getResponseProperty('NumUse');
 
         const login = this.getResponseProperty('Login');
         if (login != null) {

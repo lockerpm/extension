@@ -20,23 +20,6 @@
         </div>
       </div>
       <div class="text-left">
-        <!--        <div v-if="['vault', 'shares'].includes(routeName) && !cipher.id"-->
-        <!--             class="form-group"-->
-        <!--        >-->
-        <!--          <label for="">Kiểu mục</label>-->
-        <!--          <el-select v-model="cipher.type" placeholder=""-->
-        <!--                     class="w-full"-->
-        <!--                     :disabled="isDeleted"-->
-        <!--                     :change="handleChangeType"-->
-        <!--          >-->
-        <!--            <el-option-->
-        <!--              v-for="(item, index) in typeOptions"-->
-        <!--              :key="index"-->
-        <!--              :label="item.name"-->
-        <!--              :value="item.value"-->
-        <!--            />-->
-        <!--          </el-select>-->
-        <!--        </div>-->
         <ValidationProvider v-slot="{ errors: err }" rules="required" :name="$t('common.name')">
           <InputText
             v-model="cipher.name"
@@ -47,6 +30,16 @@
             required
           />
         </ValidationProvider>
+        <div v-if="cipher.id" class="mb-4 flex align-center justify-between">
+            <div class="text-black-700 text-head-6 font-semibold">
+                {{ $t('data.ciphers.markFavorite') }}
+            </div>
+            <el-switch
+                v-model="cipher.favorite"
+                active-color="#13ce66"
+                inactive-color="#EBEDF3">
+            </el-switch>
+        </div>
 
         <template v-if="cipher.type === CipherType.Login">
           <div class="mb-4 text-black-700 text-head-6 font-semibold">
@@ -514,7 +507,6 @@ export default Vue.extend({
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
-          // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.type}`, 1) }), 'success')
         this.closeDialog()
@@ -533,7 +525,6 @@ export default Vue.extend({
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
-          // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
         this.closeDialog()

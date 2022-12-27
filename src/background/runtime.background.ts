@@ -16,6 +16,8 @@ import { SettingsService } from 'jslib-common/abstractions/settings.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { TokenService } from 'jslib-common/abstractions/token.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
+import { CipherData } from 'jslib-common/models/data/cipherData';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 import { PassService } from 'jslib-common/abstractions/pass.service';
 
 import { BrowserApi } from '../browser/browserApi';
@@ -139,9 +141,6 @@ export default class RuntimeBackground {
           sender.frameId
         );
         break;
-      case "bgUpdateContextMenu":
-      case "editedCipher":
-      case "addedCipher":
       case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
@@ -318,6 +317,7 @@ export default class RuntimeBackground {
   }
 
   private async autofillPage() {
+    const cipherId = this.main.loginToAutoFill.id
     const totpCode = await this.autofillService.doAutoFill({
       cipher: this.main.loginToAutoFill,
       pageDetails: this.pageDetailsToAutoFill,
@@ -327,9 +327,25 @@ export default class RuntimeBackground {
     if (totpCode != null) {
       this.platformUtilsService.copyToClipboard(totpCode, { window: window });
     }
-
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
+
+    // Update used time
+    const csToken = await this.main.storageService.get<string>("cs_token");
+    const headers = {
+      "Authorization": "Bearer " + csToken,
+      "Content-Type": "application/json; charset=utf-8"
+    };
+    const res = await axios.put(
+      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
+      { use: true },
+      { headers: headers }
+    )
+    const cipherResponse = new CipherResponse(res.data)
+    const userId = await this.userService.getUserId();
+    const cipherData = new CipherData(cipherResponse, userId);
+    this.cipherService.upsert(cipherData)
+
   }
 
   private async checkOnInstalled() {

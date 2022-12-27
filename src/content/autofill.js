@@ -15,7 +15,6 @@
 
         function getPageDetails(theDoc, oneShotId) {
             // start helpers
-
             // get the value of a dom element's attribute
             function getElementAttrValue(el, attrName) {
                 var attrVal = el[attrName];
@@ -646,7 +645,6 @@
             }
 
             // custom fill script
-
             fillScriptOps = fillScript.script;
             doOperation(fillScriptOps, function () {
                 // Done now
@@ -728,14 +726,12 @@
         function doFocusByOpId(opId) {
             var el = getElementByOpId(opId)
             if (el) {
-                // 'function' === typeof el.click && el.click(),
-                    'function' === typeof el.focus && doFocusElement(el, true);
+                'function' === typeof el.focus && doFocusElement(el, true);
             }
 
             return null;
         }
 
-        // do a click by opid operation
         function doClickByOpId(opId) {
             var el = getElementByOpId(opId);
             return el ? clickElement(el) ? [el] : null : null;
@@ -746,7 +742,6 @@
             query = selectAllFromDoc(query);
             return Array.prototype.map.call(Array.prototype.slice.call(query), function (el) {
                 clickElement(el);
-                // 'function' === typeof el.click && el.click();
                 'function' === typeof el.focus && doFocusElement(el, true);
                 return [el];
             }, this);
@@ -759,7 +754,8 @@
             yes: true,
             '✓': true
         },
-            styleTimeout = 200;
+
+        styleTimeout = 200;
 
         // fill an element
         function fillTheElement(el, op) {
@@ -884,7 +880,6 @@
         function touchAllFields() {
             getAllFields().forEach(function (el) {
                 setValueForElement(el);
-                // el.click && el.click();
                 setValueForElementByEvent(el);
             });
         }

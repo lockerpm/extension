@@ -479,16 +479,6 @@ export default class MainBackground {
       title: this.i18nService.t('copyPassword'),
     });
 
-    // if (await this.userService.canAccessPremium()) {
-    //     await this.contextMenusCreate({
-    //         type: 'normal',
-    //         id: 'copy-totp',
-    //         parentId: 'root',
-    //         contexts: ['all'],
-    //         title: this.i18nService.t('copyVerificationCode'),
-    //     });
-    // }
-
     await this.contextMenusCreate({
       type: 'separator',
       parentId: 'root',
@@ -677,7 +667,6 @@ export default class MainBackground {
   }
 
   // Browser API Helpers
-
   private contextMenusRemoveAll() {
     return new Promise<void>(resolve => {
       chrome.contextMenus.removeAll(() => {
@@ -707,8 +696,6 @@ export default class MainBackground {
 
     const options = {
       path: {
-        // 19: 'images/icon19' + suffix + '.png',
-        // 38: 'images/icon38' + suffix + '.png',
         19: 'icons/19' + '.png',
         38: 'icons/38' + '.png',
       }
@@ -717,8 +704,6 @@ export default class MainBackground {
     if (this.platformUtilsService.isFirefox()) {
       await theAction.setIcon(options);
     } else if (this.platformUtilsService.isSafari()) {
-      // Workaround since Safari 14.0.3 returns a pending promise
-      // which doesn't resolve within a reasonable time.
       theAction.setIcon(options);
     } else {
       return new Promise<void>(resolve => {

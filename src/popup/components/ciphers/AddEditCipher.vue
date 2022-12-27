@@ -67,6 +67,17 @@
           />
         </ValidationProvider>
 
+        <div v-if="cipher.id" class="mb-4 flex align-center justify-between">
+            <div class="text-black-700 text-head-6 font-semibold">
+                {{ $t('data.ciphers.markFavorite') }}
+            </div>
+            <el-switch
+                v-model="cipher.favorite"
+                active-color="#13ce66"
+                inactive-color="#EBEDF3">
+            </el-switch>
+        </div>
+
         <template v-if="cipher.type === CipherType.Login">
           <div class="mb-4 text-black-700 text-head-6 font-semibold">
             {{ $t('data.ciphers.login') }}
@@ -382,14 +393,6 @@
             :disabled="isDeleted"
             is-password
           />
-          <!-- <InputText
-            v-model="cryptoWallet.seed"
-            :label="$t('data.ciphers.seed')"
-            class="w-full !mb-1"
-            :error-text="err && err.length && err[0]"
-            :disabled="isDeleted"
-            is-textarea=""
-          /> -->
           <div class="cs-field w-full">
             <label>
               {{ $t('data.ciphers.seed') }}
@@ -401,9 +404,6 @@
             class="w-full !mb-4"
             @set-seed="setSeed"
           />
-          <!-- <div class="py-1 px-3 text-xs mb-3" style="background: rgba(242, 232, 135, 0.3);">
-            {{ $t('data.ciphers.seed_phrase_desc') }}
-          </div> -->
           <InputSelectCryptoNetworks
             ref="inputSelectCryptoWallet"
             :label="$t('data.ciphers.networks')"
@@ -779,7 +779,6 @@ export default Vue.extend({
         } else {
           this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         }
-        // this.errors = (e.response && e.response.data && e.response.data.details) || {}
       } finally {
         this.loading = false
       }
@@ -802,11 +801,8 @@ export default Vue.extend({
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
-          // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
-        // this.$emit('updated-cipher')
-        // this.$router.push({ name: 'vault' })
         this.$router.back()
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '3003') {
@@ -828,7 +824,6 @@ export default Vue.extend({
           this.loading = true
           await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
-          // this.$emit('reset-selection')
           this.$router.back()
         } catch (e) {
           this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
@@ -894,7 +889,6 @@ export default Vue.extend({
       this.cipher.secureNote = new SecureNoteView()
       this.cipher.secureNote.type = SecureNoteType.Generic
       this.cipher.fields = []
-      // this.cipher.fields[0].type = FieldType.Text
       this.cipher.folderId = this.$route.params.folderId || null
       this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
       if (this.cipher.organizationId) {

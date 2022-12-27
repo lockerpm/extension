@@ -35,6 +35,8 @@ export class CipherData {
     collectionIds?: string[];
     deletedDate: string;
     reprompt: CipherRepromptType;
+    lastUseDate: number;
+    numUse: number;
 
     constructor(response?: CipherResponse, userId?: string, collectionIds?: string[]) {
         if (response == null) {
@@ -55,7 +57,8 @@ export class CipherData {
         this.notes = response.notes;
         this.collectionIds = collectionIds != null ? collectionIds : response.collectionIds;
         this.deletedDate = response.deletedDate;
-        this.reprompt = response.reprompt;
+        this.lastUseDate = response.lastUseDate;
+        this.numUse = response.numUse;
 
         switch (this.type) {
             case CipherType.Login:
