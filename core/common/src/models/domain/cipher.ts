@@ -38,6 +38,8 @@ export class Cipher extends Domain {
     passwordHistory: Password[];
     collectionIds: string[];
     deletedDate: Date;
+    lastUseDate: number;
+    numUse: number;
     reprompt: CipherRepromptType;
 
     constructor(obj?: CipherData, alreadyEncrypted: boolean = false, localData: any = null) {
@@ -68,6 +70,8 @@ export class Cipher extends Domain {
         this.collectionIds = obj.collectionIds;
         this.localData = localData;
         this.deletedDate = obj.deletedDate != null ? new Date(obj.deletedDate) : null;
+        this.lastUseDate = obj.lastUseDate;
+        this.numUse = obj.numUse;
         this.reprompt = obj.reprompt;
 
         switch (this.type) {

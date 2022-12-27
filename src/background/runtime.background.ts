@@ -16,7 +16,8 @@ import { SettingsService } from 'jslib-common/abstractions/settings.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { TokenService } from 'jslib-common/abstractions/token.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
-import { SyncService } from 'jslib-common/abstractions/sync.service';
+import { CipherData } from 'jslib-common/models/data/cipherData';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -41,7 +42,7 @@ export default class RuntimeBackground {
     private notificationsService: NotificationsService,
     private systemService: SystemService,
     private environmentService: EnvironmentService,
-    private messagingService: MessagingService, 
+    private messagingService: MessagingService,
     private cryptoService: CryptoService,
     private cipherService: CipherService,
     private folderService: FolderService,
@@ -69,14 +70,12 @@ export default class RuntimeBackground {
     });
     chrome.runtime.onMessageExternal.addListener(
       async (msg, sender, sendResponse) => {
-        // console.log(sender)
-        await  this.processMessage(msg, sender, sendResponse)
+        await this.processMessage(msg, sender, sendResponse)
       }
     );
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    // console.log(msg)
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
@@ -92,7 +91,6 @@ export default class RuntimeBackground {
             );
           }
         }
-        // await this.main.setIcon(); // error => prevent send message unlockCompleted
         await this.main.refreshBadgeAndMenu(false);
         this.notificationsService.updateConnection(msg.command === "unlocked");
         this.systemService.cancelProcessReload();
@@ -123,7 +121,6 @@ export default class RuntimeBackground {
         await this.main.openPopup();
         break;
       case "promptForLogin":
-        // await BrowserApi.createNewTab('popup/index.html?uilocation=popout', true, true);
         await BrowserApi.createNewTab(
           "popup.html?uilocation=popout",
           true,
@@ -143,10 +140,6 @@ export default class RuntimeBackground {
           sender.frameId
         );
         break;
-      case "bgUpdateContextMenu":
-      case "editedCipher":
-      case "addedCipher":
-        // console.log("added Cipher");
       case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
@@ -205,11 +198,11 @@ export default class RuntimeBackground {
         try {
           BrowserApi.createNewTab(
             "popup/index.html?uilocation=popout#/sso?code=" +
-              msg.code +
-              "&state=" +
-              msg.state
+            msg.code +
+            "&state=" +
+            msg.state
           );
-        } catch {}
+        } catch { }
         break;
       case "cs-authResult":
         await Promise.all([
@@ -317,14 +310,13 @@ export default class RuntimeBackground {
           window: window
         });
         break;
-      case "loginWithSuccess":
-        console.log("test");
       default:
         break;
     }
   }
 
   private async autofillPage() {
+    const cipherId = this.main.loginToAutoFill.id
     const totpCode = await this.autofillService.doAutoFill({
       cipher: this.main.loginToAutoFill,
       pageDetails: this.pageDetailsToAutoFill,
@@ -334,9 +326,25 @@ export default class RuntimeBackground {
     if (totpCode != null) {
       this.platformUtilsService.copyToClipboard(totpCode, { window: window });
     }
-
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
+
+    // Update used time
+    const csToken = await this.main.storageService.get<string>("cs_token");
+    const headers = {
+      "Authorization": "Bearer " + csToken,
+      "Content-Type": "application/json; charset=utf-8"
+    };
+    const res = await axios.put(
+      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
+      { use: true },
+      { headers: headers }
+    )
+    const cipherResponse = new CipherResponse(res.data)
+    const userId = await this.userService.getUserId();
+    const cipherData = new CipherData(cipherResponse, userId);
+    this.cipherService.upsert(cipherData)
+
   }
 
   private async checkOnInstalled() {
@@ -368,21 +376,21 @@ export default class RuntimeBackground {
   }
 
   private async generatePassword(tab, responseCommand, inputOptions) {
-      const options = inputOptions || (await this.passwordGenerator.getOptions())[0]
-      if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
-        options.lowercase = true
-      }
-      const responseData: any = {};
-      // const options = (await this.passwordGenerator.getOptions())[0];
-      const password = await this.passwordGenerator.generatePassword(options);
-      let passwordStrength: any = {}
-      if (password) {
-        passwordStrength =  this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
-      }
-      responseData.password = password
-      responseData.passwordStrength = passwordStrength
-      await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-      this.platformUtilsService.copyToClipboard(password, { window: window });
-      this.passwordGenerator.addHistory(password);
+    const options = inputOptions || (await this.passwordGenerator.getOptions())[0]
+    if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
+      options.lowercase = true
     }
+    const responseData: any = {};
+    // const options = (await this.passwordGenerator.getOptions())[0];
+    const password = await this.passwordGenerator.generatePassword(options);
+    let passwordStrength: any = {}
+    if (password) {
+      passwordStrength = this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
+    }
+    responseData.password = password
+    responseData.passwordStrength = passwordStrength
+    await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
+    this.platformUtilsService.copyToClipboard(password, { window: window });
+    this.passwordGenerator.addHistory(password);
+  }
 }

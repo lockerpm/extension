@@ -564,7 +564,8 @@ module.exports = {
       text: 'Text',
       hidden: 'Hidden',
       date: 'Date',
-      monthYear: 'Month/Year'
+      monthYear: 'Month/Year',
+      markFavorite: 'Mark favorite'
     },
     settings: {
       account: 'Account',

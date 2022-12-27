@@ -850,6 +850,30 @@ export class CipherService implements CipherServiceAbstraction {
         return this.getLocaleSortingFunction()(a, b);
     }
 
+    sortCiphers(ciphers: CipherView[]): CipherView[] {
+        const sort = (array: CipherView[]) => {
+            const newArray = array.sort((a: CipherView, b: CipherView) => {
+                if (b.numUse > a.numUse) {
+                    return 1
+                } else if (b.numUse === a.numUse) {
+                    if (b.lastUseDate > a.lastUseDate) {
+                        return 1
+                    } else if (b.lastUseDate === a.lastUseDate) {
+                        return this.getLocaleSortingFunction()(a, b)
+                    } else {
+                        return -1
+                    }
+                } else {
+                    return -1
+                }
+            })
+            return newArray
+        }
+        const favoriteCiphers = sort(ciphers.filter((c: CipherView) => c.favorite));
+        const notFavoriteCiphers = sort(ciphers.filter((c: CipherView) => !c.favorite));
+        return [...favoriteCiphers, ...notFavoriteCiphers]
+    }
+
     getLocaleSortingFunction(): (a: CipherView, b: CipherView) => number {
         return (a, b) => {
             let aName = a.name;
