@@ -228,9 +228,7 @@ export default Vue.extend({
         }
       });
 
-      this.loginCiphers = this.loginCiphers.sort((a, b) =>
-        this.$cipherService.sortCiphersByLastUsedThenName(a, b)
-      );
+      this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers);
       this.loaded = true;
     },
     addEdit(item) {

@@ -920,39 +920,6 @@ export class ApiService implements ApiServiceAbstraction {
         return new SyncResponse(r);
     }
 
-    // async getSync(): Promise<SyncResponse> {
-    //     let r = null
-    //     const apiUrl = 'https://api.cystack.net/v3/cystack_platform/pm/sync'
-    //     const headers = new Headers({
-    //         'Device-Type': this.deviceType,
-    //     });
-    //     if (this.customUserAgent != null) {
-    //         headers.set('User-Agent', this.customUserAgent);
-    //     }
-
-    //     const requestInit: RequestInit = {
-    //         cache: 'no-store',
-    //         method: 'GET',
-    //     };
-    //     const authHeader = await this.tokenService.getToken();  // not this token => error
-    //     headers.set('Authorization', 'Bearer cs.' + authHeader);
-    //     headers.set('Accept', 'application/json');
-    //     requestInit.headers = headers;
-    //     const response = await this.fetch(new Request(apiUrl , requestInit));
-
-    //     if (response.status === 200) {
-    //         const responseJson = await response.json();
-    //         r = responseJson;
-    //     } else if (response.status !== 200) {
-    //         const error = await this.handleError(response, false, true);
-    //         r =  Promise.reject(error);
-    //     }
-    //     console.log(r)
-    //     return new SyncResponse(r);
-    // }
-
-    // Two-factor APIs
-
     async getTwoFactorProviders(): Promise<ListResponse<TwoFactorProviderResponse>> {
         const r = await this.send('GET', '/two-factor', null, true, true);
         return new ListResponse(r, TwoFactorProviderResponse);

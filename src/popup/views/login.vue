@@ -20,217 +20,8 @@
       >
         Single Sign-On
       </button>
-      <!-- <div
-        v-if="!factor2"
-        class="mb-4"
-      >
-        <InputText
-          v-model="user.username"
-          label="Email / Username"
-          class="w-full"
-          @done="login"
-        />
-        <InputText
-          v-model="user.password"
-          :label="$t('data.ciphers.password')"
-          class="w-full"
-          is-password
-          @done="login"
-        />
-      </div> -->
-      <!-- <div
-        v-if="factor2 && step === 1"
-        class="text-left"
-      >
-        <h3 class="text-[20px] py-6">
-          <a
-            class=""
-            @click="factor2=false"
-          >
-            <i class="fas fa-long-arrow-alt-left m--font-primary"></i>
-          </a>
-          {{$t('data.login.verify')}}
-        </h3>
-        <label
-          v-for="m in methods"
-          :key="m.type"
-          class="m-option"
-          @click="selectMethod(m)"
-        >
-          <span class="m-option__control">
-            <span class="m-radio m-radio--brand m-radio--check-bold">
-              <input
-                v-model="value"
-                type="radio"
-                name="m_option_1"
-                :value="m.type"
-              >
-              <span></span>
-            </span>
-          </span>
-          <span class="m-option__label">
-            <span class="m-option__head">
-              <span class="m-option__title">
-                <i
-                  v-if="m.type === 'mail'"
-                  class="fas fa-envelope"
-                ></i>
-                <i
-                  v-if="m.type === 'smart_otp'"
-                  class="fas fa-mobile"
-                ></i>
-                <span v-if="m.type === 'mail'">
-                  Email {{ m.data }}
-                </span>
-                <span v-if="m.type === 'smart_otp'">
-                  {{$t('data.login.authentication_app')}}
-                </span>
-              </span>
-              <span class="m-option__focus"></span>
-            </span>
-            <span
-              v-if="m.type === 'mail'"
-              class="m-option__body"
-            >
-              <a
-                class="m-link m-link--primary _clickable m--font-primary m--icon-font-size-sm3"
-                @click="step = 3"
-              >
-                {{$t('data.login.have_code')}}
-              </a>
-            </span>
-          </span>
-        </label>
-        <div class="m-login__form-action mt-4 text-right">
-          <button
-            class="btn btn-primary btn-sm m-btn--wide m-btn"
-            :class="[loading?'m-loader  m-loader--light m-loader--left m-loader--md':'']"
-            :disabled="loading"
-            @click="nextMethod"
-          >
-            {{$t('data.login.next')}}
-          </button>
-        </div>
-      </div> -->
-      <!-- <div
-        v-if="factor2 && (step === 2 || step === 3)"
-        class="text-left"
-      >
-        <h3 class="text-[20px] py-6">
-          <a
-            class=""
-            @click="step = 1"
-          >
-            <i class="fas fa-long-arrow-alt-left m--font-primary"></i>
-          </a>
-          {{$t('data.login.enter_code')}}
-        </h3>
-        <p v-if="selectedMethod.type === 'mail'">
-          {{$t('data.login.check_email', {email: selectedMethod.data})}}
-        </p>
-        <p v-if="selectedMethod.type === 'smart_otp' && step !== 3">
-          {{$t('data.login.use_authentication_app')}}
-        </p>
-
-        <div :class="[errors.code === '1002'?'has-danger':'','form-group m-form__group']">
-          <label>{{$t('data.login.enter_code_here')}}</label>
-          <input
-            ref="otp"
-            v-model="otp"
-            class="form-control m-input mt-4"
-            :name="randomString()"
-          >
-          <transition
-            name="custom-classes-transition"
-            enter-active-class="animated flipInX"
-          >
-            <div
-              v-if="errors.code === '1002'"
-              class="text-danger-500"
-            >
-              {{$t('data.login.authorization_error')}}
-            </div>
-          </transition>
-        </div>
-        <div class="m-login__form-action mt-2">
-          <div class="row m-login__form-sub mb-3">
-            <div class="col m--align-left m-login__form-left pl-0">
-              <el-checkbox v-model="save_device">
-                {{$t('data.login.remember_device')}}
-              </el-checkbox>
-            </div>
-          </div>
-          <button
-            class="btn btn-primary uppercase w-full"
-            type="button"
-            :disabled="loadingOtp || !otp"
-            @click="postOtp"
-            :loading="loadingOtp"
-          >
-            {{$t('data.login.authenticate')}}
-          </button>
-        </div>
-      </div> -->
-      <!-- <transition
-        name="custom-classes-transition"
-        enter-active-class="animated flipInX"
-        leave-active-class="animated flipOutX"
-      >
-        <div
-          v-if="error!=null"
-          class="text-danger-500"
-          role="alert"
-        >
-          {{ error }}
-        </div>
-      </transition> -->
-      <!-- <transition
-        name="custom-classes-transition"
-        enter-active-class="animated flipInX"
-        leave-active-class="animated flipOutX"
-      >
-        <div
-          v-show="send_mail"
-          class="m-alert m-alert--icon m-alert--outline alert alert-info px-5 py-2"
-          role="alert"
-        >
-          <div class="m-login__desc">
-            {{$t('data.login.email_sent')}}
-            <div
-              class="alert alert-info mt-3 mx-5 text-center"
-              role="alert"
-            >
-              {{ userCopy.email }}
-            </div>
-            <p>
-              {{$t('data.login.go_to_inbox')}}
-            </p>
-          </div>
-        </div>
-      </transition> -->
       <div v-if="!factor2">
         <div class="text-center mt-2">
-          <!-- <button
-            id="m_login_signin_submit"
-            :loading="loading"
-            class="btn btn-primary w-full"
-            type="button"
-            :disabled="loading"
-            @click.prevent="login"
-          >
-            {{$t('data.login.login')}}
-          </button> -->
-          <!-- <div class="flex px-2 my-4 mx-auto">
-            <div class="text-left w-full pl-0 text-center">
-              <a
-                @click.prevent="openForgot"
-                tag="a"
-                class="text-[#0476e9] no-underline"
-              >
-                {{$t('data.login.forgot_password')}}
-              </a>
-            </div>
-          </div> -->
         </div>
         <div
           class="mx-auto border border-black-500 h-[1px]"
@@ -328,8 +119,8 @@ export default Vue.extend({
       }/login?SERVICE_URL=${encodeURIComponent(
         "/sso"
       )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      if (process.env.VUE_APP_ENVIRONMENT == 'dev') {
-        url += '&ENVIRONMENT=dev'
+      if (process.env.VUE_APP_ENVIRONMENT) {
+        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
       }
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
@@ -367,23 +158,7 @@ export default Vue.extend({
           }
         } else {
           try {
-            // await this.$storageService.save('cs_token', res.token)
-            // const store = await this.$storageService.get('cs_store')
-            // let oldStoreParsed = {}
-            // if (typeof store === 'object') {
-            //   oldStoreParsed = store
-            // }
-            // await this.$storageService.save('cs_store', {
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // console.log({
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // this.$store.commit('UPDATE_IS_LOGGEDIN', true)
             this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-            // this.$router.push({name: 'lock'})
             await this.getAccessToken(res.token)
           }
           catch (e) {
@@ -412,21 +187,12 @@ export default Vue.extend({
       thisWindow.close();
     },
     loginWith (provider) {
-      // if(provider === 'google'){
-      //   chrome.runtime.sendMessage({ command: 'loginWithGG', provider });
-      // }
-      // else if(provider === 'facebook'){
-      //   chrome.runtime.sendMessage({ command: 'loginWithFB', provider });
-      // }
-      // else if(provider === 'github'){
-      //   chrome.runtime.sendMessage({ command: 'loginWithGithub', provider });
-      // }
       let url = `${process.env.VUE_APP_ID_URL
       }/login?SERVICE_URL=${encodeURIComponent(
         "/sso"
       )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
-      if (process.env.VUE_APP_ENVIRONMENT == 'dev') {
-        url += '&ENVIRONMENT=dev'
+      if (process.env.VUE_APP_ENVIRONMENT) {
+        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
       }
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
@@ -448,7 +214,6 @@ export default Vue.extend({
           }, myHeaders)
           await this.getAccessToken(data.token)
         } catch (e) {
-          // this.$router.replace({ name: 'login' })
           this.notify('Login failed', 'error')
         }
       }

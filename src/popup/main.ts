@@ -117,7 +117,7 @@ Vue.mixin({
             llll: 'ddd, D MMM YYYY HH:mm'
           },
           week: {
-            dow: 1 // Monday is the first day of the week.
+            dow: 1
           }
         })
       } else {

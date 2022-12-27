@@ -289,7 +289,6 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   async doAutoFill(options: any) {
-    // console.log(options.pageDetails)
     let totpPromise: Promise<string> = null;
     const tab = await this.getActiveTab();
     if (!tab || !options.cipher || !options.pageDetails || !options.pageDetails.length) {

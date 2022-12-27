@@ -559,7 +559,8 @@ module.exports = {
       text: 'Văn bản',
       hidden: 'Mật khẩu',
       date: 'Ngày',
-      monthYear: 'Tháng/Năm'
+      monthYear: 'Tháng/Năm',
+      markFavorite: 'Đánh dấu yêu thích'
     },
     settings: {
       account: 'Tài khoản',
