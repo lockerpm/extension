@@ -30,6 +30,7 @@ import { PopupUtilsService } from './popup-utils.service';
 import {ImportService} from "jslib-common/abstractions/import.service";
 import AutofillService from '@/services/autofill.service'
 import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 function getBgService<T>(service: string) {
     return (): T => {
         const page = BrowserApi.getBackgroundPage();
@@ -73,6 +74,7 @@ export default {
         Vue.prototype.$popupUtilsService = getBgService<PopupUtilsService>("popupUtilsService")()
         Vue.prototype.$settingsService = getBgService<SettingsService>("settingsService")()
         Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
+        Vue.prototype.$totpService =  getBgService<TotpService>('totpService')()
         if (!popupUtilsService.inPopup(window)) {
             window.document.body.classList.add('body-full');
         } else if (window.screen.availHeight < 600) {

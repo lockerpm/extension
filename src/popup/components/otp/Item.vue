@@ -2,8 +2,8 @@
   <div class="otp-item p-4">
     <el-row type="flex" justify="space-between">
       <div class="otp-item__left">
-        <p class="name">Facebook (nguyendb@gmail.com)</p>
-        <p class="value">392 834</p>
+        <p class="name">{{ item.name }}</p>
+        <p class="value">{{ otp }}</p>
       </div>
       <div class="otp-item__right">
         <el-progress
@@ -11,7 +11,7 @@
           color="#268334"
           :width="32"
           :show-text="false"
-          :percentage="10"
+          :percentage="(start / period) * 100"
           :stroke-width="3"
         ></el-progress>
       </div>
@@ -22,19 +22,40 @@
 <script>
 export default {
   components: { },
+  props: {
+    item: Object
+  },
   data () {
     return {
-      otps: [],
-      textSearch: ''
+      otp: '',
+      period: 30,
+      now: new Date().getTime() / 1000,
     }
   },
-  computed: {},
+  computed: {
+    start () {
+      return this.period - Math.floor(this.now) % this.period
+    }
+  },
+  watch: {
+    start(value) {
+      console.log(value);
+      if (value === this.period) {
+        this.getOTP();
+      }
+    }
+  },
   mounted () {
-    this.getOtps()
+    this.getOTP();
+    setInterval(() => {
+      this.now = new Date().getTime() / 1000
+    }, 1000);
   },
   methods: {
-    async getOtps () {},
-    async handleSearch () {},
+    async getOTP () {
+      this.otp = await this.$totpService.getCode(this.item.notes);
+      this.period = await this.$totpService.getTimeInterval(this.item.notes);
+    },
   }
 }
 </script>

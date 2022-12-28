@@ -58,10 +58,6 @@ export default {
   position: relative;
   height: 100%;
   background-color: #f6f6f6;
-  &__title {
-    // font-size: 18px;
-    // font-weight: 500;
-  }
   &__form {
     .el-input {
       &__inner {

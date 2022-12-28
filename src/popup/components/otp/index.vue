@@ -14,19 +14,25 @@
         type="flex"
         justify="space-between"
       >
-        <span>Sort by: <b>Most Recent</b></span>
+        <span>Sort by: <b>{{ currentSort.label }}</b></span>
         <div class="right-icon">
-          <el-dropdown>
+          <el-dropdown trigger="click">
             <i class="el-icon-more"></i>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>A - Z</el-dropdown-item>
-              <el-dropdown-item>Most recent</el-dropdown-item>
-              <el-dropdown-item>Custom</el-dropdown-item>
+              <el-dropdown-item
+                v-for="item in sortBy"
+                :key="item.index"
+                @click.native="changeSort(item.value)"
+              >{{ item.label }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </el-row>
-      <OtpItem v-for="item in 4"/>
+      <OtpItem
+        v-for="item in ciphers"
+        :key="item.id"
+        :item="item"
+      />
     </div>
     <div class="list-otp__add">
       <el-dropdown @command="handleCreateOTP">
@@ -47,26 +53,23 @@ import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
 
 import OtpItem from './Item.vue'
+
 export default {
   name: 'ListOTP',
   components: { OtpItem },
   data () {
     return {
       otps: [],
-      textSearch: ''
+      textSearch: '',
+      orderField: "revisionDate",
+      orderDirection: 'desc',
     }
   },
   asyncComputed: {
     ciphers: {
       async get() {
-        const deletedFilter = (c) => {
-          return c.isDeleted === this.deleted;
-        };
-        let result = (await this.$searchService.searchCiphers(
-          this.searchText,
-          [(c) => c.type === CipherType['OTP'], deletedFilter],
-          null
-        )) || [];
+        let result = await this.$cipherService.getAllDecrypted();
+        result = result.filter((c) => !c.deleted && c.type === CipherType.OTP)
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
@@ -74,15 +77,38 @@ export default {
       },
       watch: [
         "$store.state.syncedCiphersToggle",
-        "deleted",
-        "searchText",
-        "filter",
         "orderField",
         "orderDirection",
       ],
     },
   },
-  computed: {},
+  computed: {
+    sortBy () {
+      return [
+        {
+          label: 'A - Z',
+          value: 'name_asc'
+        },
+        {
+          label: 'Z - A',
+          value: 'name_desc'
+        },
+        {
+          label: 'Most recent',
+          value: 'revisionDate_desc'
+        },
+        {
+          label: 'Custom',
+          value: 'custom'
+        }
+      ]
+    },
+    currentSort () {
+      const key = `${this.orderField}_${this.orderDirection}`
+      console.log(key);
+      return this.sortBy.find((s) => s.value === key) || this.sortBy[0]
+    },
+  },
   mounted () {
     this.getOtps()
   },
@@ -92,8 +118,19 @@ export default {
         this.$emit('create');
       }
     },
-    async getOtps () {},
-    async handleSearch () {},
+    async getOtps () {
+      //
+    },
+    changeSort (sortValue) {
+      if (sortValue === 'custom') {
+        return;
+      }
+      this.orderField = sortValue.split('_')[0];
+      this.orderDirection = sortValue.split('_')[1];
+    },
+    async handleSearch () {
+      //
+    }
   }
 }
 </script>
