@@ -7,6 +7,7 @@
       <div
         v-for="(cate, index) in menu"
         :key="index"
+        class="mb-4"
       >
         <p class="uppercase px-3 mb-1 font-semibold">{{cate.name}}</p>
         <ul class="popup-setting-wrapper">
@@ -46,7 +47,7 @@
           </li>
         </ul>
       </div>
-      <div class="mt-4">
+      <div>
         <div class="popup-setting-wrapper p-4 flex justify-between">
           <div class="text-black">
             {{$t("data.settings.logged_in_as")}} <span class="font-semibold">{{currentUser.email}}</span>

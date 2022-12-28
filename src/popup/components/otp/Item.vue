@@ -8,7 +8,7 @@
       <div class="otp-item__right">
         <el-progress
           type="circle"
-          color="#3A4BDE"
+          color="#268334"
           :width="32"
           :show-text="false"
           :percentage="10"
@@ -57,7 +57,7 @@ export default {
     .value {
       font-size: 18px;
       font-weight: 600;
-      color: #3A4BDE;
+      color: #268334;
     }
   }
   &__right {

@@ -29,7 +29,7 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style lang="scss">
 .vault-body {
   position: absolute !important;
   top: 180px !important;
@@ -43,5 +43,10 @@ export default Vue.extend({
   bottom: 0px !important;
   width: 100% !important;
   overflow: auto !important;
+}
+.el-input {
+  &__inner {
+    border-radius: 8px !important;
+  }
 }
 </style>

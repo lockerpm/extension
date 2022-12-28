@@ -81,6 +81,7 @@ export default {
       &__inner {
         border-left: none;
         border-right: none;
+        border-radius: 0 !important;
         &:focus {
           border-color: #E6E6E8 !important;
         }
@@ -114,7 +115,7 @@ export default {
     .icon {
       width: 40px;
       height: 40px;
-      background-color: #3A4BDE;
+      background-color: #268334;
       border-radius: 50%;
       cursor: pointer;
     }

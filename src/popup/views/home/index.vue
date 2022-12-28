@@ -348,3 +348,10 @@ export default Vue.extend({
   },
 });
 </script>
+<style>
+.el-loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
