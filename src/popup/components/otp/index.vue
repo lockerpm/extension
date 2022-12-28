@@ -43,6 +43,9 @@
 </template>
 
 <script>
+import orderBy from "lodash/orderBy";
+import { CipherType } from "jslib-common/enums/cipherType";
+
 import OtpItem from './Item.vue'
 export default {
   name: 'ListOTP',
@@ -52,6 +55,32 @@ export default {
       otps: [],
       textSearch: ''
     }
+  },
+  asyncComputed: {
+    ciphers: {
+      async get() {
+        const deletedFilter = (c) => {
+          return c.isDeleted === this.deleted;
+        };
+        let result = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => c.type === CipherType['OTP'], deletedFilter],
+          null
+        )) || [];
+        result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
+        this.dataRendered = result.slice(0, 50);
+        this.renderIndex = 0;
+        return result
+      },
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "deleted",
+        "searchText",
+        "filter",
+        "orderField",
+        "orderDirection",
+      ],
+    },
   },
   computed: {},
   mounted () {
