@@ -334,25 +334,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let color = '#000000'
     let textStrength = ''
     switch (passwordData.passwordStrength.score) {
-      case 4:
-        color = '#3DB249'
-        textStrength = i18n.informMenuScoreStrong
-        break;
-      case 3:
-        color = '#0363C2'
-        textStrength = i18n.informMenuScoreGood
-        break;
-      case 2:
-        color = '#FF9800'
-        textStrength = i18n.informMenuScoreMedium
-        break;
-      case 1:
-      case 0:
-        color = '#F54F64'
-        textStrength = i18n.informMenuScoreWeak
-        break;
-      default:
-        break;
+    case 4:
+      color = '#3DB249'
+      textStrength = i18n.informMenuScoreStrong
+      break;
+    case 3:
+      color = '#0363C2'
+      textStrength = i18n.informMenuScoreGood
+      break;
+    case 2:
+      color = '#FF9800'
+      textStrength = i18n.informMenuScoreMedium
+      break;
+    case 1:
+    case 0:
+      color = '#F54F64'
+      textStrength = i18n.informMenuScoreWeak
+      break;
+    default:
+      break;
     }
     document.getElementById('password_strength').style.color = color
     document.getElementById('password_strength_text').innerHTML = textStrength
