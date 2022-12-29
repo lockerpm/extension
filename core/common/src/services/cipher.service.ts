@@ -99,7 +99,7 @@ export class CipherService implements CipherServiceAbstraction {
 
     async encrypt(model: CipherView, key?: SymmetricCryptoKey, originalCipher: Cipher = null): Promise<Cipher> {
         // Adjust password history
-        if (model.id != null) {
+        if (model.id) {
             if (originalCipher == null) {
                 originalCipher = await this.get(model.id);
             }
@@ -150,13 +150,14 @@ export class CipherService implements CipherServiceAbstraction {
         cipher.collectionIds = model.collectionIds;
         cipher.revisionDate = model.revisionDate;
         cipher.reprompt = model.reprompt;
-
+        console.log(cipher);
         if (key == null && cipher.organizationId != null) {
             key = await this.cryptoService.getOrgKey(cipher.organizationId);
             if (key == null) {
                 throw new Error('Cannot encrypt cipher for organization. No key.');
             }
         }
+        console.log(cipher);
         await Promise.all([
             this.encryptObjProperty(model, cipher, {
                 name: null,

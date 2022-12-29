@@ -79,9 +79,11 @@ export default {
     async getOTP () {
       this.otp = await this.$totpService.getCode(this.item.notes);
       this.period = await this.$totpService.getTimeInterval(this.item.notes);
-      console.log(this.item);
     },
     formatOTP (otp) {
+      if (!otp) {
+        return 'N/A'
+      }
       const first = otp.slice(0, 3);
       const last = otp.slice(3, otp.length);
       return `${first} ${last}`

@@ -59,13 +59,12 @@
 </template>
 
 <script>
+import base32 from 'hi-base32'
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherType } from "jslib-common/enums/cipherType";
-import { SecureNoteView } from 'jslib-common/models/view/secureNoteView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
-import { SecureNoteType } from 'jslib-common/enums/secureNoteType';
 
 export default {
   name: 'CreateOTP',
@@ -96,12 +95,6 @@ export default {
     }
   },
   methods: {
-    newCipher () {
-      this.cipher = new CipherView()
-      this.cipher.type = CipherType.OTP
-      this.cipher.secureNote = new SecureNoteView()
-      this.cipher.secureNote.type = SecureNoteType.Generic
-    },
     handleAddEdit () {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -116,21 +109,24 @@ export default {
     async createOTP () {
       try {
         this.callingAPI = true;
-        const  { cipher } = new this.newCipher('OTP');
-        cipher.name = this.form.name;
-        cipher.notes = ''
-        console.log(cipher);
-        // const cipherEnc = await this.$cipherService.encrypt(cipher)
-        // const data = new CipherRequest(cipherEnc)
-
-        // await this.axios.put(`cystack_platform/pm/ciphers/${cipher.id}`, {
-        //   ...data,
-        //   collectionIds: []
-        // })
-        // this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t(`${CipherType[this.item.type]}`, 1) }), 'success')
-        // this.$emit('close')
+        const secret = base32.encode(Buffer.from(this.form.secretKey, "base64"));
+        const cipher = new CipherView()
+        cipher.name = this.form.name
+        cipher.type = CipherType.SecureNote
+        cipher.secureNote = new SecureNote()
+        cipher.secureNote.type = 0
+        cipher.notes = `otpauth://totp/${encodeURIComponent(this.form.name)}?secret=${secret}&issuer=${encodeURIComponent(this.form.name)}&algorithm=sha1&digits=6&period=30`;
+        const cipherEnc = await this.$cipherService.encrypt(cipher)
+        const data = new CipherRequest(cipherEnc)
+        data.type = CipherType.OTP;
+        await this.axios.post(`cystack_platform/pm/ciphers/vaults`, {
+          ...data,
+          collectionIds: [],
+        })
+        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t(`type.${CipherType.OTP}`, 1) }), 'success')
+        this.$emit('close')
       } catch (e) {
-        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t(`${CipherType[this.item.type]}`, 1) }), 'warning')
+        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t(`type.${CipherType.OTP}`, 1) }), 'warning')
       } finally {
         this.callingAPI = false;
       }

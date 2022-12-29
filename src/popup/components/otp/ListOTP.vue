@@ -36,7 +36,7 @@
       />
     </div>
     <div class="list-otp__add">
-      <el-dropdown @command="handleCreateOTP">
+      <el-dropdown @command="handleCreateOTP" trigger="click">
         <div class="icon flex items-center justify-center">
           <i class="el-icon-plus"></i>
         </div>
@@ -76,6 +76,7 @@ export default {
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
+        console.log(result);
         return result
       },
       watch: [
@@ -112,17 +113,11 @@ export default {
       return this.sortBy.find((s) => s.value === key) || this.sortBy[0]
     },
   },
-  mounted () {
-    this.getOtps()
-  },
   methods: {
     handleCreateOTP (command) {
       if (command === 'setup-key') {
         this.$emit('add-edit');
       }
-    },
-    async getOtps () {
-      //
     },
     changeSort (sortValue) {
       if (sortValue === 'custom') {
