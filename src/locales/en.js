@@ -174,6 +174,7 @@ module.exports = {
     2: 'Note | Notes',
     3: 'Card | Cards',
     4: 'Identity | Identities',
+    5: 'OTP | OTP',
     0: 'Item | Items',
     7: 'Crypto Backup | Crypto Backups',
     Login: 'Password | Password',

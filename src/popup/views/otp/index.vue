@@ -3,13 +3,14 @@
     class="relative mx-auto settings-body bg-white"
   >
     <Header></Header>
-    <ListOtp
-      v-if="!createOtp"
-      @create="createOtp = true"
+    <ListOTP
+      v-if="!addEditOTP"
+      @add-edit="handleAddEditOTP"
     />
-    <CreateOtp
+    <AddEditOTP
       v-else
-      @close="createOtp = false"
+      :item="selectedOTP"
+      @close="addEditOTP = false"
     />
     <Footer></Footer>
   </div>
@@ -18,17 +19,24 @@
 <script>
 import Vue from 'vue'
 import Header from "@/popup/components/layout/parts/Header";
-import ListOtp from '@/popup/components/otp';
-import CreateOtp from '@/popup/components/otp/create';
+import ListOTP from '@/popup/components/otp/ListOTP.vue';
+import AddEditOTP from '@/popup/components/otp/AddEditOTP.vue';
 import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
   name: 'OTP',
-  components: { Header, ListOtp, CreateOtp, Footer },
+  components: { Header, ListOTP, AddEditOTP, Footer },
   data () {
     return {
-      createOtp: false
+      addEditOTP: false,
+      selectedOTP: null
     }
-  } 
+  },
+  methods: {
+    handleAddEditOTP (item) {
+      this.selectedOTP = item || null;
+      this.addEditOTP = true;
+    }
+  }
 })
 </script>
 

@@ -172,6 +172,7 @@ module.exports = {
     2: 'Ghi chú | Ghi chú',
     3: 'Thẻ | Thẻ',
     4: 'Định danh | Định danh',
+    5: 'OTP | OTP',
     0: 'Mục | Mục',
     7: 'Tài sản Crypto | Tài sản Crypto',
     Login: 'Mật khẩu | Mật khẩu',

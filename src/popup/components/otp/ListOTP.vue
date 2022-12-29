@@ -5,10 +5,9 @@
       class="list-otp__search"
       prefix-icon="el-icon-search"
       :placeholder="$t('data.parts.search')"
-      @input="handleSearch"
     >
     </el-input>
-    <div class="list-otp__container">
+    <div class="list-otp__container" v-loading="callingAPI">
       <el-row
         class="list-otp__container--sort p-4"
         type="flex"
@@ -28,10 +27,12 @@
           </el-dropdown>
         </div>
       </el-row>
-      <OtpItem
+      <OTPRow
         v-for="item in ciphers"
         :key="item.id"
         :item="item"
+        @edit="$emit('add-edit', item)"
+        @delete="deleteOTPs"
       />
     </div>
     <div class="list-otp__add">
@@ -52,17 +53,18 @@
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
 
-import OtpItem from './Item.vue'
+import OTPRow from './OTPRow.vue'
 
 export default {
   name: 'ListOTP',
-  components: { OtpItem },
+  components: { OTPRow },
   data () {
     return {
       otps: [],
       textSearch: '',
       orderField: "revisionDate",
       orderDirection: 'desc',
+      callingAPI: false,
     }
   },
   asyncComputed: {
@@ -70,6 +72,7 @@ export default {
       async get() {
         let result = await this.$cipherService.getAllDecrypted();
         result = result.filter((c) => !c.deleted && c.type === CipherType.OTP)
+        result = result.filter((c) => c.name.toLowerCase().includes(this.textSearch.toLowerCase()))
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
@@ -79,6 +82,7 @@ export default {
         "$store.state.syncedCiphersToggle",
         "orderField",
         "orderDirection",
+        "textSearch",
       ],
     },
   },
@@ -86,26 +90,25 @@ export default {
     sortBy () {
       return [
         {
-          label: 'A - Z',
+          label: 'Name Ascending',
           value: 'name_asc'
         },
         {
-          label: 'Z - A',
+          label: 'Name Descending',
           value: 'name_desc'
         },
         {
-          label: 'Most recent',
-          value: 'revisionDate_desc'
+          label: 'Time Ascending',
+          value: 'revisionDate_asc'
         },
         {
-          label: 'Custom',
-          value: 'custom'
+          label: 'Time Descending',
+          value: 'revisionDate_desc'
         }
       ]
     },
     currentSort () {
       const key = `${this.orderField}_${this.orderDirection}`
-      console.log(key);
       return this.sortBy.find((s) => s.value === key) || this.sortBy[0]
     },
   },
@@ -115,7 +118,7 @@ export default {
   methods: {
     handleCreateOTP (command) {
       if (command === 'setup-key') {
-        this.$emit('create');
+        this.$emit('add-edit');
       }
     },
     async getOtps () {
@@ -128,9 +131,24 @@ export default {
       this.orderField = sortValue.split('_')[0];
       this.orderDirection = sortValue.split('_')[1];
     },
-    async handleSearch () {
-      //
-    }
+    async deleteOTPs (ids) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          this.callingAPI = true
+          await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
+          this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$t('type.5', ids.length) }), 'success')
+          this.callingAPI = false
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.5', ids.length) }), 'warning')
+        } finally {
+          this.callingAPI = false
+        }
+      })
+    },
   }
 }
 </script>
@@ -165,7 +183,7 @@ export default {
       width: 40px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
       i {
         cursor: pointer;
         font-size: 20px;
