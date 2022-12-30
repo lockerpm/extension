@@ -315,7 +315,7 @@ export default class MainBackground {
     if (!chrome.browserAction && !this.sidebarAction) {
       return;
     }
-
+    
     const isAuthenticated = await this.userService.isAuthenticated();
     const locked = await this.vaultTimeoutService.isLocked();
 
