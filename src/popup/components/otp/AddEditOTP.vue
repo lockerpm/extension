@@ -2,7 +2,7 @@
   <div class="create-otp p-4" v-loading="callingAPI">
     <div class="text-left bg-white p-4" style="border-radius: 16px">
       <h1 class="create-otp__title text-black-700 text-head-6 font-semibold">
-        {{ item ? 'Update OTP title' : 'Input secret key manually'}}
+        {{ item ? $t('data.otp.edit.form_title') : $t('data.otp.create.form_title')}}
       </h1>
       <el-form
         class="create-otp__form"
@@ -10,10 +10,10 @@
         :model="form"
         :rules="rules"
       >
-        <el-form-item label="Title" prop="name">
+        <el-form-item :label="$t('data.otp.create.title')" prop="name">
           <el-input v-model="form.name" :disabled="callingAPI"></el-input>
         </el-form-item>
-        <el-form-item v-if="!item" label="Secret key" prop="secretKey">
+        <el-form-item v-if="!item" :label="$t('data.otp.create.secret_key')" prop="secretKey">
           <el-input
             class="secret-key"
             v-model="form.secretKey"
@@ -83,12 +83,12 @@ export default {
       rules: {
         name: [
           {
-            required: true, message: 'Title is required', trigger: ['blur', 'change']
+            required: true, message: this.$t('data.otp.message.title_required'), trigger: ['blur', 'change']
           }
         ],
         secretKey: [
           {
-            required: true, message: 'Secret key is required', trigger: ['blur', 'change']
+            required: true, message: this.$t('data.otp.message.secret_key_required'), trigger: ['blur', 'change']
           }
         ]
       }

@@ -86,6 +86,12 @@ module.exports = {
     ms: 'Chị',
     dr: 'Bác sĩ'
   },
+  sort: {
+    name_asc: 'Tên tăng dần',
+    name_desc: 'Tên giảm dần',
+    time_asc: 'Thời gian xa nhất',
+    time_desc: 'Thời gian gần nhất'
+  },
   sidebar: {
     all: 'Tất cả',
     dashboard: 'Tất cả',
@@ -690,6 +696,24 @@ module.exports = {
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
       sync_data: 'Đồng bộ tài khoản'
+    },
+    otp: {
+      scan_qr: 'Quét mã QR',
+      setup_key: 'Nhập khóa cái đặt',
+      copy: 'Sao chép OTP',
+      copied: 'Đã sao chép',
+      create: {
+        form_title: 'Nhập thủ công khóa bí mật',
+        title: 'Tiêu đề',
+        secret_key: 'Khóa bí mật'
+      },
+      edit: {
+        form_title: 'Cập nhật tiêu đề OTP',
+      },
+      message: {
+        title_required: 'Tiêu đề không được để trống!',
+        secret_key_required: 'Khóa bí mật không được để trống!'
+      }
     }
   }
 }

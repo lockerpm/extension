@@ -10,7 +10,7 @@
           <p class="name text-black font-semibold truncate">{{ item.name }}</p>
           <p class="value">
             {{ formatOTP(otp) }}
-            <span v-if="isCopied" class="copied ml-xl">Copied!</span>
+            <span v-if="isCopied" class="copied ml-xl">{{ $t('data.otp.copied') }}!</span>
           </p> 
         </div>
         <el-progress
@@ -32,10 +32,10 @@
             v-clipboard:copy="item.name"
             v-clipboard:success="handleCopy"
           >
-            Copy OTP
+            {{ $t('data.otp.copy') }}
           </el-dropdown-item>
-          <el-dropdown-item @click.native="$emit('edit')">Edit</el-dropdown-item>
-          <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">Delete</el-dropdown-item>
+          <el-dropdown-item @click.native="$emit('edit')">{{ $t('common.edit') }}</el-dropdown-item>
+          <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">{{ $t('common.delete') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       </div>
