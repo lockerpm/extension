@@ -13,7 +13,7 @@
         type="flex"
         justify="space-between"
       >
-        <span>Sort by: <b>{{ currentSort.label }}</b></span>
+        <span>{{ $t('data.ciphers.sort_by') }}: <b>{{ currentSort.label }}</b></span>
         <div class="right-icon">
           <el-dropdown trigger="click">
             <i class="el-icon-more"></i>
@@ -41,8 +41,8 @@
           <i class="el-icon-plus"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="scan-qr">Scan QR code</el-dropdown-item>
-          <el-dropdown-item command="setup-key">Enter setup key</el-dropdown-item>
+          <el-dropdown-item command="scan-qr" disabled>{{ $t('data.otp.scan_qr') }}</el-dropdown-item>
+          <el-dropdown-item command="setup-key">{{ $t('data.otp.setup_key') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -76,7 +76,6 @@ export default {
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
-        console.log(result);
         return result
       },
       watch: [
@@ -91,19 +90,19 @@ export default {
     sortBy () {
       return [
         {
-          label: 'Name Ascending',
+          label: this.$t('sort.name_asc'),
           value: 'name_asc'
         },
         {
-          label: 'Name Descending',
+          label: this.$t('sort.name_desc'),
           value: 'name_desc'
         },
         {
-          label: 'Time Ascending',
+          label: this.$t('sort.time_asc'),
           value: 'revisionDate_asc'
         },
         {
-          label: 'Time Descending',
+          label: this.$t('sort.time_desc'),
           value: 'revisionDate_desc'
         }
       ]
@@ -128,8 +127,8 @@ export default {
     },
     async deleteOTPs (ids) {
       this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: this.$t('common.delete'),
+        cancelButtonText: this.$t('common.cancel'),
         type: 'warning'
       }).then(async () => {
         try {
