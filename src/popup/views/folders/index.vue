@@ -1,7 +1,6 @@
 <template>
   <div
-    style="padding-top: 180px; padding-bottom: 56px;"
-    class="p-4 text-[#A2A3A7]"
+    class="p-4 text-[#A2A3A7] vault-body"
   >
     <div v-if="folders" class="mt-5 font-semibold mb-4">
       {{ $t('type.folder') }} ({{folders.length}})

@@ -29,5 +29,27 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style lang="scss">
+.vault-body {
+  position: absolute !important;
+  top: 180px !important;
+  bottom: 56px !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
+.settings-body {
+  position: absolute !important;
+  top: 98px !important;
+  bottom: 0px !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
+.el-input {
+  &__inner {
+    border-radius: 8px !important;
+  }
+}
+.el-message-box {
+  width: 260px !important;
+}
 </style>

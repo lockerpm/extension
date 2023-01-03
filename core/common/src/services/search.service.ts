@@ -93,13 +93,11 @@ export class SearchService implements SearchServiceAbstraction {
         if (ciphers == null) {
             ciphers = await this.cipherService.getAllDecrypted();
         }
-
         if (filter != null && Array.isArray(filter) && filter.length > 0) {
             ciphers = ciphers.filter(c => filter.every(f => f == null || f(c)));
         } else if (filter != null) {
             ciphers = ciphers.filter(filter as (cipher: CipherView) => boolean);
         }
-
         if (!this.isSearchable(query)) {
             return ciphers;
         }

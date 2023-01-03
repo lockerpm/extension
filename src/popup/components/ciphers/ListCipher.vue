@@ -3,22 +3,6 @@
     v-loading="loading"
     class="relative mx-auto"
   >
-
-    <!-- <div
-      class="fixed top-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-      style="z-index:1; width: 400px"
-    >
-      <div
-        class="menu-icon mr-4"
-        @click="$router.back()"
-      >
-        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
-      </div>
-      <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
-        <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i>
-      </div>
-    </div> -->
-
     <NoCipher
       v-if="shouldRenderNoCipher"
       :type="type"
@@ -101,16 +85,13 @@
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-// import Vnodes from "@/components/Vnodes";
 import NoCipher from "@/components/cipher/NoCipher";
 import { BrowserApi } from "@/browser/browserApi";
 const BroadcasterSubscriptionId = "ChildViewComponent";
-import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 export default Vue.extend({
   components: {
-    // Vnodes,
     NoCipher,
     CipherRow,
   },
@@ -135,7 +116,7 @@ export default Vue.extend({
       dataRendered: [],
       renderIndex: 0,
       pageDetails: [],
-      orderField: "revisionDate", // revisionDate
+      orderField: "revisionDate",
       orderDirection: "desc",
     };
   },
@@ -246,7 +227,6 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-              // item.notes = item.cryptoAccount ? item.cryptoAccount.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -254,7 +234,6 @@ export default Vue.extend({
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-              // item.notes = item.cryptoWallet ? item.cryptoWallet.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -292,29 +271,13 @@ export default Vue.extend({
       },
       watch: ["searchText", "orderField", "orderDirection", "ciphers"],
     },
-    // collections: {
-    //   async get () {
-    //     let collections = await this.$collectionService.getAllDecrypted() || []
-    //     collections = collections.filter(f => f.id)
-    //     collections.forEach(f => {
-    //       const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
-    //       f.ciphersCount = ciphers && ciphers.length
-    //     })
-    //     return collections
-    //   },
-    //   watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
-    // }
   },
   methods: {
-    // addEdit (item) {
-    //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
-    // },
     changeSort(orderField, orderDirection) {
       this.orderField = orderField;
       this.orderDirection = orderDirection;
     },
     addEdit(item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       this.$router.push({ name: "add-item-create", params: { data: item } });
     },
     handleAddButton() {
@@ -336,7 +299,6 @@ export default Vue.extend({
       });
     },
     async fillCipher(cipher) {
-      // console.log(this.pageDetails.length);
       if (
         cipher.reprompt !== CipherRepromptType.None &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
@@ -350,7 +312,6 @@ export default Vue.extend({
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
-        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         this.notify(this.$t("errors.autofill"), "error");
         return;
       }
@@ -379,7 +340,6 @@ export default Vue.extend({
         }
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");
-        // this.notify(e, 'warning')
       }
     },
   },

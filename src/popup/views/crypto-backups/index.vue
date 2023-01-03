@@ -1,7 +1,6 @@
 <template>
   <div
-    class="p-4 text-[#A2A3A7]"
-    style="padding-top: 180px; padding-bottom: 56px;"
+    class="p-4 text-[#A2A3A7] vault-body"
   >
     <ListCipher
       :filter="c => c.type === 6 || c.type === 7"

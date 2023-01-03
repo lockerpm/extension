@@ -1,7 +1,6 @@
 <template>
   <div
-    class="relative mx-auto"
-    style="padding-top: 90px; min-height: 600px; max-width: 400px"
+    class="relative mx-auto settings-body"
   >
     <Header></Header>
     <PasswordGenerator />

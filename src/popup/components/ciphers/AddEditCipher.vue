@@ -628,12 +628,10 @@ export default Vue.extend({
     this.folders = await this.getFolders()
     if (this.data.id) {
       if (this.data.type === 6) {
-        // data.notes = JSON.stringify(data.cryptoAccount)
         this.cryptoAccount = this.data.cryptoAccount
       }
       if (this.data.type === 7) {
         this.cryptoWallet = this.data.cryptoWallet
-        // console.log(this.cryptoWallet)
       }
       if (this.data.type === CipherType.Login && this.data.login && this.data.login.uris == null) {
         this.data.login.uris = [{
@@ -644,7 +642,6 @@ export default Vue.extend({
 
       if (this.data.fields == null) {
         this.data.fields = []
-        // this.data.fields[0].type = FieldType.Text
       }
       this.cipher = new Cipher({ ...this.data }, true)
       this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
@@ -768,10 +765,8 @@ export default Vue.extend({
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
-          // view_password: cipher.viewPassword
         })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
-        // this.$router.push({ name: 'vault' })
         this.$router.back()
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
@@ -786,7 +781,6 @@ export default Vue.extend({
     async putCipher (cipher) {
       try {
         const type_ = this.cipher.type
-        console.log(this.cipher.type)
         if (this.cipher.type === 6 || this.cipher.type === 7) {
           this.cipher.notes = JSON.stringify(this.cipher.type === 6 ? this.cryptoAccount : this.cryptoWallet)
           this.cipher.type = CipherType.SecureNote

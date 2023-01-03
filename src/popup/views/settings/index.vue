@@ -1,14 +1,15 @@
 <template>
   <div
-    style="padding-top: 90px; padding-bottom: 32px"
+    class="settings-body"
   >
     <Header></Header>
     <div class="p-4 text-[#A2A3A7]">
       <div
         v-for="(cate, index) in menu"
         :key="index"
+        class="mb-4"
       >
-        <p class="uppercase px-3 mt-4 mb-1 font-semibold">{{cate.name}}</p>
+        <p class="uppercase px-3 mb-1 font-semibold">{{cate.name}}</p>
         <ul class="popup-setting-wrapper">
           <li
             v-for="(item, index) in cate.items"
@@ -46,7 +47,7 @@
           </li>
         </ul>
       </div>
-      <div class="mt-4">
+      <div>
         <div class="popup-setting-wrapper p-4 flex justify-between">
           <div class="text-black">
             {{$t("data.settings.logged_in_as")}} <span class="font-semibold">{{currentUser.email}}</span>

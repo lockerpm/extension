@@ -1,6 +1,6 @@
 <template>
   <div id="password-generator">
-    <div class="p-4 mt-3">
+    <div class="p-4">
       <div class="flex items-center justify-between mb-1 generated-password-container">
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
