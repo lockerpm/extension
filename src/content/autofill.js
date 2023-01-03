@@ -1,7 +1,6 @@
 !(function () {
     function collect(document, undefined) {
         // chrome.storage.local.clear();
-        // console.log(document);
         // START MODIFICATION
         var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
         // END MODIFICATION
@@ -698,7 +697,6 @@
 
         // do a fill by opid operation
         function doFillByOpId(opId, op) {
-          // console.log(`doFillByOpId: ${opId} ${op}`)
             var el = getElementByOpId(opId);
             return el ? (fillTheElement(el, op), [el]) : null;
         }
@@ -967,6 +965,51 @@
         });
     }
 
+    function scanQRCode (document) {
+      function createWrapper () {
+        if (document.querySelector('locker-select-wrapper')) {
+          return;
+        }
+        const locker_select_wrapper = document.createElement('locker-select-wrapper');
+        document.querySelector('html').appendChild(locker_select_wrapper)
+        const div = document.createElement('div');
+        div.id = 'locker_screenshot_wrapper';
+        div.style.position = 'absolute';
+        div.style.top = '0';
+        div.style.left = '0';
+        div.style.width = '100%';
+        div.style.height = '100%';
+        div.style.zIndex = '2147483620';
+        div.style.cursor = 'crosshair';
+        div.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+        div.style.boxSizing = 'content-box !important';
+        document.querySelector('locker-select-wrapper').appendChild(div);
+      }
+
+      function createWrapperChildren (id) {
+        const childrenId = `locker_screenshot_wrapper--${id}`
+        if (document.getElementById(childrenId)) {
+          return
+        }
+        const children =  document.createElement('div');
+        children.id = childrenId;
+        children.style.position = 'absolute';
+        children.style.top = '0';
+        children.style.left = '0';
+        document.getElementById('locker_screenshot_wrapper').appendChild(children);
+      }
+
+      function init () {
+        createWrapper();
+        createWrapperChildren('top');
+        createWrapperChildren('left');
+        createWrapperChildren('bottom');
+        createWrapperChildren('right');
+        createWrapperChildren('center');
+      }
+      init();
+    }
+
     /*
     End 1Password Extension
     */
@@ -983,11 +1026,14 @@
             });
             sendResponse();
             return true;
-        }
-        else if (msg.command === 'fillForm') {
+        } else if (msg.command === 'fillForm') {
             fill(document, msg.fillScript);
             sendResponse();
             return true;
+        } else if (msg.command === 'scanQRCode') {
+          scanQRCode(document);
+          sendResponse();
+          return true;
         }
     });
 })();

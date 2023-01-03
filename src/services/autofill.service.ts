@@ -184,9 +184,7 @@ export default class AutofillService implements AutofillServiceInterface {
 
   getCardForms(pageDetails: AutofillPageDetails): any[] {
     const formData: any[] = [];
-    // console.log(pageDetails)
     const cvvFields = this.loadCvvFields(pageDetails, true, true, false, false);
-    // console.log(cvvFields)
     if (cvvFields.length === 0) {
       return formData;
     }
@@ -219,8 +217,6 @@ export default class AutofillService implements AutofillServiceInterface {
               continue;
             }
 
-            // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
-            // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
             if (this.isFieldMatch(f[attr],
               ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
               ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
@@ -657,9 +653,7 @@ export default class AutofillService implements AutofillServiceInterface {
         }
       }
     });
-    // console.log(fillFields)
     const card = options.cipher.card;
-    // console.log(card)
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'cardholderName');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'number');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'code');
@@ -1028,7 +1022,6 @@ export default class AutofillService implements AutofillServiceInterface {
 
   private makeScriptActionWithValue(fillScript: AutofillScript, dataValue: any, field: AutofillField,
                                     filledFields: { [id: string]: AutofillField; }) {
-    // console.log(fillScript, dataValue, field, filledFields)                           
     let doFill = false;
     if (this.hasValue(dataValue) && field) {
       if (field.type === 'select-one' && field.selectInfo && field.selectInfo.options) {
@@ -1331,9 +1324,6 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   private fillByOpid(fillScript: AutofillScript, field: AutofillField, value: string): void {
-    // console.log('fillScript:', fillScript)
-    // console.log('field:', field)
-    // console.log('value: ', value)
     if (field.maxLength && value && value.length > field.maxLength) {
       value = value.substr(0, value.length);
     }

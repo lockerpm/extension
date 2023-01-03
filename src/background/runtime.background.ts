@@ -317,7 +317,6 @@ export default class RuntimeBackground {
   }
 
   private async autofillPage() {
-    console.log(chrome);
     const cipherId = this.main.loginToAutoFill.id
     const totpCode = await this.autofillService.doAutoFill({
       cipher: this.main.loginToAutoFill,

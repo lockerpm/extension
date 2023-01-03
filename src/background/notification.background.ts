@@ -126,7 +126,6 @@ export default class NotificationBackground {
             });
 
             this.autofillFirstPage(sender.tab);
-
             break;
           default:
             break;

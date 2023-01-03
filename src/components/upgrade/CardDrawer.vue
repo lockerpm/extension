@@ -319,7 +319,6 @@ export default Vue.extend({
     },
     async save () {
       const isValid = await this.$refs.observer.validate()
-      console.log(isValid)
       if (isValid) {
         this.loading = true
         const tokenData = {
