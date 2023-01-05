@@ -15,7 +15,7 @@ export class AvastJsonImporter extends BaseImporter implements Importer {
             return Promise.resolve(result);
         }
 
-        if (results.logins != null) {
+        if (results.logins) {
             results.logins.forEach((value: any) => {
                 const cipher = this.initLoginCipher();
                 cipher.name = this.getValueOrDefault(value.custName);
@@ -28,7 +28,7 @@ export class AvastJsonImporter extends BaseImporter implements Importer {
             });
         }
 
-        if (results.notes != null) {
+        if (results.notes) {
             results.notes.forEach((value: any) => {
                 const cipher = this.initLoginCipher();
                 cipher.type = CipherType.SecureNote;
@@ -40,7 +40,7 @@ export class AvastJsonImporter extends BaseImporter implements Importer {
             });
         }
 
-        if (results.cards != null) {
+        if (results.cards) {
             results.cards.forEach((value: any) => {
                 const cipher = this.initLoginCipher();
                 cipher.type = CipherType.Card;
@@ -50,11 +50,11 @@ export class AvastJsonImporter extends BaseImporter implements Importer {
                 cipher.card.number = this.getValueOrDefault(value.cardNumber);
                 cipher.card.code = this.getValueOrDefault(value.cvv);
                 cipher.card.brand = this.getCardBrand(cipher.card.number);
-                if (value.expirationDate != null) {
-                    if (value.expirationDate.month != null) {
+                if (value.expirationDate) {
+                    if (value.expirationDate.month) {
                         cipher.card.expMonth = value.expirationDate.month + '';
                     }
-                    if (value.expirationDate.year != null) {
+                    if (value.expirationDate.year) {
                         cipher.card.expYear = value.expirationDate.year + '';
                     }
                 }

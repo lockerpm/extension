@@ -327,9 +327,8 @@ export default class NotificationBackground {
     if (normalizedUsername != null) {
       normalizedUsername = normalizedUsername.toLowerCase();
     }
-
     if (await this.vaultTimeoutService.isLocked()) {
-      this.pushAddLoginToQueue(loginDomain, loginInfo, tab, true);
+      // this.pushAddLoginToQueue(loginDomain, loginInfo, tab, true);
       return;
     }
 
