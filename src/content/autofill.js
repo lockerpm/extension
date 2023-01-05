@@ -966,10 +966,28 @@
     }
 
     function scanQRCode (document) {
+      let docBody = 0;
+      let docHtml = null;
+      let docHeight = 0;
+      let docWidth = 0;
       let isMove = false;
       let isSetUp = false;
       let isResize = false;
       let currentCenterPosition = null;
+      const wrapperChildrenIds = ['top', 'left', 'bottom', 'right', 'center'];
+      const dragresizeIds = ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'];
+
+      function getDocumentInfo(params) {
+        docBody = document.body;
+        docHtml = document.documentElement;
+        docHeight = Math.max( docBody.scrollHeight, docBody.offsetHeight, docHtml.clientHeight, docHtml.scrollHeight, docHtml.offsetHeight );
+        docWidth = Math.max( docBody.scrollWidth, docBody.offsetWidth, docHtml.clientWidth, docHtml.scrollWidth, docHtml.offsetWidth );
+        const wrapper = document.getElementById('locker_screenshot_wrapper');
+        if (wrapper) {
+          wrapper.style.width = `${docWidth}px`;
+          wrapper.style.height = `${docHeight}px`;
+        }
+      }
 
       function createWrapper () {
         if (document.querySelector('locker-select-wrapper')) {
@@ -983,8 +1001,8 @@
           position: absolute !important;
           top: 0;
           left: 0;
-          width: ${window.innerWidth}px;
-          height: ${window.innerHeight}px;
+          width: ${docWidth}px;
+          height: ${docHeight}px;
           z-index: 2147483620;
           cursor: crosshair;
           background-color: rgba(0, 0, 0, 0.3);
@@ -1072,7 +1090,7 @@
           margin-right: 8px;
         `
         useButton.addEventListener('click', () => {
-          console.log('docj anh ow day');
+          captureImage();
         })
         wrapperActions.appendChild(useButton);
 
@@ -1168,7 +1186,7 @@
         if (!center.offsetWidth || Number(center.offsetWidth) === 0) {
           wrapper.style.backgroundColor = 'rgba(0, 0, 0, 0)';
           wrapper.style.cursor = 'auto';
-          const centerSize = getCenterSize(e, e.x - 100, e.y - 100, 200, 200);
+          const centerSize = getCenterSize(e.pageX - 100, e.pageY - 100, 200, 200);
           resizeChildren(centerSize)
         }
         const wrapperActions = document.getElementById('locker_screenshot_wrapper--actions');
@@ -1177,21 +1195,20 @@
         }
       }
 
-      function getCenterSize(event, offsetX, offsetY, width, height) {
-        const { innerWidth, innerHeight } = event.view;
+      function getCenterSize(offsetX, offsetY, width, height) {
         const centerSize = { left: offsetX, top: offsetY, width: width, height: height}
         if (offsetX <= 0) {
           centerSize.left = 0
-        } else if (innerWidth - offsetX <= width) {
-          centerSize.left = innerWidth - width
+        } else if (docWidth - offsetX <= width) {
+          centerSize.left = docWidth - width
         } else {
           centerSize.left = offsetX
         }
 
         if (offsetY <= 0) {
           centerSize.top = 0
-        } else if (innerHeight - offsetY <= height) {
-          centerSize.top = innerHeight - height
+        } else if (docHeight - offsetY <= height) {
+          centerSize.top = docHeight - height
         } else {
           centerSize.top = offsetY
         }
@@ -1206,46 +1223,46 @@
       }
 
       function startSetupWrapperChildrenCenter(e) {
-        const top = e.y >= currentCenterPosition.y ? currentCenterPosition.y : e.y;
-        const left = e.x >= currentCenterPosition.x ? currentCenterPosition.x : e.x;
-        const width = Math.abs(e.x - currentCenterPosition.x);
-        const height = Math.abs(e.y - currentCenterPosition.y);
-        const centerSize = getCenterSize(e, left, top, width, height);
+        const top = e.pageY >= currentCenterPosition.pageY ? currentCenterPosition.pageY : e.pageY;
+        const left = e.pageX >= currentCenterPosition.pageX ? currentCenterPosition.pageX : e.pageX;
+        const width = Math.abs(e.pageX - currentCenterPosition.pageX);
+        const height = Math.abs(e.pageY - currentCenterPosition.pageY);
+        const centerSize = getCenterSize(left, top, width, height);
         resizeChildren(centerSize);
       }
 
       function moveWrapperChildrenCenter(e) {
         const center = document.getElementById('locker_screenshot_wrapper--center');
-        const x = e.x - currentCenterPosition.x;
-        const y = e.y - currentCenterPosition.y;
-        const centerSize = getCenterSize(e, center.offsetLeft + x, center.offsetTop + y, center.offsetWidth, center.offsetHeight);
+        const x = e.pageX - currentCenterPosition.pageX;
+        const y = e.pageY - currentCenterPosition.pageY;
+        const centerSize = getCenterSize(center.offsetLeft + x, center.offsetTop + y, center.offsetWidth, center.offsetHeight);
         resizeChildren(centerSize);
         currentCenterPosition = e
       }
 
       function resizeWrapperChildrenCenter(e, id) {
         const center = document.getElementById('locker_screenshot_wrapper--center');
-        const x = e.x - currentCenterPosition.x;
-        const y = e.y - currentCenterPosition.y;
+        const x = e.pageX - currentCenterPosition.pageX;
+        const y = e.pageY - currentCenterPosition.pageY;
         let top = 0;
         let left = 0;
         let width = 0;
         let height = 0;
         switch (id) {
           case 'tl':
-            top = e.y;
-            left = e.x;
+            top = e.pageY;
+            left = e.pageX;
             width = center.offsetWidth - x;
             height = center.offsetHeight - y;
             break;
           case 'tm':
-            top = e.y;
+            top = e.pageY;
             left = center.offsetLeft;
             width = center.offsetWidth;
             height = center.offsetHeight - y;
             break;
           case 'tr':
-            top = e.y;
+            top = e.pageY;
             left = center.offsetLeft;
             width = center.offsetWidth + x;
             height = center.offsetHeight - y;
@@ -1283,7 +1300,7 @@
           default:
             break;
         }
-        const centerSize = getCenterSize(e, left, top, width, height);
+        const centerSize = getCenterSize(left, top, width, height);
         resizeChildren(centerSize)
         currentCenterPosition = e
       }
@@ -1320,9 +1337,32 @@
         bottom.style.bottom = 0;
       }
 
+      async function captureImage() {
+        const html2canvas = require('html2canvas');
+        const center = document.getElementById('locker_screenshot_wrapper--center');
+        html2canvas(document.body).then(async (canvas) => {
+          const ctx = canvas.getContext('2d');
+          var image = new Image();
+          image.src = canvas.toDataURL("image/png");
+          image.onload = async function() {
+            await ctx.drawImage(image, center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight, 0, 0, docWidth, docHeight);
+            canvas.width = center.offsetWidth;
+            canvas.height = center.offsetHeight;
+            canvas.style.width = `${center.offsetWidth}px`;
+            canvas.style.height = `${center.offsetHeight}px`
+            const newImage = new Image();
+            newImage.src = canvas.toDataURL("image/png");
+            console.log(newImage);
+            const qrScanner  = require('qr-scanner');
+            qrScanner.default.scanImage(newImage)
+              .then(result => alert(result))
+              .catch(() => alert('No QR code found.'));
+            }
+        });
+      };
+
       function init () {
-        const wrapperChildrenIds = ['top', 'left', 'bottom', 'right', 'center'];
-        const dragresizeIds = ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'];
+        getDocumentInfo();
         createWrapper();
         wrapperChildrenIds.forEach((id) => {
           createWrapperChildren(id);
