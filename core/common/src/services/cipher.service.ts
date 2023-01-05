@@ -150,14 +150,12 @@ export class CipherService implements CipherServiceAbstraction {
         cipher.collectionIds = model.collectionIds;
         cipher.revisionDate = model.revisionDate;
         cipher.reprompt = model.reprompt;
-        console.log(cipher);
         if (key == null && cipher.organizationId != null) {
             key = await this.cryptoService.getOrgKey(cipher.organizationId);
             if (key == null) {
                 throw new Error('Cannot encrypt cipher for organization. No key.');
             }
         }
-        console.log(cipher);
         await Promise.all([
             this.encryptObjProperty(model, cipher, {
                 name: null,
@@ -723,7 +721,6 @@ export class CipherService implements CipherServiceAbstraction {
                 ciphers[c.id] = c;
             });
         }
-
         await this.storageService.save(Keys.ciphersPrefix + userId, ciphers);
         this.decryptedCipherCache = null;
     }

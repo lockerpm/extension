@@ -201,6 +201,14 @@ export default class NotificationBackground {
             this.notificationQueue[notificationQueueIndex].newPassword = msg.newPassword
           }
         }
+        break;
+      case 'markFavorite':
+        const currentCipher = await this.getDecryptedCipherById(msg.id);
+        currentCipher.favorite = !currentCipher.favorite;
+        const password = currentCipher.login.password;
+        await this.updateCipher(currentCipher, password);
+        await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
+        break;
       default:
         break;
     }
@@ -526,7 +534,7 @@ export default class NotificationBackground {
         const cipherResponse = new CipherResponse(res.data)
         const userId = await this.userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId);
-        this.cipherService.upsert(cipherData)
+        await this.cipherService.upsert(cipherData)
       } catch (e) {
       }
     }

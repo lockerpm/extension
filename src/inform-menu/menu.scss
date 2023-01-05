@@ -116,7 +116,9 @@ button.neutral {
   overflow: hidden;
 }
 .selection-item, .dropdown-option {
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 12px;
   font-size: 14px;
   line-height: 20px;
@@ -125,9 +127,18 @@ button.neutral {
   overflow: hidden;
   &:hover {
     background-color: #E4F0E6;
+    .selection-item__pin-icon {
+      visibility: inherit !important;
+    }
   }
   .selection-item__title {
     font-weight: 600;
+  }
+  &__pin-icon {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    visibility: hidden;
   }
 }
 .selection-category {
