@@ -68,9 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (msg.command === responseGeneratePasswordNoOptions && msg.data) {
         showGeneratedPasswordNoOptions(msg.data)
       }
-      if (msg.command === responseSomethingElse && msg.data) {
-        fillMenuWithCiphers(msg.data.ciphers)
-      }
       if (msg.command === generatePasswordOptions && msg.data) {
         setGeneratePasswordOptions(msg.data.options)
       }
@@ -147,20 +144,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       for (let i = 0; i < ciphers.length; i++) {
         const cipherRow = document.createElement("div");
+
         cipherRow.setAttribute('id', ciphers[i].id)
         cipherRow.classList.add('selection-item')
 
+        const cipherRowLeft = document.createElement("div");
+        cipherRowLeft.style.cssText = `
+          cursor: pointer;
+          width: calc(100% - 24px);
+        `
         const cipherTitle = document.createElement("div")
         cipherTitle.classList.add("selection-item__title")
         cipherTitle.textContent = ciphers[i].name
-        cipherRow.appendChild(cipherTitle)
+        cipherRowLeft.appendChild(cipherTitle)
 
         const cipherSubtitle = document.createElement("div")
         cipherSubtitle.textContent = getSubTitle(ciphers[i])
-        cipherRow.appendChild(cipherSubtitle)
+        cipherRowLeft.appendChild(cipherSubtitle)
+
+        cipherRow.appendChild(cipherRowLeft)
+
+        const cipherRowRight = document.createElement("div")
+        const pinIcon = document.createElement("div")
+        pinIcon.classList.add("selection-item__pin-icon")
+        pinIcon.style.cssText = `
+          background-image: url(${ciphers[i].favorite ? require('@/assets/images/icons/icon_unpin.svg') : require('@/assets/images/icons/icon_pin.svg')});
+        `;
+        pinIcon.onclick = function () {
+          sendPlatformMessage({ command: 'markFavorite', id: cipherRow.id })
+        }
+        cipherRowRight.appendChild(pinIcon)
+
+        cipherRow.appendChild(cipherRowRight)
 
         listContainer.appendChild(cipherRow)
-        cipherRow.onclick = function () {
+        cipherRowLeft.onclick = function () {
           sendPlatformMessage({ command: 'informMenuFillCipher', id: cipherRow.id })
         }
       }
@@ -248,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setContent(document.getElementById('template-list-ciphers'));
         sendPlatformMessage({
           command: 'bgGetDataForTab',
-          responseCommand: 'informMenuGetCiphersForCurrentTab'
+          responseCommand: responseCiphersCommand
         });
       }
     }
@@ -276,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setContent(document.getElementById('template-list-ciphers'));
       sendPlatformMessage({
         command: 'bgGetDataForTab',
-        responseCommand: 'informMenuGetCiphersForCurrentTab'
+        responseCommand: responseCiphersCommand
       });
     }
   }

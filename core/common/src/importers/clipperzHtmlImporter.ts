@@ -25,18 +25,18 @@ export class ClipperzHtmlImporter extends BaseImporter implements Importer {
             if (!this.isNullOrWhitespace(entry.label)) {
                 cipher.name = entry.label.split(' ')[0];
             }
-            if (entry.data != null && !this.isNullOrWhitespace(entry.data.notes)) {
+            if (entry.data && !this.isNullOrWhitespace(entry.data.notes)) {
                 cipher.notes = entry.data.notes.split('\\n').join('\n');
             }
 
-            if (entry.currentVersion != null && entry.currentVersion.fields != null) {
+            if (entry.currentVersion && entry.currentVersion.fields) {
                 for (const property in entry.currentVersion.fields) {
                     if (!entry.currentVersion.fields.hasOwnProperty(property)) {
                         continue;
                     }
 
                     const field = entry.currentVersion.fields[property];
-                    const actionType = field.actionType != null ? field.actionType.toLowerCase() : null;
+                    const actionType = field.actionType ? field.actionType.toLowerCase() : null;
                     switch (actionType) {
                         case 'password':
                             cipher.login.password = this.getValueOrDefault(field.value);
@@ -51,7 +51,7 @@ export class ClipperzHtmlImporter extends BaseImporter implements Importer {
                             cipher.login.uris = this.makeUriArray(field.value);
                             break;
                         default:
-                            const labelLower = field.label != null ? field.label.toLowerCase() : null;
+                            const labelLower = field.label ? field.label.toLowerCase() : null;
                             if (cipher.login.password == null && this.passwordFieldNames.indexOf(labelLower) > -1) {
                                 cipher.login.password = this.getValueOrDefault(field.value);
                             } else if (cipher.login.username == null &&
