@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top: 180px; padding-bottom: 56px;">
+  <div class="vault-body">
     <div
       v-if="!isLoggedIn"
       class="p-6"
@@ -348,3 +348,10 @@ export default Vue.extend({
   },
 });
 </script>
+<style>
+.el-loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

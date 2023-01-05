@@ -27,6 +27,7 @@ import { StateService } from 'jslib-common/services/state.service';
 
 import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 
 function getBgService<T>(service: string) {
   return (): T => {
@@ -68,6 +69,7 @@ export default {
     Vue.prototype.$auditService =  getBgService<AuditService>('auditService')()
     Vue.prototype.$vaultTimeoutService =  getBgService<VaultTimeoutService>('vaultTimeoutService')()
     Vue.prototype.$broadcasterService =  getBgService<BroadcasterService>('broadcasterService')()
+    Vue.prototype.$totpService =  getBgService<TotpService>('totpService')()
 
     if (!popupUtilsService.inPopup(window)) {
       window.document.body.classList.add('body-full');

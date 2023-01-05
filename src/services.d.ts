@@ -21,6 +21,7 @@ import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { BroadcasterService } from 'jslib-common/abstractions/broadcaster.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 
 declare module "vue/types/vue" {
   interface Vue {
@@ -47,6 +48,7 @@ declare module "vue/types/vue" {
     $popupUtilsService: PopupUtilsService;
     $vaultTimeoutService: VaultTimeoutService;
     $broadcasterService: BroadcasterService;
+    $totpService: TotpService;
   }
 
   interface VueConstructor {
@@ -73,6 +75,7 @@ declare module "vue/types/vue" {
     $popupUtilsService: PopupUtilsService;
     $vaultTimeoutService: VaultTimeoutService;
     $broadcasterService: BroadcasterService;
+    $totpService: TotpService;
   }
 }
 

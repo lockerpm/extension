@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 text-[#A2A3A7]" style="padding-top: 180px; padding-bottom: 56px;">
+  <div class="p-4 text-[#A2A3A7] vault-body">
     <ListCipher
       :filter="c => c.type === CipherType['SecureNote']"
       route-name="notes"

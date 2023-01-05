@@ -87,6 +87,12 @@ module.exports = {
     ms: 'Ms',
     dr: 'Dr'
   },
+  sort: {
+    name_asc: 'Name Ascending',
+    name_desc: 'Name Descending',
+    time_asc: 'Time Ascending',
+    time_desc: 'Time Descending'
+  },
   sidebar: {
     all: 'All',
     passwords: 'Passwords',
@@ -174,6 +180,7 @@ module.exports = {
     2: 'Note | Notes',
     3: 'Card | Cards',
     4: 'Identity | Identities',
+    5: 'OTP | OTP',
     0: 'Item | Items',
     7: 'Crypto Backup | Crypto Backups',
     Login: 'Password | Password',
@@ -693,11 +700,30 @@ module.exports = {
       current: 'Current',
       vault: 'Vault',
       generate: 'Generate',
+      otp: 'OTP',
       generator: 'Generator',
       settings: 'Settings',
       search: 'Search Vault',
       open_web_app: 'Open the web app',
       sync_data: 'Sync your account'
+    },
+    otp: {
+      scan_qr: 'Scan QR code',
+      setup_key: 'Enter setup key',
+      copy: 'Copy OTP',
+      copied: 'Copied',
+      create: {
+        form_title: 'Input secret key manually',
+        title: 'Title',
+        secret_key: 'Secret key'
+      },
+      edit: {
+        form_title: 'Update OTP title',
+      },
+      message: {
+        title_required: 'Title is required!',
+        secret_key_required: 'Secret key is required'
+      }
     }
   }
 }
