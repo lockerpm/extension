@@ -37,7 +37,7 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
     }
 
     private async parseEncrypted() {
-        if (this.results.encKeyValidation_DO_NOT_EDIT != null) {
+        if (this.results.encKeyValidation_DO_NOT_EDIT) {
             const orgKey = await this.cryptoService.getOrgKey(this.organizationId);
             const encKeyValidation = new EncString(this.results.encKeyValidation_DO_NOT_EDIT);
             const encKeyValidationDecrypt = await this.cryptoService.decryptToUtf8(encKeyValidation, orgKey);
@@ -50,10 +50,10 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
 
         const groupingsMap = new Map<string, number>();
 
-        if (this.organization && this.results.collections != null) {
+        if (this.organization && this.results.collections) {
             for (const c of this.results.collections as CollectionWithId[]) {
                 const collection = CollectionWithId.toDomain(c);
-                if (collection != null) {
+                if (collection) {
                     collection.id = null;
                     collection.organizationId = this.organizationId;
                     const view = await collection.decrypt();
@@ -61,10 +61,10 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
                     this.result.collections.push(view);
                 }
             }
-        } else if (!this.organization && this.results.folders != null) {
+        } else if (!this.organization && this.results.folders) {
             for (const f of this.results.folders as FolderWithId[]) {
                 const folder = FolderWithId.toDomain(f);
-                if (folder != null) {
+                if (folder) {
                     folder.id = null;
                     const view = await folder.decrypt();
                     groupingsMap.set(f.id, this.result.folders.length);
@@ -82,13 +82,13 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
             cipher.collectionIds = null;
 
             // make sure password history is limited
-            if (cipher.passwordHistory != null && cipher.passwordHistory.length > 5) {
+            if (cipher.passwordHistory && cipher.passwordHistory.length > 5) {
                 cipher.passwordHistory = cipher.passwordHistory.slice(0, 5);
             }
 
-            if (!this.organization && c.folderId != null && groupingsMap.has(c.folderId)) {
+            if (!this.organization && c.folderId && groupingsMap.has(c.folderId)) {
                 this.result.folderRelationships.push([this.result.ciphers.length, groupingsMap.get(c.folderId)]);
-            } else if (this.organization && c.collectionIds != null) {
+            } else if (this.organization && c.collectionIds) {
                 c.collectionIds.forEach(cId => {
                     if (groupingsMap.has(cId)) {
                         this.result.collectionRelationships.push([this.result.ciphers.length, groupingsMap.get(cId)]);
@@ -106,20 +106,20 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
 
     private parseDecrypted() {
         const groupingsMap = new Map<string, number>();
-        if (this.organization && this.results.collections != null) {
+        if (this.organization && this.results.collections) {
             this.results.collections.forEach((c: CollectionWithId) => {
                 const collection = CollectionWithId.toView(c);
-                if (collection != null) {
+                if (collection) {
                     collection.id = null;
                     collection.organizationId = null;
                     groupingsMap.set(c.id, this.result.collections.length);
                     this.result.collections.push(collection);
                 }
             });
-        } else if (!this.organization && this.results.folders != null) {
+        } else if (!this.organization && this.results.folders) {
             this.results.folders.forEach((f: FolderWithId) => {
                 const folder = FolderWithId.toView(f);
-                if (folder != null) {
+                if (folder) {
                     folder.id = null;
                     groupingsMap.set(f.id, this.result.folders.length);
                     this.result.folders.push(folder);
@@ -136,13 +136,13 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
             cipher.collectionIds = null;
 
             // make sure password history is limited
-            if (cipher.passwordHistory != null && cipher.passwordHistory.length > 5) {
+            if (cipher.passwordHistory && cipher.passwordHistory.length > 5) {
                 cipher.passwordHistory = cipher.passwordHistory.slice(0, 5);
             }
 
-            if (!this.organization && c.folderId != null && groupingsMap.has(c.folderId)) {
+            if (!this.organization && c.folderId && groupingsMap.has(c.folderId)) {
                 this.result.folderRelationships.push([this.result.ciphers.length, groupingsMap.get(c.folderId)]);
-            } else if (this.organization && c.collectionIds != null) {
+            } else if (this.organization && c.collectionIds) {
                 c.collectionIds.forEach(cId => {
                     if (groupingsMap.has(cId)) {
                         this.result.collectionRelationships.push([this.result.ciphers.length, groupingsMap.get(cId)]);
