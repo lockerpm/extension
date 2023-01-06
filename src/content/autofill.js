@@ -24,29 +24,6 @@
                 return 'string' == typeof attrVal ? attrVal : null;
             }
 
-            // has the element been fake tested?
-            function checkIfFakeTested(field, el) {
-                if (-1 === ['text', 'password'].indexOf(el.type.toLowerCase()) ||
-                    !(passwordRegEx.test(field.value) ||
-                        passwordRegEx.test(field.htmlID) || passwordRegEx.test(field.htmlName) ||
-                        passwordRegEx.test(field.placeholder) || passwordRegEx.test(field['label-tag']) ||
-                        passwordRegEx.test(field['label-data']) || passwordRegEx.test(field['label-aria']))) {
-                    return false;
-                }
-
-                if (!field.visible) {
-                    return true;
-                }
-
-                if ('password' == el.type.toLowerCase()) {
-                    return false;
-                }
-
-                var elType = el.type;
-                focusElement(el, true);
-                return elType !== el.type;
-            }
-
             // get the value of a dom element
             function getElementValue(el) {
                 switch (toLowerString(el.type)) {
@@ -211,7 +188,9 @@
             });
             // get all the form fields
             var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
-                el.id = `locker-id-${elIndex}`;
+                if (!el.id) {
+                  el.id = `locker-id-${elIndex}`;
+                }
                 var field = {},
                     opId = '__' + elIndex,
                     elMaxLen = -1 == el.maxLength ? 999 : el.maxLength;

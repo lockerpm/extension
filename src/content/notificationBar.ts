@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       });
 
-      observer.observe(bodies[0], { childList: true, subtree: true });
+      observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter : ['style'] });
     }
   }
 
@@ -329,6 +329,11 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password') {
+    const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
+    const currentLogo = document.getElementById(logiId);
+    if (currentLogo) {
+      currentLogo.remove();
+    }
     const logo = document.createElement("span");
     logo.id = 'cs-logo-' + (el.htmlID || el.htmlName)
     let inputEl = document.getElementById(el.htmlID);
@@ -341,11 +346,8 @@ document.addEventListener('DOMContentLoaded', event => {
       });
       const elPosition = inputEl.getBoundingClientRect();
       let relativeContainer = inputEl.parentElement
-      while (getComputedStyle(relativeContainer).position !== 'relative') {
-        relativeContainer = relativeContainer.parentElement
-        if (relativeContainer === null || relativeContainer.tagName.toLowerCase() === 'html') {
-          break;
-        }
+      if (relativeContainer) {
+        relativeContainer.style.position = 'relative'
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
@@ -353,20 +355,24 @@ document.addEventListener('DOMContentLoaded', event => {
             position: absolute;
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVFSURBVHgB7Zy9UiNHEMd7WpSoukhv4HV8AacnsMicHSqOD0cIuMAZ8ARA5sw4c4B1S8aHOd09wYnMGXJw8S1voHKVXXXi1OPu/RD6WH2tdpddaX9VYlntAto/3T0zPT2jIEYOa2uFf+GF0aZ2CUF/p0EZGuCVc1UbvXcrS2ndBFRNPjYI1AOiapyXL+sQIwoiRkT5h5YrSsFrrbWIUYAZUUrVtaaLPObqv5cvLYiQSATqE6UEEeKJVV2/MSECQhXIFgbyB0BwCCFYypRYgGDmAS/CtKpQBHpmYfqxhaqWr08hBGYW6G1tu0Sk3w0G2WfHQsTdWYN6YIFcqzl2rSaxIKizb/j11Cx/aEIAAgn0c23baJH+lECrGYaVR1wNEpsQpkRcqkV0nyJxBEM+8/6fm2swJVMJtF/bOiAitpxnD8RBKGgFtb3bralCQm7SG/duN49Bwy+Qfn4s/vQS7q8+301y80QxSCxHkz6DuUIdVdevxj7TWIHEb8U0YQ7hbsDquG7ASIGc1koCcipjziQ0uXUrjmrdhgZp6ec4TXnyxOEMwB0SrnovreECgsHPSJ8q/KzDblgadsHuBCa0KVeovpyvP7kGNyAlCI6xRMv8rHDkd9HXgqSvk/QecpgQ6EP7mX3wFcgZWy0W3L975+dqAwLZ/Z109ZLDwkDKD3hNj0DSarGHVyAgkrziw6n34oRZA9LFQb8V9QRpjug7fDAgIJw9vKuuX59457vvNw3VyTmngoJrRSfeG30uFtx65ogeK+oItHe7XVnQ2NMPW9FyxTvpuJhSeoc7XEnAYjf93jupcFxEoi8QIzLZwAd7nGZbkATnqGcf0oRo4bmZLVCLoAQZPXhuZrtYvO6lTP4fPXS9cQAJHO95bmYLFKd78fTxxXn5qu6dc4aPuxY6eQNingUWN8O3N/5jkAyx6hfcQKBOU0cuVlCKLLQiAzJ84Tl/AxFwBTKGgAYCJS9AJgVu3VfYxVQm0AgwG3+NxJh66nnRyAQaQybQGFCqSSFjGFZmQSNQGpqoQKctsR4fqJpIqif1kNEFz5X9jUqjBRm+KIUW5pDqkOGLLH3AR3i0+PtAFaDzjtQOLUl57P77rUZcWcV2u73GU0zG0zuUyLGgO0sMbsoVPvKhBDHAf/hA6imSjqz/kKPdDyL8akJGD4S5uhxtgcTNPJPKcNzLdMvyOjOrcbrZGIy9282nSSiK3x099xI6Qw3XzbLWzJ76flp71hHIXuxB8Btk9BSE9tQH0VLrDCkfeKaTffcHdo+TzjnASjLqISbGIkSz+42e0fysVuT2pY69F8e1tM25XZh9NdMD6Q6xogXNEVnd1XEeAwKJFfEQfxcWDJ5i9n1m34TZ+cZlnd1lYQK2PKs8s9+1oZX2Ovd4omj5dRKnhRRBobvwW5NsUhC4ObDkWYddHLmYxS1/m+vFLNxqFc0gi1kE+UH2zTLMKZxz3jXHrGMdm7R3fFMdwbxB6uiPN9cfxt020ZLM++vPfxU3Xip2yBLMB6fVN9cTLS+dalm4syBW/wpphi2nujF+KabH1Ovm3SWashoobYG7KfF0WHM+jEAbCzitW7o2FuDWatWMY2MBQf4Qp0eKaehMymckbBXNgDvCzL65yc12iTChm5vw8GFal+ontP2D9m44zYFqJwFC2RkJGXQH3dCkm1A3WLJj0zeqPJNQoQrjEdkeZrK8ylniEMcWXfBRUsZhCtP5/RAxTosHpRDFkhmYRpSidBO5QP24Qf2VU6QtNdq6oLVU2g5uE2h/BWiQpgcpJMjxXNUj/GdFLUo3/wML11LelAerTQAAAABJRU5ErkJggg==');
             height: 20px;
-            min-width: 20px;
+            width: 20px;
             background-position: center;
             background-size: contain;
             z-index: 1000 !important;
             background-color: #fff;
             border-radius: 50%;
             cursor: pointer;
-            left: ${elPosition.left -
-          containerPosition.left +
-          elPosition.width -
-          30}px;
-            top: ${elPosition.top -
-          containerPosition.top +
-          (elPosition.height - 20) / 2}px`;
+        `;
+        if (elPosition.width <= 0) {
+          relativeContainer.addEventListener('stylechanged', e => {
+            console.log('update', e);
+          })
+          logo.style.right = `16px`;
+          logo.style.top = `20px`;
+        } else {
+          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30 }px`;
+          logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
+        }
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         logo.addEventListener("click", () => {
           openInformMenu(inputEl, type);

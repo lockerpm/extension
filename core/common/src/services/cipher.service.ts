@@ -721,7 +721,6 @@ export class CipherService implements CipherServiceAbstraction {
                 ciphers[c.id] = c;
             });
         }
-
         await this.storageService.save(Keys.ciphersPrefix + userId, ciphers);
         this.decryptedCipherCache = null;
     }

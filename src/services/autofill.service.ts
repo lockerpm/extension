@@ -147,13 +147,11 @@ export default class AutofillService implements AutofillServiceInterface {
   getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
     return this.loadPasswordFields(pageDetails, true, true, false, true);
   }
-  // getUsernameFields(pageDetails: AutofillPageDetails): any[] {
-  //   return this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
-  // }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
+    
     if (passwordFields.length === 0) {
       return formData;
     }
@@ -167,7 +165,6 @@ export default class AutofillService implements AutofillServiceInterface {
       if (formPasswordFields.length > 0) {
         let uf = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
         if (uf == null) {
-          // not able to find any viewable username fields. maybe there are some "hidden" ones?
           uf = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false);
         }
         formData.push({
@@ -299,7 +296,7 @@ export default class AutofillService implements AutofillServiceInterface {
         return;
       }
 
-      const fillScript = this.generateFillScript(pd.details, {
+      var fillScript = this.generateFillScript(pd.details, {
         skipUsernameOnlyFill: options.skipUsernameOnlyFill || false,
         onlyEmptyFields: options.onlyEmptyFields || false,
         onlyVisibleFields: options.onlyVisibleFields || false,
@@ -410,8 +407,8 @@ export default class AutofillService implements AutofillServiceInterface {
       return null;
     }
 
-    let fillScript = new AutofillScript(pageDetails.documentUUID);
-    const filledFields: { [id: string]: AutofillField; } = {};
+    var fillScript = new AutofillScript(pageDetails.documentUUID);
+    var filledFields: { [id: string]: AutofillField; } = {};
     const fields = options.cipher.fields;
 
     if (fields && fields.length) {
@@ -1135,7 +1132,7 @@ export default class AutofillService implements AutofillServiceInterface {
       };
       if (!f.disabled && (canBeReadOnly || !f.readonly) && (isPassword || isLikePassword())
         && (canBeHidden || f.viewable) && (!mustBeEmpty || f.value == null || f.value.trim() === '')
-        && (fillNewPassword || f.autoCompleteType !== 'new-password')) {
+      ) {
         arr.push(f);
       }
     });

@@ -91,7 +91,7 @@ export class BitwardenCsvImporter extends BaseImporter implements Importer {
                 }
             }
 
-            const valueType = value.type != null ? value.type.toLowerCase() : null;
+            const valueType = value.type ? value.type.toLowerCase() : null;
             switch (valueType) {
                 case 'note':
                     cipher.type = CipherType.SecureNote;

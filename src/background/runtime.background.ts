@@ -345,7 +345,6 @@ export default class RuntimeBackground {
     const userId = await this.userService.getUserId();
     const cipherData = new CipherData(cipherResponse, userId);
     this.cipherService.upsert(cipherData)
-
   }
 
   private async checkOnInstalled() {
