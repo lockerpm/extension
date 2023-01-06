@@ -34,7 +34,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": true,
+      "all_frames": false,
       "js": [
         "js/content/autofill.js",
         "js/content/autofiller.js",
@@ -46,7 +46,6 @@
         "https://*/*",
         "file:///*"
       ],
-      "match_origin_as_fallback": true,
       "run_at": "document_start"
     },
     {
