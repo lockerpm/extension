@@ -1325,18 +1325,15 @@
           image.src = canvas.toDataURL("image/png");
           image.onload = async function() {
             await ctx.drawImage(image, center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight, 0, 0, docWidth, docHeight);
-            canvas.width = center.offsetWidth;
-            canvas.height = center.offsetHeight;
             canvas.style.width = `${center.offsetWidth}px`;
-            canvas.style.height = `${center.offsetHeight}px`
-            const newImage = new Image();
-            newImage.src = canvas.toDataURL("image/png");
-            console.log(newImage);
+            canvas.style.height = `${center.offsetHeight}px`;
+            document.getElementById('locker_screenshot_wrapper--top').appendChild(canvas);
             const qrScanner  = require('qr-scanner');
-            qrScanner.default.scanImage(newImage)
+            qrScanner.default.scanImage(canvas)
               .then(result => alert(result))
-              .catch(() => alert('No QR code found.'));
-            }
+              .catch((error) => alert(error));
+          }
+          
         });
       };
 
