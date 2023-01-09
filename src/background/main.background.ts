@@ -518,6 +518,7 @@ export default class MainBackground {
 
     this.menuOptionsLoaded = [];
     const locked = await this.vaultTimeoutService.isLocked();
+    await this.browserActionSetIcon(tabId, locked);
     if (!locked) {
       try {
         const ciphers = await this.cipherService.getAllDecryptedForUrl(url);
@@ -550,7 +551,6 @@ export default class MainBackground {
         return;
       } catch { }
     }
-
     await this.loadMenuAndUpdateBadgeForNoAccessState(contextMenuEnabled);
   }
 
@@ -727,11 +727,19 @@ export default class MainBackground {
     }
   }
 
+  private async browserActionSetIcon(tabId: number, locked: boolean) {
+    if (chrome.browserAction && chrome.browserAction.setIcon) {
+      chrome.browserAction.setIcon({
+        path : locked ? "icons/locked.png" : 'icons/19.png',
+        tabId: tabId,
+      });
+    }
+  }
+
   private sidebarActionSetBadgeText(text: string, tabId: number) {
     if (!this.sidebarAction) {
       return;
     }
-
     if (this.sidebarAction.setBadgeText) {
       this.sidebarAction.setBadgeText({
         text: text,
