@@ -8,7 +8,7 @@
         class="menu-icon cursor-pointer"
         @click="$router.back()"
       >
-        <i class="fas fa-arrow-left text-[20px]"></i> {{$t('common.back')}}
+        <i class="fas fa-arrow-left text-[20px]"></i>
       </div>
       <div class="text-center text-head-6 font-semibold">
         <img src="@/assets/images/icons/icon_folder.svg" class="mx-auto" style="border-radius: 50%">
