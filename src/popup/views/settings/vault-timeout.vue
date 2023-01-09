@@ -11,7 +11,7 @@
         class="menu-icon cursor-pointer"
         @click="$router.back()"
       >
-        <i class="fas fa-arrow-left text-[20px]"></i> {{$t('common.back')}}
+        <i class="fas fa-arrow-left text-[20px]"></i>
       </div>
       <div class="text-center text-head-6 font-semibold col-span-2">
         {{$t('data.settings.vault_timeout')}}
@@ -22,16 +22,6 @@
         {{$t('data.settings.vault_timeout_details')}}
       </div>
       <div class="">
-        <!-- <el-radio-group v-model="user.timeout">
-          <el-radio
-            v-for="option in vaultTimeouts"
-            :key="option.value"
-            :label="option.value"
-            class="!flex items-start !break-words !whitespace-normal !mb-4"
-          >
-            {{option.label}}
-          </el-radio>
-        </el-radio-group> --> 
         <div
           v-for="option in vaultTimeouts"
           :key="option.value"
