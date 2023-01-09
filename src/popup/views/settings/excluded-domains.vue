@@ -11,18 +11,11 @@
         class="menu-icon cursor-pointer"
         @click="$router.back()"
       >
-        <i class="fas fa-arrow-left text-[20px]"></i> {{$t('common.back')}}
+        <i class="fas fa-arrow-left text-[20px]"></i>
       </div>
       <div class="col-span-2 text-center text-head-6 font-semibold">
         {{$t('data.settings.excluded_domains')}}
       </div>
-      <!-- <div
-        class="cursor-pointer"
-        style="align-self: center; justify-self: right;"
-        @click="submit"
-      >
-        {{ $t('common.save') }}
-      </div> -->
     </div>
     <div class="p-4">
       <div class="text-black-500">
@@ -36,12 +29,6 @@
             style="padding: 16px 0px"
           >
             <div class="text-head-6">
-              <!-- <div class="text-black-600">URI {{index + 1}}</div> -->
-              <!-- <input
-                class="text-lg text-black font-semibold"
-                placeholder="ex. https://google.com"
-                v-model="domain.uri"
-              > -->
               {{domain.uri}}
             </div>
             <div
@@ -50,16 +37,6 @@
             >{{$t('common.remove')}}</div>
           </div>
         </template>
-        <!-- <div
-          class="flex items-center cursor-pointer"
-          style="padding: 16px 0px;"
-          @click="addUri"
-        >
-          <div><i class="el-icon-circle-plus text-info mr-3"></i></div>
-          <div>
-            New URI
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -107,8 +84,6 @@ export default Vue.extend({
         if (domain.uri && domain.uri !== "") {
           const validDomain = Utils.getHostname(domain.uri);
           if (!validDomain) {
-            // this.platformUtilsService.showToast('error', null,
-            //   this.i18nService.t('excludedDomainsInvalidDomain', domain.uri));
             this.notify(
               `${domain.uri || "google.com"} is not a valid domain`,
               "error"
