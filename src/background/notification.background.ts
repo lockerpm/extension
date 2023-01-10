@@ -9,6 +9,7 @@ import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
@@ -38,7 +39,7 @@ export default class NotificationBackground {
   constructor(private main: MainBackground, private autofillService: AutofillService,
     private cipherService: CipherService, private storageService: StorageService,
     private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-    private folderService: FolderService, private userService: UserService) {
+    private folderService: FolderService, private userService: UserService, private totpService: TotpService) {
   }
 
   async init() {
@@ -207,6 +208,28 @@ export default class NotificationBackground {
         const password = currentCipher.login.password;
         await this.updateCipher(currentCipher, password);
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
+        break;
+      case 'scanQRCode': 
+        if (chrome.tabs.captureVisibleTab) {
+          chrome.tabs.captureVisibleTab(null,{}, function(dataUri){
+            BrowserApi.tabSendMessage(msg.tab, {
+              command: 'capturedImage',
+              tab: msg.tab,
+              sender: dataUri
+            });
+          });
+        }
+        break;
+      case 'saveNewQRCode':
+        let otp = null;
+        if (msg.sender && msg.sender.data) {
+          otp = await this.totpService.getCode(msg.sender.data);
+        }
+        if (otp) {
+          console.log(otp);
+        } else {
+          window.alert('QR code is invalid! Please try scan QR code other.');
+        }
         break;
       default:
         break;

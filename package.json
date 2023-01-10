@@ -28,6 +28,7 @@
     "extract-domain": "^2.3.4",
     "hi-base32": "^0.5.1",
     "html2canvas": "^1.4.1",
+    "jsqr": "^1.4.0",
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
     "moment": "^2.29.1",

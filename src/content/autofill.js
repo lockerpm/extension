@@ -944,11 +944,9 @@
         });
     }
 
-    function scanQRCode (document) {
-      let docBody = 0;
-      let docHtml = null;
-      let docHeight = 0;
-      let docWidth = 0;
+    function scanQRCode (document, tab) {
+      const docHeight = window.innerHeight;
+      const docWidth = window.innerWidth;
       let isMove = false;
       let isSetUp = false;
       let isResize = false;
@@ -956,28 +954,16 @@
       const wrapperChildrenIds = ['top', 'left', 'bottom', 'right', 'center'];
       const dragresizeIds = ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'];
 
-      function getDocumentInfo(params) {
-        docBody = document.body;
-        docHtml = document.documentElement;
-        docHeight = Math.max( docBody.scrollHeight, docBody.offsetHeight, docHtml.clientHeight, docHtml.scrollHeight, docHtml.offsetHeight );
-        docWidth = Math.max( docBody.scrollWidth, docBody.offsetWidth, docHtml.clientWidth, docHtml.scrollWidth, docHtml.offsetWidth );
-        const wrapper = document.getElementById('locker_screenshot_wrapper');
-        if (wrapper) {
-          wrapper.style.width = `${docWidth}px`;
-          wrapper.style.height = `${docHeight}px`;
-        }
-      }
-
       function createWrapper () {
         if (document.querySelector('locker-select-wrapper')) {
-          return;
+          document.querySelector('locker-select-wrapper').remove();
         }
         const wrapper = document.createElement('locker-select-wrapper');
         document.querySelector('html').appendChild(wrapper)
         const div = document.createElement('div');
         div.id = 'locker_screenshot_wrapper';
         div.style.cssText = `
-          position: absolute !important;
+          position: fixed !important;
           top: 0;
           left: 0;
           width: ${docWidth}px;
@@ -1165,7 +1151,7 @@
         if (!center.offsetWidth || Number(center.offsetWidth) === 0) {
           wrapper.style.backgroundColor = 'rgba(0, 0, 0, 0)';
           wrapper.style.cursor = 'auto';
-          const centerSize = getCenterSize(e.pageX - 100, e.pageY - 100, 200, 200);
+          const centerSize = getCenterSize(e.x - 100, e.y - 100, 200, 200);
           resizeChildren(centerSize)
         }
         const wrapperActions = document.getElementById('locker_screenshot_wrapper--actions');
@@ -1202,18 +1188,18 @@
       }
 
       function startSetupWrapperChildrenCenter(e) {
-        const top = e.pageY >= currentCenterPosition.pageY ? currentCenterPosition.pageY : e.pageY;
-        const left = e.pageX >= currentCenterPosition.pageX ? currentCenterPosition.pageX : e.pageX;
-        const width = Math.abs(e.pageX - currentCenterPosition.pageX);
-        const height = Math.abs(e.pageY - currentCenterPosition.pageY);
+        const top = e.y >= currentCenterPosition.y ? currentCenterPosition.y : e.y;
+        const left = e.x >= currentCenterPosition.x ? currentCenterPosition.x : e.x;
+        const width = Math.abs(e.x - currentCenterPosition.x);
+        const height = Math.abs(e.y - currentCenterPosition.y);
         const centerSize = getCenterSize(left, top, width, height);
         resizeChildren(centerSize);
       }
 
       function moveWrapperChildrenCenter(e) {
         const center = document.getElementById('locker_screenshot_wrapper--center');
-        const x = e.pageX - currentCenterPosition.pageX;
-        const y = e.pageY - currentCenterPosition.pageY;
+        const x = e.x - currentCenterPosition.x;
+        const y = e.y - currentCenterPosition.y;
         const centerSize = getCenterSize(center.offsetLeft + x, center.offsetTop + y, center.offsetWidth, center.offsetHeight);
         resizeChildren(centerSize);
         currentCenterPosition = e
@@ -1221,27 +1207,27 @@
 
       function resizeWrapperChildrenCenter(e, id) {
         const center = document.getElementById('locker_screenshot_wrapper--center');
-        const x = e.pageX - currentCenterPosition.pageX;
-        const y = e.pageY - currentCenterPosition.pageY;
+        const x = e.x - currentCenterPosition.x;
+        const y = e.y - currentCenterPosition.y;
         let top = 0;
         let left = 0;
         let width = 0;
         let height = 0;
         switch (id) {
           case 'tl':
-            top = e.pageY;
-            left = e.pageX;
+            top = e.y;
+            left = e.x;
             width = center.offsetWidth - x;
             height = center.offsetHeight - y;
             break;
           case 'tm':
-            top = e.pageY;
+            top = e.y;
             left = center.offsetLeft;
             width = center.offsetWidth;
             height = center.offsetHeight - y;
             break;
           case 'tr':
-            top = e.pageY;
+            top = e.y;
             left = center.offsetLeft;
             width = center.offsetWidth + x;
             height = center.offsetHeight - y;
@@ -1317,28 +1303,13 @@
       }
 
       async function captureImage() {
-        const html2canvas = require('html2canvas');
-        const center = document.getElementById('locker_screenshot_wrapper--center');
-        html2canvas(document.body).then(async (canvas) => {
-          const ctx = canvas.getContext('2d');
-          var image = new Image();
-          image.src = canvas.toDataURL("image/png");
-          image.onload = async function() {
-            await ctx.drawImage(image, center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight, 0, 0, docWidth, docHeight);
-            canvas.style.width = `${center.offsetWidth}px`;
-            canvas.style.height = `${center.offsetHeight}px`;
-            document.getElementById('locker_screenshot_wrapper--top').appendChild(canvas);
-            const qrScanner  = require('qr-scanner');
-            qrScanner.default.scanImage(canvas)
-              .then(result => alert(result))
-              .catch((error) => alert(error));
-          }
-          
+        chrome.runtime.sendMessage({
+          command: 'scanQRCode',
+          tab: tab,
         });
       };
 
       function init () {
-        getDocumentInfo();
         createWrapper();
         wrapperChildrenIds.forEach((id) => {
           createWrapperChildren(id);
@@ -1352,11 +1323,43 @@
       init();
     }
 
+    function readAndAddQRCode (document, msg) {
+      const center = document.getElementById('locker_screenshot_wrapper--center');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const image = new Image();
+      image.src = msg.sender;
+      image.onload = function() {
+        ctx.drawImage(image, center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight, 0, 0, canvas.width, canvas.height);
+        const newCanvas = document.createElement('canvas');
+        const newCtx = newCanvas.getContext('2d');
+        const imageData = newCtx.createImageData(center.offsetWidth, center.offsetHeight);
+        newCtx.putImageData(imageData, 0, 0);
+        newCanvas.width = center.offsetWidth;
+        newCanvas.height = center.offsetHeight;
+        const newImage = new Image();
+        newImage.src = canvas.toDataURL("image/png");
+        newImage.onload = async function() {
+          newCtx.drawImage(newImage, 0, 0, center.offsetWidth, center.offsetHeight);
+          const imageData = newCtx.getImageData(0, 0, newCanvas.width, newCanvas.height);
+          const jsQR = require("jsqr");
+          const code = await jsQR(imageData.data, newCanvas.width, newCanvas.height);
+          chrome.runtime.sendMessage({
+            command: 'saveNewQRCode',
+            tab: msg.tab,
+            sender: code
+          });
+        }
+      }
+    }
+
     /*
     End 1Password Extension
     */
 
-    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
         if (msg.command === 'collectPageDetails') {
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
@@ -1373,7 +1376,11 @@
             sendResponse();
             return true;
         } else if (msg.command === 'scanQRCode') {
-          scanQRCode(document);
+          scanQRCode(document, msg.tab);
+          sendResponse();
+          return true;
+        } else if (msg.command === 'capturedImage') {
+          readAndAddQRCode(document, msg);
           sendResponse();
           return true;
         }

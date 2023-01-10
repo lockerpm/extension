@@ -260,7 +260,7 @@ export default class MainBackground {
     this.commandsBackground = new CommandsBackground(this, this.passwordGenerationService,
       this.platformUtilsService, this.vaultTimeoutService);
     this.notificationBackground = new NotificationBackground(this, this.autofillService, this.cipherService,
-      this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService);
+      this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService, this.totpService);
 
     this.tabsBackground = new TabsBackground(this, this.notificationBackground);
     this.contextMenusBackground = new ContextMenusBackground(this, this.cipherService, this.passwordGenerationService,
