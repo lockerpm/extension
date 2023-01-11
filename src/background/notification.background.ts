@@ -1,5 +1,5 @@
 import { CipherType } from 'jslib-common/enums/cipherType';
-
+import { SecureNoteView } from 'jslib-common/models/view/secureNoteView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
 import { LoginUriView } from 'jslib-common/models/view/loginUriView';
 import { LoginView } from 'jslib-common/models/view/loginView';
@@ -9,6 +9,7 @@ import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
@@ -38,7 +39,7 @@ export default class NotificationBackground {
   constructor(private main: MainBackground, private autofillService: AutofillService,
     private cipherService: CipherService, private storageService: StorageService,
     private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-    private folderService: FolderService, private userService: UserService) {
+    private folderService: FolderService, private userService: UserService, private totpService: TotpService) {
   }
 
   async init() {
@@ -126,7 +127,6 @@ export default class NotificationBackground {
             });
 
             this.autofillFirstPage(sender.tab);
-
             break;
           default:
             break;
@@ -208,6 +208,46 @@ export default class NotificationBackground {
         const password = currentCipher.login.password;
         await this.updateCipher(currentCipher, password);
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
+        break;
+      case 'scanQRCode': 
+        if (chrome.tabs.captureVisibleTab) {
+          chrome.tabs.captureVisibleTab(null,{}, function(dataUri){
+            BrowserApi.tabSendMessage(msg.tab, {
+              command: 'capturedImage',
+              tab: msg.tab,
+              sender: dataUri
+            });
+          });
+        } else {
+          window.alert('Capture visible tab is not active! Cannot read QR code.');
+        }
+        break;
+      case 'saveNewQRCode':
+        let otp = null;
+        let senderMessage = '';
+        if (msg.sender && msg.sender.data) {
+          otp = await this.totpService.getCode(msg.sender.data);
+        }
+        if (otp) {
+          const domain = msg.tab?.url?.split('/')[2]
+          const name = msg.tab?.title + (domain ? `(${domain})` : '')
+          const notes = msg.sender.data;
+          let currentOtps = await this.cipherService.getAllDecrypted();
+          currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
+          if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
+            window.alert('QR code is existed! Please try scan QR code other.');
+          } else {
+            await this.createNewOTP({ name: name, notes: notes })
+            senderMessage = 'removeLockerWrapper';
+          }
+        } else {
+          window.alert('QR code is invalid! Please try scan QR code other.');
+        }
+        BrowserApi.tabSendMessage(msg.tab, {
+          command: 'addedOTP',
+          tab: msg.tab,
+          sender: senderMessage,
+        });
         break;
       default:
         break;
@@ -504,6 +544,41 @@ export default class NotificationBackground {
         window.alert(
           window.navigator.language === "vi"
             ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
+            : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
+        );
+      }
+    }
+  }
+
+  private async createNewOTP(otpData: any) {
+    const cipher = new CipherView()
+    cipher.name = otpData.name;
+    cipher.type = CipherType.SecureNote;
+    cipher.secureNote = new SecureNoteView();
+    cipher.secureNote.type = 0
+    cipher.notes = otpData.notes
+    const cipherEnc = await this.cipherService.encrypt(cipher)
+    const data = new CipherRequest(cipherEnc)
+    data.type = CipherType.OTP;
+    const csToken = await this.main.storageService.get<string>("cs_token");
+    const headers = {
+      "Authorization": "Bearer " + csToken,
+      "Content-Type": "application/json; charset=utf-8"
+    };
+    try {
+      const res = await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, { headers: headers })
+
+      const cipherResponse = new CipherResponse({ ...data, id: res.data ? res.data.id : '' })
+      const userId = await this.userService.getUserId();
+      const cipherData = new CipherData(cipherResponse, userId)
+      this.cipherService.upsert(cipherData)
+
+      window.alert('QR code OTP added!');
+    } catch (e) {
+      if (e.response && e.response.data && e.response.data.code === '5002') {
+        window.alert(
+          window.navigator.language === "vi"
+            ? "Đã đạt đến số lượng tối đa cho mã OTP. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
             : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
         );
       }

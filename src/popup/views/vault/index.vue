@@ -368,10 +368,6 @@ export default Vue.extend({
         this.$router.push({ name: item.routeName });
       }
     },
-    async test() {
-      const test = await BrowserApi.getTabFromCurrentWindow();
-      console.log(test);
-    },
     routerFolder(item) {
       this.$router.push({
         name: "vault-folders-folderId",

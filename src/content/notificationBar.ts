@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', event => {
   if (window.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
+  const test = window.document.createElement('div');
+  test.style.position = 'fixed';
+  test.style.top = '0px';
+  test.style.right = '0px';
+  test.style.height = '100vh';
+  test.style.width = '100%'
+  test.style.backgroundColor = 'red'
+  test.style.opacity = '0.2'
+  test.style.zIndex = '1000000000'
+  // window.document.body.appendChild(test)
 
   const pageDetails: any[] = [];
   const formData: any[] = [];

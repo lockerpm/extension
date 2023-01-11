@@ -325,23 +325,7 @@ export default Vue.extend({
           }
         } else {
           try {
-            // await this.$storageService.save('cs_token', res.token)
-            // const store = await this.$storageService.get('cs_store')
-            // let oldStoreParsed = {}
-            // if (typeof store === 'object') {
-            //   oldStoreParsed = store
-            // }
-            // await this.$storageService.save('cs_store', {
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // console.log({
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // this.$store.commit('UPDATE_IS_LOGGEDIN', true)
             this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-            // this.$router.push({name: 'lock'})
             await this.getAccessToken(res.token)
           }
           catch (e) {
@@ -461,10 +445,6 @@ export default Vue.extend({
             oldStoreParsed = store
           }
           await this.$storageService.save('cs_store', {
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          console.log({
             ...oldStoreParsed,
             isLoggedIn: true,
           })

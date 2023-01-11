@@ -44,6 +44,7 @@
                   class="form-control"
                   :class="[errors ? 'is-invalid' :'']"
                   :name="randomString()"
+                  v-on:keyup.enter="setMasterPass"
                   autocomplete="new-password"
                 >
                 <div class="input-group-append !bg-white">

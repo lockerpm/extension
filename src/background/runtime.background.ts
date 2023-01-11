@@ -313,7 +313,7 @@ export default class RuntimeBackground {
         break;
       default:
         break;
-    }
+    } 
   }
 
   private async autofillPage() {

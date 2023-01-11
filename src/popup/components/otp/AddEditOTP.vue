@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import base32 from 'hi-base32'
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { CipherView } from 'jslib-common/models/view/cipherView';
@@ -109,13 +108,12 @@ export default {
     async createOTP () {
       try {
         this.callingAPI = true;
-        const secret = base32.encode(Buffer.from(this.form.secretKey, "base64"));
         const cipher = new CipherView()
         cipher.name = this.form.name
         cipher.type = CipherType.SecureNote
         cipher.secureNote = new SecureNote()
         cipher.secureNote.type = 0
-        cipher.notes = `otpauth://totp/${encodeURIComponent(this.form.name)}?secret=${secret}&issuer=${encodeURIComponent(this.form.name)}&algorithm=sha1&digits=6&period=30`;
+        cipher.notes = `otpauth://totp/${encodeURIComponent(this.form.name)}?secret=${this.form.secretKey}&issuer=${encodeURIComponent(this.form.name)}&algorithm=sha1&digits=6&period=30`;
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = CipherType.OTP;

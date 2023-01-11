@@ -199,7 +199,6 @@ export default Vue.extend({
   },
   methods: {
     openRoute(item) {
-      // console.log(item.name)
       if (item.lock) {
         this.lock();
       } else if (item.logout) {
@@ -210,7 +209,6 @@ export default Vue.extend({
           this.getSyncData();
           break;
         case "fingerprint":
-          // this.fingerprintDialog = true
           this.openFingerprintDialog();
           break;
         case "vault_timeout":
@@ -223,10 +221,6 @@ export default Vue.extend({
       } else {
         this.$router.push({ name: item.routeName });
       }
-    },
-    async test() {
-      const test = await BrowserApi.getTabFromCurrentWindow();
-      console.log(test);
     },
     openFingerprintDialog() {
       this.$refs.fingerprintDialog.openDialog();
