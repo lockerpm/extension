@@ -41,7 +41,7 @@
           <i class="el-icon-plus"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="scan-qr" disabled>{{ $t('data.otp.scan_qr') }}</el-dropdown-item>
+          <el-dropdown-item command="scan-qr">{{ $t('data.otp.scan_qr') }}</el-dropdown-item>
           <el-dropdown-item command="setup-key">{{ $t('data.otp.setup_key') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -52,7 +52,7 @@
 <script>
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-
+import { BrowserApi } from "@/browser/browserApi";
 import OTPRow from './OTPRow.vue'
 
 export default {
@@ -116,6 +116,8 @@ export default {
     handleCreateOTP (command) {
       if (command === 'setup-key') {
         this.$emit('add-edit');
+      } else {
+        this.scanQRCode();
       }
     },
     changeSort (sortValue) {
@@ -143,6 +145,16 @@ export default {
         }
       })
     },
+    async scanQRCode () {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "scanQRCode",
+          tab: tab,
+          sender: 'scanQRCode',
+        });  
+      }
+    }
   }
 }
 </script>
