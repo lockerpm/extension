@@ -1,4 +1,5 @@
 !(function () {
+    let isReading = false;
     function collect(document, undefined) {
         // chrome.storage.local.clear();
         // START MODIFICATION
@@ -984,6 +985,9 @@
           e.preventDefault();
         });
         div.addEventListener('mousemove', (e) => {
+          if (isReading) {
+            return;
+          }
           if (isSetUp) {
             startSetupWrapperChildrenCenter(e)
           } else if (isMove) {
@@ -1071,6 +1075,7 @@
           font-weight: 400;
           `
         cancelButton.addEventListener('click', () => {
+          isReading = false;
           document.querySelector('locker-select-wrapper').remove();
         })
         wrapperActions.appendChild(cancelButton);
@@ -1303,6 +1308,9 @@
       }
 
       async function captureImage() {
+        isReading = true;
+        const actions = document.getElementById('locker_screenshot_wrapper--actions');
+        actions.style.visibility = 'hidden';
         chrome.runtime.sendMessage({
           command: 'scanQRCode',
           tab: tab,
@@ -1381,6 +1389,16 @@
           return true;
         } else if (msg.command === 'capturedImage') {
           readAndAddQRCode(document, msg);
+          sendResponse();
+          return true;
+        } else if (msg.command === 'addedOTP') {
+          isReading = false;
+          const actions = document.querySelector('locker-select-wrapper');
+          if (msg.sender === 'removeLockerWrapper') {
+            actions.remove();
+          } else {
+            actions.style.visibility = 'inherit';
+          }
           sendResponse();
           return true;
         }

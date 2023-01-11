@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import base32 from 'hi-base32'
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { CipherView } from 'jslib-common/models/view/cipherView';
