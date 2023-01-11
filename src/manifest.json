@@ -17,7 +17,6 @@
     "webRequest",
     "webRequestBlocking",
     "identity",
-    "background",
     "<all_urls>"
   ],
   "optional_permissions": [
