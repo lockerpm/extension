@@ -156,17 +156,14 @@ document.addEventListener('DOMContentLoaded', event => {
       })
       sendResponse();
       return true;
-    }
-    else if (msg.command === 'informMenuPageDetails') {
+    } else if (msg.command === 'informMenuPageDetails') {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       sendResponse();
       return true;
-    }
-    else if (msg.command === 'informMenuPassword') {
+    } else if (msg.command === 'informMenuPassword') {
       useGeneratedPassword(msg.data.password)
-    }
-    else if (msg.command === "resizeInformMenu") {
+    } else if (msg.command === "resizeInformMenu") {
       for (const logoField of inputWithLogo) {
         const elPosition = logoField.inputEl.getBoundingClientRect();
         const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
@@ -177,8 +174,7 @@ document.addEventListener('DOMContentLoaded', event => {
           }
         }
       }
-    }
-    else if (msg.command === "closeInformMenu") {
+    } else if (msg.command === "closeInformMenu") {
       if (inIframe) {
         return;
       }
@@ -187,6 +183,8 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       sendResponse();
       return true;
+    } else if (msg.command === "openPopupIframe") {
+      openPopupIframe();
     }
   }
 
@@ -785,5 +783,49 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } while ((elem = elem.offsetParent));
     return offsetLeft;
+  }
+
+  function openPopupIframe() {
+    if (document.body == null) {
+      return;
+    }
+
+    if (document.getElementById('locker_popup-iframe-container')) {
+      return
+    }
+
+    const barPageUrl: string = chrome.extension.getURL('popup.html');
+    console.log(barPageUrl);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = `
+      height: 600px;
+      width: 400px;
+      border: 1px solid rgb(189 190 190);
+      background-color: white
+    `;
+    iframe.id = 'popup-iframe';
+    iframe.src = barPageUrl;
+    const frameDiv = document.createElement('div');
+    frameDiv.id = 'locker_popup-iframe-container';
+    frameDiv.style.cssText = `
+      height: 600px;
+      width: 402px;
+      top: 0px;
+      right: 0px;
+      position: fixed;
+      z-index: 2147483647;
+      visibility: visible;
+    `;
+    frameDiv.appendChild(iframe);
+    window.addEventListener('click', function(e: any){   
+      if (frameDiv.contains(e.target)){
+      } else{
+        frameDiv.style.visibility = 'hidden'
+      }
+    });
+    document.body.appendChild(frameDiv);
+
+    (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

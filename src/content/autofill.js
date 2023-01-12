@@ -1311,10 +1311,12 @@
         isReading = true;
         const actions = document.getElementById('locker_screenshot_wrapper--actions');
         actions.style.visibility = 'hidden';
-        chrome.runtime.sendMessage({
-          command: 'scanQRCode',
-          tab: tab,
-        });
+        setTimeout(() => {
+          chrome.runtime.sendMessage({
+            command: 'scanQRCode',
+            tab: tab,
+          });
+        }, 100);
       };
 
       function init () {
@@ -1401,6 +1403,11 @@
           }
           sendResponse();
           return true;
+        } else if (msg.command === 'openPopupIframe') {
+          chrome.runtime.sendMessage({
+            command: 'openPopupIframe',
+            tab: msg.tab,
+          });
         }
     });
 })();

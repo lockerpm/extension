@@ -105,6 +105,10 @@ export default Vue.extend({
         switch(msg.command){
         case 'loginWithSuccess':
           await this.checkToken(msg.access_token, msg.provider);
+          BrowserApi.tabSendMessage(msg.tab, {
+            command: "openPopupIframe",
+            tab: msg.tab
+        });  
           break;
         default:
           break;

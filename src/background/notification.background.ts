@@ -241,13 +241,17 @@ export default class NotificationBackground {
             senderMessage = 'removeLockerWrapper';
           }
         } else {
-          window.alert('QR code is invalid! Please try scan QR code other.');
+          window.alert('QR code is invalid! Please try again.');
         }
         BrowserApi.tabSendMessage(msg.tab, {
           command: 'addedOTP',
           tab: msg.tab,
           sender: senderMessage,
         });
+        break;
+      case 'openPopupIframe':
+        console.log(msg);
+        await BrowserApi.tabSendMessageData(msg.tab, 'openPopupIframe', {});
         break;
       default:
         break;

@@ -118,9 +118,6 @@ export default class RuntimeBackground {
           setTimeout(async () => await this.main.refreshBadgeAndMenu(), 2000);
         }
         break;
-      case "openPopup":
-        await this.main.openPopup();
-        break;
       case "promptForLogin":
         await BrowserApi.createNewTab(
           "popup.html?uilocation=popout",
