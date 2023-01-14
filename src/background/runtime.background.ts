@@ -308,6 +308,9 @@ export default class RuntimeBackground {
           window: window
         });
         break;
+      case "authAccessToken":
+        await this.authAccessToken(sender.type, sender.provider)
+        break;
       default:
         break;
     } 
@@ -348,8 +351,7 @@ export default class RuntimeBackground {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-          const url = `${process.env.VUE_APP_ID_URL}/login?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-          BrowserApi.createNewTab(url);
+          
           await this.setDefaultSettings();
         }
 
@@ -402,5 +404,18 @@ export default class RuntimeBackground {
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     this.platformUtilsService.copyToClipboard(password, { window: window });
     this.passwordGenerator.addHistory(password);
+  }
+
+  private async authAccessToken(type: string, provider: string) {
+    // check open popup
+    const tab = await BrowserApi.getTabFromCurrentWindow()
+    let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url}`;
+    if (provider) {
+      url += `&provider=${provider}`
+    }
+    if (process.env.VUE_APP_ENVIRONMENT) {
+      url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+    }
+    await BrowserApi.updateCurrentTab(tab, url);
   }
 }

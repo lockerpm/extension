@@ -1371,8 +1371,7 @@
 
     chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
         if (msg.command === 'collectPageDetails') {
-            var pageDetails = collect(document);
-            var pageDetailsObj = JSON.parse(pageDetails);
+            const pageDetailsObj = JSON.parse(collect(document));
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,
@@ -1403,11 +1402,6 @@
           }
           sendResponse();
           return true;
-        } else if (msg.command === 'openPopupIframe') {
-          chrome.runtime.sendMessage({
-            command: 'openPopupIframe',
-            tab: msg.tab,
-          });
         }
     });
 })();

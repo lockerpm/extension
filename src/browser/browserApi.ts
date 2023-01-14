@@ -91,6 +91,10 @@ export class BrowserApi {
         chrome.tabs.create({ url: url, active: active });
     }
 
+    static async updateCurrentTab(tab: chrome.tabs.Tab, url: string) {
+      chrome.tabs.update(tab.id, { active: true, url: url, openerTabId: tab.id });
+    }
+
     static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
         chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
           setTimeout(function () {

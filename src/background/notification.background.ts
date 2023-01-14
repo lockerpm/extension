@@ -123,7 +123,8 @@ export default class NotificationBackground {
               details: msg.details,
               forms: forms,
               passwordFields: passwordFields,
-              usernameFields: usernameFields
+              usernameFields: usernameFields,
+              isLocked: await this.vaultTimeoutService.isLocked()
             });
 
             this.autofillFirstPage(sender.tab);
@@ -156,13 +157,12 @@ export default class NotificationBackground {
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
         break;
       case 'informMenuUsePassword':
-        const tab = await BrowserApi.getTabFromCurrentWindow();
-        if (tab == null) {
-          return;
+        const crrentTab = await BrowserApi.getTabFromCurrentWindow();
+        if (crrentTab) {
+          await BrowserApi.tabSendMessageData(crrentTab, 'informMenuPassword', {
+            password: msg.password
+          });
         }
-        await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
-          password: msg.password
-        });
         break;
       case 'bgGeneratePassword':
         const tab_ = await BrowserApi.getTabFromCurrentWindow();
@@ -241,7 +241,12 @@ export default class NotificationBackground {
             senderMessage = 'removeLockerWrapper';
           }
         } else {
-          window.alert('QR code is invalid! Please try again.');
+          window.alert(
+            window.navigator.language === "vi"
+              ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa!"
+              : "QR code is invalid! Please try again."
+          );
+          window.alert('');
         }
         BrowserApi.tabSendMessage(msg.tab, {
           command: 'addedOTP',
@@ -250,9 +255,12 @@ export default class NotificationBackground {
         });
         break;
       case 'openPopupIframe':
-        console.log(msg);
-        await BrowserApi.tabSendMessageData(msg.tab, 'openPopupIframe', {});
-        break;
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        BrowserApi.tabSendMessage(tab, {
+          command: 'openPopupIframe',
+          tab: tab,
+        });
+        break
       default:
         break;
     }
@@ -372,7 +380,6 @@ export default class NotificationBackground {
       normalizedUsername = normalizedUsername.toLowerCase();
     }
     if (await this.vaultTimeoutService.isLocked()) {
-      // this.pushAddLoginToQueue(loginDomain, loginInfo, tab, true);
       return;
     }
 
@@ -426,7 +433,6 @@ export default class NotificationBackground {
     }
 
     if (await this.vaultTimeoutService.isLocked()) {
-      this.pushChangePasswordToQueue(null, loginDomain, changeData.newPassword, '', tab, true);
       return;
     }
 
@@ -476,14 +482,13 @@ export default class NotificationBackground {
       }
       this.notificationQueue.splice(i, 1);
       BrowserApi.tabSendMessageData(tab, 'closeNotificationBar');
-
       if (queueMessage.type === NotificationQueueMessageType.changePassword) {
         const message = (queueMessage as AddChangePasswordQueueMessage);
         const cipher = await this.getDecryptedCipherById(message.cipherId);
         if (cipher == null) {
           return;
         }
-        await this.updateCipher(cipher, message.newPassword);
+        await this.updateCipher(cipher, message.newPassword, message.username);
         return;
       }
 
@@ -543,6 +548,11 @@ export default class NotificationBackground {
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
+      window.alert(
+        window.navigator.language === "vi"
+          ? "Thêm mới thành công."
+          : "Username and Password are added!"
+      );
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
         window.alert(
@@ -576,8 +586,12 @@ export default class NotificationBackground {
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
-
-      window.alert('QR code OTP added!');
+      window.alert(
+        window.navigator.language === "vi"
+          ? "Thêm mới thành công."
+          : "QR code OTP added!"
+      );
+      window.alert('');
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
         window.alert(
@@ -597,9 +611,12 @@ export default class NotificationBackground {
     return null;
   }
 
-  private async updateCipher(cipher: CipherView, newPassword: string) {
+  private async updateCipher(cipher: CipherView, newPassword: string, username: string = '') {
     if (cipher != null && cipher.type === CipherType.Login) {
       cipher.login.password = newPassword;
+      if (username) {
+        cipher.login.username = username;
+      }
       const newCipher = await this.cipherService.encrypt(cipher);
       const csToken = await this.main.storageService.get<string>("cs_token");
       const headers = {
@@ -613,6 +630,11 @@ export default class NotificationBackground {
         const userId = await this.userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId);
         await this.cipherService.upsert(cipherData)
+        window.alert(
+          window.navigator.language === "vi"
+            ? "Cập nhật thành công."
+            : "Username and Password are updated!"
+        );
       } catch (e) {
       }
     }
@@ -641,19 +663,28 @@ export default class NotificationBackground {
   private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
     const otherTypes: CipherType[] = []
     const responseData: any = {};
+    const csStore: any = await this.storageService.get("cs_store");
+    const isLoggedIn = csStore ? csStore.isLoggedIn : false;
+    const isLocked = await this.vaultTimeoutService.isLocked();
     if (responseCommand === 'notificationBarGetFoldersList') {
-      responseData.folders = await this.folderService.getAllDecrypted();
+      if (isLocked) {
+        responseData.folders = []
+      } else {
+        try {
+          responseData.folders = await this.folderService.getAllDecrypted();
+        } catch (error) {
+          responseData.folders = []
+        }
+      }
     }
     if (responseCommand === 'informMenuGetCiphersForCurrentTab') {
-      const isAuthed = await this.userService.isAuthenticated();
-      if (!isAuthed) {
-        responseData.ciphers = null
-      }
-      else {
+      if (isLocked) {
+        responseData.ciphers = []
+      } else {
         try {
           responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
         } catch (error) {
-          responseData.ciphers = null
+          responseData.ciphers = []
         }
       }
     }
@@ -664,9 +695,8 @@ export default class NotificationBackground {
       if (type === CipherType.Identity) {
         otherTypes.push(CipherType.Identity);
       }
-      const isAuthed = await this.userService.isAuthenticated();
-      if (!isAuthed) {
-        responseData.ciphers = null;
+      if (isLocked) {
+        responseData.ciphers = [];
       } else {
         try {
           if (type === CipherType.Login) {
@@ -680,11 +710,13 @@ export default class NotificationBackground {
             responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
           }
         } catch (error) {
-          responseData.ciphers = null;
+          responseData.ciphers = [];
         }
       }
     }
     responseData.ciphers = this.cipherService.sortCiphers(responseData.ciphers || [])
+    responseData.isLoggedIn = isLoggedIn;
+    responseData.isLocked = isLocked;
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
   }
 

@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     chrome.runtime.onMessage.addListener((msg) => {
       if ((msg.command === responseCiphersCommand || msg.command === responseSomethingElse) && msg.data) {
-        fillMenuWithCiphers(msg.data.ciphers);
+        fillMenuWithCiphers(msg.data);
       }
       if (msg.command === responseGeneratePassword && msg.data) {
         showGeneratedPassword(msg.data)
@@ -124,18 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function sendPlatformMessage(msg) {
     chrome.runtime.sendMessage(msg);
   }
-  function fillMenuWithCiphers(ciphers) {
+  function fillMenuWithCiphers(msgData) {
     setContent(document.getElementById('template-list-ciphers'));
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
+    const ciphers = msgData.ciphers;
     if (listContainer != null) {
-      if (ciphers == null) {
+      if (!msgData.isLoggedIn) {
         setContent(document.getElementById('template-vault-locked'));
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
           sendPlatformMessage({
-            command: 'informMenuLogin'
+            command: 'openPopupIframe'
           });
         });
+        return
+      }
+      if (msgData.isLocked) {
+        listContainer.innerHTML = `<div id="cs-inform-locked-btn" class="cs-inform-locked">${i18n.informMenuVaultLocked}</div>`
+        const lockBtn = document.getElementById('cs-inform-locked-btn');
+        lockBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          sendPlatformMessage({
+            command: 'openPopupIframe'
+          });
+        })
         return
       }
       if (!ciphers.length) {

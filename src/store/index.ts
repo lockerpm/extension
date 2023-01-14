@@ -166,6 +166,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       LoadCurrentUser ({ commit }) {
         return Vue.axios.get('me')
           .then(res => {
+            commit('UPDATE_IS_LOGGEDIN', true)
             commit('UPDATE_USER', res)
             return res
           })

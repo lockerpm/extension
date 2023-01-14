@@ -150,12 +150,11 @@ export default Vue.extend({
       this.$router.push({ name: "login" });
     },
     openRegister() {
-      const url = `${
-        process.env.VUE_APP_ID_URL
-      }/register?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      this.$platformUtilsService.launchUri(url);
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'register'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     openVault() {
       this.$platformUtilsService.launchUri("https://locker.io/vault");

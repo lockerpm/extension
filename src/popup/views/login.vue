@@ -71,11 +71,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import { BrowserApi } from "@/browser/browserApi";
-// import InputText from '@/components/input/InputText'
 export default Vue.extend({
-  components: {
-    // InputText
-  },
+  components: { },
   data () {
     return {
       user: {},
@@ -103,12 +100,11 @@ export default Vue.extend({
     chrome.runtime.onMessage.addListener(
       async (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
         switch(msg.command){
-        case 'loginWithSuccess':
-          await this.checkToken(msg.access_token, msg.provider);
-          BrowserApi.tabSendMessage(msg.tab, {
-            command: "openPopupIframe",
-            tab: msg.tab
-        });  
+        case 'collectPageDetailsResponse':
+          if (this.$route.name === 'login') {
+            await this.$store.dispatch('LoadCurrentUser')
+            this.$router.push({ name: 'lock' });
+          }
           break;
         default:
           break;
@@ -117,28 +113,26 @@ export default Vue.extend({
     );
   },
   methods: {
-    openLogin() {
-      let url = `${
-        process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      if (process.env.VUE_APP_ENVIRONMENT) {
-        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-      }
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
+    async openRegister() {
+      const msg: any = {
+        command: 'authAccessToken',
+        sender: { type: 'register'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
-    async processMessage(msg: any, sender: any, sendResponse: any) {
-      switch (msg.command) {
-      case "loginWithSuccess":
-        await this.checkToken(msg.access_token, msg.provider)
-        break;
-      default:
-        break;
-      }
+    async openLogin() {
+      const msg: any = {
+        command: 'authAccessToken',
+        sender: { type: 'login'},
+      };
+      chrome.runtime.sendMessage(msg);
+    },
+    async loginWith (provider) {
+      const msg: any = {
+        command: 'authAccessToken',
+        sender: { type: 'login', provider: provider},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     reset_state () {
       this.error = null
@@ -182,22 +176,7 @@ export default Vue.extend({
       }
     },
     openForgot () {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/forgot  `;
-
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
-    },
-    loginWith (provider) {
-      let url = `${process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
-      if (process.env.VUE_APP_ENVIRONMENT) {
-        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-      }
+      const url = `${process.env.VUE_APP_ID_URL}/forgot  `;
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
       const thisWindow = window.open("", "_self");
@@ -271,14 +250,6 @@ export default Vue.extend({
         this.$nextTick(() => this.$refs.otp.focus())
       }
     },
-    openRegister() {
-      const url = `${
-        process.env.VUE_APP_ID_URL
-      }/register?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      this.$platformUtilsService.launchUri(url);
-    },
     async getAccessToken(token){
       const url = '/sso/access_token'
       const config = {
@@ -303,10 +274,6 @@ export default Vue.extend({
             oldStoreParsed = store
           }
           await this.$storageService.save('cs_store', {
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          console.log({
             ...oldStoreParsed,
             isLoggedIn: true,
           })
