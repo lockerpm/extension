@@ -96,7 +96,8 @@
   },
   "web_accessible_resources": [
     "notification/bar.html",
-    "inform-menu/menu.html"
+    "inform-menu/menu.html",
+    "popup.html"
   ],
   "externally_connectable": {
     "matches": [

@@ -512,7 +512,6 @@ export default class MainBackground {
     if (!url || (!chrome.browserAction && !this.sidebarAction)) {
       return;
     }
-
     this.actionSetBadgeBackgroundColor(chrome.browserAction);
     this.actionSetBadgeBackgroundColor(this.sidebarAction);
 

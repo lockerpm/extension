@@ -285,48 +285,6 @@ Vue.mixin({
         params: { id: cipher.id }
       });
       return;
-      // if (this.$route.name === 'vault') {
-      //   this.$router.push({
-      //     name: 'vault-id',
-      //     params: { id: cipher.id }
-      //   })
-      //   return
-      // }
-      // if (this.$route.name === 'vault-folders-folderId') {
-      //   this.$router.push({
-      //     name: 'vault-folders-folderId-id',
-      //     params: { ...this.$route.params, id: cipher.id }
-      //   })
-      //   return
-      // }
-
-      // if (this.$route.name === 'vault-teams-teamId-tfolders-tfolderId') {
-      //   this.$router.push({
-      //     name: 'vault-teams-teamId-tfolders-tfolderId-id',
-      //     params: { ...this.$route.params, id: cipher.id }
-      //   })
-      //   return
-      // }
-
-      // let name = ''
-      // switch (cipher.type) {
-      // case CipherType.Login:
-      //   name = 'passwords'
-      //   break
-      // case CipherType.SecureNote:
-      //   name = 'notes'
-      //   break
-      // case CipherType.Card:
-      //   name = 'cards'
-      //   break
-      // case CipherType.Identity:
-      //   name = 'identities'
-      //   break
-      // }
-      // this.$router.push({
-      //   name: name + '-id',
-      //   params: { id: cipher.id }
-      // })
     },
     getTeam (teams, orgId) {
       return find(teams, e => e.id === orgId) || {}
