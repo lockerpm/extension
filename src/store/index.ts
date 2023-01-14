@@ -12,7 +12,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   if (typeof oldStore === 'object') {
     oldStoreParsed = oldStore
   }
-
   console.log('oldStoreParsed', oldStoreParsed)
 
   return new Vuex.Store({
@@ -78,7 +77,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       CLEAR_ALL_DATA (state) {
         // Auth
         state.isLoggedIn = false
-        // // User
+        // User
         state.user.full_name = ''
         state.user.email = ''
         state.user.avatar = ''
@@ -159,11 +158,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
           if (state.isLoggedIn) {
             const data = Object.assign({}, state.user)
             data.language = payload
-            // eslint-disable-next-line no-undef
-            // if (Intercom) {
-            //   // eslint-disable-next-line no-undef
-            //   Intercom('update', { language_override: payload })
-            // }
             Vue.axios.put('me', data)
           }
           resolve(payload)
@@ -172,6 +166,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       LoadCurrentUser ({ commit }) {
         return Vue.axios.get('me')
           .then(res => {
+            commit('UPDATE_IS_LOGGEDIN', true)
             commit('UPDATE_USER', res)
             return res
           })

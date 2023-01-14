@@ -100,10 +100,7 @@ export default Vue.extend({
       }
     }
   },
-  mounted () {
-    // this.$store.dispatch('LoadCurrentUser')
-    // this.$store.dispatch('LoadCurrentUserPw')
-  },
+  mounted () { },
   asyncComputed: {
     async locked () {
       return await this.$vaultTimeoutService.isLocked(this.$store.state.isLoggedInPw)
@@ -113,11 +110,6 @@ export default Vue.extend({
     this.$broadcasterService.unsubscribe(BroadcasterSubscriptionId)
   },
   methods: {
-    // openURL (url) {
-    //   if (remote) {
-    //     remote.shell.openExternal(url)
-    //   }
-    // },
     async getTeam () {
       let shouldRedirect = false
       try {

@@ -344,26 +344,26 @@ export default Vue.extend({
         }
       }
     },
-    openForgot () {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/forgot  `;
-
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
+    openRegister() {
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'register'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     loginWith (provider) {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
-
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'login', provider: provider},
+      };
+      chrome.runtime.sendMessage(msg);
+    },
+    openForgot () {
+      const url = `${process.env.VUE_APP_ID_URL}/forgot  `;
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
       const thisWindow = window.open("", "_self");
       thisWindow.close();
-      // window.location.replace(url)
     },
     async postOtp () {
       try {
@@ -413,14 +413,6 @@ export default Vue.extend({
         this.step = 2
         this.$nextTick(() => this.$refs.otp.focus())
       }
-    },
-    openRegister() {
-      const url = `${
-        process.env.VUE_APP_ID_URL
-      }/register?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      this.$platformUtilsService.launchUri(url);
     },
     async getAccessToken(token){
       const url = '/sso/access_token'

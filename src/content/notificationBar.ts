@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', event => {
   test.style.zIndex = '1000000000'
   // window.document.body.appendChild(test)
 
-  const pageDetails: any[] = [];
+  let pageDetails: any[] = [];
   const formData: any[] = [];
   let barType: string = null;
   let pageHref: string = null;
@@ -89,6 +89,8 @@ document.addEventListener('DOMContentLoaded', event => {
       sendResponse();
       return true;
     } else if (msg.command === 'notificationBarPageDetails') {
+      pageDetails = [];
+      inputWithLogo = [];
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', event => {
             for (let i = 0; i < msg.data.passwordFields.length; i++) {
               try {
                 inputWithLogo.push(
-                  setFillLogo(msg.data.passwordFields[i], "password")
+                  setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
                 );
               } catch (error) {
               }
@@ -110,7 +112,7 @@ document.addEventListener('DOMContentLoaded', event => {
             for (let i = 0; i < msg.data.usernameFields.length; i++) {
               try {
                 inputWithLogo.push(
-                  setFillLogo(msg.data.usernameFields[i], "username")
+                  setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
                 );
               } catch (error) {
               }
@@ -156,17 +158,14 @@ document.addEventListener('DOMContentLoaded', event => {
       })
       sendResponse();
       return true;
-    }
-    else if (msg.command === 'informMenuPageDetails') {
+    } else if (msg.command === 'informMenuPageDetails') {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       sendResponse();
       return true;
-    }
-    else if (msg.command === 'informMenuPassword') {
+    } else if (msg.command === 'informMenuPassword') {
       useGeneratedPassword(msg.data.password)
-    }
-    else if (msg.command === "resizeInformMenu") {
+    } else if (msg.command === "resizeInformMenu") {
       for (const logoField of inputWithLogo) {
         const elPosition = logoField.inputEl.getBoundingClientRect();
         const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
@@ -177,8 +176,7 @@ document.addEventListener('DOMContentLoaded', event => {
           }
         }
       }
-    }
-    else if (msg.command === "closeInformMenu") {
+    } else if (msg.command === "closeInformMenu") {
       if (inIframe) {
         return;
       }
@@ -187,6 +185,8 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       sendResponse();
       return true;
+    } else if (msg.command === "openPopupIframe") {
+      openPopupIframe();
     }
   }
 
@@ -328,19 +328,13 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
-  function setFillLogo(el, type = 'password') {
-    const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
-    const currentLogo = document.getElementById(logiId);
-    if (currentLogo) {
-      currentLogo.remove();
-    }
-    const logo = document.createElement("span");
-    logo.id = 'cs-logo-' + (el.htmlID || el.htmlName)
+  function setFillLogo(el, type = 'password', isLocked = false) {
     let inputEl = document.getElementById(el.htmlID);
     if (!inputEl) {
       inputEl = document.getElementsByName(el.htmlName)[0]
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
+      closeInformMenu(inputEl)
       inputEl.addEventListener("click", () => {
         openInformMenu(inputEl, type);
       });
@@ -351,32 +345,39 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
-        logo.style.cssText = `
+        const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
+        let logo = document.getElementById(logiId);
+        if (!logo) {
+          logo = document.createElement("span");
+          logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
+          logo.style.cssText = `
             position: absolute;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVFSURBVHgB7Zy9UiNHEMd7WpSoukhv4HV8AacnsMicHSqOD0cIuMAZ8ARA5sw4c4B1S8aHOd09wYnMGXJw8S1voHKVXXXi1OPu/RD6WH2tdpddaX9VYlntAto/3T0zPT2jIEYOa2uFf+GF0aZ2CUF/p0EZGuCVc1UbvXcrS2ndBFRNPjYI1AOiapyXL+sQIwoiRkT5h5YrSsFrrbWIUYAZUUrVtaaLPObqv5cvLYiQSATqE6UEEeKJVV2/MSECQhXIFgbyB0BwCCFYypRYgGDmAS/CtKpQBHpmYfqxhaqWr08hBGYW6G1tu0Sk3w0G2WfHQsTdWYN6YIFcqzl2rSaxIKizb/j11Cx/aEIAAgn0c23baJH+lECrGYaVR1wNEpsQpkRcqkV0nyJxBEM+8/6fm2swJVMJtF/bOiAitpxnD8RBKGgFtb3bralCQm7SG/duN49Bwy+Qfn4s/vQS7q8+301y80QxSCxHkz6DuUIdVdevxj7TWIHEb8U0YQ7hbsDquG7ASIGc1koCcipjziQ0uXUrjmrdhgZp6ec4TXnyxOEMwB0SrnovreECgsHPSJ8q/KzDblgadsHuBCa0KVeovpyvP7kGNyAlCI6xRMv8rHDkd9HXgqSvk/QecpgQ6EP7mX3wFcgZWy0W3L975+dqAwLZ/Z109ZLDwkDKD3hNj0DSarGHVyAgkrziw6n34oRZA9LFQb8V9QRpjug7fDAgIJw9vKuuX59457vvNw3VyTmngoJrRSfeG30uFtx65ogeK+oItHe7XVnQ2NMPW9FyxTvpuJhSeoc7XEnAYjf93jupcFxEoi8QIzLZwAd7nGZbkATnqGcf0oRo4bmZLVCLoAQZPXhuZrtYvO6lTP4fPXS9cQAJHO95bmYLFKd78fTxxXn5qu6dc4aPuxY6eQNingUWN8O3N/5jkAyx6hfcQKBOU0cuVlCKLLQiAzJ84Tl/AxFwBTKGgAYCJS9AJgVu3VfYxVQm0AgwG3+NxJh66nnRyAQaQybQGFCqSSFjGFZmQSNQGpqoQKctsR4fqJpIqif1kNEFz5X9jUqjBRm+KIUW5pDqkOGLLH3AR3i0+PtAFaDzjtQOLUl57P77rUZcWcV2u73GU0zG0zuUyLGgO0sMbsoVPvKhBDHAf/hA6imSjqz/kKPdDyL8akJGD4S5uhxtgcTNPJPKcNzLdMvyOjOrcbrZGIy9282nSSiK3x099xI6Qw3XzbLWzJ76flp71hHIXuxB8Btk9BSE9tQH0VLrDCkfeKaTffcHdo+TzjnASjLqISbGIkSz+42e0fysVuT2pY69F8e1tM25XZh9NdMD6Q6xogXNEVnd1XEeAwKJFfEQfxcWDJ5i9n1m34TZ+cZlnd1lYQK2PKs8s9+1oZX2Ovd4omj5dRKnhRRBobvwW5NsUhC4ObDkWYddHLmYxS1/m+vFLNxqFc0gi1kE+UH2zTLMKZxz3jXHrGMdm7R3fFMdwbxB6uiPN9cfxt020ZLM++vPfxU3Xip2yBLMB6fVN9cTLS+dalm4syBW/wpphi2nujF+KabH1Ovm3SWashoobYG7KfF0WHM+jEAbCzitW7o2FuDWatWMY2MBQf4Qp0eKaehMymckbBXNgDvCzL65yc12iTChm5vw8GFal+ontP2D9m44zYFqJwFC2RkJGXQH3dCkm1A3WLJj0zeqPJNQoQrjEdkeZrK8ylniEMcWXfBRUsZhCtP5/RAxTosHpRDFkhmYRpSidBO5QP24Qf2VU6QtNdq6oLVU2g5uE2h/BWiQpgcpJMjxXNUj/GdFLUo3/wML11LelAerTQAAAABJRU5ErkJggg==');
-            height: 20px;
-            width: 20px;
+            height: 19px;
+            width: 19px;
             background-position: center;
             background-size: contain;
             z-index: 1000 !important;
-            background-color: #fff;
-            border-radius: 50%;
             cursor: pointer;
-        `;
+          `;
+          logo.addEventListener("click", () => {
+            openInformMenu(inputEl, type);
+          });
+          inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
+        }
         if (elPosition.width <= 0) {
-          relativeContainer.addEventListener('stylechanged', e => {
-            console.log('update', e);
-          })
           logo.style.right = `16px`;
           logo.style.top = `20px`;
         } else {
           logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30 }px`;
           logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
         }
-        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-        logo.addEventListener("click", () => {
-          openInformMenu(inputEl, type);
-        });
+        if (isLocked) {
+          const image = 'data:image/png;base64,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'
+          logo.style.backgroundImage = `url('${image}')`;
+        } else {
+          const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAMAAABFjsb+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABIFBMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///+8vCC1AAAAXnRSTlMAABVEc5/B2urx8vDo17+eckITBJj0/fORAgi6+tb3swW5+VHesWPV+9JI3fZLx7XZUk1OvsBPwnHGSga0zYrOrZus50XclFv8jVMQtq8NKswmLcMoHqMbCmpkMKgrHCXsWAAAAAFiS0dEX3PRUS0AAAAHdElNRQflDBcJLw3hH93pAAAA1klEQVQY02NgYGJmYWVj5+Dk4ubh5eMXEBRiYBAWERWLQwAxcQlJBilpCEdGVg7CkFdgkFKM41ACMjmUVSBiqiAxOTX1OA1NFS1tJDEdXT19A0M2XRQxIz5jEyNTdDEzLGJGmGLmFpZWfEhi1jY6VrY63Hb2VlAxB2EGBkcxJx4g09nFFSLmxsDA4O4BZnJ6ckD84wUU8/aJQwa+fkAxBv8AJCHLQAYwCAqGC5mEgAQYgTg0TANiFn84WIQRJBgRCbLUIEoKJAQSAwkyRMdwhMWC9TEyAgDPwE6YM2fCkQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0yM1QwOTo0NzowOCswMDowMBHsN8QAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMjNUMDk6NDc6MDgrMDA6MDBgsY94AAAAAElFTkSuQmCC'
+          logo.style.backgroundImage = `url('${image}')`;
+        }
         return {
           logo,
           inputEl,
@@ -396,47 +397,46 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function openInformMenu(inputEl: any, type: string = 'password') {
     const elPosition = inputEl.getBoundingClientRect();
-    const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
-    if (document.body == null) {
+    if (!document.body) {
       return;
     }
-    if (document.getElementById(iframeId) != null) {
+    const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
+    if (document.getElementById(iframeId)) {
       return;
     }
     const barPageUrl: string = chrome.extension.getURL(
       "inform-menu/menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
-
     const iframe = document.createElement("iframe");
-    iframe.style.cssText =
-      `top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
-        left: ${getOffsetLeft(inputEl)}px;
-        position: absolute;
-        height: 244px;
-        width: ${elPosition.width}px !important;
-        border: 0;
-        min-height: initial;
-        padding: 0;
-        z-index: 2147483647; visibility: visible;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
-        z-index: 2147483647 !important;
-        display: block !important;
-        visibility: visible !important;
-        clip-path: none !important;
-        clip: auto !important;
-        mask: none !important;
-        filter: none !important;
-        pointer-events: auto !important;
-        resize: none !important;
-        border-width: 0px;
-        border-style: initial;
-        border-color: initial;
-        border-image: initial;
-        border-radius: 8px;
-        margin: 0px !important;
-        padding: 0px !important;
-      `;
     iframe.id = iframeId;
+    iframe.style.cssText = `
+      top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
+      left: ${getOffsetLeft(inputEl)}px;
+      position: absolute;
+      height: 244px;
+      width: ${elPosition.width}px !important;
+      border: 0;
+      min-height: initial;
+      padding: 0;
+      z-index: 2147483647; visibility: visible;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
+      z-index: 2147483647 !important;
+      display: block !important;
+      visibility: visible !important;
+      clip-path: none !important;
+      clip: auto !important;
+      mask: none !important;
+      filter: none !important;
+      pointer-events: auto !important;
+      resize: none !important;
+      border-width: 0px;
+      border-style: initial;
+      border-color: initial;
+      border-image: initial;
+      border-radius: 8px;
+      margin: 0px !important;
+      padding: 0px !important;
+    `;
     iframe.src = barPageUrl;
     document.body.appendChild(iframe);
     (iframe.contentWindow.location as any) = barPageUrl;
@@ -785,5 +785,50 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } while ((elem = elem.offsetParent));
     return offsetLeft;
+  }
+
+  function openPopupIframe() {
+    if (document.body == null) {
+      return;
+    }
+    let frameDiv = document.getElementById('locker_popup-iframe-container');
+    if (frameDiv) {
+      if (frameDiv.style.visibility === 'hidden') {
+        frameDiv.style.visibility = 'visible'
+      }
+      return
+    }
+
+    const barPageUrl: string = chrome.extension.getURL('popup.html');
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = `
+      height: 600px;
+      width: 400px;
+      border: 1px solid rgb(189 190 190);
+      background-color: white
+    `;
+    iframe.id = 'popup-iframe';
+    iframe.src = barPageUrl + '?save_popup=true';
+    frameDiv = document.createElement('div');
+    frameDiv.id = 'locker_popup-iframe-container';
+    frameDiv.style.cssText = `
+      height: 600px;
+      width: 402px;
+      top: 0px;
+      right: 0px;
+      position: fixed;
+      z-index: 2147483647;
+      visibility: visible;
+    `;
+    frameDiv.appendChild(iframe);
+    window.addEventListener('click', function(e: any){   
+      if (frameDiv.contains(e.target)){
+      } else{
+        frameDiv.style.visibility = 'hidden'
+      }
+    });
+    document.body.appendChild(frameDiv);
+
+    (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

@@ -22,6 +22,7 @@ import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
+import { BrowserApi } from "@/browser/browserApi";
 
 Vue.config.productionTip = false
 Vue.use(JSLib)
@@ -32,7 +33,6 @@ Vue.use(VueMomentJS, moment);
 Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
-
 if (process.env.NODE_ENV==='development') {
   require('@/assets/buildtw.css')
 }
@@ -56,7 +56,7 @@ Vue.mixin({
       ],
       enableAutofillKey : 'enableAutofill',
       showFoldersKey : 'showFolders',
-      hideIconsKey : 'hideIcons'
+      hideIconsKey : 'hideIcons',
     };
   },
   computed: {
@@ -140,10 +140,12 @@ Vue.mixin({
         this.$settingsService.clear(userId),
         this.$policyService.clear(userId),
         this.$tokenService.clearToken(),
-        this.$storageService.remove("cs_token")
+        this.$storageService.remove("cs_store"),
+        this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' });
+      await this.setupFillPage();
     },
     async lock () {
       await Promise.all([
@@ -156,7 +158,8 @@ Vue.mixin({
       this.$folderService.clearCache()
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
-      this.$router.push({ name: 'lock' })
+      this.$router.push({ name: 'lock' });
+      await this.setupFillPage();
     },
     randomString () {
       return nanoid()
@@ -217,11 +220,14 @@ Vue.mixin({
           this.$vaultTimeoutService.biometricLocked = false
         }
         chrome.runtime.sendMessage({ command: "unlocked" });
-        this.$router.push({ name: 'home' })
+        this.$router.push({ name: 'home' });
       } catch (e) {
         console.log(e)
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }
+      setTimeout(() => {
+        this.setupFillPage();
+      }, 1000);
     },
     async clearKeys () {
       await this.$cryptoService.clearKeys()
@@ -465,6 +471,16 @@ Vue.mixin({
       }
 
       return connectionUrl
+    },
+    async setupFillPage() {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "collectPageDetails",
+          tab: tab,
+          sender: 'notificationBar',
+        });
+      }
     }
   }
 })

@@ -181,6 +181,13 @@ button.neutral {
 }
 .cs-list-withScroll, .cs-vault-locked {
   overflow-y: auto;
+  .cs-inform-locked {
+    text-align: center;
+    padding: 16px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #69ac59;
+  }
   .cs-inform-no-ciphers {
     text-align: center;
     padding: 16px;

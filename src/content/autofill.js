@@ -1311,10 +1311,12 @@
         isReading = true;
         const actions = document.getElementById('locker_screenshot_wrapper--actions');
         actions.style.visibility = 'hidden';
-        chrome.runtime.sendMessage({
-          command: 'scanQRCode',
-          tab: tab,
-        });
+        setTimeout(() => {
+          chrome.runtime.sendMessage({
+            command: 'scanQRCode',
+            tab: tab,
+          });
+        }, 100);
       };
 
       function init () {
@@ -1369,8 +1371,7 @@
 
     chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
         if (msg.command === 'collectPageDetails') {
-            var pageDetails = collect(document);
-            var pageDetailsObj = JSON.parse(pageDetails);
+            const pageDetailsObj = JSON.parse(collect(document));
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,

@@ -13,7 +13,7 @@
         v-if="!['folders-folderId'].includes(this.$route.name)"
         class="mt-5 font-semibold mb-4 flex justify-between"
       >
-        <div>{{ $tc(`type.${type}`, 2) }} ({{ciphers.length}})</div>
+        <div>{{ $tc(`type.${type}`, 2) }} ({{ ciphers ? ciphers.length : 0 }})</div>
         <div class="flex items-center">
           <span v-if="orderString==='name_asc'">A-Z &nbsp;</span>
           <span v-if="orderString==='name_desc'">Z-A &nbsp;</span>
@@ -135,7 +135,7 @@ export default Vue.extend({
 
       if (bottomOfWindow) {
         this.renderIndex += 50;
-        if (this.renderIndex <= this.ciphers.length) {
+        if ( this.ciphers && this.renderIndex <= this.ciphers.length) {
           this.dataRendered = this.dataRendered.concat(
             this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
           );
