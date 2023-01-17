@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
   i18n.informMenuScoreGood = chrome.i18n.getMessage('informMenuScoreGood')
   i18n.informMenuScoreMedium = chrome.i18n.getMessage('informMenuScoreMedium')
   i18n.informMenuScoreWeak = chrome.i18n.getMessage('informMenuScoreWeak')
+  i18n.informMenuLoginToAutofill = chrome.i18n.getMessage('informMenuLoginToAutofill')
+  i18n.informMenuUnlockNow = chrome.i18n.getMessage('informMenuUnlockNow')
 
   const responseCiphersCommand = 'informMenuGetCiphersForCurrentTab';
   const responseSomethingElse = 'informMenuGetCiphers';
@@ -35,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function load() {
     document.querySelector('#template-vault-locked .btn-inform-login').textContent = i18n.informMenuLoginNow
-    document.querySelector('#template-vault-locked .cs-inform-no-ciphers').textContent = i18n.informMenuVaultLocked
+    document.querySelector('#template-vault-locked .cs-inform-no-ciphers').textContent = i18n.informMenuLoginToAutofill
+    document.querySelector('#template-vault-locked .btn-inform-unlock').textContent = i18n.informMenuUnlockNow
     document.querySelector('#template-generated-password .use-password').textContent = i18n.informMenuUsePassword
     document.querySelector('#template-generated-password .use-password').textContent = i18n.informMenuUsePassword
     document.querySelector('#template-dropdown-options .generate-password').textContent = i18n.informMenuGeneratePassword
@@ -127,29 +130,42 @@ document.addEventListener('DOMContentLoaded', () => {
   function fillMenuWithCiphers(msgData) {
     setContent(document.getElementById('template-list-ciphers'));
     const listContainer = document.getElementsByClassName('cs-list-withScroll')[0];
+    const btnDropdown = document.getElementById('dropdownOptions')
     const ciphers = msgData.ciphers;
     if (listContainer != null) {
       if (!msgData.isLoggedIn) {
+        listContainer.innerHTML = `<div class="cs-inform-no-ciphers">${i18n.informMenuLoginToAutofill}</div>`
         setContent(document.getElementById('template-vault-locked'));
+        const loginBtn = document.getElementById('btn-inform-login');
+        loginBtn.style.display = 'initial'
+        const lockBtn = document.getElementById('btn-inform-unlock');
+        lockBtn.style.display = 'none'
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
           sendPlatformMessage({
             command: 'openPopupIframe'
           });
         });
+        btnDropdown.style.display = 'none'
         return
       }
       if (msgData.isLocked) {
-        listContainer.innerHTML = `<div id="cs-inform-locked-btn" class="cs-inform-locked">${i18n.informMenuVaultLocked}</div>`
-        const lockBtn = document.getElementById('cs-inform-locked-btn');
+        listContainer.innerHTML = `<div class="cs-inform-no-ciphers">${i18n.informMenuVaultLocked}</div>`
+        setContent(document.getElementById('template-vault-locked'));
+        const loginBtn = document.getElementById('btn-inform-login');
+        loginBtn.style.display = 'none'
+        const lockBtn = document.getElementById('btn-inform-unlock');
+        lockBtn.style.display = 'initial'
         lockBtn.addEventListener('click', (e) => {
           e.preventDefault();
           sendPlatformMessage({
             command: 'openPopupIframe'
           });
         })
+        btnDropdown.style.display = 'none'
         return
       }
+      btnDropdown.style.display = 'initial'
       if (!ciphers.length) {
         listContainer.innerHTML = `<div class="cs-inform-no-ciphers">${i18n.informMenuNoPassword}</div>`
         return

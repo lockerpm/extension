@@ -17,6 +17,7 @@
     "webRequest",
     "webRequestBlocking",
     "identity",
+    "activeTab",
     "<all_urls>"
   ],
   "optional_permissions": [

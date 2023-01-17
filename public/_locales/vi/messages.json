@@ -1757,10 +1757,16 @@
     "message": "Tài khoản đã lưu"
   },
   "informMenuVaultLocked": {
-    "message": "Kho bí mật đã khóa."
+    "message": "Mở khoá kho dữ liệu"
+  },
+  "informMenuLoginToAutofill": {
+    "message": "Đăng nhập để tự động điền"
   },
   "informMenuLoginNow": {
     "message": "Đăng nhập"
+  },
+  "informMenuUnlockNow": {
+    "message": "Mở khoá"
   },
   "informMenuGeneratePassword": {
     "message": "Tạo mật khẩu mạnh"

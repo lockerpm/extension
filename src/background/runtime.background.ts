@@ -209,15 +209,14 @@ export default class RuntimeBackground {
         ]);
         try {
           await this.storageService.save("cs_token", msg.token);
-          const store = await this.storageService.get("cs_store");
-          let oldStoreParsed = {};
-          if (typeof store === "object") {
-            oldStoreParsed = store;
+          const store : any = await this.storageService.get("cs_store");
+          await this.updateStoreService('isLoggedIn', true);
+          if (store && store.savePopup) {
+            setTimeout(async () => {
+              const tab = await BrowserApi.getTabFromCurrentWindow();
+              await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
+            }, 1000);
           }
-          await this.storageService.save("cs_store", {
-            ...oldStoreParsed,
-            isLoggedIn: true
-          });
           sendResponse({ success: true });
         } catch (e) {
           console.log(e);
@@ -257,15 +256,7 @@ export default class RuntimeBackground {
             .then(async result => {
               const access_token = result.data ? result.data.access_token : "";
               await this.storageService.save("cs_token", access_token);
-              const store = await this.storageService.get("cs_store");
-              let oldStoreParsed = {};
-              if (typeof store === "object") {
-                oldStoreParsed = store;
-              }
-              await this.storageService.save("cs_store", {
-                ...oldStoreParsed,
-                isLoggedIn: true
-              });
+              await this.updateStoreService('isLoggedIn', true);
               sendResponse({ success: true });
             });
         } catch (e) {
@@ -309,8 +300,17 @@ export default class RuntimeBackground {
         });
         break;
       case "authAccessToken":
-        await this.authAccessToken(sender.type, sender.provider)
+        await this.authAccessToken(msg.sender.type, msg.sender.provider)
         break;
+      case "openPopupIframe":
+        await this.updateStoreService('savePopup', true);
+        break;
+      case "closePopupIframe":
+        await this.updateStoreService('savePopup', false);
+      case "updateStoreService":
+        if (msg.sender) {
+          await this.updateStoreService(msg.sender.key, msg.sender.value);
+        }
       default:
         break;
     } 
@@ -318,6 +318,7 @@ export default class RuntimeBackground {
 
   private async autofillPage() {
     const cipherId = this.main.loginToAutoFill.id
+    const cipherFavorite = this.main.loginToAutoFill.favorite
     const totpCode = await this.autofillService.doAutoFill({
       cipher: this.main.loginToAutoFill,
       pageDetails: this.pageDetailsToAutoFill,
@@ -338,7 +339,7 @@ export default class RuntimeBackground {
     };
     const res = await axios.put(
       `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
-      { use: true },
+      { use: true, favorite: cipherFavorite },
       { headers: headers }
     )
     const cipherResponse = new CipherResponse(res.data)
@@ -417,5 +418,17 @@ export default class RuntimeBackground {
       url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
     }
     await BrowserApi.updateCurrentTab(tab, url);
+  }
+
+  private async updateStoreService(key: string, value: any) {
+    const store = await this.storageService.get("cs_store");
+    let oldStoreParsed = {};
+    if (typeof store === "object") {
+      oldStoreParsed = store;
+    }
+    await this.storageService.save("cs_store", {
+      ...oldStoreParsed,
+      [key]: value
+    });
   }
 }
