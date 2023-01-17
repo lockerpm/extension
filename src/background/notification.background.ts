@@ -126,8 +126,9 @@ export default class NotificationBackground {
               usernameFields: usernameFields,
               isLocked: await this.vaultTimeoutService.isLocked()
             });
-
-            this.autofillFirstPage(sender.tab);
+            if (passwordFields.length > 0) {
+              this.autofillFirstPage(sender.tab);
+            }
             break;
           default:
             break;
