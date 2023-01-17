@@ -7,6 +7,7 @@
     "dev": "vue-cli-service build --mode development --watch",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build",
     "build:staging": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build --mode staging",
+    "build:production": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build --mode production",
     "lint": "vue-cli-service lint",
     "sub:init": "git submodule update --init --recursive",
     "sub:pull": "git submodule foreach git pull origin master",
