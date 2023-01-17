@@ -100,7 +100,6 @@ export default Vue.extend({
       }
     }
   },
-  mounted () { },
   asyncComputed: {
     async locked () {
       return await this.$vaultTimeoutService.isLocked(this.$store.state.isLoggedInPw)

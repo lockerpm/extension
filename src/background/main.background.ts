@@ -158,12 +158,12 @@ export default class MainBackground {
     this.storageService = new BrowserStorageService();
     this.platformUtilsService = new BrowserPlatformUtilsService(this.messagingService, this.storageService,
       (clipboardValue, clearMs) => {
-        if (this.systemService != null) {
+        if (this.systemService) {
           this.systemService.clearClipboard(clipboardValue, clearMs);
         }
       },
       async () => {
-        if (this.nativeMessagingBackground != null) {
+        if (this.nativeMessagingBackground) {
           const promise = this.nativeMessagingBackground.getResponse();
 
           try {
@@ -205,12 +205,12 @@ export default class MainBackground {
       this.collectionService, this.cryptoService, this.platformUtilsService, this.storageService,
       this.messagingService, this.searchService, this.userService, this.tokenService, this.policyService,
       async () => {
-        if (this.notificationsService != null) {
+        if (this.notificationsService) {
           this.notificationsService.updateConnection(false);
         }
         await this.setIcon();
         await this.refreshBadgeAndMenu(true);
-        if (this.systemService != null) {
+        if (this.systemService) {
           this.systemService.startProcessReload();
           await this.systemService.clearPendingClipboard();
         }
@@ -315,7 +315,6 @@ export default class MainBackground {
     if (!chrome.browserAction && !this.sidebarAction) {
       return;
     }
-    
     const isAuthenticated = await this.userService.isAuthenticated();
     const locked = await this.vaultTimeoutService.isLocked();
 
@@ -385,12 +384,12 @@ export default class MainBackground {
   }
 
   async collectPageDetailsForContentScript(tab: any, sender: string, frameId: number = null) {
-    if (tab == null || !tab.id) {
+    if (!tab || !tab.id) {
       return;
     }
 
     const options: any = {};
-    if (frameId != null) {
+    if (frameId) {
       options.frameId = frameId;
     }
     BrowserApi.tabSendMessage(tab, {
@@ -417,7 +416,7 @@ export default class MainBackground {
     }
 
     const currentVaultTimeout = await this.storageService.get<number>(ConstantsService.vaultTimeoutKey);
-    if (currentVaultTimeout == null) {
+    if (!currentVaultTimeout) {
       return;
     }
 
@@ -560,9 +559,9 @@ export default class MainBackground {
     }
 
     const tabs = await BrowserApi.getActiveTabs();
-    if (tabs != null) {
+    if (tabs) {
       tabs.forEach(tab => {
-        if (tab.id != null) {
+        if (tab.id) {
           this.browserActionSetBadgeText('', tab.id);
           this.sidebarActionSetBadgeText('', tab.id);
         }
@@ -571,7 +570,7 @@ export default class MainBackground {
   }
 
   private async loadLoginContextMenuOptions(cipher: any) {
-    if (cipher == null || cipher.type !== CipherType.Login || cipher.reprompt !== CipherRepromptType.None) {
+    if (!cipher || cipher.type !== CipherType.Login || cipher.reprompt !== CipherRepromptType.None) {
       return;
     }
 
@@ -588,13 +587,13 @@ export default class MainBackground {
 
   private async loadContextMenuOptions(title: string, idSuffix: string, cipher: any) {
     if (!chrome.contextMenus || this.menuOptionsLoaded.indexOf(idSuffix) > -1 ||
-      (cipher != null && cipher.type !== CipherType.Login)) {
+      (cipher && cipher.type !== CipherType.Login)) {
       return;
     }
 
     this.menuOptionsLoaded.push(idSuffix);
 
-    if (cipher == null || (cipher.login.password && cipher.login.password !== '')) {
+    if (!cipher || (cipher.login.password && cipher.login.password !== '')) {
       await this.contextMenusCreate({
         type: 'normal',
         id: 'autofill_' + idSuffix,
@@ -604,7 +603,7 @@ export default class MainBackground {
       });
     }
 
-    if (cipher == null || (cipher.login.username && cipher.login.username !== '')) {
+    if (!cipher || (cipher.login.username && cipher.login.username !== '')) {
       await this.contextMenusCreate({
         type: 'normal',
         id: 'copy-username_' + idSuffix,
@@ -614,7 +613,7 @@ export default class MainBackground {
       });
     }
 
-    if (cipher == null || (cipher.login.password && cipher.login.password !== '' && cipher.viewPassword)) {
+    if (!cipher || (cipher.login.password && cipher.login.password !== '' && cipher.viewPassword)) {
       await this.contextMenusCreate({
         type: 'normal',
         id: 'copy-password_' + idSuffix,
@@ -625,7 +624,7 @@ export default class MainBackground {
     }
 
     const canAccessPremium = await this.userService.canAccessPremium();
-    if (canAccessPremium && (cipher == null || (cipher.login.totp && cipher.login.totp !== ''))) {
+    if (canAccessPremium && (!cipher || (cipher.login.totp && cipher.login.totp !== ''))) {
       await this.contextMenusCreate({
         type: 'normal',
         id: 'copy-totp_' + idSuffix,
@@ -645,7 +644,7 @@ export default class MainBackground {
     const lastSync = await this.syncService.getLastSync();
 
     let lastSyncAgo = syncInternal + 1;
-    if (lastSync != null) {
+    if (lastSync) {
       lastSyncAgo = new Date().getTime() - lastSync.getTime();
     }
 

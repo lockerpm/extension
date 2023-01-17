@@ -219,7 +219,11 @@ export default class NotificationBackground {
             });
           });
         } else {
-          window.alert('Capture visible tab is not active! Cannot read QR code.');
+          window.alert(
+            window.navigator.language === "vi"
+              ? "Sự kiện chụp ảnh của trình duyệt không hoạt đông!. Không thể đọc mã QR"
+              : "Capture visible tab is not active! Cannot read QR code."
+          );
         }
         break;
       case 'saveNewQRCode':
@@ -235,7 +239,9 @@ export default class NotificationBackground {
           let currentOtps = await this.cipherService.getAllDecrypted();
           currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
           if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
-            window.alert('QR code is existed! Please try scan QR code other.');
+            window.navigator.language === "vi"
+              ? "Mã QR đã tồn tại! Vui lòng quét mã QR khác."
+              : "QR code is existed! Please try scan QR code other."
           } else {
             await this.createNewOTP({ name: name, notes: notes })
             senderMessage = 'removeLockerWrapper';
@@ -243,10 +249,9 @@ export default class NotificationBackground {
         } else {
           window.alert(
             window.navigator.language === "vi"
-              ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa!"
+              ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa."
               : "QR code is invalid! Please try again."
           );
-          window.alert('');
         }
         BrowserApi.tabSendMessage(msg.tab, {
           command: 'addedOTP',
@@ -255,12 +260,14 @@ export default class NotificationBackground {
         });
         break;
       case 'openPopupIframe':
-        const tab = await BrowserApi.getTabFromCurrentWindow();
-        BrowserApi.tabSendMessage(tab, {
+        BrowserApi.tabSendMessage(sender.tab, {
           command: 'openPopupIframe',
-          tab: tab,
+          tab: sender.tab,
         });
         break
+      case 'closePopupIframe':
+        await BrowserApi.tabSendMessageData(sender.tab, 'closePopupIframe');
+        break;
       default:
         break;
     }
@@ -271,7 +278,7 @@ export default class NotificationBackground {
       if (this.cipherService && tab.url) {
         const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url);
         const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
-        if (loginCiphers.length === 1) {
+        if (loginCiphers.length > 0) {
           await this.startAutofillPage(loginCiphers[0])
         }
       }
@@ -591,7 +598,6 @@ export default class NotificationBackground {
           ? "Thêm mới thành công."
           : "QR code OTP added!"
       );
-      window.alert('');
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
         window.alert(

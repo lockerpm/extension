@@ -431,16 +431,11 @@ export default Vue.extend({
           let token = url.substring(url.indexOf("token")+6)
           token = token.indexOf("&") === -1?token:token.substring(0, token.indexOf("&"))
           await this.$storageService.save('cs_token', token)
-          const store = await this.$storageService.get('cs_store')
-          let oldStoreParsed = {}
-          if (typeof store === 'object') {
-            oldStoreParsed = store
-          }
-          await this.$storageService.save('cs_store', {
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
           this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+          chrome.runtime.sendMessage({
+            command: 'updateStoreService',
+            sender: { key: 'isLoggedIn', value: true },
+          });
           this.$router.push({ name: 'lock' })
         }
       } catch (error) {
