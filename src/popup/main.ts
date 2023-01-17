@@ -140,11 +140,14 @@ Vue.mixin({
         this.$settingsService.clear(userId),
         this.$policyService.clear(userId),
         this.$tokenService.clearToken(),
-        this.$storageService.remove("cs_store"),
         this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$router.push({ name: 'login' });
+      chrome.runtime.sendMessage({
+        command: 'updateStoreService',
+        sender: { key: 'isLoggedIn', value: false },
+      });
       await this.setupFillPage();
     },
     async lock () {

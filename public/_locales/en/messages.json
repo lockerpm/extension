@@ -1812,10 +1812,16 @@
     "message": "Saved Login"
   },
   "informMenuVaultLocked": {
-    "message": "Vault is locked"
+    "message": "Unlock your vault"
+  },
+  "informMenuLoginToAutofill": {
+    "message": "Log in to autofill"
   },
   "informMenuLoginNow": {
     "message": "Login now"
+  },
+  "informMenuUnlockNow": {
+    "message": "Unlock now"
   },
   "informMenuGeneratePassword": {
     "message": "Generate Password"

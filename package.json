@@ -1,6 +1,6 @@
 {
   "name": "locker-extention",
-  "version": "1.10.33",
+  "version": "1.10.34",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
@@ -27,7 +27,6 @@
     "element-ui": "^2.15.6",
     "extract-domain": "^2.3.4",
     "hi-base32": "^0.5.1",
-    "html2canvas": "^1.4.1",
     "jsqr": "^1.4.0",
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
