@@ -519,33 +519,33 @@ export default class MainBackground {
     await this.browserActionSetIcon(tabId, locked);
     if (!locked) {
       try {
-        const ciphers = await this.cipherService.getAllDecryptedForUrl(url);
-        ciphers.sort((a, b) => this.cipherService.sortCiphersByLastUsedThenName(a, b));
-
-        if (contextMenuEnabled) {
-          ciphers.forEach(cipher => {
-            this.loadLoginContextMenuOptions(cipher);
-          });
-        }
-
-        const disableBadgeCounter = await this.storageService.get<boolean>(ConstantsService.disableBadgeCounterKey);
-        let theText = '';
-
-        if (!disableBadgeCounter) {
-          if (ciphers.length > 0 && ciphers.length <= 9) {
-            theText = ciphers.length.toString();
-          } else if (ciphers.length > 0) {
-            theText = '9+';
+        setTimeout(async () => {
+          const ciphers = await this.cipherService.getAllDecryptedForUrl(url);
+          ciphers.sort((a, b) => this.cipherService.sortCiphersByLastUsedThenName(a, b));
+          if (contextMenuEnabled) {
+            ciphers.forEach(cipher => {
+              this.loadLoginContextMenuOptions(cipher);
+            });
           }
-        }
 
-        if (contextMenuEnabled && ciphers.length === 0) {
-          await this.loadNoLoginsContextMenuOptions(this.i18nService.t('noMatchingLogins'));
-        }
+          const disableBadgeCounter = await this.storageService.get<boolean>(ConstantsService.disableBadgeCounterKey);
+          let theText = '';
 
-        this.sidebarActionSetBadgeText(theText, tabId);
-        this.browserActionSetBadgeText(theText, tabId);
+          if (!disableBadgeCounter) {
+            if (ciphers.length > 0 && ciphers.length <= 9) {
+              theText = ciphers.length.toString();
+            } else if (ciphers.length > 0) {
+              theText = '9+';
+            }
+          }
 
+          if (contextMenuEnabled && ciphers.length === 0) {
+            await this.loadNoLoginsContextMenuOptions(this.i18nService.t('noMatchingLogins'));
+          }
+
+          await this.sidebarActionSetBadgeText(theText, tabId);
+          await this.browserActionSetBadgeText(theText, tabId);
+        }, 1000);
         return;
       } catch { }
     }
@@ -716,9 +716,9 @@ export default class MainBackground {
     }
   }
 
-  private browserActionSetBadgeText(text: string, tabId: number) {
+  private async browserActionSetBadgeText(text: string, tabId: number) {
     if (chrome.browserAction && chrome.browserAction.setBadgeText) {
-      chrome.browserAction.setBadgeText({
+      await chrome.browserAction.setBadgeText({
         text: text,
         tabId: tabId,
       });
@@ -727,19 +727,19 @@ export default class MainBackground {
 
   private async browserActionSetIcon(tabId: number, locked: boolean) {
     if (chrome.browserAction && chrome.browserAction.setIcon) {
-      chrome.browserAction.setIcon({
+      await chrome.browserAction.setIcon({
         path : locked ? "icons/locked.png" : 'icons/19.png',
         tabId: tabId,
       });
     }
   }
 
-  private sidebarActionSetBadgeText(text: string, tabId: number) {
+  private async sidebarActionSetBadgeText(text: string, tabId: number) {
     if (!this.sidebarAction) {
       return;
     }
     if (this.sidebarAction.setBadgeText) {
-      this.sidebarAction.setBadgeText({
+      await this.sidebarAction.setBadgeText({
         text: text,
         tabId: tabId,
       });
@@ -749,7 +749,7 @@ export default class MainBackground {
         title += (' [' + text + ']');
       }
 
-      this.sidebarAction.setTitle({
+      await this.sidebarAction.setTitle({
         title: title,
         tabId: tabId,
       });
