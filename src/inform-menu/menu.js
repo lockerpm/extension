@@ -150,7 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
       if (msgData.isLocked) {
-        listContainer.innerHTML = `<div class="cs-inform-no-ciphers">${i18n.informMenuVaultLocked}</div>`
+        if (document.getElementsByClassName('cs-inform-no-ciphers')[0]) {
+          document.getElementsByClassName('cs-inform-no-ciphers')[0].textContent = i18n.informMenuVaultLocked
+        }
         setContent(document.getElementById('template-vault-locked'));
         const loginBtn = document.getElementById('btn-inform-login');
         loginBtn.style.display = 'none'
