@@ -402,11 +402,21 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
+  function closeAllInformMenu() {
+    const menuEls = document.getElementsByClassName('cs-inform-menu-iframe');
+    if (menuEls && menuEls.length > 0) {
+      for (let i = 0; i < menuEls.length; i += 1) {
+        menuEls[i].remove();
+      };
+    }
+  }
+
   function openInformMenu(inputEl: any, type: string = 'password') {
     const elPosition = inputEl.getBoundingClientRect();
     if (!document.body) {
       return;
     }
+    const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
     if (document.getElementById(iframeId)) {
       return;
@@ -416,6 +426,7 @@ document.addEventListener('DOMContentLoaded', event => {
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
+    iframe.className = iframeClass;
     iframe.style.cssText = `
       top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
       left: ${getOffsetLeft(inputEl)}px;
@@ -516,6 +527,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function formSubmitted(e: Event) {
+    closeAllInformMenu();
     let form: HTMLFormElement = null;
     if (e.type === 'click') {
       form = (e.target as HTMLElement).closest('form');
