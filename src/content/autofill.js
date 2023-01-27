@@ -1339,29 +1339,20 @@
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      const imageData = ctx.createImageData(window.innerWidth, window.innerHeight);
+      ctx.putImageData(imageData, 0, 0);
       const image = new Image();
       image.src = msg.sender;
-      image.onload = function() {
-        ctx.drawImage(image, center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight, 0, 0, canvas.width, canvas.height);
-        const newCanvas = document.createElement('canvas');
-        const newCtx = newCanvas.getContext('2d');
-        const imageData = newCtx.createImageData(center.offsetWidth, center.offsetHeight);
-        newCtx.putImageData(imageData, 0, 0);
-        newCanvas.width = center.offsetWidth;
-        newCanvas.height = center.offsetHeight;
-        const newImage = new Image();
-        newImage.src = canvas.toDataURL("image/png");
-        newImage.onload = async function() {
-          newCtx.drawImage(newImage, 0, 0, center.offsetWidth, center.offsetHeight);
-          const imageData = newCtx.getImageData(0, 0, newCanvas.width, newCanvas.height);
-          const jsQR = require("jsqr");
-          const code = await jsQR(imageData.data, newCanvas.width, newCanvas.height);
-          chrome.runtime.sendMessage({
-            command: 'saveNewQRCode',
-            tab: msg.tab,
-            sender: code
-          });
-        }
+      image.onload = async function () {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight);
+        const jsQR = require("jsqr");
+        const code = await jsQR(imgData.data, center.offsetWidth, center.offsetHeight);
+        chrome.runtime.sendMessage({
+          command: 'saveNewQRCode',
+          tab: msg.tab,
+          sender: code
+        });
       }
     }
 

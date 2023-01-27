@@ -234,8 +234,7 @@ export default class NotificationBackground {
           otp = await this.totpService.getCode(msg.sender.data);
         }
         if (otp) {
-          const domain = msg.tab?.url?.split('/')[2]
-          const name = msg.tab?.title + (domain ? `(${domain})` : '')
+          const name = msg.tab?.url?.split('/')[2]
           const notes = msg.sender.data;
           let currentOtps = await this.cipherService.getAllDecrypted();
           currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
