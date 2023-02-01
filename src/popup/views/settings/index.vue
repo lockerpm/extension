@@ -266,6 +266,9 @@ export default Vue.extend({
         key,
         this.storage[key]
       )
+      if (key === enableAutofillKey && this.storage[enableAutofillKey]) {
+        await this.setupFillPage()
+      }
     }
   },
 });

@@ -675,7 +675,8 @@ module.exports = {
       forgot_password: 'Quên mật khẩu?',
       login_with: 'Hoặc Đăng nhập với',
       dont_have_account: 'Chưa có tài khoản?',
-      sign_up: 'Đăng ký'
+      sign_up: 'Đăng ký',
+      sign_in: 'Đăng nhập'
     },
     set_master_pass: {
       create: 'Tạo Mật khẩu chính',

@@ -126,9 +126,13 @@ export default class NotificationBackground {
               usernameFields: usernameFields,
               isLocked: await this.vaultTimeoutService.isLocked()
             });
-            if (passwordFields.length > 0) {
-              this.autofillFirstPage(sender.tab);
-            }
+            chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
+              if (autofillObj.enableAutofill === false) return;
+              // check is login page
+              if (passwordFields.length === 1 && !passwordFields[0].value) {
+                this.autofillFirstPage(sender.tab);
+              }
+            })
             break;
           default:
             break;
