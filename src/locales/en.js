@@ -685,7 +685,8 @@ module.exports = {
       forgot_password: 'Forgot Password?',
       login_with: 'Or Log in with',
       dont_have_account: 'Don\'t have an account yet?',
-      sign_up: 'Sign Up'
+      sign_up: 'Sign Up',
+      sign_in: 'Sign In'
     },
     set_master_pass: {
       create: 'Create Master Password',

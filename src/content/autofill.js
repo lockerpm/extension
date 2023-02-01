@@ -167,7 +167,6 @@
             }
 
             // end helpers
-
             var theView = theDoc.defaultView ? theDoc.defaultView : window,
                 passwordRegEx = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|(\\\\b|_|-)passe(\\\\b|_|-)|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
 
