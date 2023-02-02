@@ -1,80 +1,67 @@
 <template>
-  <div class="flex flex-grow flex-col items-center mx-auto" style="width: 400px;">
-    <div class="mt-[3rem] text-center">
+  <div style="width: 400px;">
+    <div class="mt-14 text-center">
       <img
         src="@/assets/images/logo/logo_black.svg"
         alt=""
         class="h-[36px] mx-auto"
       >
     </div>
-    <div class="w-full p-6 text-center mt-14">
-      <div class="font-bold text-head-4 text-black-700 mt-7">
-        {{$t('data.login.login')}}
-      </div>
-      <div class="text-base mt-2 mb-6">
-        {{$t('data.login.login_desc')}}
-      </div>
-      <button
-        class="btn btn-primary w-3/4"
-        @click="openLogin"
-      >
-        Single Sign-On
-      </button>
-      <div v-if="!factor2">
-        <div class="text-center mt-2">
-        </div>
-        <div
-          class="mx-auto border border-black-500 h-[1px]"
-          style="width: 30px; margin-top: 30px"
-        >
-        </div>
-        <div class="mt-3 text-center">
-          <p class="mb-2">
-            {{$t('data.login.login_with')}}
-          </p>
-          <button
-            v-for="s in strategies"
-            :key="s.key"
-            type="button"
-            class="m-btn--icon btn-icon-login m-btn--pill"
-            @click="loginWith(s.key)"
-          >
-            <img
-              class="social__app-icon"
-              :src="require(`@/assets/images/icons/${s.key}.svg`)"
-              :alt="s.key"
-            >
-          </button>
-        </div>
-        <div class="absolute" style="bottom: 20px; width: 400px; padding-right: 48px">
-          <div class="flex px-2 my-4 mx-auto">
-            <div class="w-full pl-0 text-center">
-              <span>
-                {{$t('data.login.dont_have_account')}}
-                <a
-                @click.prevent="openRegister"
-                tag="a"
-                class="text-[#0476e9] no-underline"
-              >
-                {{$t('data.login.sign_up')}}
-              </a>
-              </span>
-              
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="font-bold text-head-5 text-black-700 text-center mt-10">
+      {{$t('data.login.login')}}
     </div>
+    <el-row type="flex" justify="space-between my-4 px-10" align="middle">
+      <div class="text-base">
+        {{ login_step === 1 ? $t('data.login.login_option') : $t('data.login.login_option_locker', { option: $t(`data.login.options.${optionValue}`) })}}
+      </div>
+      <div
+        v-if="language !== 'vi'"
+        class="cursor-pointer"
+        @click="changeLang('vi')"
+      >
+        <span class="flag flag-us"></span>
+      </div>
+      <div v-else
+        class="cursor-pointer"
+        @click="changeLang('en')"
+      >
+        <span class="flag flag-vn"></span>
+      </div>
+    </el-row>
+    <Options
+      v-if="login_step === 1"
+      :optionValue="optionValue"
+      @change-option="(value) => optionValue = value"
+      @next="() => updateLoginStep(2)"
+    />
+    <Form
+      v-else :login-step="login_step"
+      :isEnterprise="isEnterprise"
+      @back="() => updateLoginStep(1)"
+    />
+    <LogInWith />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import Options from '../components/auth/Options.vue';
+import LogInWith from '../components/auth/LogInWith.vue'
+import Form from '../components/auth/Form.vue'
+
 import { BrowserApi } from "@/browser/browserApi";
 export default Vue.extend({
-  components: { },
+  name: 'Login',
+  components: {
+    Options,
+    LogInWith,
+    Form
+  },
   data () {
     return {
+      optionValue: 'individual_vault',
+      login_step: 1,
+
       user: {},
       error: null,
       send_mail: false,
@@ -90,10 +77,15 @@ export default Vue.extend({
       step: 1,
       methods: [],
       loadingSendEmail: false,
-      selectedMethod: {
-      },
+      selectedMethod: {},
       value: 'mail',
-      showPassword: false
+      showPassword: false,
+      showOptions: false
+    }
+  },
+  computed: {
+    isEnterprise() {
+      return this.optionValue === 'enterprise_vault'
     }
   },
   async mounted() {
@@ -113,26 +105,8 @@ export default Vue.extend({
     );
   },
   methods: {
-    async openRegister() {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'register' },
-      };
-      chrome.runtime.sendMessage(msg);
-    },
-    async openLogin() {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'login' },
-      };
-      chrome.runtime.sendMessage(msg);
-    },
-    async loginWith (provider) {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'login', provider: provider },
-      };
-      chrome.runtime.sendMessage(msg);
+    updateLoginStep (value) {
+      this.login_step = value
     },
     reset_state () {
       this.error = null
@@ -284,45 +258,4 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.m-btn--icon {
-  width: 43px;
-  height: 43px;
-  text-align: center;
-  padding-top: 5px;
-}
-.btn-icon-login {
-  background: transparent !important;
-}
-.btn-icon-login:hover {
-  background: rgba(9, 30, 66, 0.02) !important;
-  box-shadow: 1px 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-}
-.m-btn--pill {
-  border-radius: 60px;
-}
-.social__app-icon {
-  display: inline-block;
-  height: 20px;
-  vertical-align: -0.2rem;
-  width: 20px;
-  border-radius: 0;
-}
-.m-option {
-  display: flex;
-  padding: 1.4em;
-  border-radius: 6px;
-  border: 1px solid #ebedf2;
-}
-.m-option .m-option__control {
-  width: 2.7rem;
-  padding-top: 0.1rem;
-}
-.m-option .m-option__label {
-  width: 100%;
-}
-.m-option .m-option__label .m-option__body {
-  display: block;
-  padding-top: 0.7rem;
-  font-size: 0.85rem;
-}
 </style>

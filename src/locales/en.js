@@ -686,7 +686,16 @@ module.exports = {
       login_with: 'Or Log in with',
       dont_have_account: 'Don\'t have an account yet?',
       sign_up: 'Sign Up',
-      sign_in: 'Sign In'
+      sign_in: 'Sign In',
+      login_option: 'Sign in to your account',
+      login_option_locker: 'Sign in to your Locker {option}',
+      username_placeholder: 'Email or Username',
+      password_placeholder: 'Password',
+      options: {
+        individual_vault: 'Individual',
+        business_vault: 'Business',
+        enterprise_vault: 'Enterprise',
+      }
     },
     set_master_pass: {
       create: 'Create Master Password',

@@ -676,7 +676,16 @@ module.exports = {
       login_with: 'Hoặc Đăng nhập với',
       dont_have_account: 'Chưa có tài khoản?',
       sign_up: 'Đăng ký',
-      sign_in: 'Đăng nhập'
+      sign_in: 'Đăng nhập',
+      login_option: 'Đăng nhập tài khoản',
+      login_option_locker: 'Đăng nhập tài khoản {option}',
+      username_placeholder: 'Email hoặc Tên đăng nhập',
+      password_placeholder: 'Mật khẩu',
+      options: {
+        individual_vault: 'Cá nhân',
+        business_vault: 'Doanh nghiệp',
+        enterprise_vault: 'Doanh nghiệp On-premise',
+      }
     },
     set_master_pass: {
       create: 'Tạo Mật khẩu chính',

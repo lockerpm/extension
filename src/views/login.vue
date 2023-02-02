@@ -296,8 +296,7 @@ export default Vue.extend({
       step: 1,
       methods: [],
       loadingSendEmail: false,
-      selectedMethod: {
-      },
+      selectedMethod: {},
       value: 'mail',
       showPassword: false
     }

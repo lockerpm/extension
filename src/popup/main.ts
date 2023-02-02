@@ -40,6 +40,7 @@ if (process.env.NODE_ENV==='development') {
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@/assets/tailwind.css'
 import '@/assets/app.scss'
+import '@/assets/flags/flags.css'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
@@ -125,6 +126,10 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
+        chrome.runtime.sendMessage({
+          command: 'updateStoreService',
+          sender: { key: 'language', value: value },
+        });
       })
     },
     async logout () {
@@ -505,6 +510,8 @@ Vue.filter('filterString', function (value) {
 
 storePromise.then((store) => {
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+  store.commit('SET_LANG', store.state.language)
+  i18n.locale = store.state.language
   axios.interceptors.request.use(
     async (config) => {
       const token = await browserStorageService.get('cs_token')

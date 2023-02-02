@@ -31,5 +31,13 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style lang="scss">
+.el-input {
+  &__inner {
+    border-radius: 8px !important;
+  }
+}
+.el-button {
+  border-radius: 8px
+}
 </style>
