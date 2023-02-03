@@ -11,8 +11,8 @@
       {{$t('data.login.login')}}
     </div>
     <el-row type="flex" justify="space-between my-4 px-10" align="middle">
-      <div class="text-base">
-        {{ login_step === 1 ? $t('data.login.login_option') : $t('data.login.login_option_locker', { option: $t(`data.login.options.${optionValue}`) })}}
+      <div class="text-base font-medium">
+        {{ loginSubtitle }}
       </div>
       <div
         v-if="language !== 'vi'"
@@ -35,9 +35,22 @@
       @next="() => updateLoginStep(2)"
     />
     <Form
-      v-else :login-step="login_step"
+      v-else-if="login_step === 2"
       :isEnterprise="isEnterprise"
       @back="() => updateLoginStep(1)"
+      @next="() => updateLoginStep(3)"
+    />
+    <Identity
+      v-else-if="login_step === 3"
+      :identity="identity"
+      @change-identity="(value) => identity = value"
+      @back="() => updateLoginStep(2)"
+      @next="() => updateLoginStep(4)"
+    />
+    <VerifyOTP
+      v-else-if="login_step === 4"
+      :identity="identity"
+      @back="() => updateLoginStep(3)"
     />
     <LogInWith />
   </div>
@@ -48,6 +61,8 @@ import Vue from 'vue'
 import Options from '../components/auth/Options.vue';
 import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
+import Identity from '../components/auth/Identity.vue'
+import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
 import { BrowserApi } from "@/browser/browserApi";
 export default Vue.extend({
@@ -55,20 +70,21 @@ export default Vue.extend({
   components: {
     Options,
     LogInWith,
-    Form
+    Form,
+    Identity,
+    VerifyOTP
   },
   data () {
     return {
       optionValue: 'individual_vault',
       login_step: 1,
+      identity: 'email',
 
       user: {},
       error: null,
       send_mail: false,
       loading: false,
       userCopy: {},
-      bugs: {},
-      typePassword: 'password',
       factor2: false,
       otp: '',
       loadingOtp: false,
@@ -79,13 +95,23 @@ export default Vue.extend({
       loadingSendEmail: false,
       selectedMethod: {},
       value: 'mail',
-      showPassword: false,
-      showOptions: false
     }
   },
   computed: {
     isEnterprise() {
       return this.optionValue === 'enterprise_vault'
+    },
+    loginSubtitle() {
+      if (this.login_step === 1) {
+        return this.$t('data.login.login_option')
+      }
+      if (this.login_step === 2) {
+        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.optionValue}`) })
+      }
+      if (this.login_step === 3) {
+        return this.$t('data.login.verify')
+      }
+      return this.$t('data.login.enter_code')
     }
   },
   async mounted() {

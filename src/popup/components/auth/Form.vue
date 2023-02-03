@@ -20,13 +20,14 @@
     </el-form>
     <el-row type="flex" align="middle" justify="space-between">
       <el-button
-      type="text"
-      icon="el-icon-back"
-      @click="$emit('back')"
-    >{{ $t(`common.back`) }}</el-button>
+        type="text"
+        icon="el-icon-back"
+        @click="$emit('back')"
+      >{{ $t(`common.back`) }}</el-button>
       <el-button
-      type="primary"
-    >{{ $t(`data.login.sign_in`) }}</el-button>
+        type="primary"
+        @click="handleLogin"
+      >{{ $t(`data.login.sign_in`) }}</el-button>
     </el-row>
     
   </div>
@@ -47,6 +48,9 @@ export default Vue.extend({
     }
   },
   methods: {
+    handleLogin() {
+      this.$emit('next')
+    }
   }
 })
 </script>

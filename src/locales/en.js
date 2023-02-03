@@ -85,7 +85,8 @@ module.exports = {
     mr: 'Mr',
     mrs: 'Mrs',
     ms: 'Ms',
-    dr: 'Dr'
+    dr: 'Dr',
+    next: 'Next'
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -672,7 +673,6 @@ module.exports = {
       verify: 'Verify your identity',
       authentication_app: 'Authentication App',
       have_code: 'I have a code',
-      next: 'Next',
       enter_code: 'Enter code',
       check_email: 'An email has been sent to {email}. Check you inbox/spam to get verification code.',
       use_authentication_app: 'Please use your authentication app (such as Duo or Google Authenticator) to get the code.',
