@@ -12,7 +12,6 @@ import moment from "moment";
 import VueMomentJS from "vue-momentjs";
 import VueNativeSock from "vue-native-websocket";
 
-
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
 import storePromise from '@/store'

@@ -695,6 +695,9 @@ module.exports = {
         individual_vault: 'Individual',
         business_vault: 'Business',
         enterprise_vault: 'Enterprise',
+      },
+      message: {
+        required: '{name} is required!',
       }
     },
     set_master_pass: {

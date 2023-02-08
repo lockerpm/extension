@@ -685,6 +685,9 @@ module.exports = {
         individual_vault: 'Cá nhân',
         business_vault: 'Doanh nghiệp',
         enterprise_vault: 'Doanh nghiệp on-premise',
+      },
+      message: {
+        required: '{name} là bắt buộc!',
       }
     },
     set_master_pass: {

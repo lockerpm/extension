@@ -37,12 +37,17 @@
     <Form
       v-else-if="login_step === 2"
       :isEnterprise="isEnterprise"
+      @update-auth="(v) => auth_info = v"
+      @update-user="(v) => user_info = v"
       @back="() => updateLoginStep(1)"
       @next="() => updateLoginStep(3)"
+      @get-access-token="getAccessToken"
     />
     <Identity
       v-else-if="login_step === 3"
       :identity="identity"
+      :auth_info="auth_info"
+      :user_info="user_info"
       @change-identity="(value) => identity = value"
       @back="() => updateLoginStep(2)"
       @next="() => updateLoginStep(4)"
@@ -50,9 +55,12 @@
     <VerifyOTP
       v-else-if="login_step === 4"
       :identity="identity"
+      :otp-method="otpMethod"
+      :user_info="user_info"
       @back="() => updateLoginStep(3)"
+      @get-access-token="getAccessToken"
     />
-    <LogInWith />
+    <LogInWith v-if="[1, 2].includes(login_step)"/>
   </div>
 </template>
 
@@ -64,7 +72,6 @@ import Form from '../components/auth/Form.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
-import { BrowserApi } from "@/browser/browserApi";
 export default Vue.extend({
   name: 'Login',
   components: {
@@ -78,23 +85,9 @@ export default Vue.extend({
     return {
       optionValue: 'individual_vault',
       login_step: 1,
-      identity: 'email',
-
-      user: {},
-      error: null,
-      send_mail: false,
-      loading: false,
-      userCopy: {},
-      factor2: false,
-      otp: '',
-      loadingOtp: false,
-      save_device: false,
-      errors: {},
-      step: 1,
-      methods: [],
-      loadingSendEmail: false,
-      selectedMethod: {},
-      value: 'mail',
+      identity: 'mail',
+      auth_info: null,
+      user_info: null,
     }
   },
   computed: {
@@ -112,6 +105,9 @@ export default Vue.extend({
         return this.$t('data.login.verify')
       }
       return this.$t('data.login.enter_code')
+    },
+    otpMethod () {
+      return this.auth_info?.methods?.find((m) => m.type === this.identity)
     }
   },
   async mounted() {
@@ -134,122 +130,6 @@ export default Vue.extend({
     updateLoginStep (value) {
       this.login_step = value
     },
-    reset_state () {
-      this.error = null
-      this.send_mail = false
-    },
-    async login () {
-      if (this.loading) { return }
-      this.reset_state()
-      try {
-        const res = await this.axios.post('/sso/auth', {
-          ...this.user
-        })
-        this.loading = false
-        if (res.is_factor2) {
-          this.factor2 = true
-          this.step = 1
-          this.methods = res.methods
-          if (res.methods.length) {
-            this.selectedMethod = res.methods[0]
-            this.value = res.methods[0].type
-          }
-        } else {
-          try {
-            this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-            await this.getAccessToken(res.token)
-          }
-          catch (e) {
-            this.notify(e, 'warning')
-          }
-        }
-      }
-      catch (e) {
-        if (e.response) {
-          this.loading = false
-          this.error = e.response.data.message
-          if (e.response.data.code === '1003') {
-            this.send_mail = true
-            Object.assign(this.userCopy, this.user)
-          }
-        }
-      }
-    },
-    openForgot () {
-      const url = `${process.env.VUE_APP_ID_URL}/forgot  `;
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
-    },
-    async checkToken (access_token, authStrategy) {
-      if (authStrategy === 'facebook' || authStrategy === 'google' || authStrategy === 'github') {
-        const accessToken = access_token
-        const url = '/sso/auth/social'
-        try {
-          const myHeaders = {
-            headers: { Authorization: `Bearer ${accessToken}` }
-          }
-          const data = await this.axios.post(url, {
-            provider: authStrategy,
-            access_token: accessToken.split(' ').pop(),
-            scope: "pwdmanager"
-          }, myHeaders)
-          await this.getAccessToken(data.token)
-        } catch (e) {
-          this.notify('Login failed', 'error')
-        }
-      }
-    },
-    async postOtp () {
-      try {
-        this.loadingOtp = true
-        const res = await this.axios.post('/sso/auth/otp', {
-          ...this.user,
-          otp: this.otp,
-          method: this.selectedMethod.type,
-          save_device: this.save_device
-        })
-        try {
-          this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-          await this.getAccessToken(res.token)
-        }
-        catch (e) {
-          this.notify(e, 'warning')
-        }
-      } catch (e) {
-        this.loadingOtp = false
-        if (e.response) {
-          if (e.response.data.code === '1002') {
-            this.errors = e.response.data
-          }
-        }
-      }
-    },
-    selectMethod (method) {
-      this.selectedMethod = method
-      this.value = method.type
-    },
-    nextMethod () {
-      if (this.loadingSendEmail) { return }
-
-      if (this.selectedMethod.type === 'mail') {
-        this.loadingSendEmail = true
-        const url = '/sso/auth/otp/mail'
-        this.axios.post(url, this.user)
-          .then((res) => {
-            this.loadingSendEmail = false
-            this.step = 2
-            this.$nextTick(() => this.$refs.otp.focus())
-          }).catch(() => {
-            this.loadingSendEmail = false
-            this.factor2 = false
-          })
-      } else {
-        this.step = 2
-        this.$nextTick(() => this.$refs.otp.focus())
-      }
-    },
     async getAccessToken(token){
       const url = '/sso/access_token'
       const config = {
@@ -262,7 +142,7 @@ export default Vue.extend({
       }
       try {
         this.axios.post('/sso/me/last_active', {}, config)
-        const data = await this.axios.post(url,payload,config)
+        const data = await this.axios.post(url, payload, config)
         if(data.url){
           const url = data.url
           let token = url.substring(url.indexOf("token")+6)
@@ -276,9 +156,9 @@ export default Vue.extend({
           this.$router.push({ name: 'lock' })
         }
       } catch (error) {
-        this.notify(error, 'warning')
+        this.notify(error?.response?.data?.message, 'error')
       }
-    }
+    },
   }
 })
 </script>
