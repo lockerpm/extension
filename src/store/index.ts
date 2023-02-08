@@ -8,9 +8,14 @@ const browserStorageService = JSLib.getBgService<StorageService>('storageService
 const STORAGE_KEY = 'cs_store'
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
-  let oldStoreParsed = {}
+  let oldStoreParsed = {
+    language: 'en'
+  }
   if (typeof oldStore === 'object') {
-    oldStoreParsed = oldStore
+    oldStoreParsed = {
+      ...oldStoreParsed,
+      ...oldStore
+    }
   }
   console.log('oldStoreParsed', oldStoreParsed)
 
@@ -20,7 +25,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       isLoggedIn: false,
       user: {
         email: null,
-        language: 'vi',
+        language: oldStoreParsed.language,
         full_name: '',
         avatar: '',
         organization: '',
@@ -58,7 +63,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.isLoggedIn = payload.isLoggedIn || false
         state.user = payload.user || {
           email: null,
-          language: 'vi',
+          language: 'en',
           full_name: '',
           avatar: '',
           organization: '',
@@ -68,7 +73,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.currentPath = payload.currentPath || '/'
         state.previousPath = payload.previousPath || ''
       },
-      SET_LANG (state, {language}) {
+      SET_LANG (state, language) {
         state.user.language = language
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
