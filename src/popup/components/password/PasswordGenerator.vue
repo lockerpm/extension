@@ -84,6 +84,7 @@
 
 <script>
 import PasswordStrength from './PasswordStrength'
+import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 export default {
   components: { PasswordStrength },
@@ -110,10 +111,10 @@ export default {
     }
   },
   mounted () {
-    this.regenerate()
+    this.regenerate(false)
   },
   methods: {
-    async regenerate () {
+    async regenerate (isReset = true) {
       const oldGeneratePassword = await this.$passService.getGeneratePassword()
       if (oldGeneratePassword) {
         this.password = oldGeneratePassword.password
@@ -122,8 +123,10 @@ export default {
       if (!this.options.lowercase && !this.options.uppercase && !this.options.lowercase && !this.options.number && !this.options.special) {
         this.options.lowercase = true
       }
-      if (!this.password) {
+      if (isReset) {
         this.password = await this.$passwordGenerationService.generatePassword(this.options)
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        await this.$passService.setInformation(this.password, this.options, tab)
       }
     },
     async savePassword () {
