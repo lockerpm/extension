@@ -4,6 +4,7 @@
       <el-form-item prop="username">
         <el-input
           v-model="form.username"
+          ref="username"
           :disabled="callingAPI"
           :placeholder="$t('data.login.username_placeholder')"
         ></el-input>
@@ -48,8 +49,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: '', //quyetnguyencr7@gmail.com
-        password: '' //tienquyet1997@
+        username: 'quyetnguyencr7@gmail.com', //quyetnguyencr7@gmail.com
+        password: 'tienquyet1997@' //tienquyet1997@
       }
     }
   },
@@ -72,6 +73,9 @@ export default Vue.extend({
         ]
       }
     }
+  },
+  mounted() {
+    this.$nextTick(() => this.$refs.username.focus())
   },
   methods: {
     handleLogin() {

@@ -8,6 +8,7 @@
       >
         <el-input
           v-model="form.otpCode"
+          ref="otp"
           :placeholder="$t('data.login.enter_code')"
           :disabled="callingAPI"
         ></el-input>
