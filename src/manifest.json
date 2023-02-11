@@ -100,7 +100,7 @@
     "inform-menu/menu.html",
     "popup.html"
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; script-src-elem https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/releases/gEr-ODersURoIfof1hiDm7R5/recaptcha__vi.js 'self' 'unsafe-eval'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; script-src-elem https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/* 'self' *",
   "externally_connectable": {
     "matches": [
       "https://*.demo.cystack.net:3011/*",
