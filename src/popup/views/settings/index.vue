@@ -58,12 +58,7 @@
         </div>
       </div>
       <div class="mt-4 flex items-center justify-center">
-          <div v-if="language==='vi'">
-            Một sản phẩm của
-          </div>
-          <div v-else>
-            A product of
-          </div>
+          {{ $t('data.settings.a_product_of') }}
           <a href="https://cystack.net" target="_blank">
             <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack"/>
           </a>
@@ -76,7 +71,6 @@
 
 <script>
 import Vue from "vue";
-import { BrowserApi } from "@/browser/browserApi";
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import Header from "../../components/layout/parts/Header.vue";
 import Footer from "../../components/layout/parts/Footer.vue";
