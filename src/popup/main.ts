@@ -129,6 +129,7 @@ Vue.mixin({
     },
     async logout () {
       console.log('###### LOG OUT')
+      await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
       await this.axios.post('/users/logout')
       await Promise.all([
@@ -144,6 +145,7 @@ Vue.mixin({
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$router.push({ name: 'login' });
+      
       chrome.runtime.sendMessage({
         command: 'updateStoreService',
         sender: { key: 'isLoggedIn', value: false },
