@@ -118,7 +118,6 @@ export class TotpService implements TotpServiceAbstraction {
     }
 
     // Helpers
-
     private leftPad(s: string, l: number, p: string): string {
         if (l + 1 >= s.length) {
             s = Array(l + 1 - s.length).join(p) + s;

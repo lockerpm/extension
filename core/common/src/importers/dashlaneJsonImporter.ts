@@ -25,22 +25,22 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
             return Promise.resolve(this.result);
         }
 
-        if (results.ADDRESS != null) {
+        if (results.ADDRESS) {
             this.processAddress(results.ADDRESS);
         }
-        if (results.AUTHENTIFIANT != null) {
+        if (results.AUTHENTIFIANT) {
             this.processAuth(results.AUTHENTIFIANT);
         }
-        if (results.BANKSTATEMENT != null) {
+        if (results.BANKSTATEMENT) {
             this.processNote(results.BANKSTATEMENT, 'BankAccountName');
         }
-        if (results.IDCARD != null) {
+        if (results.IDCARD) {
             this.processNote(results.IDCARD, 'Fullname');
         }
-        if (results.PAYMENTMEANS_CREDITCARD != null) {
+        if (results.PAYMENTMEANS_CREDITCARD) {
             this.processCard(results.PAYMENTMEANS_CREDITCARD);
         }
-        if (results.IDENTITY != null) {
+        if (results.IDENTITY) {
             this.processIdentity(results.IDENTITY);
         }
 
@@ -110,7 +110,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
             cipher.identity.state = this.getValueOrDefault(obj.state);
             cipher.identity.postalCode = this.getValueOrDefault(obj.zipcode);
             cipher.identity.country = this.getValueOrDefault(obj.country);
-            if (cipher.identity.country != null) {
+            if (cipher.identity.country) {
                 cipher.identity.country = cipher.identity.country.toUpperCase();
             }
             this.cleanupCipher(cipher);
@@ -145,7 +145,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
             cipher.secureNote = new SecureNoteView();
             cipher.type = CipherType.SecureNote;
             cipher.secureNote.type = SecureNoteType.Generic;
-            if (name != null) {
+            if (name) {
                 cipher.name = name;
             } else {
                 cipher.name = this.getValueOrDefault(obj[nameProperty]);

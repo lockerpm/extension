@@ -2,7 +2,7 @@ import { LogLevelType } from '../enums/logLevelType';
 
 import { LogService as LogServiceAbstraction } from '../abstractions/log.service';
 
-import * as hrtime from 'browser-hrtime';
+import hrtime from 'browser-hrtime';
 
 export class ConsoleLogService implements LogServiceAbstraction {
     protected timersMap: Map<string, [number, number]> = new Map();

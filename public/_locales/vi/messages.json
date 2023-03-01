@@ -38,10 +38,10 @@
     "message": "Mật khẩu chính"
   },
   "masterPassDesc": {
-    "message": "Mật khẩu chủ là mật khẩu bạn sử dụng để truy cập kho mật khẩu của bạn. Nó rất quan trọng nên bạn không được quên mật khẩu chủ của mình. Không thể khôi phục lại mật khẩu chủ nếu bạn quên nó."
+    "message": "Mật khẩu chính là mật khẩu bạn sử dụng để truy cập kho mật khẩu của bạn. Nó rất quan trọng nên bạn không được quên Mật khẩu chính của mình. Không thể khôi phục lại Mật khẩu chính nếu bạn quên nó."
   },
   "masterPassHintDesc": {
-    "message": "Một gợi ý mật khẩu có thể giúp bạn nhớ lại mật khẩu chủ của bạn nếu bạn quên nó."
+    "message": "Một gợi ý mật khẩu có thể giúp bạn nhớ lại Mật khẩu chính của bạn nếu bạn quên nó."
   },
   "reTypeMasterPass": {
     "message": "Nhập lại mật khẩu chính"
@@ -110,10 +110,10 @@
     "message": "Gợi ý mật khẩu"
   },
   "enterEmailToGetHint": {
-    "message": "Nhập địa chỉ email tài khoản của bạn để nhận gợi ý mật khẩu chủ."
+    "message": "Nhập địa chỉ email tài khoản của bạn để nhận gợi ý Mật khẩu chính."
   },
   "getMasterPasswordHint": {
-    "message": "Nhận gợi ý mật khẩu chủ"
+    "message": "Nhận gợi ý Mật khẩu chính"
   },
   "continue": {
     "message": "Tiếp tục"
@@ -328,7 +328,7 @@
     }
   },
   "invalidMasterPassword": {
-    "message": "Mật khẩu chủ không hợp lệ"
+    "message": "Mật khẩu chính không hợp lệ"
   },
   "vaultTimeout": {
     "message": "Thời Gian Chờ Của Kho"
@@ -391,19 +391,19 @@
     "message": "Địa chỉ email không hợp lệ."
   },
   "masterPassRequired": {
-    "message": "Mật khẩu chủ là bắt buộc."
+    "message": "Mật khẩu chính là bắt buộc."
   },
   "masterPassLength": {
-    "message": "Mật khẩu chủ phải có ít nhất 8 kí tự."
+    "message": "Mật khẩu chính phải có ít nhất 8 kí tự."
   },
   "masterPassDoesntMatch": {
-    "message": "Xác nhận mật khẩu chủ không khớp."
+    "message": "Xác nhận Mật khẩu chính không khớp."
   },
   "newAccountCreated": {
     "message": "Tài khoản của bạn đã được tạo. Bạn có thể đăng nhập bây giờ."
   },
   "masterPassSent": {
-    "message": "Chúng tôi đã gửi cho bạn email có chứa gợi ý mật khẩu chủ của bạn."
+    "message": "Chúng tôi đã gửi cho bạn email có chứa gợi ý Mật khẩu chính của bạn."
   },
   "verificationCodeRequired": {
     "message": "Yêu cầu mã xác nhận."
@@ -449,7 +449,7 @@
     "message": "Thay đổi mật khẩu chính"
   },
   "changeMasterPasswordConfirmation": {
-    "message": "Bạn có thể thay đổi mật khẩu chủ trong trang web Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
+    "message": "Bạn có thể thay đổi Mật khẩu chính trong trang web Locker. Bạn có muốn truy cập bitwarden.com bây giờ?"
   },
   "twoStepLoginConfirmation": {
     "message": "Xác thực hai lớp giúp cho tài khoản của bạn an toàn hơn bằng cách yêu cầu bạn xác minh thông tin đăng nhập của bạn bằng một thiết bị khác như khóa bảo mật, ứng dụng xác thực, SMS, cuộc gọi điện thoại hoặc email. Bạn có thể bật xác thực hai lớp trong trang web Locker. Bạn có muốn ghé thăm bitwarden.com bây giờ?"
@@ -626,7 +626,7 @@
     "message": "Account encryption keys are unique to each Locker user account, so you can't import an encrypted export into a different account."
   },
   "exportMasterPassword": {
-    "message": "Nhập mật khẩu chủ để xuất kho dữ liệu của bạn."
+    "message": "Nhập Mật khẩu chính để xuất kho dữ liệu của bạn."
   },
   "shared": {
     "message": "Đã chia sẻ"
@@ -918,7 +918,7 @@
     "message": "Đây là một tính năng thử nghiệm. Sử dụng nó có thể gây ra rủi ro cho bạn."
   },
   "defaultAutoFillOnPageLoad": {
-    "message": "Default autofill setting for login items"
+    "message": "Default autofill setting for  items"
   },
   "defaultAutoFillOnPageLoadDesc": {
     "message": "After enabling Auto-fill on Page Load, you can enable or disable the feature for individual login items. This is the default setting for login items that are not separately configured."
@@ -1381,7 +1381,7 @@
     "message": "Tự động điền"
   },
   "setMasterPassword": {
-    "message": "Đặt mật khẩu chủ"
+    "message": "Đặt Mật khẩu chính"
   },
   "masterPasswordPolicyInEffect": {
     "message": "One or more organization policies require your master password to meet the following requirements:"
@@ -1757,10 +1757,16 @@
     "message": "Tài khoản đã lưu"
   },
   "informMenuVaultLocked": {
-    "message": "Kho bí mật đã khóa."
+    "message": "Mở khoá kho dữ liệu"
+  },
+  "informMenuLoginToAutofill": {
+    "message": "Đăng nhập để tự động điền"
   },
   "informMenuLoginNow": {
     "message": "Đăng nhập"
+  },
+  "informMenuUnlockNow": {
+    "message": "Mở khoá"
   },
   "informMenuGeneratePassword": {
     "message": "Tạo mật khẩu mạnh"

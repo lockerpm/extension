@@ -6,6 +6,7 @@ import { ExportService } from 'jslib-common/abstractions/export.service';
 import { ImportService } from 'jslib-common/abstractions/import.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
 import { MessagingService } from 'jslib-common/abstractions/messaging.service';
+import { PassService } from 'jslib-common/abstractions/pass.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
 import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.service';
 import { StorageService } from 'jslib-common/abstractions/storage.service';
@@ -20,6 +21,7 @@ import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { BroadcasterService } from 'jslib-common/abstractions/broadcaster.service';
+import { TotpService } from 'jslib-common/abstractions/totp.service';
 
 declare module "vue/types/vue" {
   interface Vue {
@@ -31,6 +33,7 @@ declare module "vue/types/vue" {
     $importService: ImportService;
     $folderService: FolderService;
     $messagingService: MessagingService;
+    $passService: PassService;
     $passwordGenerationService: PasswordGenerationService;
     $platformUtilsService: PlatformUtilsService;
     $storageService: StorageService;
@@ -45,6 +48,7 @@ declare module "vue/types/vue" {
     $popupUtilsService: PopupUtilsService;
     $vaultTimeoutService: VaultTimeoutService;
     $broadcasterService: BroadcasterService;
+    $totpService: TotpService;
   }
 
   interface VueConstructor {
@@ -56,6 +60,7 @@ declare module "vue/types/vue" {
     $importService: ImportService;
     $folderService: FolderService;
     $messagingService: MessagingService;
+    $passService: PassService;
     $passwordGenerationService: PasswordGenerationService;
     $platformUtilsService: PlatformUtilsService;
     $storageService: StorageService;
@@ -70,6 +75,7 @@ declare module "vue/types/vue" {
     $popupUtilsService: PopupUtilsService;
     $vaultTimeoutService: VaultTimeoutService;
     $broadcasterService: BroadcasterService;
+    $totpService: TotpService;
   }
 }
 

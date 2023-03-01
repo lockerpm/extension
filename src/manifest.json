@@ -16,7 +16,9 @@
     "https://*/*",
     "webRequest",
     "webRequestBlocking",
-    "identity"
+    "identity",
+    "activeTab",
+    "<all_urls>"
   ],
   "optional_permissions": [
     "nativeMessaging"
@@ -34,7 +36,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": true,
+      "all_frames": false,
       "js": [
         "js/content/autofill.js",
         "js/content/autofiller.js",
@@ -95,7 +97,8 @@
   },
   "web_accessible_resources": [
     "notification/bar.html",
-    "inform-menu/menu.html"
+    "inform-menu/menu.html",
+    "popup.html"
   ],
   "externally_connectable": {
     "matches": [

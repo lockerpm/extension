@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #E4F0E6; min-height: 600px; max-width: 400px"
+    style="background: #F6F6F6; min-height: 600px; max-width: 400px"
   >
     <Header></Header>
     <router-view v-if="wrapperType === 'component'" />
@@ -48,14 +48,12 @@ export default Vue.extend({
       }
     },
     'locked' (newValue) {
-      // console.log('locked: ', newValue)
       if (newValue === true) {
         this.$router.push({ name: 'lock' })
         this.disconnectSocket()
       }
       if (newValue === false) {
         this.$store.dispatch('LoadTeams')
-        // console.log('unlock sync')
         this.getSyncData()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')

@@ -134,7 +134,6 @@ Vue.mixin({
       this.$folderService.clearCache()
       this.$cipherService.clearCache()
       this.$collectionService.clearCache()
-      // this.$searchService.clearIndex()
       this.$router.push({ name: 'lock' })
     },
     randomString () {
@@ -177,7 +176,6 @@ Vue.mixin({
           device_identifier: deviceIdentifier
         })
         this.$messagingService.send('loggedIn')
-        console.log(res)
         await this.$tokenService.setTokens(res.access_token, res.refresh_token)
         await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
         await this.$cryptoService.setKey(key)
@@ -189,10 +187,8 @@ Vue.mixin({
           this.$vaultTimeoutService.biometricLocked = false
         }
         this.$messagingService.send('unlocked')
-        // this.$router.push({ path: this.$store.state.currentPath === '/lock' ? '/vault' : this.$store.state.currentPath })
         this.$router.push({ name: 'vault' })
       } catch (e) {
-        console.log(e)
         this.notify('Xác thực thông tin thất bại', 'warning')
       }
     },
@@ -284,54 +280,11 @@ Vue.mixin({
         callbackDeleted(cipher)
         return
       }
-      console.log(cipher)
       this.$router.push({
         name: "vault-id",
         params: { id: cipher.id }
       });
       return;
-      if (this.$route.name === 'vault') {
-        this.$router.push({
-          name: 'vault-id',
-          params: { id: cipher.id }
-        })
-        return
-      }
-      if (this.$route.name === 'vault-folders-folderId') {
-        this.$router.push({
-          name: 'vault-folders-folderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      if (this.$route.name === 'vault-teams-teamId-tfolders-tfolderId') {
-        this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      let name = ''
-      switch (cipher.type) {
-      case CipherType.Login:
-        name = 'passwords'
-        break
-      case CipherType.SecureNote:
-        name = 'notes'
-        break
-      case CipherType.Card:
-        name = 'cards'
-        break
-      case CipherType.Identity:
-        name = 'identities'
-        break
-      }
-      this.$router.push({
-        name: name + '-id',
-        params: { id: cipher.id }
-      })
     },
     getTeam (teams, orgId) {
       return find(teams, e => e.id === orgId) || {}
@@ -400,10 +353,6 @@ storePromise.then((store) => {
       store.commit('UPDATE_PATH', toRoute.fullPath)
       store.commit('UPDATE_PREVIOUS_PATH', fromRoute.fullPath)
     }
-    // if (store.state.isLoggedIn) {
-    //   await store.dispatch('LoadCurrentUser')
-    //   await store.dispatch('LoadCurrentUserPw')
-    // }
     next()
   })
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()

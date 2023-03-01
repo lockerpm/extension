@@ -77,8 +77,8 @@
           </template>
           <template v-for="(item, index) in cipher.login.uris">
             <InputText
-              :key="index"
               v-model="item.uri"
+              :key="index"
               :label="$t('data.ciphers.website_address')"
               class="w-full"
               :disabled="true"

@@ -87,6 +87,12 @@ module.exports = {
     ms: 'Ms',
     dr: 'Dr'
   },
+  sort: {
+    name_asc: 'Name Ascending',
+    name_desc: 'Name Descending',
+    time_asc: 'Time Ascending',
+    time_desc: 'Time Descending'
+  },
   sidebar: {
     all: 'All',
     passwords: 'Passwords',
@@ -128,7 +134,10 @@ module.exports = {
     invalid_expiry_year: "Your card's expiration year is invalid.",
     invalid_expiry_year_past: "Your card's expiration year is in the past.",
     autofill: 'Unable to auto-fill the selected item on this page. Copy and paste the information instead.',
-    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.'
+    5002: 'The maximum ciphers of {type} is reached. Please check your Trash if any.',
+    5001: 'You can not delete more than 10000 items at a time.',
+    7012: 'The plan only accepts 6 members including you',
+    3003: 'This team was locked. Please upgrade your plan'
   },
   master_password: {
     create_success: 'Your Master Password has been created!',
@@ -147,7 +156,7 @@ module.exports = {
     re_password: 'Re-Enter new Master Password',
     change_btn: 'Change password',
     enter_password: 'Enter Master Password',
-    enter_password_desc: 'Enter your Master Password',
+    enter_password_desc: 'Enter your Master Password to unlock',
     enter_password_title: 'Login',
     get_hint: 'Get master password hint',
     continue: 'Continue',
@@ -171,6 +180,7 @@ module.exports = {
     2: 'Note | Notes',
     3: 'Card | Cards',
     4: 'Identity | Identities',
+    5: 'OTP | OTP',
     0: 'Item | Items',
     7: 'Crypto Backup | Crypto Backups',
     Login: 'Password | Password',
@@ -561,7 +571,8 @@ module.exports = {
       text: 'Text',
       hidden: 'Hidden',
       date: 'Date',
-      monthYear: 'Month/Year'
+      monthYear: 'Month/Year',
+      markFavorite: 'Mark favorite'
     },
     settings: {
       account: 'Account',
@@ -626,7 +637,8 @@ module.exports = {
       logged_in_as: 'Logged in as',
       version: 'Version',
       term: 'Terms of use',
-      privacy: 'Privacy policy'
+      privacy: 'Privacy policy',
+      a_product_of: 'A product of'
     },
     tools: {
       password_generator: 'Password Generator',
@@ -657,7 +669,7 @@ module.exports = {
     },
     login: {
       login: 'Login',
-      login_desc: 'Login with CyStack ID to use Locker',
+      login_desc: 'Login with Locker ID to use Locker',
       verify: 'Verify your identity',
       authentication_app: 'Authentication App',
       have_code: 'I have a code',
@@ -674,7 +686,8 @@ module.exports = {
       forgot_password: 'Forgot Password?',
       login_with: 'Or Log in with',
       dont_have_account: 'Don\'t have an account yet?',
-      sign_up: 'Sign Up'
+      sign_up: 'Sign Up',
+      sign_in: 'Sign In'
     },
     set_master_pass: {
       create: 'Create Master Password',
@@ -683,17 +696,36 @@ module.exports = {
       confirm_pass: 'Confirm Master Password',
       hint_pass: 'Master password hint (optional)',
       create_btn: 'Create password',
-      note: 'Note: CyStack cannot view, store, or re-issue Master Password in case you forget or lose it.'
+      note: 'Note: Locker cannot view, store, or re-issue Master Password in case you forget or lose it.'
     },
     parts: {
       current: 'Current',
       vault: 'Vault',
       generate: 'Generate',
+      otp: 'OTP',
       generator: 'Generator',
       settings: 'Settings',
       search: 'Search Vault',
       open_web_app: 'Open the web app',
       sync_data: 'Sync your account'
+    },
+    otp: {
+      scan_qr: 'Scan QR code',
+      setup_key: 'Enter setup key',
+      copy: 'Copy OTP',
+      copied: 'Copied',
+      create: {
+        form_title: 'Input secret key manually',
+        title: 'Title',
+        secret_key: 'Secret key'
+      },
+      edit: {
+        form_title: 'Update OTP title',
+      },
+      message: {
+        title_required: 'Title is required!',
+        secret_key_required: 'Secret key is required'
+      }
     }
   }
 }

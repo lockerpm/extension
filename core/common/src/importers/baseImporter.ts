@@ -78,22 +78,22 @@ export abstract class BaseImporter {
     };
 
     protected get organization() {
-        return this.organizationId != null;
+        return !!this.organizationId;
     }
 
     protected parseXml(data: string): Document {
         const parser = new DOMParser();
         const doc = parser.parseFromString(data, 'application/xml');
-        return doc != null && doc.querySelector('parsererror') == null ? doc : null;
+        return doc && doc.querySelector('parsererror') == null ? doc : null;
     }
 
     protected parseCsv(data: string, header: boolean, options: any = {}): any[] {
         const parseOptions = Object.assign({ header: header }, this.parseCsvOptions, options);
         data = this.splitNewLine(data).join('\n').trim();
         const result = papa.parse(data, parseOptions);
-        if (result.errors != null && result.errors.length > 0) {
+        if (result.errors && result.errors.length > 0) {
             result.errors.forEach(e => {
-                if (e.row != null) {
+                if (e.row) {
                     // tslint:disable-next-line
                     this.logService.warning('Error parsing row ' + e.row + ': ' + e.message);
                 }
@@ -107,7 +107,7 @@ export abstract class BaseImporter {
             return null;
         }
         const parsedRow = this.parseCsv(rowData, false);
-        if (parsedRow != null && parsedRow.length > 0 && parsedRow[0].length > 0) {
+        if (parsedRow && parsedRow.length > 0 && parsedRow[0].length > 0) {
             return parsedRow[0];
         }
         return null;
@@ -190,7 +190,7 @@ export abstract class BaseImporter {
 
         // Visa
         let re = new RegExp('^4');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Visa';
         }
 
@@ -203,37 +203,37 @@ export abstract class BaseImporter {
 
         // AMEX
         re = new RegExp('^3[47]');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Amex';
         }
 
         // Discover
         re = new RegExp('^(6011|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[0-1][0-9]|92[0-5]|64[4-9])|65)');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Discover';
         }
 
         // Diners
         re = new RegExp('^36');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Diners Club';
         }
 
         // Diners - Carte Blanche
         re = new RegExp('^30[0-5]');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Diners Club';
         }
 
         // JCB
         re = new RegExp('^35(2[89]|[3-8][0-9])');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'JCB';
         }
 
         // Visa Electron
         re = new RegExp('^(4026|417500|4508|4844|491(3|7))');
-        if (cardNum.match(re) != null) {
+        if (cardNum.match(re)) {
             return 'Visa';
         }
 
@@ -256,7 +256,7 @@ export abstract class BaseImporter {
                 if (parts[1].length === 2 || parts[1].length === 4) {
                     year = month.length === 2 ? '20' + parts[1] : parts[1];
                 }
-                if (month != null && year != null) {
+                if (month && year) {
                     cipher.card.expMonth = month;
                     cipher.card.expYear = year;
                     return true;
@@ -311,7 +311,7 @@ export abstract class BaseImporter {
         } else {
             cipher.notes = cipher.notes.trim();
         }
-        if (cipher.fields != null && cipher.fields.length === 0) {
+        if (cipher.fields && cipher.fields.length === 0) {
             cipher.fields = null;
         }
     }

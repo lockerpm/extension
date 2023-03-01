@@ -1,20 +1,16 @@
 import Vue from 'vue'
-import VueRouter, {RouteConfig} from 'vue-router'
-import Home from '../views/home.vue'
-Vue.use(VueRouter)
+import VueRouter from 'vue-router'
+import * as Sentry from "@sentry/vue";
+import { BrowserTracing } from "@sentry/tracing";
 
-const routes: Array<RouteConfig> = [
-  {
-    path: '/',
-    name: 'home',
-    component: Home
-  }
-]
-
-const router = new VueRouter({
-  mode: 'hash',
-  base: '/popup.html',
-  routes
-})
-
-export default router
+const sentryConfig = (router: VueRouter) => Sentry.init({
+  Vue,
+  dsn: process.env.VUE_APP_SENTRY_DSN || '',
+  integrations: [
+    new BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router)
+    })
+  ],
+  tracesSampleRate: 1.0
+});
+export default sentryConfig

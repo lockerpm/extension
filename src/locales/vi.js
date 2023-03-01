@@ -60,7 +60,7 @@ module.exports = {
     folder_name: 'Tên Thư mục',
     group_name: 'Tên Nhóm',
     ownership: 'Quyền sở hữu',
-    master_password: 'Mật khẩu chủ',
+    master_password: 'Mật khẩu chính',
     joined: 'Tham gia lúc',
     close: 'Đóng',
     status: 'Trạng thái',
@@ -85,6 +85,12 @@ module.exports = {
     mrs: 'Bà',
     ms: 'Chị',
     dr: 'Bác sĩ'
+  },
+  sort: {
+    name_asc: 'Tên tăng dần',
+    name_desc: 'Tên giảm dần',
+    time_asc: 'Thời gian xa nhất',
+    time_desc: 'Thời gian gần nhất'
   },
   sidebar: {
     all: 'Tất cả',
@@ -118,7 +124,7 @@ module.exports = {
   errors: {
     confirm_password: 'Mật khẩu xác nhận không trùng khớp',
     invalid_password: 'Sai mật khẩu, vui lòng thử lại',
-    invalid_master_password: 'Sai mật khẩu tổng, vui lòng thử lại.',
+    invalid_master_password: 'Sai Mật khẩu chính, vui lòng thử lại.',
     111111: 'Phương thức thanh toán đã tồn tại.',
     invalid_number: 'Vui lòng nhập đúng số thẻ.',
     incomplete_number: 'Vui lòng nhập đầy đủ số thẻ.',
@@ -127,11 +133,14 @@ module.exports = {
     invalid_expiry_year: 'Vui lòng nhập chính xác năm hết hạn.',
     invalid_expiry_year_past: 'Vui lòng nhập chính xác năm hết hạn.',
     autofill: 'Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin.',
-    5002: 'Đã đạt đến số lượng tối đa của {type}. Vui lòng kiểm tra Thùng rác của bạn nếu có.'
+    5001: 'Bạn không thể xóa nhiều hơn 10000 mục tại 1 thời điểm.',
+    5002: 'Đã đạt đến số lượng tối đa của {type}. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục.',
+    7012: 'Gói Family chỉ bao gồm 6 thành viên.',
+    3003: 'Mục chia sẻ đã bị khóa. Vui lòng nâng cấp gói của bạn.'
   },
   master_password: {
-    create_success: 'Mật khẩu tổng đã được tạo',
-    create_failed: 'Mật khẩu tổng chưa được tạo',
+    create_success: 'Mật khẩu chính đã được tạo',
+    create_failed: 'Mật khẩu chính chưa được tạo',
     scores: {
       na: 'N/A',
       very_weak: 'Rất yếu',
@@ -140,21 +149,21 @@ module.exports = {
       good: 'Tốt',
       strong: 'Mạnh'
     },
-    change: 'Đổi Mật khẩu chủ',
-    current_password: 'Nhập Mật khẩu chủ hiện tại',
-    new_password: 'Nhập Mật khẩu chủ mới',
-    re_password: 'Nhập lại Mật khẩu chủ mới',
+    change: 'Đổi Mật khẩu chính',
+    current_password: 'Nhập Mật khẩu chính hiện tại',
+    new_password: 'Nhập Mật khẩu chính mới',
+    re_password: 'Nhập lại Mật khẩu chính mới',
     change_btn: 'OK',
-    enter_password: 'Nhập Mật khẩu chủ',
-    enter_password_desc: 'Nhập Mật khẩu chủ để mở khóa',
+    enter_password: 'Nhập Mật khẩu chính',
+    enter_password_desc: 'Nhập Mật khẩu chính để mở khóa',
     enter_password_title: 'Đăng nhập',
-    get_hint: 'Xem cụm từ gợi nhớ Mật khẩu chủ',
+    get_hint: 'Xem cụm từ gợi nhớ Mật khẩu chính',
     continue: 'Tiếp tục',
-    master_password_hint: 'Cụm từ gợi nhớ Mật khẩu chủ',
+    master_password_hint: 'Cụm từ gợi nhớ Mật khẩu chính',
     send: 'Gửi',
-    master_password_hint_desc: 'Cụm từ gợi nhớ Mật khẩu chủ sẽ được gửi về địa chỉ email của bạn',
+    master_password_hint_desc: 'Cụm từ gợi nhớ Mật khẩu chính sẽ được gửi về địa chỉ email của bạn',
     back_login: 'Trở lại Đăng nhập',
-    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ Mật khẩu chủ.',
+    sorry: 'Lỗi. Bạn chưa tạo cụm từ gợi nhớ Mật khẩu chính.',
     unlock: 'Mở khóa'
   },
   enum: {
@@ -169,6 +178,7 @@ module.exports = {
     2: 'Ghi chú | Ghi chú',
     3: 'Thẻ | Thẻ',
     4: 'Định danh | Định danh',
+    5: 'OTP | OTP',
     0: 'Mục | Mục',
     7: 'Tài sản Crypto | Tài sản Crypto',
     Login: 'Mật khẩu | Mật khẩu',
@@ -220,8 +230,8 @@ module.exports = {
       accept_member_failed: 'Có lỗi xảy ra. Bạn đã đồng ý lời mời thất bại!',
       update_settings_success: 'Cài đặt của bạn đã được cập nhật!',
       update_settings_failed: 'Cài đặt của bạn đã được cập nhật!',
-      update_master_success: 'Mật khẩu chủ của bạn đã được cập nhật!',
-      update_master_failed: 'Có lỗi xảy ra. Mật khẩu chủ của bạn chưa được cập nhật!',
+      update_master_success: 'Mật khẩu chính của bạn đã được cập nhật!',
+      update_master_failed: 'Có lỗi xảy ra. Mật khẩu chính của bạn chưa được cập nhật!',
       add_group_success: 'Nhóm đã được tạo!',
       add_group_failed: 'Có lỗi xảy ra. Nhóm chưa được tạo!',
       delete_group_success: 'Nhóm đã được xóa!',
@@ -354,7 +364,7 @@ module.exports = {
     exportFile: {
       export: 'Export',
       export_items: 'Xuất dữ liệu',
-      export_items_desc: 'Nhập Mật khẩu chủ để xuất dữ liệu.',
+      export_items_desc: 'Nhập Mật khẩu chính để xuất dữ liệu.',
       csv: 'CSV',
       json: 'JSON',
       encrypted_json: 'Encrypted JSON'
@@ -556,7 +566,8 @@ module.exports = {
       text: 'Văn bản',
       hidden: 'Mật khẩu',
       date: 'Ngày',
-      monthYear: 'Tháng/Năm'
+      monthYear: 'Tháng/Năm',
+      markFavorite: 'Đánh dấu yêu thích'
     },
     settings: {
       account: 'Tài khoản',
@@ -568,10 +579,10 @@ module.exports = {
       timeout: 'Hết thời gian',
       timeout_desc: 'Tự động khóa ứng dụng sau một khoảng thời gian không hoạt động',
       timeout_action: 'Hành động',
-      timeout_action_1: 'Khi khóa, bạn sẽ được yêu cầu nhập Mật khẩu chủ để truy cập lại.',
-      timeout_action_2: 'Khi đăng xuất, bạn cần đăng nhập lại tài khoản CyStack và Mật khẩu chủ để truy cập lại.',
+      timeout_action_1: 'Khi khóa, bạn sẽ được yêu cầu nhập Mật khẩu chính để truy cập lại.',
+      timeout_action_2: 'Khi đăng xuất, bạn cần đăng nhập lại tài khoản Locker và Mật khẩu chính để truy cập lại.',
       security: 'Bảo mật',
-      change_master_password: 'Đổi Mật khẩu chủ',
+      change_master_password: 'Đổi Mật khẩu chính',
       emergency_access: 'Liên hệ khẩn cấp',
       danger_zone: 'Khu vực nguy hiểm',
       danger_zone_note: 'Hãy cẩn trọng, những hành động dưới đây không thể khôi phục lại!',
@@ -590,7 +601,7 @@ module.exports = {
       vault_timeout: 'Hẹn giờ khóa',
       vault_timeout_desc: 'Tự động khóa kho dữ liệu của bạn',
       vault_timeout_action: 'Hành động khi hết giờ',
-      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chủ để mở khóa khi bị khóa.',
+      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
       fingerprint_phase: 'Định danh',
       lock_now: 'Khóa ngay',
       upgrade_to_premium: 'Nâng cấp Premium',
@@ -616,7 +627,8 @@ module.exports = {
       logged_in_as: 'Tài khoản',
       version: 'Phiên bản',
       term: 'Điều khoản sử dụng',
-      privacy: 'Chính sách bảo mật'
+      privacy: 'Chính sách bảo mật',
+      a_product_of: 'Một sản phẩm của'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
@@ -647,7 +659,7 @@ module.exports = {
     },
     login: {
       login: 'Đăng nhập',
-      login_desc: 'Đăng nhập bằng CyStack ID để sử dụng Locker',
+      login_desc: 'Đăng nhập bằng Locker ID để sử dụng Locker',
       verify: 'Xác minh danh tính của bạn',
       authentication_app: 'Ứng dụng xác thực',
       have_code: 'Tôi đã có code',
@@ -664,26 +676,46 @@ module.exports = {
       forgot_password: 'Quên mật khẩu?',
       login_with: 'Hoặc Đăng nhập với',
       dont_have_account: 'Chưa có tài khoản?',
-      sign_up: 'Đăng ký'
+      sign_up: 'Đăng ký',
+      sign_in: 'Đăng nhập'
     },
     set_master_pass: {
-      create: 'Tạo Mật khẩu chủ',
+      create: 'Tạo Mật khẩu chính',
       logout: 'Đăng xuất',
-      enter_pass: 'Nhập Mật khẩu chủ',
+      enter_pass: 'Nhập Mật khẩu chính',
       confirm_pass: 'Xác nhận mật khẩu',
       hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
       create_btn: 'Tạo mật khẩu',
-      note: 'Lưu ý: CyStack không thể xem, không thể lưu trữ, cũng như không thể cấp lại Mật khẩu chủ trong trường hợp bạn quên hoặc đánh mất.'
+      note: 'Lưu ý: Locker không thể xem, không thể lưu trữ, cũng như không thể cấp lại Mật khẩu chính trong trường hợp bạn quên hoặc đánh mất.'
     },
     parts: {
       current: 'Hiện tại',
       vault: 'Kho',
       generate: 'Tạo Mật khẩu',
+      otp: 'OTP',
       generator: 'Tạo Mật khẩu',
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
       sync_data: 'Đồng bộ tài khoản'
+    },
+    otp: {
+      scan_qr: 'Quét mã QR',
+      setup_key: 'Nhập khóa cái đặt',
+      copy: 'Sao chép OTP',
+      copied: 'Đã sao chép',
+      create: {
+        form_title: 'Nhập thủ công khóa bí mật',
+        title: 'Tiêu đề',
+        secret_key: 'Khóa bí mật'
+      },
+      edit: {
+        form_title: 'Cập nhật tiêu đề OTP',
+      },
+      message: {
+        title_required: 'Tiêu đề không được để trống!',
+        secret_key_required: 'Khóa bí mật không được để trống!'
+      }
     }
   }
 }

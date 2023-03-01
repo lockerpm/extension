@@ -220,21 +220,6 @@ export default Vue.extend({
     closeDialog () {
       this.dialogVisible = false
     },
-    // async postUser (user) {
-    //   try {
-    //     this.loading = true
-    //     await this.axios.post(`cystack_platform/pm/teams/${this.$route.params.teamId}/members`, user)
-    //     this.notify(this.$t('data.notifications.add_member_success'), 'success')
-    //     this.closeDialog()
-    //     this.$emit('done')
-    //   } catch (e) {
-    //     console.log(e)
-    //     this.errors = (e.response && e.response.data && e.response.data.details) || {}
-    //     this.notify(this.$t('data.notifications.add_member_failed'), 'warning')
-    //   } finally {
-    //     this.loading = false
-    //   }
-    // },
     async postUser (user) { // invite multiple
       try {
         this.loading = true

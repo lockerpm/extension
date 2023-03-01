@@ -1,47 +1,7 @@
 !(function () {
-    /*
-    1Password Extension
-
-    Lovingly handcrafted by Dave Teare, Michael Fey, Rad Azzouz, and Roustem Karimov.
-    Copyright (c) 2014 AgileBits. All rights reserved.
-
-    ================================================================================
-
-    Copyright (c) 2014 AgileBits Inc.
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-    */
-
-    /*
-    MODIFICATIONS FROM ORIGINAL
-
-    1. Populate isFirefox
-    2. Remove isChrome and isSafari since they are not used.
-    3. Unminify and format to meet Mozilla review requirements.
-    4. Remove unnecessary input types from getFormElements query selector and limit number of elements returned.
-    5. Remove fakeTested prop.
-    6. Rename com.agilebits.* stuff to com.bitwarden.*
-    7. Remove "some useful globals" on window
-    8. Add ability to autofill span[data-bwautofill] elements
-    */
-
+    let isReading = false;
     function collect(document, undefined) {
+        // chrome.storage.local.clear();
         // START MODIFICATION
         var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
         // END MODIFICATION
@@ -55,7 +15,6 @@
 
         function getPageDetails(theDoc, oneShotId) {
             // start helpers
-
             // get the value of a dom element's attribute
             function getElementAttrValue(el, attrName) {
                 var attrVal = el[attrName];
@@ -64,29 +23,6 @@
                 }
                 attrVal = el.getAttribute(attrName);
                 return 'string' == typeof attrVal ? attrVal : null;
-            }
-
-            // has the element been fake tested?
-            function checkIfFakeTested(field, el) {
-                if (-1 === ['text', 'password'].indexOf(el.type.toLowerCase()) ||
-                    !(passwordRegEx.test(field.value) ||
-                        passwordRegEx.test(field.htmlID) || passwordRegEx.test(field.htmlName) ||
-                        passwordRegEx.test(field.placeholder) || passwordRegEx.test(field['label-tag']) ||
-                        passwordRegEx.test(field['label-data']) || passwordRegEx.test(field['label-aria']))) {
-                    return false;
-                }
-
-                if (!field.visible) {
-                    return true;
-                }
-
-                if ('password' == el.type.toLowerCase()) {
-                    return false;
-                }
-
-                var elType = el.type;
-                focusElement(el, true);
-                return elType !== el.type;
             }
 
             // get the value of a dom element
@@ -231,7 +167,6 @@
             }
 
             // end helpers
-
             var theView = theDoc.defaultView ? theDoc.defaultView : window,
                 passwordRegEx = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|(\\\\b|_|-)passe(\\\\b|_|-)|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
 
@@ -251,17 +186,17 @@
 
                 return op;
             });
-
             // get all the form fields
             var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+                if (!el.id) {
+                  el.id = `locker-id-${elIndex}`;
+                }
                 var field = {},
                     opId = '__' + elIndex,
                     elMaxLen = -1 == el.maxLength ? 999 : el.maxLength;
-
                 if (!elMaxLen || 'number' === typeof elMaxLen && isNaN(elMaxLen)) {
                     elMaxLen = 999;
                 }
-
                 theDoc.elementsByOPID[opId] = el;
                 el.opid = opId;
                 field.opid = opId;
@@ -331,11 +266,6 @@
                 if (el.form) {
                     field.form = getElementAttrValue(el.form, 'opid');
                 }
-
-                // START MODIFICATION
-                //addProp(field, 'fakeTested', checkIfFakeTested(field, el), false);
-                // END MODIFICATION
-
                 return field;
             });
 
@@ -348,7 +278,7 @@
 
                 var originalValue = el.value;
                 // click it
-                !el || el && 'function' !== typeof el.click || el.click();
+                // !el || el && 'function' !== typeof el.click || el.click();
                 focusElement(el, false);
 
                 el.dispatchEvent(doEventOnElement(el, 'keydown'));
@@ -357,7 +287,7 @@
 
                 el.value !== originalValue && (el.value = originalValue);
 
-                el.click && el.click();
+                // el.click && el.click();
                 f.postFakeTestVisible = isElementVisible(el);
                 f.postFakeTestViewable = isElementViewable(el);
                 f.postFakeTestType = el.type;
@@ -693,7 +623,6 @@
             }
 
             // custom fill script
-
             fillScriptOps = fillScript.script;
             doOperation(fillScriptOps, function () {
                 // Done now
@@ -774,14 +703,12 @@
         function doFocusByOpId(opId) {
             var el = getElementByOpId(opId)
             if (el) {
-                'function' === typeof el.click && el.click(),
-                    'function' === typeof el.focus && doFocusElement(el, true);
+                'function' === typeof el.focus && doFocusElement(el, true);
             }
 
             return null;
         }
 
-        // do a click by opid operation
         function doClickByOpId(opId) {
             var el = getElementByOpId(opId);
             return el ? clickElement(el) ? [el] : null : null;
@@ -792,7 +719,6 @@
             query = selectAllFromDoc(query);
             return Array.prototype.map.call(Array.prototype.slice.call(query), function (el) {
                 clickElement(el);
-                'function' === typeof el.click && el.click();
                 'function' === typeof el.focus && doFocusElement(el, true);
                 return [el];
             }, this);
@@ -805,7 +731,8 @@
             yes: true,
             '✓': true
         },
-            styleTimeout = 200;
+
+        styleTimeout = 200;
 
         // fill an element
         function fillTheElement(el, op) {
@@ -833,6 +760,7 @@
                             theEl.value = op;
                         });
                 }
+
             }
         }
 
@@ -881,7 +809,6 @@
         // set value of the given element
         function setValueForElement(el) {
             var valueToSet = el.value;
-            clickElement(el);
             doFocusElement(el, false);
             el.dispatchEvent(normalizeEvent(el, 'keydown'));
             el.dispatchEvent(normalizeEvent(el, 'keypress'));
@@ -908,10 +835,13 @@
 
         // click on an element
         function clickElement(el) {
+            const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.id}`);
+            if (menuEl) {
+                menuEl.parentElement.removeChild(menuEl);
+            }
             if (!el || el && 'function' !== typeof el.click) {
                 return false;
             }
-            el.click();
             return true;
         }
 
@@ -927,7 +857,6 @@
         function touchAllFields() {
             getAllFields().forEach(function (el) {
                 setValueForElement(el);
-                el.click && el.click();
                 setValueForElementByEvent(el);
             });
         }
@@ -1010,21 +939,429 @@
         }
 
         doFill(fillScript);
-
         return JSON.stringify({
             success: true
         });
+    }
+
+    function scanQRCode (document, tab) {
+      const docHeight = window.innerHeight;
+      const docWidth = window.innerWidth;
+      let isMove = false;
+      let isSetUp = false;
+      let isResize = false;
+      let currentCenterPosition = null;
+      const wrapperChildrenIds = ['top', 'left', 'bottom', 'right', 'center'];
+      const dragresizeIds = ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'];
+
+      function createWrapper () {
+        if (document.querySelector('locker-select-wrapper')) {
+          document.querySelector('locker-select-wrapper').remove();
+        }
+        const wrapper = document.createElement('locker-select-wrapper');
+        document.querySelector('html').appendChild(wrapper)
+        const div = document.createElement('div');
+        div.id = 'locker_screenshot_wrapper';
+        div.style.cssText = `
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          width: ${docWidth}px;
+          height: ${docHeight}px;
+          z-index: 2147483620;
+          cursor: crosshair;
+          background-color: rgba(0, 0, 0, 0.3);
+          boxSizing: content-box !important;
+        `
+        div.addEventListener('mousedown', (e) => {
+          div.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+          div.style.cursor = 'auto';
+          currentCenterPosition = e;
+          const center = document.getElementById('locker_screenshot_wrapper--center');
+          if (!center.offsetWidth || Number(center.offsetWidth) <= 0) {
+            isSetUp = true;
+          }
+          e.preventDefault();
+        });
+        div.addEventListener('mousemove', (e) => {
+          if (isReading) {
+            return;
+          }
+          if (isSetUp) {
+            startSetupWrapperChildrenCenter(e)
+          } else if (isMove) {
+            moveWrapperChildrenCenter(e)
+          } else if (isResize) {
+            resizeWrapperChildrenCenter(e, isResize)
+          }
+        });
+        div.addEventListener('mouseup', (e) => {
+          isSetUp = false;
+          isMove = false;
+          isResize = false;
+          firstClickWrapper(e);
+        });
+        document.querySelector('locker-select-wrapper').appendChild(div);
+      }
+
+      function createWrapperChildren (id) {
+        const childrenId = `locker_screenshot_wrapper--${id}`
+        if (document.getElementById(childrenId)) {
+          return
+        }
+        const children =  document.createElement('div');
+        children.id = childrenId;
+        children.style.cssText = `
+          position: absolute !important;
+          top: 0;
+          left: 0;
+          background-color: rgba(0, 0, 0, 0.3);
+        `
+        if (id === 'center') {
+          children.style.cursor = 'move';
+          children.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+          children.addEventListener('mousedown', (e) => {
+            isMove = !isResize;
+          });
+          children.addEventListener('mouseup', (e) => {
+            hiddenAndInheritDragresize(id !== 'center')
+          });
+        }
+        document.getElementById('locker_screenshot_wrapper').appendChild(children);
+      }
+
+      function createWrapperActions () {
+        const wrapperActionsId = `locker_screenshot_wrapper--actions`
+        if (document.getElementById(wrapperActionsId)) {
+          return
+        }
+        const wrapperActions =  document.createElement('div');
+        wrapperActions.id = wrapperActionsId;
+        wrapperActions.style.cssText = `
+          position: absolute !important;
+          bottom: 0;
+          right: 0px;
+          padding: 12px;
+          z-index: 1000;
+          visibility: hidden;
+        `
+        const useButton =  document.createElement('button');
+        useButton.innerText = 'Use image';
+        useButton.style.cssText = `
+          background-color: #268334;
+          border-radius: 8px;
+          color: white;
+          cursor: pointer;
+          padding: 8px 12px;
+          border: none;
+          font-weight: 400;
+          margin-right: 8px;
+        `
+        useButton.addEventListener('click', () => {
+          captureImage();
+        })
+        wrapperActions.appendChild(useButton);
+
+        const cancelButton =  document.createElement('button');
+        cancelButton.innerText = 'Cancel';
+        cancelButton.style.cssText = `
+          background-color: rgba(0, 0, 0, 0.4);
+          border-radius: 8px;
+          color: white;
+          cursor: pointer;
+          padding: 8px 12px;
+          border: none;
+          font-weight: 400;
+          `
+        cancelButton.addEventListener('click', () => {
+          isReading = false;
+          document.querySelector('locker-select-wrapper').remove();
+        })
+        wrapperActions.appendChild(cancelButton);
+
+        document.getElementById('locker_screenshot_wrapper--center').appendChild(wrapperActions);
+      }
+
+      function createDragresize (id) {
+        const dragresize =  document.createElement('div');
+        dragresize.className = 'locker_screenshot_wrapper_dragresize';
+        dragresize.id = `locker_screenshot_wrapper_dragresize--${id}`
+        dragresize.style.cssText = `
+          display: block !important;
+          position: absolute !important;
+          z-index: 999 !important;
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIxJREFUeNqMUDEOgCAMrA58CFZX3uDIU/iBX3D0DawkTCS8xhBYao84aOLgJZdy10sLTMxMgDHGSVmFizAKj5zzPpoIaa037z2nlLjWOio0/DFEDg5Ga42fgL6DbsYKay0ppegJaPjjCpI8seIL8NHHpFhKoS/cfkToCCFQ7/0VgIaP/q/XTX/+6RJgAEc6j4dkIiynAAAAAElFTkSuQmCC);
+          background-position: center center !important;
+          background-repeat: no-repeat !important;
+          font-size: 0.1px !important;
+        `
+        dragresize.style.width = '9px';
+        dragresize.style.height = '9px';
+        dragresize.style.visibility = 'hidden';
+        switch (id) {
+          case 'tl':
+            dragresize.style.top = '-5px';
+            dragresize.style.left = '-5px';
+            dragresize.style.cursor = 'nw-resize';
+            break;
+          case 'tm':
+            dragresize.style.top = '-5px';
+            dragresize.style.width = '100%';
+            dragresize.style.cursor = 'n-resize';
+            break;
+          case 'tr':
+            dragresize.style.top = '-5px';
+            dragresize.style.right = '-5px';
+            dragresize.style.cursor = 'ne-resize';
+            break;
+          case 'mr':
+            dragresize.style.right = '-5px';
+            dragresize.style.height = '100%';
+            dragresize.style.cursor = 'e-resize';
+            break;
+          case 'br':
+            dragresize.style.bottom = '-5px';
+            dragresize.style.right = '-5px';
+            dragresize.style.cursor = 'se-resize';
+            break;
+          case 'bm':
+            dragresize.style.bottom = '-5px';
+            dragresize.style.width = '100%';
+            dragresize.style.cursor = 's-resize';
+            break;
+          case 'bl':
+            dragresize.style.bottom = '-5px';
+            dragresize.style.left = '-5px';
+            dragresize.style.cursor = 'sw-resize';
+            break;
+          case 'ml':
+            dragresize.style.left = '-5px';
+            dragresize.style.height = '100%';
+            dragresize.style.cursor = 'w-resize';
+            break;
+          default:
+            break;
+        }
+        dragresize.addEventListener('mousedown', (e) => {
+          isResize = id;
+        });
+        document.getElementById('locker_screenshot_wrapper--center').appendChild(dragresize);
+      }
+
+      function firstClickWrapper(e) {
+        const wrapper = document.getElementById('locker_screenshot_wrapper');
+        const center = document.getElementById('locker_screenshot_wrapper--center');
+        hiddenAndInheritDragresize(false);
+        if (!center.offsetWidth || Number(center.offsetWidth) === 0) {
+          wrapper.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+          wrapper.style.cursor = 'auto';
+          const centerSize = getCenterSize(e.x - 100, e.y - 100, 200, 200);
+          resizeChildren(centerSize)
+        }
+        const wrapperActions = document.getElementById('locker_screenshot_wrapper--actions');
+        if (wrapperActions) {
+          wrapperActions.style.visibility = 'inherit';
+        }
+      }
+
+      function getCenterSize(offsetX, offsetY, width, height) {
+        const centerSize = { left: offsetX, top: offsetY, width: width, height: height}
+        if (offsetX <= 0) {
+          centerSize.left = 0
+        } else if (docWidth - offsetX <= width) {
+          centerSize.left = docWidth - width
+        } else {
+          centerSize.left = offsetX
+        }
+
+        if (offsetY <= 0) {
+          centerSize.top = 0
+        } else if (docHeight - offsetY <= height) {
+          centerSize.top = docHeight - height
+        } else {
+          centerSize.top = offsetY
+        }
+        return centerSize;
+      }
+
+      function hiddenAndInheritDragresize(isHidden = true) {
+        const dragresizes = document.getElementsByClassName('locker_screenshot_wrapper_dragresize');
+        for (let index = 0; index < dragresizes.length; index += 1) {
+          dragresizes[index].style.visibility = isHidden ? 'hidden' : 'inherit'
+        }
+      }
+
+      function startSetupWrapperChildrenCenter(e) {
+        const top = e.y >= currentCenterPosition.y ? currentCenterPosition.y : e.y;
+        const left = e.x >= currentCenterPosition.x ? currentCenterPosition.x : e.x;
+        const width = Math.abs(e.x - currentCenterPosition.x);
+        const height = Math.abs(e.y - currentCenterPosition.y);
+        const centerSize = getCenterSize(left, top, width, height);
+        resizeChildren(centerSize);
+      }
+
+      function moveWrapperChildrenCenter(e) {
+        const center = document.getElementById('locker_screenshot_wrapper--center');
+        const x = e.x - currentCenterPosition.x;
+        const y = e.y - currentCenterPosition.y;
+        const centerSize = getCenterSize(center.offsetLeft + x, center.offsetTop + y, center.offsetWidth, center.offsetHeight);
+        resizeChildren(centerSize);
+        currentCenterPosition = e
+      }
+
+      function resizeWrapperChildrenCenter(e, id) {
+        const center = document.getElementById('locker_screenshot_wrapper--center');
+        const x = e.x - currentCenterPosition.x;
+        const y = e.y - currentCenterPosition.y;
+        let top = 0;
+        let left = 0;
+        let width = 0;
+        let height = 0;
+        switch (id) {
+          case 'tl':
+            top = e.y;
+            left = e.x;
+            width = center.offsetWidth - x;
+            height = center.offsetHeight - y;
+            break;
+          case 'tm':
+            top = e.y;
+            left = center.offsetLeft;
+            width = center.offsetWidth;
+            height = center.offsetHeight - y;
+            break;
+          case 'tr':
+            top = e.y;
+            left = center.offsetLeft;
+            width = center.offsetWidth + x;
+            height = center.offsetHeight - y;
+            break;
+          case 'mr':
+            top = center.offsetTop;
+            left = center.offsetLeft;
+            width = center.offsetWidth + x;
+            height = center.offsetHeight;
+            break;
+          case 'br':
+            top = center.offsetTop;
+            left = center.offsetLeft;
+            width = center.offsetWidth + x;
+            height = center.offsetHeight + y;
+            break;
+          case 'bm':
+            top = center.offsetTop;
+            left = center.offsetLeft;
+            width = center.offsetWidth;
+            height = center.offsetHeight + y;
+            break;
+          case 'bl':
+            top = center.offsetTop;
+            left = center.offsetLeft + x;
+            width = center.offsetWidth - x;
+            height = center.offsetHeight + y;
+            break;
+          case 'ml':
+            top = center.offsetTop;
+            left = center.offsetLeft + x;
+            width = center.offsetWidth - x;
+            height = center.offsetHeight;
+            break;
+          default:
+            break;
+        }
+        const centerSize = getCenterSize(left, top, width, height);
+        resizeChildren(centerSize)
+        currentCenterPosition = e
+      }
+
+      function resizeChildren(centerSize) {
+        const center = document.getElementById('locker_screenshot_wrapper--center');
+        center.style.top = centerSize.top + 'px';
+        center.style.left = centerSize.left + 'px';
+        center.style.width = centerSize.width + 'px';
+        center.style.height = centerSize.height + 'px';
+
+        const top = document.getElementById('locker_screenshot_wrapper--top');
+        top.style.top = 0;
+        top.style.left = 0;
+        top.style.width = centerSize.left + centerSize.width + 'px';
+        top.style.height = centerSize.top + 'px';
+
+        const left = document.getElementById('locker_screenshot_wrapper--left');
+        left.style.top = centerSize.top + 'px';
+        left.style.left = 0;
+        left.style.bottom = 0;
+        left.style.width = centerSize.left + 'px';
+
+        const right = document.getElementById('locker_screenshot_wrapper--right');
+        right.style.top = 0;
+        right.style.left = centerSize.left + centerSize.width + 'px';
+        right.style.right = 0;
+        right.style.height = centerSize.height + centerSize.top + 'px';
+
+        const bottom = document.getElementById('locker_screenshot_wrapper--bottom');
+        bottom.style.top = centerSize.height + centerSize.top + 'px';
+        bottom.style.left = centerSize.left + 'px';
+        bottom.style.right = 0;
+        bottom.style.bottom = 0;
+      }
+
+      async function captureImage() {
+        isReading = true;
+        const actions = document.getElementById('locker_screenshot_wrapper--actions');
+        actions.style.visibility = 'hidden';
+        setTimeout(() => {
+          chrome.runtime.sendMessage({
+            command: 'scanQRCode',
+            tab: tab,
+          });
+        }, 100);
+      };
+
+      function init () {
+        createWrapper();
+        wrapperChildrenIds.forEach((id) => {
+          createWrapperChildren(id);
+        });
+        dragresizeIds.forEach((id) => {
+          createDragresize(id);
+        });
+        createWrapperActions();
+      }
+
+      init();
+    }
+
+    function readAndAddQRCode (document, msg) {
+      const center = document.getElementById('locker_screenshot_wrapper--center');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const imageData = ctx.createImageData(window.innerWidth, window.innerHeight);
+      ctx.putImageData(imageData, 0, 0);
+      const image = new Image();
+      image.src = msg.sender;
+      image.onload = async function () {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(center.offsetLeft, center.offsetTop, center.offsetWidth, center.offsetHeight);
+        const jsQR = require("jsqr");
+        const code = await jsQR(imgData.data, center.offsetWidth, center.offsetHeight);
+        chrome.runtime.sendMessage({
+          command: 'saveNewQRCode',
+          tab: msg.tab,
+          sender: code
+        });
+      }
     }
 
     /*
     End 1Password Extension
     */
 
-  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.command === 'collectPageDetails') {
-            var pageDetails = collect(document);
-            var pageDetailsObj = JSON.parse(pageDetails);
-            // console.log(pageDetailsObj)
+    chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
+        if (msg.command === 'collectPageDetails') {
+            const pageDetailsObj = JSON.parse(collect(document));
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,
@@ -1033,11 +1370,28 @@
             });
             sendResponse();
             return true;
-        }
-        else if (msg.command === 'fillForm') {
+        } else if (msg.command === 'fillForm') {
             fill(document, msg.fillScript);
             sendResponse();
             return true;
+        } else if (msg.command === 'scanQRCode') {
+          scanQRCode(document, msg.tab);
+          sendResponse();
+          return true;
+        } else if (msg.command === 'capturedImage') {
+          readAndAddQRCode(document, msg);
+          sendResponse();
+          return true;
+        } else if (msg.command === 'addedOTP') {
+          isReading = false;
+          const actions = document.querySelector('locker-select-wrapper');
+          if (msg.sender === 'removeLockerWrapper') {
+            actions.remove();
+          } else {
+            actions.style.visibility = 'inherit';
+          }
+          sendResponse();
+          return true;
         }
     });
 })();

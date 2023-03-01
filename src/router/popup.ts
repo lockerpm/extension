@@ -3,6 +3,9 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import storePromise from "../store/index";
 import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
+import i18n from '@/locales/i18n';
+import sentryConfig from './index'
+
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -26,7 +29,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "home-id",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/home/_id.vue")
+          import("../popup/views/home/_id.vue")
       }
     ]
   },
@@ -35,7 +38,7 @@ const routes: Array<RouteConfig> = [
     name: "set-master-password",
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/set-master-password.vue"
+        "../popup/views/set-master-password.vue"
       )
   },
   {
@@ -43,14 +46,13 @@ const routes: Array<RouteConfig> = [
     name: "lock",
     beforeEnter: VaultGuard,
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/lock.vue")
+      import("../popup/views/lock.vue")
   },
   {
     path: "/login",
     name: "login",
-    // beforeEnter: VaultGuard,
     component: () =>
-      import(/* webpackChunkName: "vault" */ "../popup/views/login.vue")
+      import("../popup/views/login.vue")
   },
   {
     path: "/vault",
@@ -62,7 +64,7 @@ const routes: Array<RouteConfig> = [
         name: "vault",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/vault/index.vue"
+            "../popup/views/vault/index.vue"
           )
       }
     ]
@@ -76,7 +78,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "vault-id",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/vault/_id.vue")
+          import("../popup/views/vault/_id.vue")
       }
     ]
   },
@@ -90,7 +92,7 @@ const routes: Array<RouteConfig> = [
         name: "passwords",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/passwords/index.vue"
+            "../popup/views/passwords/index.vue"
           )
       }
     ]
@@ -105,7 +107,7 @@ const routes: Array<RouteConfig> = [
         name: "passwords-id",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/passwords/_id.vue"
+            "../popup/views/passwords/_id.vue"
           )
       }
     ]
@@ -120,7 +122,7 @@ const routes: Array<RouteConfig> = [
         name: "notes",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/notes/index.vue"
+            "../popup/views/notes/index.vue"
           )
       }
     ]
@@ -134,7 +136,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "notes-id",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/notes/_id.vue")
+          import("../popup/views/notes/_id.vue")
       }
     ]
   },
@@ -148,7 +150,7 @@ const routes: Array<RouteConfig> = [
         name: "cards",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/cards/index.vue"
+            "../popup/views/cards/index.vue"
           )
       }
     ]
@@ -162,7 +164,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         name: "cards-id",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/cards/_id.vue")
+          import("../popup/views/cards/_id.vue")
       }
     ]
   },
@@ -176,7 +178,7 @@ const routes: Array<RouteConfig> = [
         name: "identities",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/identities/index.vue"
+            "../popup/views/identities/index.vue"
           )
       }
     ]
@@ -190,7 +192,7 @@ const routes: Array<RouteConfig> = [
         name: "identities-id",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/identities/_id.vue"
+            "../popup/views/identities/_id.vue"
           )
       }
     ]
@@ -205,7 +207,7 @@ const routes: Array<RouteConfig> = [
         name: "crypto-backups",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/index.vue"
+            "../popup/views/crypto-backups/index.vue"
           )
       }
     ]
@@ -219,7 +221,7 @@ const routes: Array<RouteConfig> = [
         name: "crypto-backups-id",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/crypto-backups/_id.vue"
+            "../popup/views/crypto-backups/_id.vue"
           )
       }
     ]
@@ -234,7 +236,7 @@ const routes: Array<RouteConfig> = [
         name: "folders",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/folders/index.vue"
+            "../popup/views/folders/index.vue"
           )
       }
     ]
@@ -249,7 +251,7 @@ const routes: Array<RouteConfig> = [
         name: "folders-folderId",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/folders/_folderId/index.vue"
+            "../popup/views/folders/_folderId/index.vue"
           )
       }
     ]
@@ -260,7 +262,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/folders/_folderId/_id.vue"
+        "../popup/views/folders/_folderId/_id.vue"
       )
   },
   {
@@ -269,7 +271,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/folders/_folderId/index.vue"
+        "../popup/views/vault/folders/_folderId/index.vue"
       )
   },
   {
@@ -278,7 +280,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/folders/_folderId/_id.vue"
+        "../popup/views/vault/folders/_folderId/_id.vue"
       )
   },
   {
@@ -287,7 +289,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
+        "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
       )
   },
   {
@@ -296,27 +298,9 @@ const routes: Array<RouteConfig> = [
     beforeEnter: VaultGuard,
     component: () =>
       import(
-        /* webpackChunkName: "vault" */ "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
+        "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
       )
   },
-  // {
-  //   path: "/add_item/create",
-  //   name: "add-item-create",
-  //   beforeEnter: VaultGuard,
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
-  //     )
-  // },
-  // {
-  //   path: "/add_item",
-  //   name: "add-item",
-  //   beforeEnter: VaultGuard,
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
-  //     )
-  // },
   {
     path: "/add_item",
     component: Layout,
@@ -327,7 +311,7 @@ const routes: Array<RouteConfig> = [
         name: "add_item",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/add_item/index.vue"
+            "../popup/views/add_item/index.vue"
           )
       },
       {
@@ -335,7 +319,7 @@ const routes: Array<RouteConfig> = [
         name: "add-item-create",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/add_item/create.vue"
+            "../popup/views/add_item/create.vue"
           )
       }
     ]
@@ -349,7 +333,7 @@ const routes: Array<RouteConfig> = [
         name: "generator",
         path: "",
         component: () =>
-          import(/* webpackChunkName: "vault" */ "../popup/views/generator.vue")
+          import("../popup/views/generator.vue")
       }
     ]
   },
@@ -363,7 +347,7 @@ const routes: Array<RouteConfig> = [
         name: "settings",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/settings/index.vue"
+            "../popup/views/settings/index.vue"
           )
       },
       {
@@ -371,7 +355,7 @@ const routes: Array<RouteConfig> = [
         name: "settings-excluded-domains",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/settings/excluded-domains.vue"
+            "../popup/views/settings/excluded-domains.vue"
           )
       },
       {
@@ -379,7 +363,7 @@ const routes: Array<RouteConfig> = [
         name: "settings-vault-timeout",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/settings/vault-timeout.vue"
+            "../popup/views/settings/vault-timeout.vue"
           )
       },
       {
@@ -387,11 +371,24 @@ const routes: Array<RouteConfig> = [
         name: "settings-info",
         component: () =>
           import(
-            /* webpackChunkName: "vault" */ "../popup/views/settings/info.vue"
+            "../popup/views/settings/info.vue"
           )
       }
     ]
-  }
+  },
+  {
+    path: "/otp",
+    component: Layout,
+    beforeEnter: VaultGuard,
+    children: [
+      {
+        path: "",
+        name: "otp",
+        component: () =>
+          import("../popup/views/otp/index.vue")
+      }
+    ]
+  },
 ];
 
 const router = new VueRouter({
@@ -399,17 +396,19 @@ const router = new VueRouter({
   base: '/popup.html',
   routes
 })
+
+sentryConfig(router);
+
 async function VaultGuard(to, from, next) {
-  console.log(to.path, from.path)
+  console.log(from.path, to.path)
   const store = await storePromise;
   if (store.state.isLoggedIn === true) {
-    await store.dispatch("LoadCurrentUser");
+    const res = await store.dispatch("LoadCurrentUser");
+    i18n.locale = res.language
     await store.dispatch("LoadCurrentUserPw");
     if (store.state.userPw.is_pwd_manager === false) {
-      console.log("Dieu huong set-master-password");
       next({ name: "set-master-password" });
     } else {
-      console.log("Dieu huong binh thuong");
       next();
     }
   } else {

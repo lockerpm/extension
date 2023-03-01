@@ -632,7 +632,7 @@ video {
      -moz-appearance: none;
           appearance: none;
   background-color: #fff;
-  border-color: #6b7280;
+  /* border-color: #6b7280; */
   border-width: 1px;
   border-radius: 0px;
   padding-top: 0.5rem;
@@ -654,7 +654,6 @@ video {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  border-color: #2563eb;
 }
 
 input::-moz-placeholder, textarea::-moz-placeholder {
@@ -719,7 +718,7 @@ select {
   width: 1rem;
   color: #2563eb;
   background-color: #fff;
-  border-color: #6b7280;
+  /* border-color: #6b7280; */
   border-width: 1px;
   --tw-shadow: 0 0 #0000;
 }

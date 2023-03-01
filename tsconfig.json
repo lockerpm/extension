@@ -14,6 +14,7 @@
     "noEmit": true,
     "experimentalDecorators": true,
     "noImplicitAny": false,
+    "allowJs": true,
     "paths": {
       "@/*": [
         "./src/*"

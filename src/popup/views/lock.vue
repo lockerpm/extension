@@ -14,7 +14,7 @@
       <div class="w-full py-[2.8125rem] px-6 text-center">
         <template v-if="step===1">
           <div class="text-head-4 font-semibold mb-2.5">
-            {{ $t('master_password.enter_password_desc') }}
+            {{ $t('master_password.enter_password_title') }}
           </div>
           <div class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}

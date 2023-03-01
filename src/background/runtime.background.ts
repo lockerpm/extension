@@ -16,6 +16,9 @@ import { SettingsService } from 'jslib-common/abstractions/settings.service';
 import { PolicyService } from 'jslib-common/abstractions/policy.service';
 import { TokenService } from 'jslib-common/abstractions/token.service';
 import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGeneration.service';
+import { CipherData } from 'jslib-common/models/data/cipherData';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { PassService } from 'jslib-common/abstractions/pass.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -31,15 +34,27 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
-  constructor(private main: MainBackground, private autofillService: AutofillService,
-              private platformUtilsService: BrowserPlatformUtilsService,
-              private storageService: StorageService, private i18nService: I18nService,
-              private notificationsService: NotificationsService, private systemService: SystemService,
-              private environmentService: EnvironmentService, private messagingService: MessagingService, 
-              private cryptoService: CryptoService, private cipherService: CipherService, private folderService: FolderService, private collectionService: CollectionService,
-              private userService: UserService, private settingsService: SettingsService, private policyService: PolicyService, private tokenService: TokenService, private passwordGenerator: PasswordGenerationService) {
-
-    // onInstalled listener must be wired up before anything else, so we do it in the ctor
+  constructor(
+    private main: MainBackground,
+    private autofillService: AutofillService,
+    private platformUtilsService: BrowserPlatformUtilsService,
+    private storageService: StorageService,
+    private i18nService: I18nService,
+    private notificationsService: NotificationsService,
+    private systemService: SystemService,
+    private environmentService: EnvironmentService,
+    private messagingService: MessagingService,
+    private cryptoService: CryptoService,
+    private cipherService: CipherService,
+    private folderService: FolderService,
+    private collectionService: CollectionService,
+    private userService: UserService,
+    private settingsService: SettingsService,
+    private policyService: PolicyService,
+    private tokenService: TokenService,
+    private passwordGenerator: PasswordGenerationService,
+    private passService: PassService,
+  ) {
     chrome.runtime.onInstalled.addListener((details: any) => {
       this.onInstalledReason = details.reason;
     });
@@ -56,15 +71,12 @@ export default class RuntimeBackground {
     });
     chrome.runtime.onMessageExternal.addListener(
       async (msg, sender, sendResponse) => {
-        // console.log(sender)
-        await  this.processMessage(msg, sender, sendResponse)
+        await this.processMessage(msg, sender, sendResponse)
       }
     );
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    // console.log(`runtimeBackground processMessage: ${msg} - sender: ${sender} - data: ${msg.data}`);
-    // console.log(msg)
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
@@ -80,7 +92,6 @@ export default class RuntimeBackground {
             );
           }
         }
-        // await this.main.setIcon(); // error => prevent send message unlockCompleted
         await this.main.refreshBadgeAndMenu(false);
         this.notificationsService.updateConnection(msg.command === "unlocked");
         this.systemService.cancelProcessReload();
@@ -94,7 +105,6 @@ export default class RuntimeBackground {
         }
         break;
       case "addToLockedVaultPendingNotifications":
-        // console.log(msg.data);
         this.lockedVaultPendingNotifications.push(msg.data);
         break;
       case "addToLockedVaultPendingInformMenu":
@@ -108,11 +118,7 @@ export default class RuntimeBackground {
           setTimeout(async () => await this.main.refreshBadgeAndMenu(), 2000);
         }
         break;
-      case "openPopup":
-        await this.main.openPopup();
-        break;
       case "promptForLogin":
-        // await BrowserApi.createNewTab('popup/index.html?uilocation=popout', true, true);
         await BrowserApi.createNewTab(
           "popup.html?uilocation=popout",
           true,
@@ -132,10 +138,6 @@ export default class RuntimeBackground {
           sender.frameId
         );
         break;
-      case "bgUpdateContextMenu":
-      case "editedCipher":
-      case "addedCipher":
-        // console.log("added Cipher");
       case "deletedCipher":
         await this.main.refreshBadgeAndMenu();
         break;
@@ -180,7 +182,7 @@ export default class RuntimeBackground {
         }
         break;
       case "bgGeneratePassword":
-        this.generatePassword(sender.tab, msg.responseCommand, msg.options);
+        this.generatePassword(sender.tab, msg.responseCommand, msg.options, msg.isReplace);
       case "authResult":
         const vaultUrl = this.environmentService.getWebVaultUrl();
 
@@ -194,56 +196,27 @@ export default class RuntimeBackground {
         try {
           BrowserApi.createNewTab(
             "popup/index.html?uilocation=popout#/sso?code=" +
-              msg.code +
-              "&state=" +
-              msg.state
+            msg.code +
+            "&state=" +
+            msg.state
           );
-        } catch {}
+        } catch { }
         break;
       case "cs-authResult":
-        // console.log(msg.referrer);
-        // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
-        //     return;
-        // }
-        // const token = await this.storageService.get("cs_token");
-        // if (token) {
-        //   try {
-        //     const myHeaders = {
-        //       headers: { Authorization: `Bearer ${token}` }
-        //     };
-        //     await axios.post(
-        //       `${process.env.VUE_APP_BASE_API_URL}/users/logout`,
-        //       {},
-        //       myHeaders
-        //     );
-        //   } catch (error) {
-        //     console.log(error);
-        //   }
-        // }
-        // const userId = await this.userService.getUserId();
         await Promise.all([
           this.cryptoService.clearKeys(),
-          this.storageService.remove("cs_token")
-          // this.folderService.clear(userId),
-          // this.collectionService.clear(userId),
-
-          // this.cipherService.clear(userId),
-          // this.settingsService.clear(userId),
-          // this.policyService.clear(userId),
-          // this.tokenService.clearToken(),
-          // this.userService.clear(),
+          this.storageService.remove("cs_token"),
         ]);
         try {
           await this.storageService.save("cs_token", msg.token);
-          const store = await this.storageService.get("cs_store");
-          let oldStoreParsed = {};
-          if (typeof store === "object") {
-            oldStoreParsed = store;
+          const store : any = await this.storageService.get("cs_store");
+          await this.updateStoreService('isLoggedIn', true);
+          if (store && store.savePopup) {
+            setTimeout(async () => {
+              const tab = await BrowserApi.getTabFromCurrentWindow();
+              await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
+            }, 1000);
           }
-          await this.storageService.save("cs_store", {
-            ...oldStoreParsed,
-            isLoggedIn: true
-          });
           sendResponse({ success: true });
         } catch (e) {
           console.log(e);
@@ -265,10 +238,6 @@ export default class RuntimeBackground {
         ]);
         break;
       case "locker-authResult":
-        // console.log(msg.referrer);
-        // if (msg.referrer == null || Utils.getHostname(vaultUrl) !== msg.referrer) {
-        //     return;
-        // }
         const myHeaders = {
           headers: { Authorization: `Bearer ${msg.token}` }
         };
@@ -287,19 +256,7 @@ export default class RuntimeBackground {
             .then(async result => {
               const access_token = result.data ? result.data.access_token : "";
               await this.storageService.save("cs_token", access_token);
-              const store = await this.storageService.get("cs_store");
-              let oldStoreParsed = {};
-              if (typeof store === "object") {
-                oldStoreParsed = store;
-              }
-              await this.storageService.save("cs_store", {
-                ...oldStoreParsed,
-                isLoggedIn: true
-              });
-              // console.log({
-              //   ...oldStoreParsed,
-              //   isLoggedIn: true
-              // });
+              await this.updateStoreService('isLoggedIn', true);
               sendResponse({ success: true });
             });
         } catch (e) {
@@ -342,14 +299,26 @@ export default class RuntimeBackground {
           window: window
         });
         break;
-      case "loginWithSuccess":
-        console.log("test");
+      case "authAccessToken":
+        await this.authAccessToken(msg.sender.type, msg.sender.provider)
+        break;
+      case "openPopupIframe":
+        await this.updateStoreService('savePopup', true);
+        break;
+      case "closePopupIframe":
+        await this.updateStoreService('savePopup', false);
+      case "updateStoreService":
+        if (msg.sender) {
+          await this.updateStoreService(msg.sender.key, msg.sender.value);
+        }
       default:
         break;
-    }
+    } 
   }
 
   private async autofillPage() {
+    const cipherId = this.main.loginToAutoFill.id
+    const cipherFavorite = this.main.loginToAutoFill.favorite
     const totpCode = await this.autofillService.doAutoFill({
       cipher: this.main.loginToAutoFill,
       pageDetails: this.pageDetailsToAutoFill,
@@ -359,18 +328,31 @@ export default class RuntimeBackground {
     if (totpCode != null) {
       this.platformUtilsService.copyToClipboard(totpCode, { window: window });
     }
-
-    // reset
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
+
+    // Update used time
+    const csToken = await this.main.storageService.get<string>("cs_token");
+    const headers = {
+      "Authorization": "Bearer " + csToken,
+      "Content-Type": "application/json; charset=utf-8"
+    };
+    const res = await axios.put(
+      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
+      { use: true, favorite: cipherFavorite },
+      { headers: headers }
+    )
+    const cipherResponse = new CipherResponse(res.data)
+    const userId = await this.userService.getUserId();
+    const cipherData = new CipherData(cipherResponse, userId);
+    this.cipherService.upsert(cipherData)
   }
 
   private async checkOnInstalled() {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-          const url = `${process.env.VUE_APP_ID_URL}/login?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-          BrowserApi.createNewTab(url);
+          
           await this.setDefaultSettings();
         }
 
@@ -393,22 +375,60 @@ export default class RuntimeBackground {
     }
   }
 
-  private async generatePassword(tab, responseCommand, inputOptions) {
-      const options = inputOptions || (await this.passwordGenerator.getOptions())[0]
-      if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
-        options.lowercase = true
-      }
-      const responseData: any = {};
-      // const options = (await this.passwordGenerator.getOptions())[0];
-      const password = await this.passwordGenerator.generatePassword(options);
-      let passwordStrength: any = {}
-      if (password) {
-        passwordStrength =  this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
-      }
-      responseData.password = password
-      responseData.passwordStrength = passwordStrength
-      await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-      this.platformUtilsService.copyToClipboard(password, { window: window });
-      this.passwordGenerator.addHistory(password);
+  private async generatePassword(tab, responseCommand, inputOptions, isReplace) {
+    const oldGeneratePassword = await this.passService.getGeneratePassword();
+    let password = '';
+    let options = null;
+    if (oldGeneratePassword && !isReplace && tab.id === oldGeneratePassword.tab.id) {
+      password = oldGeneratePassword.password;
+      options = oldGeneratePassword.options
     }
+    if (!options) {
+      options = inputOptions || (await this.passwordGenerator.getOptions())[0]
+    } else {
+      await BrowserApi.tabSendMessageData(tab, 'setGeneratePasswordOptions', { options });
+    }
+    if (!password) {
+      password = await this.passwordGenerator.generatePassword(options);
+    }
+    if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
+      options.lowercase = true
+    }
+    let passwordStrength: any = {}
+    if (password) {
+      passwordStrength = this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
+    }
+    await this.passService.setInformation(password, options, tab)
+    const responseData: any = {};
+    responseData.password = password
+    responseData.passwordStrength = passwordStrength
+    await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
+    this.platformUtilsService.copyToClipboard(password, { window: window });
+    this.passwordGenerator.addHistory(password);
+  }
+
+  private async authAccessToken(type: string, provider: string) {
+    // check open popup
+    const tab = await BrowserApi.getTabFromCurrentWindow()
+    let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url}`;
+    if (provider) {
+      url += `&provider=${provider}`
+    }
+    if (process.env.VUE_APP_ENVIRONMENT) {
+      url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+    }
+    await BrowserApi.updateCurrentTab(tab, url);
+  }
+
+  private async updateStoreService(key: string, value: any) {
+    const store = await this.storageService.get("cs_store");
+    let oldStoreParsed = {};
+    if (typeof store === "object") {
+      oldStoreParsed = store;
+    }
+    await this.storageService.save("cs_store", {
+      ...oldStoreParsed,
+      [key]: value
+    });
+  }
 }

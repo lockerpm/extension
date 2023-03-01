@@ -44,16 +44,18 @@ export default Vue.extend({
   name: 'HomeWeb',
   methods: {
     openLogin () {
-      const url = `${process.env.VUE_APP_ID_URL}/login?SERVICE_URL=${encodeURIComponent('/sso')}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`
-
-      this.$platformUtilsService.launchUri(url)
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open('', '_self');
-      thisWindow.close();
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'login'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     openRegister () {
-      const url = `${process.env.VUE_APP_ID_URL}/register?SERVICE_URL=${encodeURIComponent('/sso')}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`
-      this.$platformUtilsService.launchUri(url)
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'register'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     openVault () {
       this.$router.push({name: 'vault'})

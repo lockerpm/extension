@@ -99,7 +99,7 @@ export default class ContextMenusBackground {
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,
-            sender: 'contextMenu',
+            sender: 'contextMenu'
         });
     }
 }

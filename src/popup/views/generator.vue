@@ -1,7 +1,6 @@
 <template>
   <div
-    class="relative mx-auto bg-white"
-    style="padding-top: 90px; min-height: 600px; max-width: 400px"
+    class="relative mx-auto settings-body"
   >
     <Header></Header>
     <PasswordGenerator />
@@ -15,11 +14,7 @@ import PasswordGenerator from '@/popup/components/password/PasswordGenerator'
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
 export default Vue.extend({
-  components: { PasswordGenerator, Header, Footer },
-  data() {
-    return {}
-  },
-  mounted: {}
+  components: { PasswordGenerator, Header, Footer }
 })
 </script>
 

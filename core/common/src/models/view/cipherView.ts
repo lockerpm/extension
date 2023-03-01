@@ -35,6 +35,8 @@ export class CipherView implements View {
     revisionDate: Date = null;
     deletedDate: Date = null;
     reprompt: CipherRepromptType = CipherRepromptType.None;
+    lastUseDate: number;
+    numUse: number;
 
     constructor(c?: Cipher) {
         if (!c) {
@@ -53,7 +55,8 @@ export class CipherView implements View {
         this.collectionIds = c.collectionIds;
         this.revisionDate = c.revisionDate;
         this.deletedDate = c.deletedDate;
-        // Old locally stored ciphers might have reprompt == null. If so set it to None.
+        this.lastUseDate = c.lastUseDate;
+        this.numUse = c.numUse;
         this.reprompt = c.reprompt ?? CipherRepromptType.None;
     }
 

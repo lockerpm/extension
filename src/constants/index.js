@@ -1,0 +1,6 @@
+export const OBSERVE_IGNORED_ELEMENTS = ['a', 'i', 'b', 'strong', 'span', 'code', 'br', 'img', 'small', 'em', 'hr']
+export const CANCEL_BUTTON_NAMES = ['cancel', 'close', 'back']
+export const LOGIN_BUTTON_NAMES = ['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập', 'tiếp tục']
+export const SIGN_UP_BUTTON_NAMES = ['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']
+export const CHANGE_PASSWORD_BUTTON_NAMES = ['save password', 'update password', 'change password', 'change']
+export const CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES = ['pass', 'change', 'contras', 'senha']

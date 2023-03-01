@@ -440,6 +440,7 @@ export abstract class ApiService {
     postSetupPayment: () => Promise<string>;
 
     getActiveBearerToken: () => Promise<string>;
+    getActiveCsToken: () => Promise<string>;
     fetch: (request: Request) => Promise<Response>;
     nativeFetch: (request: Request) => Promise<Response>;
 

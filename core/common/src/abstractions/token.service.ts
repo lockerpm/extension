@@ -1,10 +1,12 @@
 export abstract class TokenService {
     token: string;
+    csToken: string;
     decodedToken: any;
     refreshToken: string;
     setTokens: (accessToken: string, refreshToken: string, clientIdClientSecret: [string, string]) => Promise<any>;
     setToken: (token: string) => Promise<any>;
     getToken: () => Promise<string>;
+    getCsToken: () => Promise<string>;
     setRefreshToken: (refreshToken: string) => Promise<any>;
     getRefreshToken: () => Promise<string>;
     setClientId: (clientId: string) => Promise<any>;

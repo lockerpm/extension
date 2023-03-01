@@ -147,14 +147,11 @@ export default class AutofillService implements AutofillServiceInterface {
   getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
     return this.loadPasswordFields(pageDetails, true, true, false, true);
   }
-  // getUsernameFields(pageDetails: AutofillPageDetails): any[] {
-  //   return this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
-  // }
   getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
-    // console.log(pageDetails)
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
+    
     if (passwordFields.length === 0) {
       return formData;
     }
@@ -168,7 +165,6 @@ export default class AutofillService implements AutofillServiceInterface {
       if (formPasswordFields.length > 0) {
         let uf = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
         if (uf == null) {
-          // not able to find any viewable username fields. maybe there are some "hidden" ones?
           uf = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false);
         }
         formData.push({
@@ -185,9 +181,7 @@ export default class AutofillService implements AutofillServiceInterface {
 
   getCardForms(pageDetails: AutofillPageDetails): any[] {
     const formData: any[] = [];
-    // console.log(pageDetails)
     const cvvFields = this.loadCvvFields(pageDetails, true, true, false, false);
-    // console.log(cvvFields)
     if (cvvFields.length === 0) {
       return formData;
     }
@@ -220,8 +214,6 @@ export default class AutofillService implements AutofillServiceInterface {
               continue;
             }
 
-            // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
-            // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
             if (this.isFieldMatch(f[attr],
               ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
               ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
@@ -290,7 +282,6 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   async doAutoFill(options: any) {
-    // console.log(options.pageDetails)
     let totpPromise: Promise<string> = null;
     const tab = await this.getActiveTab();
     if (!tab || !options.cipher || !options.pageDetails || !options.pageDetails.length) {
@@ -305,7 +296,7 @@ export default class AutofillService implements AutofillServiceInterface {
         return;
       }
 
-      const fillScript = this.generateFillScript(pd.details, {
+      var fillScript = this.generateFillScript(pd.details, {
         skipUsernameOnlyFill: options.skipUsernameOnlyFill || false,
         onlyEmptyFields: options.onlyEmptyFields || false,
         onlyVisibleFields: options.onlyVisibleFields || false,
@@ -324,7 +315,6 @@ export default class AutofillService implements AutofillServiceInterface {
       if (!options.skipLastUsed) {
         this.cipherService.updateLastUsedDate(options.cipher.id);
       }
-      // console.log(fillScript)
       BrowserApi.tabSendMessage(tab, {
         command: 'fillForm',
         fillScript: fillScript,
@@ -417,8 +407,8 @@ export default class AutofillService implements AutofillServiceInterface {
       return null;
     }
 
-    let fillScript = new AutofillScript(pageDetails.documentUUID);
-    const filledFields: { [id: string]: AutofillField; } = {};
+    var fillScript = new AutofillScript(pageDetails.documentUUID);
+    var filledFields: { [id: string]: AutofillField; } = {};
     const fields = options.cipher.fields;
 
     if (fields && fields.length) {
@@ -660,9 +650,7 @@ export default class AutofillService implements AutofillServiceInterface {
         }
       }
     });
-    // console.log(fillFields)
     const card = options.cipher.card;
-    // console.log(card)
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'cardholderName');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'number');
     this.makeScriptAction(fillScript, card, fillFields, filledFields, 'code');
@@ -1031,7 +1019,6 @@ export default class AutofillService implements AutofillServiceInterface {
 
   private makeScriptActionWithValue(fillScript: AutofillScript, dataValue: any, field: AutofillField,
                                     filledFields: { [id: string]: AutofillField; }) {
-    // console.log(fillScript, dataValue, field, filledFields)                           
     let doFill = false;
     if (this.hasValue(dataValue) && field) {
       if (field.type === 'select-one' && field.selectInfo && field.selectInfo.options) {
@@ -1145,7 +1132,7 @@ export default class AutofillService implements AutofillServiceInterface {
       };
       if (!f.disabled && (canBeReadOnly || !f.readonly) && (isPassword || isLikePassword())
         && (canBeHidden || f.viewable) && (!mustBeEmpty || f.value == null || f.value.trim() === '')
-        && (fillNewPassword || f.autoCompleteType !== 'new-password')) {
+      ) {
         arr.push(f);
       }
     });
@@ -1334,9 +1321,6 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   private fillByOpid(fillScript: AutofillScript, field: AutofillField, value: string): void {
-    // console.log('fillScript:', fillScript)
-    // console.log('field:', field)
-    // console.log('value: ', value)
     if (field.maxLength && value && value.length > field.maxLength) {
       value = value.substr(0, value.length);
     }

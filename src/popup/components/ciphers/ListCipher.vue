@@ -3,22 +3,6 @@
     v-loading="loading"
     class="relative mx-auto"
   >
-
-    <!-- <div
-      class="fixed top-0 flex justify-between items-center bg-black-300 cursor-pointer h-[44px] leading-[44px] px-5"
-      style="z-index:1; width: 400px"
-    >
-      <div
-        class="menu-icon mr-4"
-        @click="$router.back()"
-      >
-        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
-      </div>
-      <div @click="$router.push({name: 'add-item-create', params: {type: type}})">
-        <i class="fas fa-plus-circle hover:text-primary text-black-500 text-[20px]"></i>
-      </div>
-    </div> -->
-
     <NoCipher
       v-if="shouldRenderNoCipher"
       :type="type"
@@ -29,7 +13,7 @@
         v-if="!['folders-folderId'].includes(this.$route.name)"
         class="mt-5 font-semibold mb-4 flex justify-between"
       >
-        <div>{{ $tc(`type.${type}`, 2) }} ({{ciphers.length}})</div>
+        <div>{{ $tc(`type.${type}`, 2) }} ({{ ciphers ? ciphers.length : 0 }})</div>
         <div class="flex items-center">
           <span v-if="orderString==='name_asc'">A-Z &nbsp;</span>
           <span v-if="orderString==='name_desc'">Z-A &nbsp;</span>
@@ -97,20 +81,17 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-// import Vnodes from "@/components/Vnodes";
 import NoCipher from "@/components/cipher/NoCipher";
 import { BrowserApi } from "@/browser/browserApi";
 const BroadcasterSubscriptionId = "ChildViewComponent";
-import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 export default Vue.extend({
   components: {
-    // Vnodes,
     NoCipher,
     CipherRow,
   },
@@ -135,7 +116,7 @@ export default Vue.extend({
       dataRendered: [],
       renderIndex: 0,
       pageDetails: [],
-      orderField: "revisionDate", // revisionDate
+      orderField: "revisionDate",
       orderDirection: "desc",
     };
   },
@@ -154,7 +135,7 @@ export default Vue.extend({
 
       if (bottomOfWindow) {
         this.renderIndex += 50;
-        if (this.renderIndex <= this.ciphers.length) {
+        if ( this.ciphers && this.renderIndex <= this.ciphers.length) {
           this.dataRendered = this.dataRendered.concat(
             this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
           );
@@ -162,7 +143,7 @@ export default Vue.extend({
       }
     };
     chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
+      (msg, sender, response) => {
         switch (msg.command) {
         case "collectPageDetailsResponse":
           if (msg.sender === BroadcasterSubscriptionId) {
@@ -172,6 +153,7 @@ export default Vue.extend({
               details: msg.details,
             };
             this.pageDetails.push(pageDetailsObj);
+            response()
           }
           break;
         default:
@@ -245,7 +227,6 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-              // item.notes = item.cryptoAccount ? item.cryptoAccount.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -253,7 +234,6 @@ export default Vue.extend({
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-              // item.notes = item.cryptoWallet ? item.cryptoWallet.notes : ''
             } catch (error) {
               console.log(error);
             }
@@ -291,29 +271,13 @@ export default Vue.extend({
       },
       watch: ["searchText", "orderField", "orderDirection", "ciphers"],
     },
-    // collections: {
-    //   async get () {
-    //     let collections = await this.$collectionService.getAllDecrypted() || []
-    //     collections = collections.filter(f => f.id)
-    //     collections.forEach(f => {
-    //       const ciphers = this.ciphers && (this.ciphers.filter(c => c.collectionIds.includes(f.id)) || [])
-    //       f.ciphersCount = ciphers && ciphers.length
-    //     })
-    //     return collections
-    //   },
-    //   watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
-    // }
   },
   methods: {
-    // addEdit (item) {
-    //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
-    // },
     changeSort(orderField, orderDirection) {
       this.orderField = orderField;
       this.orderDirection = orderDirection;
     },
     addEdit(item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       this.$router.push({ name: "add-item-create", params: { data: item } });
     },
     handleAddButton() {
@@ -334,8 +298,7 @@ export default Vue.extend({
         sender: BroadcasterSubscriptionId,
       });
     },
-    async fillCipher(cipher: CipherView) {
-      // console.log(this.pageDetails.length);
+    async fillCipher(cipher) {
       if (
         cipher.reprompt !== CipherRepromptType.None &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
@@ -349,7 +312,6 @@ export default Vue.extend({
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
-        // this.toasterService.popAsync('error', null, this.$i18nService.t('autofillError'));
         this.notify(this.$t("errors.autofill"), "error");
         return;
       }
@@ -358,7 +320,6 @@ export default Vue.extend({
         this.totpCode = await this.$autofillService.doAutoFill({
           cipher: cipher,
           pageDetails: this.pageDetails,
-          doc: window.document,
           fillNewPassword: true,
         });
         if (this.totpCode != null) {
@@ -379,7 +340,6 @@ export default Vue.extend({
         }
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");
-        // this.notify(e, 'warning')
       }
     },
   },

@@ -14,9 +14,6 @@
 }
 
 html {
-//width: 375px;
-//height: 600px;
-//background: grey;
   height: 100%;
 }
 
@@ -30,8 +27,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-width: 400px;
   &.body-full {
-     @apply w-full h-full;
-   }
+    @apply w-full h-full;
+  }
 }
 
 .cs-content {
@@ -47,9 +44,9 @@ body {
 
 
 .tab-page {
-.cs-content {
-  bottom: 56px
-}
+  .cs-content {
+    bottom: 56px
+  }
 }
 
 
@@ -58,50 +55,60 @@ body {
   line-height: 40px;
 }
 
-[type='text']:focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus {
+[type='text']:focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
   @apply ring-0 outline-none #{!important}
 }
 
 .el-dialog.locker-dialog {
-.el-dialog__header, .el-dialog__footer {
-  @apply px-8
+  .el-dialog__header, .el-dialog__footer {
+    @apply px-8
+  }
+  .el-dialog__header {
+    @apply pt-8
+  }
+  .el-dialog__footer {
+    @apply pb-8
+  }
+  .el-dialog__body {
+    @apply px-8 py-5
+  }
 }
-.el-dialog__header {
-  @apply pt-8
-}
-.el-dialog__footer {
-  @apply pb-8
-}
-.el-dialog__body {
-  @apply px-8 py-5
-}
-}
-//.col-actions {
-  //  display: none;
-  //  visibility: hidden;
-  //}
 .hover-table-row:hover {
-.col-actions {
-  display: block;
-  visibility: visible;
-}
+  .col-actions {
+    display: block;
+    visibility: visible;
+  }
 }
 .cipher-items {
-.cipher-item {
-  border-bottom: 1px solid #EAEAF5;
-  height: 57px;
-  @apply hover:bg-black-300 cursor-pointer items-center px-5;
-&:last-child {
-   border-bottom: none;
- }
-}
+  .cipher-item {
+    border-bottom: 1px solid #EAEAF5;
+    height: 57px;
+    @apply hover:bg-black-300 cursor-pointer items-center px-5;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 
 .btn.btn-action {
   @apply hover:bg-black-400 text-black-600 hover:text-black mr-3;
-&:last-child {
-   @apply mr-0
- }
+  &:last-child {
+    @apply mr-0
+  }
 }
 a {
   @apply hover:text-primary cursor-pointer hover:underline
@@ -122,13 +129,8 @@ a {
 .v-context{
   background-color:#fff;
   background-clip:padding-box;
-//border-radius:.25rem;
-//border:1px solid rgba(0,0,0,.15);
-//box-shadow:0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
-//padding:10px 0;
   display:block;
   margin:0;
-//min-width:10rem;
   z-index:1500;
   position:fixed;
   list-style:none;
@@ -193,26 +195,26 @@ a {
 .setting-wrapper {
   @apply border border-transparent rounded mb-6 last:mb-0;
   box-shadow: 0px 0px 8px 2px rgba(109,122,130,0.1);
-.setting-section {
-  @apply px-8 py-6 last:border-b-0 border-0 border-b;
-&.setting-section--hover:hover {
-   cursor: pointer;
-   background: #F6F8F9;
- }
-border-color: #eaeaf5;
-.setting-title {
-  @apply text-lg font-semibold;
-}
-.setting-description {
-  @apply text-black-600;
-}
-.setting-section-header {
-  @apply flex items-center justify-between;
-}
-.setting-section-body {
-  @apply mt-6
-}
-}
+  .setting-section {
+    @apply px-8 py-6 last:border-b-0 border-0 border-b;
+    &.setting-section--hover:hover {
+      cursor: pointer;
+      background: #F6F8F9;
+    }
+    border-color: #eaeaf5;
+    .setting-title {
+      @apply text-lg font-semibold;
+    }
+    .setting-description {
+      @apply text-black-600;
+    }
+    .setting-section-header {
+      @apply flex items-center justify-between;
+    }
+    .setting-section-body {
+      @apply mt-6
+    }
+  }
 }
 
 svg {
@@ -239,15 +241,15 @@ svg {
 }
 .locker-callout {
   @apply border border-black-200 rounded py-2 px-4 border-l-4;
-&.locker-callout-info {
-   border-left-color: $--color-info!important;
- }
-&.locker-callout-success {
-   border-left-color: $--color-success!important;
- }
-&.locker-callout-danger {
-   border-left-color: $--color-danger!important;
- }
+  &.locker-callout-info {
+    border-left-color: $--color-info!important;
+  }
+  &.locker-callout-success {
+    border-left-color: $--color-success!important;
+  }
+  &.locker-callout-danger {
+    border-left-color: $--color-danger!important;
+  }
 }
 .el-avatar {
   background: transparent;
@@ -277,23 +279,20 @@ a {
   height: calc(100% - 20px);
   bottom: unset;
   margin: 10px;
-.el-drawer__header {
-  margin-bottom: 0;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #DCDFE6;
-  color: #113F67
-}
-.el-drawer__body {
-  overflow-y: auto;
-  flex: unset;
-.credit-drawer-body {
-
-}
-.credit-drawer-footer {
-  border-top: #DCDFE6;
-  padding: 20px;
-}
-}
+  .el-drawer__header {
+    margin-bottom: 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #DCDFE6;
+    color: #113F67
+  }
+  .el-drawer__body {
+    overflow-y: auto;
+    flex: unset;
+    .credit-drawer-footer {
+      border-top: #DCDFE6;
+      padding: 20px;
+    }
+  }
 }
 
 .cloud-card {
@@ -303,9 +302,9 @@ a {
 }
 
 .el-select.is-invalid {
-input.el-input__inner {
-  @apply border-danger;
-}
+  input.el-input__inner {
+    @apply border-danger;
+  }
 }
 
 .transition-card {
@@ -321,22 +320,22 @@ input:-webkit-autofill:active
 }
 
 .cs-field {
-.el-input__inner {
-  background-color: transparent;
-  border: none;
-  height: 32px;
-  line-height: 19px;
-  padding-left: 12px;
-}
-.el-input__suffix {
-  display: none;
-  visibility: hidden;
-}
-.el-select .el-input.is-focus .el-input__inner {
-  border: none;
-}
-.el-input.is-disabled .el-input__inner {
-  background-color: transparent;
-  border-color: transparent;
-}
+  .el-input__inner {
+    background-color: transparent;
+    border: none;
+    height: 32px;
+    line-height: 19px;
+    padding-left: 12px;
+  }
+  .el-input__suffix {
+    display: none;
+    visibility: hidden;
+  }
+  .el-select .el-input.is-focus .el-input__inner {
+    border: none;
+  }
+  .el-input.is-disabled .el-input__inner {
+    background-color: transparent;
+    border-color: transparent;
+  }
 }

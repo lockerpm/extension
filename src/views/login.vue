@@ -325,23 +325,7 @@ export default Vue.extend({
           }
         } else {
           try {
-            // await this.$storageService.save('cs_token', res.token)
-            // const store = await this.$storageService.get('cs_store')
-            // let oldStoreParsed = {}
-            // if (typeof store === 'object') {
-            //   oldStoreParsed = store
-            // }
-            // await this.$storageService.save('cs_store', {
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // console.log({
-            //   ...oldStoreParsed,
-            //   isLoggedIn: true,
-            // })
-            // this.$store.commit('UPDATE_IS_LOGGEDIN', true)
             this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-            // this.$router.push({name: 'lock'})
             await this.getAccessToken(res.token)
           }
           catch (e) {
@@ -360,26 +344,26 @@ export default Vue.extend({
         }
       }
     },
-    openForgot () {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/forgot  `;
-
-      this.$platformUtilsService.launchUri(url);
-      BrowserApi.reloadOpenWindows();
-      const thisWindow = window.open("", "_self");
-      thisWindow.close();
+    openRegister() {
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'register'},
+      };
+      chrome.runtime.sendMessage(msg);
     },
     loginWith (provider) {
-      const url = `${process.env.VUE_APP_ID_URL
-      }/login?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&provider=${provider}`;
-
+      const msg = {
+        command: 'authAccessToken',
+        sender: { type: 'login', provider: provider},
+      };
+      chrome.runtime.sendMessage(msg);
+    },
+    openForgot () {
+      const url = `${process.env.VUE_APP_ID_URL}/forgot  `;
       this.$platformUtilsService.launchUri(url);
       BrowserApi.reloadOpenWindows();
       const thisWindow = window.open("", "_self");
       thisWindow.close();
-      // window.location.replace(url)
     },
     async postOtp () {
       try {
@@ -430,14 +414,6 @@ export default Vue.extend({
         this.$nextTick(() => this.$refs.otp.focus())
       }
     },
-    openRegister() {
-      const url = `${
-        process.env.VUE_APP_ID_URL
-      }/register?SERVICE_URL=${encodeURIComponent(
-        "/sso"
-      )}&SERVICE_SCOPE=pwdmanager&CLIENT=browser`;
-      this.$platformUtilsService.launchUri(url);
-    },
     async getAccessToken(token){
       const url = '/sso/access_token'
       const config = {
@@ -455,20 +431,11 @@ export default Vue.extend({
           let token = url.substring(url.indexOf("token")+6)
           token = token.indexOf("&") === -1?token:token.substring(0, token.indexOf("&"))
           await this.$storageService.save('cs_token', token)
-          const store = await this.$storageService.get('cs_store')
-          let oldStoreParsed = {}
-          if (typeof store === 'object') {
-            oldStoreParsed = store
-          }
-          await this.$storageService.save('cs_store', {
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
-          console.log({
-            ...oldStoreParsed,
-            isLoggedIn: true,
-          })
           this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+          chrome.runtime.sendMessage({
+            command: 'updateStoreService',
+            sender: { key: 'isLoggedIn', value: true },
+          });
           this.$router.push({ name: 'lock' })
         }
       } catch (error) {

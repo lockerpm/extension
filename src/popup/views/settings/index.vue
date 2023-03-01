@@ -1,14 +1,15 @@
 <template>
   <div
-    style="padding-top: 90px; padding-bottom: 32px"
+    class="settings-body"
   >
     <Header></Header>
     <div class="p-4 text-[#A2A3A7]">
       <div
         v-for="(cate, index) in menu"
         :key="index"
+        class="mb-4"
       >
-        <p class="uppercase px-3 mt-4 mb-1 font-semibold">{{cate.name}}</p>
+        <p class="uppercase px-3 mb-1 font-semibold">{{cate.name}}</p>
         <ul class="popup-setting-wrapper">
           <li
             v-for="(item, index) in cate.items"
@@ -46,7 +47,7 @@
           </li>
         </ul>
       </div>
-      <div class="mt-4">
+      <div>
         <div class="popup-setting-wrapper p-4 flex justify-between">
           <div class="text-black">
             {{$t("data.settings.logged_in_as")}} <span class="font-semibold">{{currentUser.email}}</span>
@@ -57,13 +58,10 @@
         </div>
       </div>
       <div class="mt-4 flex items-center justify-center">
-          <div v-if="locale==='vi'">
-            Một sản phẩm của
-          </div>
-          <div v-else>
-            A product of
-          </div>
-          <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack">
+          {{ $t('data.settings.a_product_of') }}
+          <a href="https://cystack.net" target="_blank">
+            <img class="h-4 ml-2" src="@/assets/images/logo/CyStack.png" alt="CyStack"/>
+          </a>
         </div>
     </div>
     <Footer></Footer>
@@ -71,12 +69,12 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import { BrowserApi } from "@/browser/browserApi";
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
-import Header from "@/popup/components/layout/parts/Header";
-import Footer from "@/popup/components/layout/parts/Footer";
+import Header from "../../components/layout/parts/Header.vue";
+import Footer from "../../components/layout/parts/Footer.vue";
+import i18n from '@/locales/i18n';
 const enableAutofillKey = 'enableAutofill'
 const showFoldersKey = 'showFolders'
 const hideIconsKey = 'hideIcons'
@@ -88,11 +86,6 @@ export default Vue.extend({
     Footer,
   },
   async mounted() {
-    chrome.runtime.onMessage.addListener(
-      (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-        this.processMessage(msg, sender, response);
-      }
-    );
     const res = await Promise.all([
       this.$storageService.get(enableAutofillKey),
       this.$storageService.get(showFoldersKey),
@@ -115,16 +108,6 @@ export default Vue.extend({
       }
     };
   },
-  // asyncComputed: {
-  //   enableAutofill: {
-  //     async get() {
-  //       return await this.$storageService.get('enableAutofill');
-  //     },
-  //     watch: [
-  //       "$storageService",
-  //     ]
-  //   }
-  // },
   computed: {
     vaultTimeouts() {
       return [
@@ -149,16 +132,6 @@ export default Vue.extend({
           name: this.$t("data.settings.autofill"),
           divided: false,
           items: [
-            // {
-            //   routeName: "",
-            //   externalUrl: "https://locker.io/vault",
-            //   name: this.$t("data.settings.go_to_web_vault"),
-            // },
-            // {
-            //   routeName: "",
-            //   externalUrl: "https://locker.io/settings/options#import",
-            //   name: this.$t("data.settings.import_export"),
-            // },
             {
               name: this.$t("data.settings.enable_autofill"),
               desc: this.$t("data.settings.enable_autofill_desc"),
@@ -181,80 +154,22 @@ export default Vue.extend({
               desc: this.$t("data.settings.vault_timeout_desc"),
               routeName: "settings-vault-timeout",
             },
-            // {
-            //   name: this.$t("data.settings.show_folders"),
-            //   desc: this.$t("data.settings.show_folders_desc"),
-            //   switch: true,
-            //   key: showFoldersKey,
-            // },
             {
               name: this.$t("data.settings.hide_icons"),
               desc: this.$t("data.settings.hide_icons_desc"),
               switch: true,
               key: hideIconsKey,
             },
-            // {
-            //   name: this.$t("data.settings.vault_timeout_action"),
-            //   action: "vault_timeout_action",
-            //   picker: true,
-            // },
-            // {
-            //   externalUrl: "/web.html#/settings/exclude-domains",
-            //   action: "fingerprint",
-            //   name: this.$t("data.settings.fingerprint_phase"),
-            // },
             {
               lock: true,
               name: this.$t("data.settings.lock_now"),
             },
           ],
         },
-        // {
-        //   name: this.$t("data.settings.account"),
-        //   divided: true,
-        //   items: [
-        //     {
-        //       icon: "fa-home",
-        //       routeName: "",
-        //       externalUrl: "https://locker.io/plans",
-        //       name: this.$t("data.settings.upgrade_to_premium"),
-        //     },
-        //     {
-        //       icon: "fa-home",
-        //       routeName: "",
-        //       externalUrl: "https://locker.io/settings/security",
-        //       name: this.$t("data.settings.change_master_password"),
-        //     },
-        //     {
-        //       icon: "fa-home",
-        //       routeName: "",
-        //       externalUrl: "https://locker.io/settings/account",
-        //       name: this.$t("data.settings.manage_your_account"),
-        //     },
-        //     {
-        //       icon: "fa-home",
-        //       routeName: "",
-        //       externalUrl: "/web.html#/settings/",
-        //       action: "sync_data",
-        //       name: this.$t("data.settings.sync_data"),
-        //     },
-        //     {
-        //       icon: "fa-home",
-        //       routeName: "",
-        //       externalUrl: "",
-        //       logout: true,
-        //       name: this.$t("data.settings.logout"),
-        //     },
-        //   ],
-        // },
         {
           name: this.$t("data.settings.help_feedback"),
           divided: true,
           items: [
-            // {
-            //   externalUrl: "https://cystack.net/about",
-            //   name: this.$t("data.settings.about"),
-            // },
             {
               externalUrl: "https://support.locker.io",
               name: this.$t("data.settings.support_center"),
@@ -267,24 +182,17 @@ export default Vue.extend({
               routeName: "settings-info",
               desc: this.$t("data.settings.info_desc", {version: chrome.runtime.getManifest().version}),
               info: true,
-            },
-            // {
-            //   externalUrl:
-            //     "https://chrome.google.com/webstore/detail/cystack-locker-free-passw/cmajindocfndlkpkjnmjpjoilibjgmgh",
-            //   name: this.$t("data.settings.rate_extension"),
-            // },
-            // {
-            //   externalUrl: "https://locker.io/contact",
-            //   name: this.$t("data.settings.contact_us"),
-            // }
+            }
           ],
         },
       ];
     },
+    language () {
+      return i18n.locale
+    }
   },
   methods: {
     openRoute(item) {
-      // console.log(item.name)
       if (item.lock) {
         this.lock();
       } else if (item.logout) {
@@ -295,7 +203,6 @@ export default Vue.extend({
           this.getSyncData();
           break;
         case "fingerprint":
-          // this.fingerprintDialog = true
           this.openFingerprintDialog();
           break;
         case "vault_timeout":
@@ -307,22 +214,6 @@ export default Vue.extend({
         this.$platformUtilsService.launchUri(item.externalUrl);
       } else {
         this.$router.push({ name: item.routeName });
-      }
-    },
-    async test() {
-      const test = await BrowserApi.getTabFromCurrentWindow();
-      console.log(test);
-    },
-    async processMessage(msg: any, sender: any, sendResponse: any) {
-      switch (msg.command) {
-      case "syncCompleted":
-        // console.log('sync complete')
-        if (msg.successfully && msg.trigger) {
-          this.notify("Syncing complete", "success");
-        }
-        break;
-      default:
-        break;
       }
     },
     openFingerprintDialog() {
@@ -369,6 +260,9 @@ export default Vue.extend({
         key,
         this.storage[key]
       )
+      if (key === enableAutofillKey && this.storage[enableAutofillKey]) {
+        await this.setupFillPage()
+      }
     }
   },
 });

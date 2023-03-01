@@ -99,7 +99,7 @@ export class CipherService implements CipherServiceAbstraction {
 
     async encrypt(model: CipherView, key?: SymmetricCryptoKey, originalCipher: Cipher = null): Promise<Cipher> {
         // Adjust password history
-        if (model.id != null) {
+        if (model.id) {
             if (originalCipher == null) {
                 originalCipher = await this.get(model.id);
             }
@@ -150,7 +150,6 @@ export class CipherService implements CipherServiceAbstraction {
         cipher.collectionIds = model.collectionIds;
         cipher.revisionDate = model.revisionDate;
         cipher.reprompt = model.reprompt;
-
         if (key == null && cipher.organizationId != null) {
             key = await this.cryptoService.getOrgKey(cipher.organizationId);
             if (key == null) {
@@ -722,7 +721,6 @@ export class CipherService implements CipherServiceAbstraction {
                 ciphers[c.id] = c;
             });
         }
-
         await this.storageService.save(Keys.ciphersPrefix + userId, ciphers);
         this.decryptedCipherCache = null;
     }
@@ -848,6 +846,30 @@ export class CipherService implements CipherServiceAbstraction {
         }
 
         return this.getLocaleSortingFunction()(a, b);
+    }
+
+    sortCiphers(ciphers: CipherView[]): CipherView[] {
+        const sort = (array: CipherView[]) => {
+            const newArray = array.sort((a: CipherView, b: CipherView) => {
+                if (b.numUse > a.numUse) {
+                    return 1
+                } else if (b.numUse === a.numUse) {
+                    if (b.lastUseDate > a.lastUseDate) {
+                        return 1
+                    } else if (b.lastUseDate === a.lastUseDate) {
+                        return this.getLocaleSortingFunction()(a, b)
+                    } else {
+                        return -1
+                    }
+                } else {
+                    return -1
+                }
+            })
+            return newArray
+        }
+        const favoriteCiphers = sort(ciphers.filter((c: CipherView) => c.favorite));
+        const notFavoriteCiphers = sort(ciphers.filter((c: CipherView) => !c.favorite));
+        return [...favoriteCiphers, ...notFavoriteCiphers]
     }
 
     getLocaleSortingFunction(): (a: CipherView, b: CipherView) => number {
@@ -1166,5 +1188,14 @@ export class CipherService implements CipherServiceAbstraction {
         
         decCiphers.sort(this.getLocaleSortingFunction());
         this.decryptedCipherCache = decCiphers;
+  }
+  
+    // CS
+    csDeleteFromDecryptedCache(ids: string[]) {
+        if (this.decryptedCipherCache) {
+            let decCiphers = [...this.decryptedCipherCache]
+            decCiphers = decCiphers.filter(c => !ids.includes(c.id));
+            this.decryptedCipherCache = decCiphers
+        }
     }
 }
