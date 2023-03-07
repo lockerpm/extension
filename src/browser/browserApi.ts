@@ -2,6 +2,8 @@ import { SafariApp } from './safariApp';
 
 import { Utils } from 'jslib-common/misc/utils';
 
+import MainBackground from '../background/main.background';
+
 export class BrowserApi {
     static isWebExtensionsApi: boolean = (typeof browser !== 'undefined');
     static isSafariApi: boolean = navigator.userAgent.indexOf(' Safari/') !== -1 &&
@@ -33,7 +35,7 @@ export class BrowserApi {
 
     static async tabsQuery(options: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab[]> {
         return new Promise(resolve => {
-            chrome.tabs.query(options, (tabs: any[]) => {
+            chrome.tabs?.query(options, (tabs: any[]) => {
                 resolve(tabs);
             });
         });
@@ -60,13 +62,13 @@ export class BrowserApi {
         return BrowserApi.tabSendMessage(tab, obj);
     }
 
-  static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
+    static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
         if (!tab || !tab.id) {
             return;
         }
 
         return new Promise<void>(resolve => {
-            chrome.tabs.sendMessage(tab.id, obj, options, () => {
+            chrome.tabs?.sendMessage(tab.id, obj, options, () => {
                 if (chrome.runtime.lastError) {
                     // Some error happened
                 }
@@ -76,7 +78,14 @@ export class BrowserApi {
     }
 
     static getBackgroundPage(): any {
+      if (chrome.extension.getBackgroundPage) {
         return chrome.extension.getBackgroundPage();
+      }
+      const bitwardenMain = (window as any).bitwardenMain = new MainBackground();
+      bitwardenMain.bootstrap().then(() => {
+        // Finished bootstrapping
+      });
+      return window;
     }
 
     static getApplicationVersion(): string {
@@ -84,15 +93,18 @@ export class BrowserApi {
     }
 
     static async isPopupOpen(): Promise<boolean> {
+      if (chrome.extension.getViews) {
         return Promise.resolve(chrome.extension.getViews({ type: 'popup' }).length > 0);
+      }
+      return false
     }
 
     static createNewTab(url: string, extensionPage: boolean = false, active: boolean = true) {
-        chrome.tabs.create({ url: url, active: active });
+        chrome.tabs?.create({ url: url, active: active });
     }
 
     static async updateCurrentTab(tab: chrome.tabs.Tab, url: string) {
-      chrome.tabs.update(tab.id, { active: true, url: url, openerTabId: tab.id });
+      chrome.tabs?.update(tab.id, { active: true, url: url, openerTabId: tab.id });
     }
 
     static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
@@ -117,11 +129,11 @@ export class BrowserApi {
         }
 
         const tabToClose = tabs[tabs.length - 1].id;
-        chrome.tabs.remove(tabToClose);
+        chrome.tabs?.remove(tabToClose);
     }
 
     static async focusSpecifiedTab(tabId: number) {
-        chrome.tabs.update(tabId, { active: true, highlighted: true });
+        chrome.tabs?.update(tabId, { active: true, highlighted: true });
     }
 
     static closePopup(win: Window) {
@@ -181,10 +193,14 @@ export class BrowserApi {
     }
 
     static reloadOpenWindows() {
+      if (chrome.extension.getViews) {
         const views = chrome.extension.getViews() as Window[];
         views.filter(w => w.location.href != null).forEach(w => {
             w.location.reload();
         });
+      }
+      return window.location.reload()
+        
     }
 
     static connectNative(application: string): browser.runtime.Port | chrome.runtime.Port {

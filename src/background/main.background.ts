@@ -247,7 +247,7 @@ export default class MainBackground {
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ?
-      opr.sidebarAction : (window as any).chrome.sidebarAction;
+      opr.sidebarAction : (window as any).chrome?.sidebarAction;
 
     // Background
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,

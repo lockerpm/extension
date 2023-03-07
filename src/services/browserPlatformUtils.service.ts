@@ -94,12 +94,12 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     }
 
     const sidebarView = this.sidebarViewName();
-    const sidebarOpen = sidebarView != null && chrome.extension.getViews({ type: sidebarView }).length > 0;
+    const sidebarOpen = sidebarView != null && chrome.extension.getViews && chrome.extension.getViews({ type: sidebarView }).length > 0;
     if (sidebarOpen) {
       return true;
     }
 
-    const tabOpen = chrome.extension.getViews({ type: 'tab' }).length > 0;
+    const tabOpen = chrome.extension.getViews && chrome.extension.getViews({ type: 'tab' }).length > 0;
     return tabOpen;
   }
 
