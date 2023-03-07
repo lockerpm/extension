@@ -55,7 +55,7 @@ export default class RuntimeBackground {
     private passwordGenerator: PasswordGenerationService,
     private passService: PassService,
   ) {
-    chrome.runtime.onInstalled.addListener((details: any) => {
+    chrome.runtime?.onInstalled?.addListener((details: any) => {
       this.onInstalledReason = details.reason;
     });
   }
@@ -209,7 +209,7 @@ export default class RuntimeBackground {
         ]);
         try {
           await this.storageService.save("cs_token", msg.token);
-          const store : any = await this.storageService.get("cs_store");
+          const store: any = await this.storageService.get("cs_store");
           await this.updateStoreService('isLoggedIn', true);
           if (store && store.savePopup) {
             setTimeout(async () => {
@@ -303,7 +303,9 @@ export default class RuntimeBackground {
         await this.authAccessToken(msg.sender.type, msg.sender.provider)
         break;
       case "openPopupIframe":
-        await this.updateStoreService('savePopup', true);
+        if (!this.platformUtilsService.isFirefox()) {
+          await this.updateStoreService('savePopup', true);
+        }
         break;
       case "closePopupIframe":
         await this.updateStoreService('savePopup', false);
@@ -313,7 +315,7 @@ export default class RuntimeBackground {
         }
       default:
         break;
-    } 
+    }
   }
 
   private async autofillPage() {
@@ -352,7 +354,7 @@ export default class RuntimeBackground {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-          
+
           await this.setDefaultSettings();
         }
 

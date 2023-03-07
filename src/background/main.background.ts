@@ -403,6 +403,9 @@ export default class MainBackground {
     // Chrome APIs cannot open popup
 
     // TODO: Do we need to open this popup?
+    if (this.platformUtilsService.isFirefox()) {
+      await browser.browserAction.openPopup();
+    }
     if (!this.isSafari) {
       return;
     }
@@ -728,7 +731,7 @@ export default class MainBackground {
   private async browserActionSetIcon(tabId: number, locked: boolean) {
     if (chrome.browserAction && chrome.browserAction.setIcon) {
       await chrome.browserAction.setIcon({
-        path : locked ? "icons/locked.png" : 'icons/19.png',
+        path: locked ? "icons/locked.png" : 'icons/19.png',
         tabId: tabId,
       });
     }

@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       sendResponse();
       return true;
-    } 
+    }
   }
 
   function observeDom() {
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       });
 
-      observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter : ['style'] });
+      observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter: ['style'] });
     }
   }
 
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', event => {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
         } else {
-          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30 }px`;
+          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30}px`;
           logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
         }
         if (isLocked) {
@@ -838,9 +838,9 @@ document.addEventListener('DOMContentLoaded', event => {
       visibility: visible;
     `;
     frameDiv.appendChild(iframe);
-    window.addEventListener('click', function(e: any){   
-      if (frameDiv.contains(e.target)){
-      } else{
+    window.addEventListener('click', function (e: any) {
+      if (frameDiv.contains(e.target)) {
+      } else {
         sendPlatformMessage({
           command: 'closePopupIframe',
         });
