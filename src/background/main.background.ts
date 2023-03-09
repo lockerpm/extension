@@ -404,7 +404,8 @@ export default class MainBackground {
 
     // TODO: Do we need to open this popup?
     if (this.platformUtilsService.isFirefox()) {
-      await browser.browserAction.openPopup();
+      browser.browserAction.openPopup();
+      return;
     }
     if (!this.isSafari) {
       return;

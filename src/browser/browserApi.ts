@@ -12,7 +12,6 @@ export class BrowserApi {
   static isChromeApi: boolean = !BrowserApi.isSafariApi && (typeof chrome !== 'undefined');
   static isFirefoxOnAndroid: boolean = navigator.userAgent.indexOf('Firefox/') !== -1 &&
     navigator.userAgent.indexOf('Android') !== -1;
-
   static async getTabFromCurrentWindowId(): Promise<chrome.tabs.Tab> | null {
     return await BrowserApi.tabsQueryFirst({
       active: true,

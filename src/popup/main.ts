@@ -2,9 +2,9 @@
 // @ts-nocheck
 import Vue from 'vue'
 
+import AsyncComputed from 'vue-async-computed'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import AsyncComputed from 'vue-async-computed'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -24,9 +24,10 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 
-Vue.config.productionTip = false
-Vue.use(JSLib)
+Vue.config.productionTip = false;
+
 Vue.use(AsyncComputed)
+Vue.use(JSLib)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
