@@ -6,6 +6,7 @@ body {
     font-size: 14px;
     line-height: 16px;
     color: #333333;
+    min-width: 100% !important;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
@@ -231,10 +232,22 @@ button.neutral {
   .cs-generate-password-options{
     padding: 16px;
     background-color: #E4F0E6;
+    .cs-ui-components {
+      margin-bottom: 6px;
+    }
+    .option-length-div {
+      margin-bottom: 4px;
+    }
+    .cs-generator-checkbox {
+      margin-bottom: 4px;
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
   }
 }
   #button_use_password{
-    max-width: 320px;
+    // max-width: 320px;
     width: 100%;
     border-radius: 64px !important;
     padding: 12px !important;

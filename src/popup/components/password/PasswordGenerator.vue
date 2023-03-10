@@ -163,5 +163,6 @@ export default {
 <style>
 .generator-option {
   @apply w-full py-2;
+  margin-right: 0 !important;
 }
 </style>
