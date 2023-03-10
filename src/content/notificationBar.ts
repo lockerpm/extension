@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
     const barPageUrl: string = chrome.extension.getURL(
-      "inform-menu/menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+      "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
-    let barPage = 'notification/bar.html';
+    let barPage = 'bar.html';
     switch (type) {
       case 'add':
         barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);

@@ -96,8 +96,8 @@
     }
   },
   "web_accessible_resources": [
-    "notification/bar.html",
-    "inform-menu/menu.html",
+    "bar.html",
+    "menu.html",
     "popup.html"
   ],
   "externally_connectable": {

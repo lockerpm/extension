@@ -1,6 +1,5 @@
 /* eslint-disable */
 var path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 const os = require('os');
@@ -10,6 +9,16 @@ module.exports = {
       template: 'public/web.html',
       entry: './src/web/main.ts',
       title: 'Web'
+    },
+    bar: {
+      template: './src/notification/bar.html',
+      entry: './src/notification/bar.js',
+      title: 'Bar'
+    },
+    menu: {
+      template: './src/inform-menu/menu.html',
+      entry: './src/inform-menu/menu.js',
+      title: 'Bar'
     },
     popup: {
       template: 'public/browser-extension.html',
@@ -31,8 +40,6 @@ module.exports = {
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',
             'content/shortcuts': 'src/content/shortcuts.ts',
             'content/message_handler': 'src/content/message_handler.ts',
-            'notification/bar': './src/notification/bar.js',
-            'inform-menu/menu': './src/inform-menu/menu.js',
           },
         },
       },
@@ -40,7 +47,6 @@ module.exports = {
         if (process.env.NODE_ENV === 'development') {
           manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
         }
-
         return manifest;
       }
     }
@@ -52,23 +58,7 @@ module.exports = {
         'jslib/angular': path.resolve(__dirname, 'jslib/angular/src'),
       }
     },
-    entry: {
-      'notification/bar': './src/notification/bar.js',
-      'inform-menu/menu': './src/inform-menu/menu.js'
-    },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/notification/bar.html',
-        filename: 'notification/bar.html',
-        chunks: ['notification/bar'],
-        cache: false, // Remove after upgrading to Webpack 5
-      }),
-      new HtmlWebpackPlugin({
-        template: './src/inform-menu/menu.html',
-        filename: 'inform-menu/menu.html',
-        chunks: ['inform-menu/menu'],
-        cache: false, // Remove after upgrading to Webpack 5
-      }),
       new MomentLocalesPlugin({
         localesToKeep: ['vi'],
       }),

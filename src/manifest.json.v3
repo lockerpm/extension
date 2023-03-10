@@ -103,8 +103,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "js/notification/bar.js",
-        "js/inform-menu/menu.js",
+        "bar.html",
+        "menu.html",
         "popup.html"
       ],
       "matches": [
