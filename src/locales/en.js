@@ -638,7 +638,8 @@ module.exports = {
       logged_in_as: 'Logged in as',
       version: 'Version',
       term: 'Terms of use',
-      privacy: 'Privacy policy'
+      privacy: 'Privacy policy',
+      a_product_of: 'A product of'
     },
     tools: {
       password_generator: 'Password Generator',

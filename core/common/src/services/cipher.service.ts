@@ -323,7 +323,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     async getAllDecryptedForGrouping(groupingId: string, folder: boolean = true): Promise<CipherView[]> {
-        const ciphers = await this.getAllDecrypted();
+        const ciphers = await this.getAllDecrypted() || [];
 
         return ciphers.filter(cipher => {
             if (cipher.isDeleted) {
@@ -364,7 +364,7 @@ export class CipherService implements CipherServiceAbstraction {
 
         const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted()]);
         const matchingDomains = result[0];
-        const ciphers = result[1];
+        const ciphers = result[1] || [];
 
         if (defaultMatch == null) {
             defaultMatch = await this.storageService.get<UriMatchType>(ConstantsService.defaultUriMatch);
@@ -1124,7 +1124,7 @@ export class CipherService implements CipherServiceAbstraction {
         const cacheKey = autofillOnPageLoad ? 'autofillOnPageLoad-' + url : url;
 
         if (!this.sortedCiphersCache.isCached(cacheKey)) {
-            let ciphers = await this.getAllDecryptedForUrl(url);
+            let ciphers = await this.getAllDecryptedForUrl(url) || [];
             if (!ciphers) {
                 return null;
             }

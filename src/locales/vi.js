@@ -628,7 +628,8 @@ module.exports = {
       logged_in_as: 'Tài khoản',
       version: 'Phiên bản',
       term: 'Điều khoản sử dụng',
-      privacy: 'Chính sách bảo mật'
+      privacy: 'Chính sách bảo mật',
+      a_product_of: 'Một sản phẩm của'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',
