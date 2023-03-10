@@ -1083,11 +1083,11 @@ select {
 }
 
 .grid {
-  display: grid;
+  display: grid !important;
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .h-full {
