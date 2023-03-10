@@ -24,9 +24,9 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 
 
 Vue.config.productionTip = false
+Vue.use(AsyncComputed)
 Vue.use(JSLib)
 Vue.use(VueCookies)
-Vue.use(AsyncComputed)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);

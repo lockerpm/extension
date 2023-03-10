@@ -35,7 +35,6 @@
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/vue-i18n",
-
     ]
   },
   "include": [
