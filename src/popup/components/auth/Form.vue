@@ -4,7 +4,6 @@
       ref="form"
       :model="form"
       :rules="rules"
-      @submit.prevent="handleLogin"
     >
       <el-form-item prop="username">
         <el-input
@@ -12,6 +11,7 @@
           ref="username"
           :disabled="callingAPI"
           :placeholder="$t('data.login.username_placeholder')"
+          @keyup.native.enter="handleLogin"
         ></el-input>
       </el-form-item>
       <el-form-item
@@ -23,6 +23,7 @@
           v-model="form.password"
           :disabled="callingAPI"
           :placeholder="$t('data.login.password_placeholder')"
+          @keyup.native.enter="handleLogin"
         >
         </el-input>
       </el-form-item>
