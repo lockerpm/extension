@@ -214,9 +214,9 @@ export default class NotificationBackground {
         await this.updateCipher(currentCipher, password);
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
         break;
-      case 'scanQRCode': 
-        if (chrome.tabs.captureVisibleTab) {
-          chrome.tabs.captureVisibleTab(null,{}, function(dataUri){
+      case 'scanQRCode':
+        if (chrome.tabs && chrome.tabs.captureVisibleTab) {
+          chrome.tabs.captureVisibleTab(null, {}, function (dataUri) {
             BrowserApi.tabSendMessage(msg.tab, {
               command: 'capturedImage',
               tab: msg.tab,
@@ -224,11 +224,7 @@ export default class NotificationBackground {
             });
           });
         } else {
-          window.alert(
-            window.navigator.language === "vi"
-              ? "Sự kiện chụp ảnh của trình duyệt không hoạt đông!. Không thể đọc mã QR"
-              : "Capture visible tab is not active! Cannot read QR code."
-          );
+          this.notificationAlert('capture_not_active')
         }
         break;
       case 'saveNewQRCode':
@@ -243,19 +239,13 @@ export default class NotificationBackground {
           let currentOtps = await this.cipherService.getAllDecrypted();
           currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
           if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
-            window.navigator.language === "vi"
-              ? "Mã QR đã tồn tại! Vui lòng quét mã QR khác."
-              : "QR code is existed! Please try scan QR code other."
+            this.notificationAlert('qr_existed')
           } else {
             await this.createNewOTP({ name: name, notes: notes })
             senderMessage = 'removeLockerWrapper';
           }
         } else {
-          window.alert(
-            window.navigator.language === "vi"
-              ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa."
-              : "QR code is invalid! Please try again."
-          );
+          this.notificationAlert('qr_invalid')
         }
         BrowserApi.tabSendMessage(msg.tab, {
           command: 'addedOTP',
@@ -264,10 +254,14 @@ export default class NotificationBackground {
         });
         break;
       case 'openPopupIframe':
-        BrowserApi.tabSendMessage(sender.tab, {
-          command: 'openPopupIframe',
-          tab: sender.tab,
-        });
+        if (this.main.platformUtilsService.isFirefox()) {
+          await this.main.openPopup();
+        } else {
+          BrowserApi.tabSendMessage(sender.tab, {
+            command: 'openPopupIframe',
+            tab: sender.tab,
+          });
+        }
         break
       case 'closePopupIframe':
         await BrowserApi.tabSendMessageData(sender.tab, 'closePopupIframe');
@@ -559,18 +553,10 @@ export default class NotificationBackground {
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
-      window.alert(
-        window.navigator.language === "vi"
-          ? "Thêm mới thành công."
-          : "Username and Password are added!"
-      );
+      this.notificationAlert('password_added')
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
-        window.alert(
-          window.navigator.language === "vi"
-            ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
-            : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
-        );
+        this.notificationAlert('password_limited')
       }
     }
   }
@@ -597,18 +583,10 @@ export default class NotificationBackground {
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
-      window.alert(
-        window.navigator.language === "vi"
-          ? "Thêm mới thành công."
-          : "QR code OTP added!"
-      );
+      this.notificationAlert('otp_added')
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
-        window.alert(
-          window.navigator.language === "vi"
-            ? "Đã đạt đến số lượng tối đa cho mã OTP. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
-            : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
-        );
+        this.notificationAlert('otp_limited')
       }
     }
   }
@@ -639,12 +617,8 @@ export default class NotificationBackground {
         const cipherResponse = new CipherResponse(res.data)
         const userId = await this.userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId);
-        await this.cipherService.upsert(cipherData)
-        window.alert(
-          window.navigator.language === "vi"
-            ? "Cập nhật thành công."
-            : "Username and Password are updated!"
-        );
+        await this.cipherService.upsert(cipherData);
+        this.notificationAlert('username_password_updated')
       } catch (e) {
       }
     }
@@ -738,5 +712,14 @@ export default class NotificationBackground {
     BrowserApi.tabSendMessageData(tab, "closeInformMenu");
     const hostname = Utils.getHostname(tab.url);
     await this.cipherService.saveNeverDomain(hostname);
+  }
+
+  private async notificationAlert(type: string) {
+    const tab = await BrowserApi.getTabFromCurrentWindow();
+    BrowserApi.tabSendMessage(tab, {
+      command: 'alert',
+      tab: tab,
+      type: type,
+    });
   }
 }

@@ -247,7 +247,7 @@ export default class MainBackground {
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ?
-      opr.sidebarAction : (window as any).chrome.sidebarAction;
+      opr.sidebarAction : (window as any).chrome?.sidebarAction;
 
     // Background
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
@@ -403,6 +403,10 @@ export default class MainBackground {
     // Chrome APIs cannot open popup
 
     // TODO: Do we need to open this popup?
+    if (this.platformUtilsService.isFirefox()) {
+      browser.browserAction.openPopup();
+      return;
+    }
     if (!this.isSafari) {
       return;
     }
@@ -728,7 +732,7 @@ export default class MainBackground {
   private async browserActionSetIcon(tabId: number, locked: boolean) {
     if (chrome.browserAction && chrome.browserAction.setIcon) {
       await chrome.browserAction.setIcon({
-        path : locked ? "icons/locked.png" : 'icons/19.png',
+        path: locked ? "icons/locked.png" : 'icons/19.png',
         tabId: tabId,
       });
     }

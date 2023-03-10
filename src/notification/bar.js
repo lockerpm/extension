@@ -1,5 +1,4 @@
 require('./bar.scss');
-
 document.addEventListener('DOMContentLoaded', () => {
     var i18n = {};
     var lang = window.navigator.language;

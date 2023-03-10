@@ -96,8 +96,8 @@
     }
   },
   "web_accessible_resources": [
-    "notification/bar.html",
-    "inform-menu/menu.html",
+    "bar.html",
+    "menu.html",
     "popup.html"
   ],
   "externally_connectable": {
@@ -113,6 +113,27 @@
     "default_icon": {
       "19": "icons/19.png",
       "38": "icons/38.png"
+    }
+  },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Alt+L",
+        "mac": "Alt+L"
+      },
+      "description": "Opens popup menu"
+    },
+    "_execute_sidebar_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+L",
+        "mac": "Alt+Shift+L"
+      },
+      "description": "Execute sidebar action"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "locker-extention@cystack.net"
     }
   }
 }

@@ -103,9 +103,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "notification/bar.html",
-        "inform-menu/menu.html",
-        "icons/19.png"
+        "bar.html",
+        "menu.html",
+        "popup.html"
       ],
       "matches": [
         "<all_urls>"
