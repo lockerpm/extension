@@ -234,6 +234,9 @@ button.neutral {
     background-color: #E4F0E6;
     .cs-ui-components {
       margin-bottom: 6px;
+      #password_length_slider {
+        width: 100% !important;
+      }
     }
     .option-length-div {
       margin-bottom: 4px;
