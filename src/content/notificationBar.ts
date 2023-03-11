@@ -819,8 +819,8 @@ document.addEventListener('DOMContentLoaded', event => {
     let barPageUrl: string = chrome.extension.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
-      height: 600px;
-      width: 400px;
+      height: 602px;
+      width: 402px;
       border: 1px solid rgb(189 190 190);
       background-color: white
     `;

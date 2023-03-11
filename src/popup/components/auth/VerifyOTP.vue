@@ -1,7 +1,9 @@
 <template>
   <div class="w-full px-10">
     <el-form :model="form">
-      <p class="mt-0">{{ identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}</p>
+      <p class="mt-0">
+        {{ identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
+      </p>
       <el-form-item
         prop="otpCode"
         :label="$t('data.login.enter_code_here')"
@@ -11,6 +13,7 @@
           ref="otp"
           :placeholder="$t('data.login.enter_code')"
           :disabled="callingAPI"
+          @keyup.native.enter="verifyOtp"
         ></el-input>
       </el-form-item>
       <el-form-item

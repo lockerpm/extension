@@ -33,11 +33,9 @@ Vue.use(VueMomentJS, moment);
 Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
-if (process.env.NODE_ENV === 'development') {
-  require('@/assets/buildtw.css')
-}
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import '@/assets/buildtw.css'
 import '@/assets/tailwind.css'
 import '@/assets/app.scss'
 import '@/assets/flags/flags.css'

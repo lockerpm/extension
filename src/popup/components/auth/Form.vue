@@ -1,12 +1,17 @@
 <template>
   <div class="w-full px-10">
-    <el-form ref="form" :model="form" :rules="rules">
+    <el-form
+      ref="form"
+      :model="form"
+      :rules="rules"
+    >
       <el-form-item prop="username">
         <el-input
           v-model="form.username"
           ref="username"
           :disabled="callingAPI"
           :placeholder="$t('data.login.username_placeholder')"
+          @keyup.native.enter="handleLogin"
         ></el-input>
       </el-form-item>
       <el-form-item
@@ -18,6 +23,7 @@
           v-model="form.password"
           :disabled="callingAPI"
           :placeholder="$t('data.login.password_placeholder')"
+          @keyup.native.enter="handleLogin"
         >
         </el-input>
       </el-form-item>
@@ -35,7 +41,6 @@
         @click="handleLogin"
       >{{ $t(`data.login.sign_in`) }}</el-button>
     </el-row>
-    
   </div>
 </template>
 
@@ -49,8 +54,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: 'quyetnguyencr7@gmail.com', //quyetnguyencr7@gmail.com
-        password: 'tienquyet1997@' //tienquyet1997@
+        username: '', //quyetnguyencr7@gmail.com
+        password: '' //tienquyet1997@
       }
     }
   },
