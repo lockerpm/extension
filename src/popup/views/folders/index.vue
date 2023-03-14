@@ -49,14 +49,9 @@ export default Vue.extend({
           results = []
         }
         results = results.filter((f) => f.id);
-        // folders.forEach((f) => {
-        //   const ciphers =
-        //     this.ciphers &&
-        //     (this.ciphers.filter((c) => c.folderId === f.id) || []);
-        //   f.ciphersCount = ciphers && ciphers.length;
-        // });
         return results;
-      }
+      },
+      watch: []
     },
   },
   methods: {

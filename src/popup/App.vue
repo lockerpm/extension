@@ -32,8 +32,8 @@ export default Vue.extend({
 <style lang="scss">
 .vault-body {
   position: absolute !important;
-  top: 180px !important;
-  bottom: 56px !important;
+  top: 192px !important;
+  bottom: 42px !important;
   width: 100% !important;
   overflow: auto !important;
 }
@@ -48,6 +48,9 @@ export default Vue.extend({
   &__inner {
     border-radius: 8px !important;
   }
+}
+.el-button {
+  border-radius: 8px !important;
 }
 .el-message-box {
   width: 260px !important;

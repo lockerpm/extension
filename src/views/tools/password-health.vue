@@ -252,7 +252,7 @@ export default Vue.extend({
 
         return reusedPasswordCiphers
       },
-      watch: ['$store.state.syncedCiphersToggle']
+      watch: ['$store.state.syncedCiphersToggle', 'passwordUseMap']
     }
   },
   methods: {

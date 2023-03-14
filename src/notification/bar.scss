@@ -23,8 +23,8 @@
   background-color: #F6F6F6;
 }
 .inner-wrapper {
-    // display: grid;
-    // grid-template-columns: auto max-content;
+    display: grid;
+    grid-template-columns: auto max-content;
 }
 
 .outer-wrapper > *, .inner-wrapper > * {
