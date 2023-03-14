@@ -33,9 +33,12 @@ export default Vue.extend({
     }
   },
   asyncComputed: {
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked()
-    }
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
   },
   methods: {
     syncData () {

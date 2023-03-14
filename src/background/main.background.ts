@@ -190,7 +190,7 @@ export default class MainBackground {
     this.settingsService = new SettingsService(this.userService, this.storageService);
     this.fileUploadService = new FileUploadService(this.logService, this.apiService);
     this.cipherService = new CipherService(this.cryptoService, this.userService, this.settingsService,
-      this.apiService, this.fileUploadService, this.storageService, this.i18nService, () => this.searchService,
+      this.apiService, this.fileUploadService, this.storageService, this.i18nService, () => this.searchService, this.platformUtilsService,
       this.logService);
     this.folderService = new FolderService(this.cryptoService, this.userService, this.apiService,
       this.storageService, this.i18nService, this.cipherService);

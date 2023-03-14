@@ -36,9 +36,6 @@ export default Vue.extend({
     password: ''
   }),
   methods: {
-    async submit() {
-      // console.log("email submitted!");
-    },
     switchLoc () {
       // switch the locale.
       this.$i18n.locale = this.$i18n.locale === 'en' ? 'vi' : 'en';
