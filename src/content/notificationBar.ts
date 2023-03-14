@@ -720,15 +720,30 @@ document.addEventListener('DOMContentLoaded', event => {
     const barPageUrl: string = chrome.extension.getURL(barPage);
 
     const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'height: 320px; width: 450px; border: 0; min-height: initial; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); border-radius: 12px;';
+    iframe.style.cssText = `
+      height: 320px !important;
+      width: 450px;
+      border: 0;
+      min-height: initial;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
+      border-radius: 12px;
+    `;
     iframe.id = 'bit-notification-bar-iframe';
     iframe.src = barPageUrl;
 
     const frameDiv = document.createElement('div');
     frameDiv.setAttribute('aria-live', 'polite');
     frameDiv.id = 'bit-notification-bar';
-    frameDiv.style.cssText = 'height: 325px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
-      'z-index: 2147483647; visibility: visible;';
+    frameDiv.style.cssText = `
+      height: 325px !important;
+      width: 450px;
+      top: 40px;
+      right: 40px;
+      padding: 0;
+      position: fixed;
+      z-index: 2147483647;
+      visibility: visible;
+    `
     frameDiv.appendChild(iframe);
     document.body.appendChild(frameDiv);
 
