@@ -383,7 +383,7 @@ export default class RuntimeBackground {
     let options = null;
     if (oldGeneratePassword && !isReplace && tab.id === oldGeneratePassword.tab.id) {
       password = oldGeneratePassword.password;
-      options = oldGeneratePassword.options
+      options = JSON.parse(oldGeneratePassword.options)
     }
     if (!options) {
       options = inputOptions || (await this.passwordGenerator.getOptions())[0]

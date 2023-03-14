@@ -207,7 +207,8 @@ export default Vue.extend({
       async get () {
         const collections = await this.$collectionService.getAllDecrypted() || []
         return collections.filter(c => !c.readOnly && c.organizationId === this.$route.params.teamId)
-      }
+      },
+      watch: ['$route.params.teamId']
     }
   },
   methods: {

@@ -44,6 +44,8 @@ import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
+import '../middleware'
+
 Vue.mixin({
   data() {
     return {
@@ -156,6 +158,7 @@ Vue.mixin({
       await this.setupFillPage();
     },
     async lock() {
+      await this.$passService.clearGeneratePassword()
       await Promise.all([
         this.$cryptoService.clearKey(),
         this.$cryptoService.clearOrgKeys(true),
@@ -191,6 +194,7 @@ Vue.mixin({
       }
     },
     async login() {
+      await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
         browserStorageService.get("device_id"),
@@ -208,7 +212,6 @@ Vue.mixin({
       try {
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-        console.log(key);
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
         const res = await this.axios.post('cystack_platform/pm/users/session', {
           client_id: 'browser',

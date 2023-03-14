@@ -115,7 +115,7 @@ export default Vue.extend({
 
         return exposedPasswordCiphers
       },
-      watch: ['$store.state.syncedCiphersToggle']
+      watch: ['$store.state.syncedCiphersToggle', 'exposedPasswordMap']
     }
   },
   methods: {

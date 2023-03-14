@@ -6,23 +6,18 @@ const Keys = {
 };
 
 export class PassService implements PassServiceAbstraction {
-  private generatePassword: Object;
   constructor(private storageService: StorageService) { }
 
   async setInformation(password: string, options: any, tab: any): Promise<any> {
-    this.generatePassword = {
+    await this.storageService.save(Keys.generatePassword, {
       password: password,
-      options: options,
+      options: JSON.stringify(options),
       tab: tab
-    };
-    await this.storageService.save(Keys.generatePassword, this.generatePassword);
+    });
   }
 
   async getGeneratePassword(): Promise<any> {
-    if (this.generatePassword == null) {
-      this.generatePassword = await this.storageService.get<string>(Keys.generatePassword);
-    }
-    return this.generatePassword;
+    return await this.storageService.get<string>(Keys.generatePassword) || null;
   }
 
   async clearGeneratePassword(): Promise<any> {

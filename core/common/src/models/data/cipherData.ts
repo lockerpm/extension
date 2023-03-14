@@ -33,7 +33,7 @@ export class CipherData {
     attachments?: AttachmentData[];
     passwordHistory?: PasswordHistoryData[];
     collectionIds?: string[];
-    deletedDate: string;
+    deletedDate: any;
     reprompt: CipherRepromptType;
     lastUseDate: number;
     numUse: number;

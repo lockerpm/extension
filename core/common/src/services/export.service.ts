@@ -73,7 +73,7 @@ export class ExportService implements ExportServiceAbstraction {
         }));
 
         promises.push(this.cipherService.getAllDecrypted().then(ciphers => {
-            decCiphers = ciphers.filter(f => f.deletedDate == null);
+            decCiphers = ciphers.filter(f => !f.deletedDate);
         }));
 
         await Promise.all(promises);
@@ -145,7 +145,7 @@ export class ExportService implements ExportServiceAbstraction {
         }));
 
         promises.push(this.cipherService.getAll().then(c => {
-            ciphers = c.filter(f => f.deletedDate == null);
+            ciphers = c.filter(f => !f.deletedDate);
         }));
 
         await Promise.all(promises);
@@ -202,7 +202,7 @@ export class ExportService implements ExportServiceAbstraction {
         promises.push(this.apiService.getCiphersOrganization(organizationId).then(ciphers => {
             const cipherPromises: any = [];
             if (ciphers != null && ciphers.data != null && ciphers.data.length > 0) {
-                ciphers.data.filter(c => c.deletedDate === null).forEach(c => {
+                ciphers.data.filter(c => !c.deletedDate).forEach(c => {
                     const cipher = new Cipher(new CipherData(c));
                     cipherPromises.push(cipher.decrypt().then(decCipher => {
                         decCiphers.push(decCipher);
@@ -279,7 +279,7 @@ export class ExportService implements ExportServiceAbstraction {
         promises.push(this.apiService.getCiphersOrganization(organizationId).then(c => {
             const cipherPromises: any = [];
             if (c != null && c.data != null && c.data.length > 0) {
-                c.data.filter(item => item.deletedDate === null).forEach(item => {
+                c.data.filter(item => !item.deletedDate).forEach(item => {
                     const cipher = new Cipher(new CipherData(item));
                     ciphers.push(cipher);
                 });

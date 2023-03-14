@@ -1,6 +1,6 @@
 {
   "name": "locker-extention",
-  "version": "1.10.41",
+  "version": "1.10.42",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
@@ -36,6 +36,7 @@
     "moment": "^2.29.1",
     "mousetrap": "^1.6.5",
     "nanoid": "^3.1.28",
+    "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
     "papaparse": "^5.3.1",
     "qr-scanner": "^1.4.2",

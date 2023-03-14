@@ -54,9 +54,12 @@ export default {
     }
   },
   asyncComputed: {
-    async locked() {
-      return await this.$vaultTimeoutService.isLocked()
-    }
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
   },
   methods: {
     handleSearch: debounce(function (e) {
