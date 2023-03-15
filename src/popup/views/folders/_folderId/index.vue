@@ -42,12 +42,6 @@ export default {
       async get () {
         let folders = (await this.$folderService.getAllDecrypted()) || [];
         folders = folders.filter((f) => f.id);
-        // folders.forEach((f) => {
-        //   const ciphers =
-        //     this.ciphers &&
-        //     (this.ciphers.filter((c) => c.folderId === f.id) || []);
-        //   f.ciphersCount = ciphers && ciphers.length;
-        // });
         return folders;
       },
       watch: ["ciphers"],

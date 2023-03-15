@@ -7,7 +7,7 @@
       :placeholder="$t('data.parts.search')"
     >
     </el-input>
-    <div class="list-otp__container" v-loading="callingAPI">
+    <div class="list-otp__container" v-loading="callingAPI || loading">
       <el-row
         class="list-otp__container--sort p-4"
         type="flex"
@@ -61,6 +61,7 @@ export default {
   data () {
     return {
       otps: [],
+      loading: false,
       textSearch: '',
       orderField: "revisionDate",
       orderDirection: 'desc',
@@ -70,12 +71,14 @@ export default {
   asyncComputed: {
     ciphers: {
       async get() {
+        this.loading = true;
         let result = await this.$cipherService.getAllDecrypted();
         result = result.filter((c) => !c.deleted && c.type === CipherType.OTP)
         result = result.filter((c) => c.name.toLowerCase().includes(this.textSearch.toLowerCase()))
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
+        this.loading = false;
         return result
       },
       watch: [

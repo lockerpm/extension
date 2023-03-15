@@ -23,8 +23,8 @@
   background-color: #F6F6F6;
 }
 .inner-wrapper {
-    // display: grid;
-    // grid-template-columns: auto max-content;
+    display: block !important;
+    grid-template-columns: auto max-content;
 }
 
 .outer-wrapper > *, .inner-wrapper > * {
@@ -90,7 +90,7 @@ button.primary {
 }
 .btn-icon {
   background-color: transparent !important;
-  padding: 5px 15px;
+  padding: 7px 15px;
   border-radius: 3px;
   color: #ffffff;
   border: 0;
@@ -113,7 +113,7 @@ button.primary {
 }
 input {
   margin-top: 8px;
-  height: 35px !important;
+  height: 36px !important;
   width: 100%;
   border-radius: 12px !important;
   border: 1px solid #AED1B3 !important;
@@ -121,8 +121,8 @@ input {
   padding-right: 12px !important;
 }
 select {
-  height: 35px;
-  border-radius: 12px;
+  height: 40px !important;
+  border-radius: 20px;
   border: 1px solid #AED1B3;
 }
 .ui-components.relative {

@@ -33,7 +33,7 @@ export class CipherView implements View {
     passwordHistory: PasswordHistoryView[] = null;
     collectionIds: string[] = null;
     revisionDate: Date = null;
-    deletedDate: Date = null;
+    deletedDate: any = null;
     reprompt: CipherRepromptType = CipherRepromptType.None;
     lastUseDate: number;
     numUse: number;
@@ -110,6 +110,6 @@ export class CipherView implements View {
     }
 
     get isDeleted(): boolean {
-        return this.deletedDate != null;
+        return !!this.deletedDate;
     }
 }

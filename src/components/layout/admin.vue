@@ -101,9 +101,12 @@ export default Vue.extend({
     }
   },
   asyncComputed: {
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked(this.$store.state.isLoggedInPw)
-    }
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked(this.$store.state.isLoggedInPw)
+      },
+      watch: ['$store.state.isLoggedInPw']
+    },
   },
   beforeDestroy () {
     this.$broadcasterService.unsubscribe(BroadcasterSubscriptionId)

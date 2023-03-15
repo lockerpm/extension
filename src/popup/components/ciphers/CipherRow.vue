@@ -150,13 +150,8 @@ export default Vue.extend(
       }
     },
     methods: {
-      // addEdit (item) {
-      //   this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
-      // }
       addEdit (item) {
-        // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
         this.$router.push({name: 'add-item-create', params: {data: item}})
-        // this.routerCipher(item)
       },
       fillCipher(){
         this.$emit('do-fill')

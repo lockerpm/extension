@@ -39,6 +39,7 @@
               </label>
               <div class="input-group mb-1.5">
                 <input
+                  ref="master-pass"
                   v-model="masterPassword"
                   :type="showPassword ? 'text' : 'password'"
                   class="form-control"
@@ -170,6 +171,9 @@ export default Vue.extend({
       step: 1,
       loadingSend: false
     }
+  },
+  mounted() {
+    this.$nextTick(() => this.$refs['master-pass'].focus())
   },
   methods: {
     async setMasterPass () {

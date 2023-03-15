@@ -1,18 +1,12 @@
 <template>
   <div v-loading="loading" class="flex flex-col flex-column-fluid relative">
-    <NoCipher
-      v-if="shouldRenderNoCipher"
-      :type="type"
-      @add-cipher="handleAddButton"
-    />
+    <NoCipher v-if="shouldRenderNoCipher" :type="type" @add-cipher="handleAddButton" />
     <div v-else class="flex-column-fluid lg:px-28 py-10 px-10 mb-20">
       <div class="flex items-center justify-between mb-5">
         <div class="flex-grow">
           <el-breadcrumb separator-class="el-icon-arrow-right">
             <template v-if="$route.name === 'vault-folders-folderId'">
-              <el-breadcrumb-item
-                :to="{name: 'vault'}"
-              >
+              <el-breadcrumb-item :to="{ name: 'vault' }">
                 {{ $t('sidebar.vault') }}
               </el-breadcrumb-item>
               <el-breadcrumb-item class="flex items-center">
@@ -20,28 +14,24 @@
               </el-breadcrumb-item>
             </template>
             <template v-else-if="$route.name === 'vault-teams-teamId-tfolders-tfolderId'">
-              <el-breadcrumb-item
-                :to="{name: 'vault'}"
-              >
+              <el-breadcrumb-item :to="{ name: 'vault' }">
                 {{ $t('sidebar.vault') }}
               </el-breadcrumb-item>
               <el-breadcrumb-item class="flex items-center">
                 {{ getTeam(teams, $route.params.teamId).name }} - {{ collection.name }}
               </el-breadcrumb-item>
             </template>
-            <template v-else-if="$route.name ==='vault'">
+            <template v-else-if="$route.name === 'vault'">
               <span class="font-medium">Folders</span>
             </template>
-            <template v-else-if="$route.name ==='shares'">
+            <template v-else-if="$route.name === 'shares'">
               <span class="font-medium">Shares</span>
             </template>
-            <template v-else-if="$route.name ==='trash'">
+            <template v-else-if="$route.name === 'trash'">
               <span class="font-medium">Trash</span>
             </template>
             <template v-else>
-              <el-breadcrumb-item
-                :to="{name: routeName}"
-              >
+              <el-breadcrumb-item :to="{ name: routeName }">
                 {{ $tc(`type.${type}`, 2) }}
               </el-breadcrumb-item>
             </template>
@@ -53,202 +43,123 @@
               {{ $t('data.ciphers.sort_by') }} <i class="el-icon-caret-bottom el-icon--right" />
             </div>
             <el-dropdown-menu slot="dropdown" class="w-[200px] ">
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('name', 'asc')"
-              >
+              <el-dropdown-item class="flex items-center justify-between" @click.native="changeSort('name', 'asc')">
                 <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.ascending') }}</span>
-                <i v-if="orderString==='name_asc'" class="fa fa-check" />
+                <i v-if="orderString === 'name_asc'" class="fa fa-check" />
               </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('name', 'desc')"
-              >
+              <el-dropdown-item class="flex items-center justify-between" @click.native="changeSort('name', 'desc')">
                 <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.descending') }}</span>
-                <i v-if="orderString==='name_desc'" class="fa fa-check" />
+                <i v-if="orderString === 'name_desc'" class="fa fa-check" />
               </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('revisionDate', 'asc')"
-              >
+              <el-dropdown-item class="flex items-center justify-between"
+                @click.native="changeSort('revisionDate', 'asc')">
                 <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.ascending') }}</span>
-                <i v-if="orderString==='revisionDate_asc'" class="fa fa-check" />
+                <i v-if="orderString === 'revisionDate_asc'" class="fa fa-check" />
               </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('revisionDate', 'desc')"
-              >
+              <el-dropdown-item class="flex items-center justify-between"
+                @click.native="changeSort('revisionDate', 'desc')">
                 <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.descending') }}</span>
-                <i v-if="orderString==='revisionDate_desc'" class="fa fa-check" />
+                <i v-if="orderString === 'revisionDate_desc'" class="fa fa-check" />
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </div>
-      <div
-        v-if="$route.name === 'vault' && folders"
-        class="mb-10"
-      >
+      <div v-if="$route.name === 'vault' && folders" class="mb-10">
         <div class="grid grid-cols-2 2xl:grid-cols-5 gap-6 ">
-          <div
-            v-for="item in folders"
-            :key="item.id"
+          <div v-for="item in folders" :key="item.id"
             class="px-4 py-6 flex items-center cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
-            :class="{'border-primary': selectedFolder.id === item.id}"
-            :title="item.name"
-            @click="routerFolder(item)"
-            @contextmenu.prevent="$refs.menu.open($event, item)"
-          >
+            :class="{ 'border-primary': selectedFolder.id === item.id }" :title="item.name" @click="routerFolder(item)"
+            @contextmenu.prevent="$refs.menu.open($event, item)">
             <img src="@/assets/images/icons/folderSolid.svg" alt="" class="select-none mr-2">
             <div class="font-semibold truncate select-none">{{ item.name }} ({{ item.ciphersCount }})</div>
           </div>
-          <component
-            :is="context"
-            ref="menu"
-            class="el-dropdown-menu"
-            @open="openContextFolder"
-          >
+          <component :is="context" ref="menu" class="el-dropdown-menu" @open="openContextFolder">
             <template #default>
-              <li
-                class="el-dropdown-menu__item w-[200px]"
-                @click.prevent="addEditFolder(selectedFolder, false)"
-              >
+              <li class="el-dropdown-menu__item w-[200px]" @click.prevent="addEditFolder(selectedFolder, false)">
                 {{ $t('common.rename') }}
               </li>
-              <li
-                class="el-dropdown-menu__item"
-                @click.prevent="deleteFolder(selectedFolder)"
-              >
+              <li class="el-dropdown-menu__item" @click.prevent="deleteFolder(selectedFolder)">
                 <span class="text-danger">{{ $t('common.delete') }}</span>
               </li>
             </template>
           </component>
         </div>
       </div>
-      <div
-        v-if="$route.name === 'vault' && collections"
-        class="mb-10"
-      >
-        <template v-for="(value, key) in filteredCollection">
-          <div :key="key" class="mb-5 font-medium">
+      <div v-if="$route.name === 'vault' && collections" class="mb-10">
+        <div v-for="(value, index) in filteredCollection" :key="index">
+          <div class="mb-5 font-medium">
             {{ getTeam(teams, key).name }}
           </div>
-          <div :key="key" class="grid grid-cols-3 2xl:grid-cols-5 gap-6 ">
-            <div
-              v-for="item in value"
-              :key="item.id"
+          <div class="grid grid-cols-3 2xl:grid-cols-5 gap-6 ">
+            <div v-for="item in value" :key="item.id"
               class="px-4 py-6 cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
-              :class="{'border-primary': selectedFolder.id === item.id}"
-              :title="`${item.name} (${item.ciphersCount})`"
+              :class="{ 'border-primary': selectedFolder.id === item.id }" :title="`${item.name} (${item.ciphersCount})`"
               @click="routerCollection(item)"
-              @contextmenu.prevent="canManageFolder(teams, item) ? $refs.menuTeam.open($event, item) : null"
-            >
+              @contextmenu.prevent="canManageFolder(teams, item) ? $refs.menuTeam.open($event, item) : null">
               <div class="flex items-center">
                 <img src="@/assets/images/icons/folderSolidShare.svg" alt="" class="select-none mr-2">
                 <div class="font-semibold truncate select-none">{{ item.name }} ({{ item.ciphersCount }})</div>
               </div>
             </div>
-            <div
-              class="px-4 py-6 cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
-              :class="{'border-primary': selectedFolder.id === 'unassigned'}"
-              @click="selectedFolder = {id: 'unassigned'}"
-              @dblclick="routerCollection({id: 'unassigned', organizationId: key})"
-            >
+            <div class="px-4 py-6 cursor-pointer rounded border border-[#E6E6E8] hover:border-primary"
+              :class="{ 'border-primary': selectedFolder.id === 'unassigned' }"
+              @click="selectedFolder = { id: 'unassigned' }"
+              @dblclick="routerCollection({ id: 'unassigned', organizationId: key })">
               <div class="flex items-center">
                 <img src="@/assets/images/icons/folderSolid.svg" alt="" class="select-none mr-2">
-                <div class="font-semibold truncate select-none">{{ $t('data.ciphers.unassigned_folder') }} ({{ countUnassignedItems(ciphers, key) }})</div>
+                <div class="font-semibold truncate select-none">{{ $t('data.ciphers.unassigned_folder') }} ({{
+                  countUnassignedItems(ciphers, key) }})</div>
               </div>
             </div>
           </div>
-        </template>
-        <component
-          :is="context"
-          ref="menuTeam"
-          class="el-dropdown-menu"
-          @open="openContextTeamFolder"
-        >
+        </div>
+        <component :is="context" ref="menuTeam" class="el-dropdown-menu" @open="openContextTeamFolder">
           <template #default>
-            <li
-              class="el-dropdown-menu__item w-[200px]"
-              @click.prevent="addEditTeamFolder(selectedFolder, false)"
-            >
+            <li class="el-dropdown-menu__item w-[200px]" @click.prevent="addEditTeamFolder(selectedFolder, false)">
               {{ $t('common.rename') }}
             </li>
-            <li
-              v-if="isBiz(getTeam(teams, selectedFolder.organizationId))"
-              class="el-dropdown-menu__item w-[200px]"
-              @click.prevent="putTeamFolderUsers(selectedFolder)"
-            >
+            <li v-if="isBiz(getTeam(teams, selectedFolder.organizationId))" class="el-dropdown-menu__item w-[200px]"
+              @click.prevent="putTeamFolderUsers(selectedFolder)">
               {{ $t('data.groups.user_access') }}
             </li>
-            <li
-              v-if="isBiz(getTeam(teams, selectedFolder.organizationId))"
-              class="el-dropdown-menu__item w-[200px]"
-              @click.prevent="putTeamFolderGroups(selectedFolder)"
-            >
+            <li v-if="isBiz(getTeam(teams, selectedFolder.organizationId))" class="el-dropdown-menu__item w-[200px]"
+              @click.prevent="putTeamFolderGroups(selectedFolder)">
               {{ $t('data.folders.user_access') }}
             </li>
-            <li
-              class="el-dropdown-menu__item"
-              @click.prevent="deleteTeamFolder(selectedFolder)"
-            >
+            <li class="el-dropdown-menu__item" @click.prevent="deleteTeamFolder(selectedFolder)">
               <span class="text-danger">{{ $t('common.delete') }}</span>
             </li>
           </template>
         </component>
       </div>
-      <div
-        v-if="$route.name === 'vault'"
-        class="mb font-medium"
-      >
+      <div v-if="$route.name === 'vault'" class="mb font-medium">
         {{ $t('data.ciphers.all_items') }}
       </div>
-      <el-table
-        ref="multipleTable"
-        :data="ciphers || []"
-        style="width: 100%"
-        row-class-name="hover-table-row"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-        <el-table-column
-          prop="name"
-          label=""
-          show-overflow-tooltip
-        >
+      <el-table ref="multipleTable" :data="ciphers || []" style="width: 100%" row-class-name="hover-table-row"
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="name" label="" show-overflow-tooltip>
           <template slot="header">
             <div v-if="multipleSelection.length" class="flex items-center ">
               <div class="text-black mr-8 whitespace-nowrap">
                 {{ multipleSelection.length }} {{ $t('data.ciphers.selected_items') }}
               </div>
               <div v-if="deleted">
-                <button
-                  class="btn btn-default btn-xs"
-                  @click="restoreCiphers(multipleSelection.map(e => e.id))"
-                >
+                <button class="btn btn-default btn-xs" @click="restoreCiphers(multipleSelection.map(e => e.id))">
                   {{ $t('common.restore') }}
                 </button>
-                <button
-                  class="btn btn-default btn-xs !text-danger"
-                  @click="deleteCiphers(multipleSelection.map(e => e.id))"
-                >
+                <button class="btn btn-default btn-xs !text-danger"
+                  @click="deleteCiphers(multipleSelection.map(e => e.id))">
                   {{ $t('common.permanently_delete') }}
                 </button>
               </div>
               <div v-else class="">
-                <button
-                  class="btn btn-default btn-xs"
-                  @click="moveFolders(multipleSelection.map(e => e.id))"
-                >
+                <button class="btn btn-default btn-xs" @click="moveFolders(multipleSelection.map(e => e.id))">
                   {{ $t('common.move_folder') }}
                 </button>
-                <button
-                  class="btn btn-default btn-xs !text-danger"
-                  @click="moveTrashCiphers(multipleSelection.map(e => e.id))"
-                >
+                <button class="btn btn-default btn-xs !text-danger"
+                  @click="moveTrashCiphers(multipleSelection.map(e => e.id))">
                   {{ $t('common.delete') }}
                 </button>
               </div>
@@ -256,20 +167,15 @@
           </template>
           <template slot-scope="scope">
             <div class="flex items-center">
-              <div
-                class="text-[34px] mr-3 flex-shrink-0"
-                :class="{'filter grayscale': scope.row.isDeleted}"
-              >
+              <div class="text-[34px] mr-3 flex-shrink-0" :class="{ 'filter grayscale': scope.row.isDeleted }">
                 <Vnodes :vnodes="getIconCipher(scope.row, 34)" />
               </div>
               <div class="flex flex-col">
-                <a
-                  class="text-black font-semibold truncate flex items-center"
-                  :class="{'opacity-80': scope.row.isDeleted}"
-                  @click="routerCipher(scope.row, addEdit)"
-                >
+                <a class="text-black font-semibold truncate flex items-center"
+                  :class="{ 'opacity-80': scope.row.isDeleted }" @click="routerCipher(scope.row, addEdit)">
                   {{ scope.row.name }}
-                  <img v-if="scope.row.organizationId" src="@/assets/images/icons/shares.svg" alt="Shared" :title="$t('common.shared_with_you')"  class="inline-block ml-2">
+                  <img v-if="scope.row.organizationId" src="@/assets/images/icons/shares.svg" alt="Shared"
+                    :title="$t('common.shared_with_you')" class="inline-block ml-2">
                 </a>
                 <div>
                   {{ scope.row.subTitle }}
@@ -278,38 +184,21 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
-          align="right"
-          :label="$t('common.ownership')"
-          width="200"
-          show-overflow-tooltip
-        >
+        <el-table-column align="right" :label="$t('common.ownership')" width="200" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ getTeam(teams, scope.row.organizationId).name || $t('common.me') }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          width="200"
-          align="right"
-          :label="$t('data.ciphers.updated_time')"
-        >
+        <el-table-column width="200" align="right" :label="$t('data.ciphers.updated_time')">
           <template slot-scope="scope">
             {{ $moment(scope.row.revisionDate).fromNow() }}
           </template>
         </el-table-column>
-        <el-table-column
-          label=""
-          align="right"
-          width="200"
-        >
+        <el-table-column label="" align="right" width="200">
           <template slot-scope="scope">
             <div class="col-actions">
-              <button
-                v-if="scope.row.login.canLaunch"
-                class="btn btn-icon btn-xs hover:bg-black-400"
-                :title="$t('common.go_to_website')"
-                @click="openNewTab(scope.row.login.uri)"
-              >
+              <button v-if="scope.row.login.canLaunch" class="btn btn-icon btn-xs hover:bg-black-400"
+                :title="$t('common.go_to_website')" @click="openNewTab(scope.row.login.uri)">
                 <i class="fas fa-external-link-square-alt" />
               </button>
               <el-dropdown v-if="canManageItem(teams, scope.row)" trigger="click" :hide-on-click="false">
@@ -321,26 +210,18 @@
                     {{ $t('common.edit') }}
                   </el-dropdown-item>
                   <template v-if="!scope.row.isDeleted && scope.row.type === CipherType.Login">
-                    <el-dropdown-item
-                      v-clipboard:copy="scope.row.login.username"
-                      v-clipboard:success="clipboardSuccessHandler"
-                      divided
-                    >
+                    <el-dropdown-item v-clipboard:copy="scope.row.login.username"
+                      v-clipboard:success="clipboardSuccessHandler" divided>
                       {{ $t('common.copy') }} {{ $t('common.username') }}
                     </el-dropdown-item>
-                    <el-dropdown-item
-                      v-clipboard:copy="scope.row.login.password"
-                      v-clipboard:success="clipboardSuccessHandler"
-                    >
+                    <el-dropdown-item v-clipboard:copy="scope.row.login.password"
+                      v-clipboard:success="clipboardSuccessHandler">
                       {{ $t('common.copy') }} {{ $t('common.password') }}
                     </el-dropdown-item>
                   </template>
                   <template v-if="!scope.row.isDeleted && scope.row.type === CipherType.SecureNote">
-                    <el-dropdown-item
-                      v-clipboard:copy="scope.row.notes"
-                      v-clipboard:success="clipboardSuccessHandler"
-                      divided
-                    >
+                    <el-dropdown-item v-clipboard:copy="scope.row.notes" v-clipboard:success="clipboardSuccessHandler"
+                      divided>
                       {{ $t('common.copy') }} {{ $t('common.note') }}
                     </el-dropdown-item>
                   </template>
@@ -348,20 +229,15 @@
                     <el-dropdown-item divided @click.native="cloneCipher(scope.row)">
                       {{ $t('common.clone') }}
                     </el-dropdown-item>
-                    <el-dropdown-item
-                      v-if="!scope.row.organizationId && canManageTeamFolder"
-                      @click.native="shareItem(scope.row)"
-                    >
+                    <el-dropdown-item v-if="!scope.row.organizationId && canManageTeamFolder"
+                      @click.native="shareItem(scope.row)">
                       {{ $t('common.share') }}
                     </el-dropdown-item>
                     <el-dropdown-item @click.native="moveFolders([scope.row.id])">
                       {{ $t('common.move_folder') }}
                     </el-dropdown-item>
-                    <el-dropdown-item
-                      v-if="scope.row.organizationId && canManageTeamFolder"
-                      divided
-                      @click.native="shareItem(scope.row)"
-                    >
+                    <el-dropdown-item v-if="scope.row.organizationId && canManageTeamFolder" divided
+                      @click.native="shareItem(scope.row)">
                       {{ $t('common.collections') }}
                     </el-dropdown-item>
                     <el-dropdown-item divided @click.native="moveTrashCiphers([scope.row.id])">
@@ -392,52 +268,32 @@
     <ShareCipher ref="shareCipher" />
     <MoveFolder ref="moveFolder" @reset-selection="multipleSelection = []" />
     <div class="fixed bottom-[50px] right-[55px]">
-      <el-popover
-        v-if="['vault'].includes(routeName)"
-        placement="right-end"
-        width="200"
-        trigger="click"
-        popper-class="!p-0"
-      >
+      <el-popover v-if="['vault'].includes(routeName)" placement="right-end" width="200" trigger="click"
+        popper-class="!p-0">
         <div class="text-black">
           <div class="px-5 pt-5 text-xs">
             {{ $t('common.add') }}
           </div>
           <ul class="el-dropdown-menu !static !border-0 !shadow-none">
-            <li
-              v-if="$route.name ==='vault'"
-              class="el-dropdown-menu__item font-semibold !text-black"
-              @click="addEditFolder({}, true)"
-            >
+            <li v-if="$route.name === 'vault'" class="el-dropdown-menu__item font-semibold !text-black"
+              @click="addEditFolder({}, true)">
               {{ $t('data.folders.add_folder') }}
             </li>
-            <li
-              v-if="$route.name ==='vault' && canCreateTeamFolder"
-              class="el-dropdown-menu__item font-semibold !text-black"
-              @click="addEditTeamFolder({})"
-            >
+            <li v-if="$route.name === 'vault' && canCreateTeamFolder"
+              class="el-dropdown-menu__item font-semibold !text-black" @click="addEditTeamFolder({})">
               {{ $t('data.folders.add_team_folder') }}
             </li>
-            <li
-              class="el-dropdown-menu__item font-semibold !text-black"
-              @click="chooseCipherType"
-            >
+            <li class="el-dropdown-menu__item font-semibold !text-black" @click="chooseCipherType">
               {{ $t('data.ciphers.add_item') }}
             </li>
           </ul>
         </div>
-        <button
-          slot="reference"
-          class="btn btn-fab rounded-full flex items-center justify-center btn-primary"
-        >
+        <button slot="reference" class="btn btn-fab rounded-full flex items-center justify-center btn-primary">
           <i class="fas fa-plus text-[24px]" />
         </button>
       </el-popover>
-      <button
-        v-else
-        class="btn btn-fab btn-primary rounded-full flex items-center justify-center"
-        @click="handleAddButton"
-      >
+      <button v-else class="btn btn-fab btn-primary rounded-full flex items-center justify-center"
+        @click="handleAddButton">
         <i class="fas fa-plus text-[24px]" />
       </button>
     </div>
@@ -490,7 +346,7 @@ export default Vue.extend({
       default: null
     }
   },
-  data () {
+  data() {
     return {
       data: {},
       CipherType,
@@ -504,25 +360,25 @@ export default Vue.extend({
     }
   },
   computed: {
-    folder () {
+    folder() {
       if (this.folders) {
         return find(this.folders, e => e.id === this.$route.params.folderId) || {}
       }
       return {}
     },
-    collection () {
+    collection() {
       if (this.collections) {
         return find(this.collections, e => e.id === this.$route.params.tfolderId) || { name: 'Unassigned Folder' }
       }
       return {}
     },
-    filteredCollection () {
+    filteredCollection() {
       return groupBy(this.collections, 'organizationId')
     },
-    orderString () {
+    orderString() {
       return `${this.orderField}_${this.orderDirection}`
     },
-    type () {
+    type() {
       switch (this.routeName) {
       case 'passwords':
         return 'Login'
@@ -542,13 +398,13 @@ export default Vue.extend({
         return null
       }
     },
-    filteredCiphers () {
+    filteredCiphers() {
       if (this.$route.name === 'vault' && this.ciphers) {
         return this.ciphers.filter(e => !e.folderId)
       }
       return this.ciphers || []
     },
-    shouldRenderNoCipher () {
+    shouldRenderNoCipher() {
       const haveCipher = this.filteredCiphers.length
       if (this.$route.name === 'vault') {
         return this.folders && !this.folders.length && !haveCipher
@@ -565,22 +421,22 @@ export default Vue.extend({
       return !haveCipher && !this.searchText
       // return true
     },
-    shouldRenderShare () {
+    shouldRenderShare() {
       return (this.$route.name === 'shares')
     },
-    canManageTeamFolder () {
+    canManageTeamFolder() {
       return this.teams.some(e => ['owner', 'admin', 'manager'].includes(e.role))
     },
-    canCreateTeamFolder () {
+    canCreateTeamFolder() {
       return this.teams.some(e => ['owner', 'admin'].includes(e.role))
     }
   },
-  mounted () {
+  mounted() {
     this.context = 'VueContext'
   },
   asyncComputed: {
     ciphers: {
-      async get () {
+      async get() {
         const deletedFilter = c => {
           return c.isDeleted === this.deleted
         }
@@ -592,7 +448,7 @@ export default Vue.extend({
       watch: ['$store.state.syncedCiphersToggle', 'deleted', 'searchText', 'filter', 'orderField', 'orderDirection']
     },
     folders: {
-      async get () {
+      async get() {
         let folders = await this.$folderService.getAllDecrypted() || []
         folders = folders.filter(f => f.id)
         folders.forEach(f => {
@@ -604,7 +460,7 @@ export default Vue.extend({
       watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
     },
     collections: {
-      async get () {
+      async get() {
         let collections = await this.$collectionService.getAllDecrypted() || []
         collections = collections.filter(f => f.id)
         collections.forEach(f => {
@@ -616,7 +472,7 @@ export default Vue.extend({
       watch: ['searchText', 'orderField', 'orderDirection', 'ciphers']
     },
     weakPasswordScores: {
-      async get () {
+      async get() {
         const weakPasswordScores = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
         if (this.$route.name === 'vault') {
           const allCiphers = await this.$cipherService.getAllDecrypted()
@@ -654,10 +510,10 @@ export default Vue.extend({
     }
   },
   methods: {
-    addEdit (cipher) {
+    addEdit(cipher) {
       this.$refs.addEditCipherDialog.openDialog(cloneDeep(cipher))
     },
-    handleAddButton () {
+    handleAddButton() {
       if (this.$route.name === 'vault-tfolders-tfolderId' && !this.collection.readOnly) {
         this.addEdit({
           organizationId: this.collection.organizationId
@@ -668,37 +524,37 @@ export default Vue.extend({
         this.chooseCipherType()
       }
     },
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    cloneCipher (cipher) {
+    cloneCipher(cipher) {
       const _cipher = cloneDeep(cipher)
       delete _cipher.id
       this.$refs.addEditCipherDialog.openDialog(_cipher, true)
     },
-    moveFolders (ids) {
+    moveFolders(ids) {
       this.$refs.moveFolder.openDialog(ids)
     },
-    deleteCiphers (ids) {
+    deleteCiphers(ids) {
       this.$refs.addEditCipherDialog.deleteCiphers(ids)
     },
-    restoreCiphers (ids) {
+    restoreCiphers(ids) {
       this.$refs.addEditCipherDialog.restoreCiphers(ids)
     },
-    moveTrashCiphers (ids) {
+    moveTrashCiphers(ids) {
       this.$refs.addEditCipherDialog.moveTrashCiphers(ids)
     },
-    changeSort (orderField, orderDirection) {
+    changeSort(orderField, orderDirection) {
       this.orderField = orderField
       this.orderDirection = orderDirection
     },
-    routerFolder (item) {
+    routerFolder(item) {
       this.$router.push({
         name: 'vault-folders-folderId',
         params: { folderId: item.id }
       })
     },
-    routerCollection (item) {
+    routerCollection(item) {
       if (item.id === 'unassigned') {
         this.$router.push({
           name: 'vault-teams-teamId-tfolders-tfolderId',
@@ -711,47 +567,47 @@ export default Vue.extend({
         })
       }
     },
-    openContextFolder (event, data) {
+    openContextFolder(event, data) {
       this.selectedFolder = data
     },
-    openContextTeamFolder (event, data) {
+    openContextTeamFolder(event, data) {
       this.selectedFolder = data
     },
-    addEditFolder (folder, shouldRedirect = false) {
+    addEditFolder(folder, shouldRedirect = false) {
       this.$refs.addEditFolder.openDialog(folder, shouldRedirect)
     },
-    addEditTeamFolder (folder, shouldRedirect = false) {
+    addEditTeamFolder(folder, shouldRedirect = false) {
       this.$refs.addEditTeamFolder.openDialog(folder, shouldRedirect)
     },
-    deleteFolder (folder) {
+    deleteFolder(folder) {
       this.$refs.addEditFolder.deleteFolder(folder)
     },
-    deleteTeamFolder (folder) {
+    deleteTeamFolder(folder) {
       this.$refs.addEditTeamFolder.deleteFolder(folder)
     },
-    shareItem (cipher) {
+    shareItem(cipher) {
       this.$refs.shareCipher.openDialog(cipher)
     },
-    putTeamFolderGroups (folder) {
+    putTeamFolderGroups(folder) {
       this.$refs.addEditTeamFolderGroups.openDialog(folder)
     },
-    putTeamFolderUsers (folder) {
+    putTeamFolderUsers(folder) {
       this.$refs.addEditTeamFolderUsers.openDialog(folder)
     },
-    chooseCipherType () {
+    chooseCipherType() {
       this.$refs.chooseCipherType.openDialog()
     },
-    countUnassignedItems (ciphers = [], organizationId) {
+    countUnassignedItems(ciphers = [], organizationId) {
       if (ciphers) {
         const filteredCipher = ciphers.filter(c => c.organizationId === organizationId && c.collectionIds.length === 0)
         return filteredCipher.length
       }
       return 0
     },
-    canDeleteTeamFolder (team) {
+    canDeleteTeamFolder(team) {
       return ['owner', 'admin'].includes(team.role) && !team.locked
     },
-    isBiz (team) {
+    isBiz(team) {
       return team.is_business
     }
   }

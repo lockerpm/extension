@@ -46,6 +46,7 @@ module.exports = {
       manifestTransformer: (manifest) => {
         if (process.env.NODE_ENV === 'development') {
           manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
+          manifest.content_security_policy = manifest.content_security_policy.replace('script-src-elem', 'script-src-elem http://localhost:8098');
         }
         return manifest;
       }

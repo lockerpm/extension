@@ -12,7 +12,6 @@ import moment from "moment";
 import VueMomentJS from "vue-momentjs";
 import VueNativeSock from "vue-native-websocket";
 
-
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
 import storePromise from '@/store'
@@ -34,17 +33,18 @@ Vue.use(VueMomentJS, moment);
 Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
-if (process.env.NODE_ENV === 'development') {
-  require('@/assets/buildtw.css')
-}
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import '@/assets/buildtw.css'
 import '@/assets/tailwind.css'
 import '@/assets/app.scss'
+import '@/assets/flags/flags.css'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
+
+import '../middleware'
 
 Vue.mixin({
   data() {
@@ -126,6 +126,10 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
+        chrome.runtime.sendMessage({
+          command: 'updateStoreService',
+          sender: { key: 'language', value: value },
+        });
       })
     },
     async logout() {
@@ -154,6 +158,7 @@ Vue.mixin({
       await this.setupFillPage();
     },
     async lock() {
+      await this.$passService.clearGeneratePassword()
       await Promise.all([
         this.$cryptoService.clearKey(),
         this.$cryptoService.clearOrgKeys(true),
@@ -189,6 +194,7 @@ Vue.mixin({
       }
     },
     async login() {
+      await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
         browserStorageService.get("device_id"),
@@ -206,7 +212,6 @@ Vue.mixin({
       try {
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-        console.log(key);
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
         const res = await this.axios.post('cystack_platform/pm/users/session', {
           client_id: 'browser',
@@ -508,6 +513,8 @@ Vue.filter('filterString', function (value) {
 
 storePromise.then((store) => {
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+  store.commit('SET_LANG', store.state.language)
+  i18n.locale = store.state.language
   axios.interceptors.request.use(
     async (config) => {
       const token = await browserStorageService.get('cs_token')
