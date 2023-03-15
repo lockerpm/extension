@@ -360,6 +360,7 @@ module.exports = {
       thirtyMinutes: '30 phút',
       oneHour: '1 giờ',
       fourHours: '4 giờ',
+      twoWeeks: '2 tuần',
       onRefresh: 'Khi tải lại trình duyệt'
     },
     exportFile: {
