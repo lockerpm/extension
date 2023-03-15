@@ -54,8 +54,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: '', //quyetnguyencr7@gmail.com
-        password: '' //tienquyet1997@
+        username: '',
+        password: ''
       }
     }
   },
@@ -90,6 +90,8 @@ export default Vue.extend({
             this.originalLogin();
           } else {
             // logig on-primise
+            // callapi check email have to pwl
+            // connect ws
           }
         }
       })

@@ -16,8 +16,6 @@ import { CipherType } from 'jslib-common/enums/cipherType';
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
 
-import uuid from 'uuid';
-
 export default Vue.extend({
   props: {
     wrapperType: {
@@ -66,10 +64,6 @@ export default Vue.extend({
       }
     }
   },
-  async created() {
-    console.log('ws2', 1);
-    await this.reconnectDesktopAppSocket();
-  },
   methods: {
     disconnectSocket () {
       if (this.ws1) {
@@ -98,42 +92,6 @@ export default Vue.extend({
         }
       }
     },
-
-    async reconnectDesktopAppSocket () {
-      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
-        format: 'json',
-      })
-      this.ws2  = this.$socket;
-      setTimeout(async () => {
-        try {
-          await this.ws2.sendObj({
-            msgType: 1,
-            clientId: uuid(),
-          })
-          this.desktopAppInstalled = true;
-        } catch (error) {
-          this.desktopAppInstalled = false;
-        }
-      }, 2000)
-      this.ws2.onmessage = message => {
-        const data = JSON.parse(message.data)
-        console.log('ws2', data);
-        this.desktopAppData = data;
-        switch (data.msgType) {
-        case 3:
-          // console.log(3, data);
-          break
-        case 4:
-          // console.log(4, data);
-          break
-        case 6:
-          // console.log(6, data);
-          break
-        default:
-          break
-        }
-      }
-    }
   }
 }
 )

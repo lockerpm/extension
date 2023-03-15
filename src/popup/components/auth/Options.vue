@@ -10,7 +10,6 @@
         round
         class="w-full"
         type="primary"
-        :disabled="option.disabled"
         @click="handleLogin(option)"
       >{{ $t(`data.login.options.${option.title}`) }}</el-button>
     </div>
@@ -37,7 +36,6 @@ export default Vue.extend({
         {
           title: 'enterprise_vault',
           value: 'enterprise_vault',
-          disabled: true,
         }
       ]
     }
