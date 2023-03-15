@@ -21,16 +21,6 @@
         >
           Web Vault
         </button>
-        <!-- <button class="btn btn-default w-full mb-4"
-                @click="openLock"
-        >
-          Lock
-        </button>
-        <button class="btn btn-default w-full mb-4"
-                @click="openSet"
-        >
-          Set master
-        </button> -->
       </div>
     </div>
   </div>
