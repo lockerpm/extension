@@ -369,6 +369,9 @@
   "fourHours": {
     "message": "4 giờ"
   },
+  "twoWeeks": {
+    "message": "2 tuần"
+  },
   "onLocked": {
     "message": "Mỗi khi khóa"
   },

@@ -236,6 +236,8 @@ import Vue from 'vue'
 import ChangeMasterPassword from '@/components/user/ChangeMasterPassword'
 import PurgeVault from '@/components/setting/PurgeVault'
 import DeauthorizeSessions from '@/components/setting/DeauthorizeSessions'
+import { VAULT_TIMEOUTS } from '@/constants/index'
+
 export default Vue.extend({
   components: {
     ChangeMasterPassword, PurgeVault, DeauthorizeSessions
@@ -250,15 +252,7 @@ export default Vue.extend({
   },
   computed: {
     vaultTimeouts () {
-      return [
-        { label: this.$t('data.timeouts.oneMinute'), value: 1 },
-        { label: this.$t('data.timeouts.fiveMinutes'), value: 5 },
-        { label: this.$t('data.timeouts.fifteenMinutes'), value: 15 },
-        { label: this.$t('data.timeouts.thirtyMinutes'), value: 30 },
-        { label: this.$t('data.timeouts.oneHour'), value: 60 },
-        { label: this.$t('data.timeouts.fourHours'), value: 240 },
-        { label: this.$t('data.timeouts.onRefresh'), value: -1 }
-      ]
+      return VAULT_TIMEOUTS
     },
     vaultTimeoutActions () {
       return [

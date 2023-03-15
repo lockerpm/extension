@@ -364,6 +364,7 @@ module.exports = {
       thirtyMinutes: '30 minutes',
       oneHour: '1 hour',
       fourHours: '4 hours',
+      twoWeeks: '2 weeks',
       onRefresh: 'On Browser Reload'
     },
     exportFile: {
