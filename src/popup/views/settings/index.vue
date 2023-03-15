@@ -75,6 +75,7 @@ import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import Header from "../../components/layout/parts/Header.vue";
 import Footer from "../../components/layout/parts/Footer.vue";
 import i18n from '@/locales/i18n';
+import { VAULT_TIMEOUTS } from '@/constants/index'
 const enableAutofillKey = 'enableAutofill'
 const showFoldersKey = 'showFolders'
 const hideIconsKey = 'hideIcons'
@@ -110,15 +111,7 @@ export default Vue.extend({
   },
   computed: {
     vaultTimeouts() {
-      return [
-        { label: this.$t("data.timeouts.oneMinute"), value: 1 },
-        { label: this.$t("data.timeouts.fiveMinutes"), value: 5 },
-        { label: this.$t("data.timeouts.fifteenMinutes"), value: 15 },
-        { label: this.$t("data.timeouts.thirtyMinutes"), value: 30 },
-        { label: this.$t("data.timeouts.oneHour"), value: 60 },
-        { label: this.$t("data.timeouts.fourHours"), value: 240 },
-        { label: this.$t("data.timeouts.onRefresh"), value: -1 },
-      ];
+      return VAULT_TIMEOUTS;
     },
     vaultTimeoutActions() {
       return [
