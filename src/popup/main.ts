@@ -55,9 +55,13 @@ Vue.mixin({
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
         { key: "github", name: "GitHub", color: "#202326" }
       ],
-      enableAutofillKey: 'enableAutofill',
-      showFoldersKey: 'showFolders',
-      hideIconsKey: 'hideIcons',
+      enableAutofillKey : 'enableAutofill',
+      showFoldersKey : 'showFolders',
+      hideIconsKey : 'hideIcons',
+      ws1: null,
+      ws2: null,
+      desktopAppInstalled: false,
+      desktopAppData: null
     };
   },
   computed: {

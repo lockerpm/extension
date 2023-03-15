@@ -15,6 +15,9 @@ import Vue from 'vue'
 import { CipherType } from 'jslib-common/enums/cipherType';
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
+
+import uuid from 'uuid';
+
 export default Vue.extend({
   props: {
     wrapperType: {
@@ -33,7 +36,7 @@ export default Vue.extend({
       lastActivity: null,
       idleTimer: null,
       isIdle: false,
-      CipherType
+      CipherType,
     }
   },
   asyncComputed: {
@@ -63,10 +66,16 @@ export default Vue.extend({
       }
     }
   },
+  async created() {
+    console.log('ws2', 1);
+    await this.reconnectDesktopAppSocket();
+  },
   methods: {
     disconnectSocket () {
-      delete this.$options.sockets.onmessage
-      this.$disconnect()
+      if (this.ws1) {
+        delete this.ws1.onmessage
+        this.ws1.close()
+      }
     },
     async reconnectSocket () {
       const token = await this.$storageService.get('cs_token')
@@ -76,11 +85,49 @@ export default Vue.extend({
         reconnectionAttempts: 60,
         reconnectionDelay: 3000
       })
-      this.$options.sockets.onmessage = message => {
+      this.ws1 = this.$socket
+      this.ws1.onmessage = message => {
         const data = JSON.parse(message.data)
+        console.log('ws1', data);
         switch (data.event) {
         case 'sync':
           this.getSyncData()
+          break
+        default:
+          break
+        }
+      }
+    },
+
+    async reconnectDesktopAppSocket () {
+      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
+        format: 'json',
+      })
+      this.ws2  = this.$socket;
+      setTimeout(async () => {
+        try {
+          await this.ws2.sendObj({
+            msgType: 1,
+            clientId: uuid(),
+          })
+          this.desktopAppInstalled = true;
+        } catch (error) {
+          this.desktopAppInstalled = false;
+        }
+      }, 2000)
+      this.ws2.onmessage = message => {
+        const data = JSON.parse(message.data)
+        console.log('ws2', data);
+        this.desktopAppData = data;
+        switch (data.msgType) {
+        case 3:
+          // console.log(3, data);
+          break
+        case 4:
+          // console.log(4, data);
+          break
+        case 6:
+          // console.log(6, data);
           break
         default:
           break
