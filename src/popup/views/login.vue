@@ -60,7 +60,10 @@
       @back="() => updateLoginStep(3)"
       @get-access-token="getAccessToken"
     />
-    <LogInWith v-if="[1, 2].includes(login_step)"/>
+    <LogInWith
+      v-if="[1, 2].includes(login_step) && !isEnterprise"
+      :login_step="login_step"
+    />
   </div>
 </template>
 
@@ -92,7 +95,7 @@ export default Vue.extend({
   },
   computed: {
     isEnterprise() {
-      return this.optionValue === 'enterprise_vault'
+      return this.optionValue === 'enterprise_vault' && this.login_step !== 1
     },
     loginSubtitle() {
       if (this.login_step === 1) {

@@ -1,30 +1,32 @@
 <template>
   <div class="w-full px-6 text-center mt-10">
     <div>
-      <div class="text-center mt-2">
-      </div>
-      <div
-        class="mx-auto border border-black-500 h-[1px]"
-        style="width: 30px"
-      >
-      </div>
-      <div class="mt-3 text-center">
-        <p class="mb-2">
-          {{$t('data.login.login_with')}}
-        </p>
-        <button
-          v-for="s in strategies"
-          :key="s.key"
-          type="button"
-          class="m-btn--icon btn-icon-login m-btn--pill"
-          @click="loginWith(s.key)"
+      <div v-if="login_step === 2">
+        <div class="text-center mt-2">
+        </div>
+        <div
+          class="mx-auto border border-black-500 h-[1px]"
+          style="width: 30px"
         >
-          <img
-            class="social__app-icon"
-            :src="require(`@/assets/images/icons/${s.key}.svg`)"
-            :alt="s.key"
+        </div>
+        <div class="mt-3 text-center">
+          <p class="mb-2">
+            {{$t('data.login.login_with')}}
+          </p>
+          <button
+            v-for="s in strategies"
+            :key="s.key"
+            type="button"
+            class="m-btn--icon btn-icon-login m-btn--pill"
+            @click="loginWith(s.key)"
           >
-        </button>
+            <img
+              class="social__app-icon"
+              :src="require(`@/assets/images/icons/${s.key}.svg`)"
+              :alt="s.key"
+            >
+          </button>
+        </div>
       </div>
       <div class="flex px-2 my-4 mx-auto">
         <div class="w-full pl-0 text-center">
@@ -48,6 +50,9 @@
 import Vue from 'vue'
 export default Vue.extend({
   name: 'SignIn',
+  props: {
+    login_step: Number
+  },
   data () {
     return {}
   },

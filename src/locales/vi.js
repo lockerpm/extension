@@ -85,7 +85,8 @@ module.exports = {
     mrs: 'Bà',
     ms: 'Chị',
     dr: 'Bác sĩ',
-    next: 'Tiếp tục'
+    next: 'Tiếp tục',
+    download: 'Tải ứng dụng',
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -683,6 +684,11 @@ module.exports = {
       login_option_locker: 'Tài khoản {option}',
       username_placeholder: 'Email hoặc Tên đăng nhập',
       password_placeholder: 'Mật khẩu',
+      alert: {
+        th1: 'Email của bạn không thuộc về doanh nghiệp nào. Vui lòng thử lại với email khác.',
+        th2: 'Tài khoản của bạn được cài đặt đăng nhập không mật khẩu. Vui lòng đăng nhập vào ứng dụng máy tính trước để tiếp tục sử dụng tiện ích.',
+        th3: 'Vui lòng đăng nhập vào tài khoản này trên ứng dụng máy tính và thử lại.'
+      },
       options: {
         individual_vault: 'Cá nhân',
         business_vault: 'Doanh nghiệp',

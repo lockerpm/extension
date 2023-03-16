@@ -86,7 +86,8 @@ module.exports = {
     mrs: 'Mrs',
     ms: 'Ms',
     dr: 'Dr',
-    next: 'Next'
+    next: 'Next',
+    download: 'Download Desktop App',
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -693,6 +694,11 @@ module.exports = {
       login_option_locker: 'Sign in to your Locker {option}',
       username_placeholder: 'Email or Username',
       password_placeholder: 'Password',
+      alert: {
+        th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
+        th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',
+        th3: 'Please log in to this account on Desktop app and try again.'
+      },
       options: {
         individual_vault: 'Individual',
         business_vault: 'Business',
