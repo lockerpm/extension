@@ -2,7 +2,7 @@
   <div class="w-full px-10">
     <el-form :model="form">
       <p class="mt-0">
-        {{ identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
+        {{ loginInfo.identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
       </p>
       <el-form-item
         prop="otpCode"
@@ -47,9 +47,7 @@
 import Vue from 'vue'
 export default Vue.extend({
   props: {
-    identity: String,
     otpMethod: Object,
-    user_info: Object,
   },
   data () {
     return {
@@ -68,9 +66,9 @@ export default Vue.extend({
       try {
         this.callingAPI = true
         const res = await this.axios.post('/sso/auth/otp', {
-          ...this.user_info,
+          ...this.loginInfo.user_info,
           otp: this.form.otpCode,
-          method: this.identity,
+          method: this.loginInfo.identity,
           save_device: this.form.saveDevice
         })
         try {

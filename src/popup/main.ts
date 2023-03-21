@@ -44,7 +44,7 @@ import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import '../middleware'
+import '../middleware';
 
 Vue.mixin({
   data() {
@@ -54,17 +54,24 @@ Vue.mixin({
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
         { key: "github", name: "GitHub", color: "#202326" }
-      ],
-      enableAutofillKey : 'enableAutofill',
-      showFoldersKey : 'showFolders',
-      hideIconsKey : 'hideIcons',
-      ws1: null,
-      ws2: null,
-      desktopAppInstalled: false,
-      desktopAppData: null
+      ]
     };
   },
   computed: {
+    loginInfo() {
+      return {
+        optionValue: this.$store.state.optionValue,
+        login_step: this.$store.state.login_step,
+        identity: this.$store.state.identity,
+        auth_info: this.$store.state.auth_info,
+        user_info: this.$store.state.user_info,
+        ws2: this.$store.state.ws2,
+        clientId: this.$store.state.clientId,
+        desktopAppInstalled: this.$store.state.desktopAppInstalled,
+        desktopAppData: this.$store.state.desktopAppData,
+        preloginData: this.$store.state.preloginData,
+      }
+    },
     language() { return this.$store.state.user.language },
     currentUser() { return this.$store.state.user },
     currentUserPw() { return this.$store.state.userPw },
@@ -138,6 +145,7 @@ Vue.mixin({
     },
     async logout() {
       console.log('###### LOG OUT')
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
       await this.axios.post('/users/logout')
@@ -153,6 +161,8 @@ Vue.mixin({
         this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
+      this.$store.commit('CLEAR_ALL_DATA')
+
       this.$router.push({ name: 'login' });
 
       chrome.runtime.sendMessage({
@@ -495,6 +505,45 @@ Vue.mixin({
           tab: tab,
           sender: 'notificationBar',
         });
+      }
+    },
+    async reconnectDesktopAppSocket (email = this.loginInfo.user_info ? this.loginInfo.user_info.email : '') {
+      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
+        format: 'json',
+      })
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        ws2: this.$socket
+      })
+      setTimeout(async () => {
+        this.wsDesktopAppSendMessage(email);
+      }, 100)
+      this.loginInfo.ws2.onmessage = (message) => {
+        const data = JSON.parse(message.data)
+        console.log(data);
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppData: data,
+        })
+        if (data.msgType === 9) {
+          this.logout();
+        }
+      }
+    },
+    async wsDesktopAppSendMessage(email = null) {
+      try {
+        const message = {
+          msgType: 1,
+          clientId: this.clientId,
+          email
+        }
+        await this.loginInfo.ws2.sendObj(message)
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppInstalled: true,
+        })
+      } catch (error) {
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppData: null,
+          desktopAppInstalled: false
+        })
       }
     }
   }

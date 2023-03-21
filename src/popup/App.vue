@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import uuid from 'uuid';
 
 export default Vue.extend({
   name: 'App',
@@ -27,30 +26,7 @@ export default Vue.extend({
     }
     await this.reconnectDesktopAppSocket();
   },
-  methods: {
-    async reconnectDesktopAppSocket () {
-      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
-        format: 'json',
-      })
-      this.ws2  = this.$socket;
-      setTimeout(async () => {
-        try {
-          await this.ws2.sendObj({
-            msgType: 1,
-            clientId: uuid(),
-          })
-          this.desktopAppInstalled = true;
-        } catch (error) {
-          this.desktopAppInstalled = false;
-        }
-      }, 2000)
-      this.ws2.onmessage = message => {
-        const data = JSON.parse(message.data)
-        this.desktopAppData = data;
-      }
-    }
-
-  }
+  methods: {}
 })
 </script>
 

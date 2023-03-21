@@ -35,6 +35,7 @@ export default Vue.extend({
       idleTimer: null,
       isIdle: false,
       CipherType,
+      ws1: null,
     }
   },
   asyncComputed: {

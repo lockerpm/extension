@@ -30,10 +30,11 @@
             </div>
           </div>
           <form
+            v-if="loginInfo.optionValue !== 'enterprise_vault'"
             class="mb-8"
             @submit.prevent="setMasterPass"
           >
-            <div class="form-group !mb-4">
+            <div class="form-group mb-4">
               <label class="text-left">
                 {{ $t('master_password.enter_password') }}
               </label>
@@ -70,9 +71,18 @@
               </div>
             </div>
           </form>
+          <div v-else class="mb-8">
+            <el-alert              
+              :title="$t('data.login.alert.lock')"
+              type="warning"
+              :closable="false"
+            >
+            </el-alert>
+          </div>
           <div class="form-group">
             <div class="grid lg:grid-cols-2 grid-cols-1 gap-2">
               <button
+                v-if="loginInfo.optionValue !== 'enterprise_vault'"
                 class="btn btn-primary w-full"
                 :disabled="loading"
                 @click="setMasterPass"

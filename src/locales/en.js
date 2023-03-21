@@ -697,7 +697,13 @@ module.exports = {
       alert: {
         th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
         th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',
-        th3: 'Please log in to this account on Desktop app and try again.'
+        th3: 'Please log in to this account on Desktop app and try again.',
+        lock: "Please unlock your Vault on desktop app to continue to extension. Or log in to another Locker account.",
+      },
+      unlock: {
+        title: "Passwordless Unlock",
+        subtitle: "The admin has required you to unlock your vault using Passwordless method only.",
+        enter_otp: "Enter the OTP code below to your Desktop app to continue Login."
       },
       options: {
         individual_vault: 'Individual',

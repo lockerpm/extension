@@ -8,7 +8,7 @@
           border
           class="flex w-full h-max"
           :disabled="callingAPI"
-          @change="$emit('change-identity', newIdentity)"
+          @change="changeIdentity(newIdentity)"
         >
           <div>
             <p class="text-black-700">
@@ -30,7 +30,7 @@
           border
           class="flex w-full h-max"
           :disabled="callingAPI"
-          @change="$emit('change-identity', newIdentity)"
+          @change="changeIdentity(newIdentity)"
         >
           <div class="text-black-700">
             <i class="el-icon-mobile"></i>
@@ -61,13 +61,12 @@ import { load } from 'recaptcha-v3';
 export default Vue.extend({
   components: {},
   props: {
-    identity: String,
     auth_info: Object,
     user_info: Object
   },
   data () {
     return {
-      newIdentity: this.identity,
+      newIdentity: null,
       callingAPI: false,
       siteKey: process.env.VUE_APP_RECAPTCHA_SITE_KEY,
       recaptcha: null
@@ -76,20 +75,26 @@ export default Vue.extend({
   computed: {},
   async mounted () {
     this.recaptcha = await load(this.siteKey);
+    this.newIdentity = this.loginInfo.identity;
   },
   methods: {
+    changeIdentity (identity) {
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        identity: identity
+      })
+    },
     getOtpMethod (type) {
-      return this.auth_info?.methods?.find((m) => m.type === type)
+      return this.loginInfo?.auth_info?.methods?.find((m) => m.type === type)
     },
     async nextMethod () {
       if (this.callingAPI) { return }
-      if (this.identity === 'mail') {
+      if (this.loginInfo.identity === 'mail') {
         this.callingAPI = true;
         this.recaptcha = await load(this.siteKey);
         const token = await this.recaptcha.execute('login');
         const url = '/sso/auth/otp/mail'
         this.axios.post(url, {
-          ...this.user_info,
+          ...this.loginInfo.user_info,
           request_code: token
         })
           .then(() => {

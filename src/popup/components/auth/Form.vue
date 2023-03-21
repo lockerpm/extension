@@ -57,7 +57,7 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <div v-if="alertData" class="mb-6">
+    <div v-if="alertData && !callingAPI" class="mb-6">
       <el-alert
         :title="alertData.title"
         :type="alertData.type || 'info'"
@@ -108,7 +108,6 @@ export default Vue.extend({
   data () {
     return {
       callingAPI: false,
-      preloginData: null,
       form: {
         username: null,
         password: null
@@ -150,25 +149,25 @@ export default Vue.extend({
       }
     },
     isPasswordMethod () {
-      return this.preloginData
-        && this.preloginData[0]
-        && this.preloginData[0].login_method === 'password'
-        && !this.preloginData[0].require_passwordless
+      return this.loginInfo.preloginData
+        && this.loginInfo.preloginData[0]
+        && this.loginInfo.preloginData[0].login_method === 'password'
+        && !this.loginInfo.preloginData[0].require_passwordless
     },
     isPasswordlessMethod () {
-      return this.preloginData
-        && this.preloginData[0]
-        && (this.preloginData[0].login_method === 'passwordless' || this.preloginData[0].require_passwordless)
+      return this.loginInfo.preloginData
+        && this.loginInfo.preloginData[0]
+        && (this.loginInfo.preloginData[0].login_method === 'passwordless' || this.loginInfo.preloginData[0].require_passwordless)
     },
     notLoginDesktopApp () {
-      return (!this.desktopAppInstalled || this.desktopAppData?.msgType === 6) && this.isPasswordlessMethod
+      return (!this.loginInfo.desktopAppInstalled || this.loginInfo.desktopAppData?.msgType === 6) && this.isPasswordlessMethod
     },
     alertData () {
       if (!this.enterpriseForm.email) {
         return null
       }
-      if (this.preloginData) {
-        const alertData = this.preloginData[0]
+      if (this.loginInfo.preloginData) {
+        const alertData = this.loginInfo.preloginData[0]
         if (!alertData) {
           return {
             type: 'warning',
@@ -189,14 +188,32 @@ export default Vue.extend({
   },
   mounted() {
     this.$nextTick(() => this.$refs.username.focus())
+    this.loadData();
+  },
+  watch: {
+    loginInfo: {
+      handler() {
+        this.loadData();
+      },
+      deep: true
+    }
   },
   methods: {
-    handleBack() {
-      if (this.isPasswordMethod) {
-        this.preloginData = null;
-      } else {
-        this.$emit('back')
+    loadData() {
+      if (this.loginInfo?.user_info?.username) {
+        this.form.username = this.loginInfo?.user_info?.username
       }
+      if (this.loginInfo?.user_info?.email) {
+        this.enterpriseForm.email = this.loginInfo?.user_info?.email
+      }
+    },
+    handleBack() {
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        preloginData: null,
+        user_info: null,
+        auth_info: null,
+      })
+      this.$emit('back')
     },
 
     handleLogin() {
@@ -209,10 +226,7 @@ export default Vue.extend({
       } else {
         this.$refs.enterpriseForm.validate((valid) => {
           if (valid) {
-            // logig on-primise
-            // call api check email have to pwl
             this.handlePrelogin();
-            // connect ws
           }
         })
       }
@@ -227,8 +241,10 @@ export default Vue.extend({
       }
       this.axios.post('/sso/auth', payload).then(async (response) => {
         if (response.is_factor2) {
-          this.$emit('update-auth', response)
-          this.$emit('update-user', payload)
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            auth_info: response,
+            user_info: payload
+          })
           this.$emit('next');
         } else {
           try {
@@ -256,8 +272,21 @@ export default Vue.extend({
         language: this.language
       }
       this.axios.post('/cystack_platform/pm/users/onpremise/prelogin', payload).then(async (response) => {
-        this.preloginData = response;
-        this.callingAPI = false
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          preloginData: response,
+          user_info: payload
+        })
+        if (this.isPasswordlessMethod) {
+          this.reconnectDesktopAppSocket(payload.email);
+        }
+        setTimeout(() => {
+          if (this.loginInfo.desktopAppData?.msgType === 3 && this.loginInfo.desktopAppData?.otp) {
+            this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+              login_step: 5
+            })
+          }
+          this.callingAPI = false
+        }, 1000);
       }).catch ((error) => {
         this.callingAPI = false
         this.notify(error?.response?.data?.message, 'error')
@@ -272,13 +301,7 @@ export default Vue.extend({
         password: this.enterpriseForm.password,
         language: this.language
       }
-      // this.axios.post('/cystack_platform/pm/users/onpremise/prelogin', payload).then(async (response) => {
-      //   this.preloginData = response;
-      //   this.callingAPI = false
-      // }).catch ((error) => {
-      //   this.callingAPI = false
-      //   this.notify(error?.response?.data?.message, 'error')
-      // })
+      console.log(payload);
     }
   }
 })

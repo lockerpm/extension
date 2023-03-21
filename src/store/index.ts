@@ -2,14 +2,30 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import {StorageService} from "jslib-common/abstractions/storage.service";
+import uuid from 'uuid';
+
 Vue.use(Vuex)
 
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
 const STORAGE_KEY = 'cs_store'
 
+const defaultLoginInfo = {
+  optionValue: '',
+  login_step: 1,
+  identity: 'mail',
+  auth_info: null,
+  user_info: null,
+  ws2: null,
+  clientId: uuid(),
+  desktopAppInstalled: false,
+  desktopAppData: null,
+  preloginData: null
+}
+
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   let oldStoreParsed = {
-    language: 'en'
+    language: 'en',
+    ...JSON.parse(JSON.stringify(defaultLoginInfo)),
   }
   if (typeof oldStore === 'object') {
     oldStoreParsed = {
@@ -151,7 +167,34 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_ENABLE_AUTOFILL(state, value) {
         state.enableAutofill = value
-      }
+      },
+      UPDATE_LOGIN_PAGE_INFO(state, info) {
+        let keys = []
+        const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
+        if (info) {
+          keys = Object.keys(defaultData)
+        } else {
+          keys = Object.keys(defaultData)
+        }
+        keys.forEach((key) => {
+          state[key] = defaultData[key]
+        });
+        chrome.runtime.sendMessage({
+          command: 'updateStoreServiceInfo',
+          sender: {
+            optionValue: state.optionValue,
+            login_step: state.login_step,
+            identity: state.identity,
+            auth_info: state.auth_info,
+            user_info: state.user_info,
+            ws2: state.ws2,
+            clientId: state.clientId,
+            desktopAppInstalled: state.desktopAppInstalled,
+            desktopAppData: state.desktopAppData,
+            preloginData: state.preloginData,
+          },
+        });
+      },
     },
     actions: {
       InitStore (context, payload) {
@@ -209,7 +252,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
             commit('UPDATE_CURRENT_PLAN', res)
             return res
           })
-      }
+      },
+
     },
     modules: {
     },

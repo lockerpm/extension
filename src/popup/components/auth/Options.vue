@@ -19,9 +19,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  props: {
-    optionValue: String
-  },
+  props: {},
   data () {
     return {
       options: [
@@ -42,7 +40,9 @@ export default Vue.extend({
   },
   methods: {
     handleLogin(option) {
-      this.$emit('change-option', option.value)
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        optionValue: option.value
+      })
       this.$emit('next');
     }
   }

@@ -687,7 +687,8 @@ module.exports = {
       alert: {
         th1: 'Email của bạn không thuộc về doanh nghiệp nào. Vui lòng thử lại với email khác.',
         th2: 'Tài khoản của bạn được cài đặt đăng nhập không mật khẩu. Vui lòng đăng nhập vào ứng dụng máy tính trước để tiếp tục sử dụng tiện ích.',
-        th3: 'Vui lòng đăng nhập vào tài khoản này trên ứng dụng máy tính và thử lại.'
+        th3: 'Vui lòng đăng nhập vào tài khoản này trên ứng dụng máy tính và thử lại.',
+        lock: "Vui lòng mở khóa Vault trên ứng dụng máy tính của bạn để tiếp tục. Hoặc đăng nhập vào tài khoản Locker khác.",
       },
       options: {
         individual_vault: 'Cá nhân',

@@ -313,6 +313,8 @@ export default class RuntimeBackground {
         if (msg.sender) {
           await this.updateStoreService(msg.sender.key, msg.sender.value);
         }
+      case "updateStoreServiceInfo":
+        await this.updateStoreServiceInfo(msg.sender);
       default:
         break;
     }
@@ -431,6 +433,19 @@ export default class RuntimeBackground {
     await this.storageService.save("cs_store", {
       ...oldStoreParsed,
       [key]: value
+    });
+  }
+
+  private async updateStoreServiceInfo(value = {}) {
+    console.log('value', value);
+    const store = await this.storageService.get("cs_store");
+    let oldStoreParsed = {};
+    if (typeof store === "object") {
+      oldStoreParsed = store;
+    }
+    await this.storageService.save("cs_store", {
+      ...oldStoreParsed,
+      ...value
     });
   }
 }

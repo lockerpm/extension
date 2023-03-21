@@ -7,62 +7,58 @@
         class="h-[36px] mx-auto"
       >
     </div>
-    <div class="font-bold text-head-5 text-black-700 text-center mt-10">
-      {{$t('data.login.login')}}
-    </div>
-    <el-row type="flex" justify="space-between my-4 px-10" align="middle">
-      <div class="text-base font-medium">
-        {{ loginSubtitle }}
-      </div>
+    <div v-if="loginInfo.login_step !== 5">
       <div
-        v-if="language !== 'vi'"
-        class="cursor-pointer"
-        @click="changeLang('vi')"
-      >
-        <span class="flag flag-us"></span>
+        class="font-bold text-head-5 text-black-700 text-center mt-10">
+        {{$t('data.login.login')}}
       </div>
-      <div v-else
-        class="cursor-pointer"
-        @click="changeLang('en')"
-      >
-        <span class="flag flag-vn"></span>
-      </div>
-    </el-row>
+      <el-row type="flex" justify="space-between my-4 px-10" align="middle">
+        <div class="text-base font-medium">
+          {{ loginSubtitle }}
+        </div>
+        <div
+          v-if="language !== 'vi'"
+          class="cursor-pointer"
+          @click="changeLang('vi')"
+        >
+          <span class="flag flag-us"></span>
+        </div>
+        <div v-else
+          class="cursor-pointer"
+          @click="changeLang('en')"
+        >
+          <span class="flag flag-vn"></span>
+        </div>
+      </el-row>
+    </div>
     <Options
-      v-if="login_step === 1"
-      :optionValue="optionValue"
-      @change-option="(value) => optionValue = value"
+      v-if="loginInfo.login_step === 1"
       @next="() => updateLoginStep(2)"
     />
     <Form
-      v-else-if="login_step === 2"
+      v-else-if="loginInfo.login_step === 2"
       :isEnterprise="isEnterprise"
-      @update-auth="(v) => auth_info = v"
-      @update-user="(v) => user_info = v"
       @back="() => updateLoginStep(1)"
       @next="() => updateLoginStep(3)"
       @get-access-token="getAccessToken"
     />
+    <PWLUnlock
+      v-if="loginInfo.login_step === 5"
+    />
     <Identity
-      v-else-if="login_step === 3"
-      :identity="identity"
-      :auth_info="auth_info"
-      :user_info="user_info"
-      @change-identity="(value) => identity = value"
+      v-else-if="loginInfo.login_step === 3"
       @back="() => updateLoginStep(2)"
       @next="() => updateLoginStep(4)"
     />
     <VerifyOTP
-      v-else-if="login_step === 4"
-      :identity="identity"
+      v-else-if="loginInfo.login_step === 4"
       :otp-method="otpMethod"
-      :user_info="user_info"
       @back="() => updateLoginStep(3)"
       @get-access-token="getAccessToken"
     />
     <LogInWith
-      v-if="[1, 2].includes(login_step) && !isEnterprise"
-      :login_step="login_step"
+      v-if="[1, 2].includes(loginInfo.login_step) && !isEnterprise"
+      :login_step="loginInfo.login_step"
     />
   </div>
 </template>
@@ -74,6 +70,7 @@ import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
+import PWLUnlock from '../components/auth/PWLUnlock.vue'
 
 export default Vue.extend({
   name: 'Login',
@@ -82,35 +79,30 @@ export default Vue.extend({
     LogInWith,
     Form,
     Identity,
-    VerifyOTP
+    VerifyOTP,
+    PWLUnlock
   },
   data () {
-    return {
-      optionValue: 'individual_vault',
-      login_step: 1,
-      identity: 'mail',
-      auth_info: null,
-      user_info: null,
-    }
+    return {}
   },
   computed: {
     isEnterprise() {
-      return this.optionValue === 'enterprise_vault' && this.login_step !== 1
+      return this.loginInfo.optionValue === 'enterprise_vault' && this.loginInfo.login_step !== 1
     },
     loginSubtitle() {
-      if (this.login_step === 1) {
+      if (this.loginInfo.login_step === 1) {
         return this.$t('data.login.login_option')
       }
-      if (this.login_step === 2) {
-        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.optionValue}`) })
+      if (this.loginInfo.login_step === 2) {
+        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.loginInfo.optionValue}`) })
       }
-      if (this.login_step === 3) {
+      if (this.loginInfo.login_step === 3) {
         return this.$t('data.login.verify')
       }
       return this.$t('data.login.enter_code')
     },
     otpMethod () {
-      return this.auth_info?.methods?.find((m) => m.type === this.identity)
+      return this.loginInfo.auth_info?.methods?.find((m) => m.type === this.loginInfo.identity)
     }
   },
   async mounted() {
@@ -131,7 +123,9 @@ export default Vue.extend({
   },
   methods: {
     updateLoginStep (value) {
-      this.login_step = value
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        login_step: value
+      })
     },
     async getAccessToken(token){
       const url = '/sso/access_token'
