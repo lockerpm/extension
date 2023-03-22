@@ -85,7 +85,6 @@ export default Vue.extend({
       this.ws1 = this.$socket
       this.ws1.onmessage = message => {
         const data = JSON.parse(message.data)
-        console.log('ws1', data);
         switch (data.event) {
         case 'sync':
           this.getSyncData()

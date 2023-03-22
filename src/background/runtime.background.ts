@@ -23,10 +23,10 @@ import { PassService } from 'jslib-common/abstractions/pass.service';
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
+import RequestBackground from './request.backgroud';
 
 import { Utils } from 'jslib-common/misc/utils';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
-import axios from "axios";
 
 export default class RuntimeBackground {
   private autofillTimeout: any;
@@ -54,6 +54,7 @@ export default class RuntimeBackground {
     private tokenService: TokenService,
     private passwordGenerator: PasswordGenerationService,
     private passService: PassService,
+    private request: RequestBackground
   ) {
     chrome.runtime?.onInstalled?.addListener((details: any) => {
       this.onInstalledReason = details.reason;
@@ -238,27 +239,18 @@ export default class RuntimeBackground {
         ]);
         break;
       case "locker-authResult":
-        const myHeaders = {
-          headers: { Authorization: `Bearer ${msg.token}` }
-        };
+        await this.storageService.save("cs_token", msg.token);
         try {
-          const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
-          axios
-            .post(
-              url,
-              {
-                SERVICE_URL: "/sso",
-                SERVICE_SCOPE: "pwdmanager",
-                CLIENT: "browser"
-              },
-              myHeaders
-            )
-            .then(async result => {
-              const access_token = result.data ? result.data.access_token : "";
-              await this.storageService.save("cs_token", access_token);
-              await this.updateStoreService('isLoggedIn', true);
-              sendResponse({ success: true });
-            });
+          this.request.sso_access_token({
+            SERVICE_URL: "/sso",
+            SERVICE_SCOPE: "pwdmanager",
+            CLIENT: "browser"
+          }).then(async (result: any) => {
+            const access_token = result.data ? result.data.access_token : "";
+            await this.storageService.save("cs_token", access_token);
+            await this.updateStoreService('isLoggedIn', true);
+            sendResponse({ success: true });
+          });
         } catch (e) {
           console.log(e);
         }
@@ -335,18 +327,11 @@ export default class RuntimeBackground {
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
 
-    // Update used time
-    const csToken = await this.main.storageService.get<string>("cs_token");
-    const headers = {
-      "Authorization": "Bearer " + csToken,
-      "Content-Type": "application/json; charset=utf-8"
-    };
-    const res = await axios.put(
-      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
+    const res: any = await this.request.use_cipher(
+      cipherId,
       { use: true, favorite: cipherFavorite },
-      { headers: headers }
     )
-    const cipherResponse = new CipherResponse(res.data)
+    const cipherResponse = new CipherResponse(res)
     const userId = await this.userService.getUserId();
     const cipherData = new CipherData(cipherResponse, userId);
     this.cipherService.upsert(cipherData)
@@ -437,7 +422,6 @@ export default class RuntimeBackground {
   }
 
   private async updateStoreServiceInfo(value = {}) {
-    console.log('value', value);
     const store = await this.storageService.get("cs_store");
     let oldStoreParsed = {};
     if (typeof store === "object") {
