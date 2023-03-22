@@ -216,6 +216,7 @@ export default Vue.extend({
         preloginData: null,
         user_info: null,
         auth_info: null,
+        baseApiUrl: null
       })
       this.$emit('back')
     },
@@ -282,11 +283,6 @@ export default Vue.extend({
           this.reconnectDesktopAppSocket(payload.email);
         }
         setTimeout(() => {
-          if (this.loginInfo.desktopAppData?.msgType === 3 && this.loginInfo.desktopAppData?.otp) {
-            this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-              login_step: 5
-            })
-          }
           this.callingAPI = false
         }, 1000);
       }).catch ((error) => {

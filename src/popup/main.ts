@@ -208,7 +208,7 @@ Vue.mixin({
         return ''
       }
     },
-    async login() {
+    async login(isPwl = false) {
       await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
@@ -226,28 +226,42 @@ Vue.mixin({
       }
       try {
         await this.clearKeys()
-        const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-        const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
-        const res = await cystackPlatformAPI.users_session({
-          client_id: 'browser',
-          password: hashedPassword,
-          device_name: this.$platformUtilsService.getDeviceString(),
-          device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: deviceIdentifier
-        })
-        chrome.runtime.sendMessage({ command: 'loggedIn' })
-        await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-        await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
-        await this.$cryptoService.setKey(key)
-        await this.$cryptoService.setKeyHash(hashedPassword)
-        await this.$cryptoService.setEncKey(res.key)
-        await this.$cryptoService.setEncPrivateKey(res.private_key)
+        if (!isPwl) {
+          const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
+          const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: hashedPassword,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceIdentifier
+          })
+          chrome.runtime.sendMessage({ command: 'loggedIn' })
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
+          await this.$cryptoService.setKey(key)
+          await this.$cryptoService.setKeyHash(hashedPassword)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
+        } else {
+          chrome.runtime.sendMessage({ command: 'loggedIn' })
+          await this.$tokenService.setTokens(
+            this.loginInfo.desktopAppData.data?.accessToken,
+            this.loginInfo.desktopAppData.data?.refreshToken
+          )
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
+          await this.$cryptoService.setKey(this.loginInfo.desktopAppData.data?.key)
+          await this.$cryptoService.setKeyHash(this.loginInfo.desktopAppData.data?.hashedPassword)
+          await this.$cryptoService.setEncKey(this.loginInfo.desktopAppData.data?.encKey)
+          await this.$cryptoService.setEncPrivateKey(this.loginInfo.desktopAppData.data?.encPrivateKey)
+        }
 
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
         chrome.runtime.sendMessage({ command: "unlocked" });
         this.$router.push({ name: 'home' });
+        console.log(11111);
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }
@@ -529,17 +543,23 @@ Vue.mixin({
         })
         if (data.msgType === 9) {
           this.logout();
+        } else if (data.msgType === 3) {
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            login_step: 5
+          })
         } else if (data.msgType === 4) {
+          // Update access Token
           await this.$storageService.save('cs_token', this.loginInfo.desktopAppData.data?.accessToken)
           // Update base URL
-          console.log(this.loginInfo);
-          
-          chrome.runtime.sendMessage({
-            command: 'updateStoreService',
-            sender: { key: 'isLoggedIn', value: true },
-          });
-          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.$router.push({ name: 'lock' })
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            baseApiUrl: this.loginInfo.preloginData[0].base_api + '/v3',
+            isLoggedIn: true,
+          })
+          // Update base URL
+          setTimeout(async () => {
+            await this.$store.dispatch('LoadCurrentUser');
+            await this.login(true);
+          }, 1000);
         }
       }
     },

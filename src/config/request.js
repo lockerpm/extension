@@ -14,7 +14,7 @@ service.interceptors.request.use(async (config) => {
   const accessToken = await browserStorageService.get('cs_token')
   const deviceId = await browserStorageService.get('device_id')
 
-  const baseUrl = cs_store?.preloginData && cs_store?.preloginData[0] ? cs_store?.preloginData[0].base_api : process.env.VUE_APP_BASE_API_URL;
+  const baseUrl = cs_store?.baseApiUrl || process.env.VUE_APP_BASE_API_URL;
 
   config.baseURL = baseUrl
 

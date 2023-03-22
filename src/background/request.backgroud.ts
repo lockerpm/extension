@@ -17,7 +17,7 @@ export default class RequestBackground {
       const accessToken = await this.main.storageService.get('cs_token')
       const deviceId = await this.main.storageService.get('device_id')
     
-      const baseUrl = cs_store?.preloginData && cs_store?.preloginData[0] ? cs_store?.preloginData[0].base_api : process.env.VUE_APP_BASE_API_URL;
+      const baseUrl = cs_store?.baseApiUrl || process.env.VUE_APP_BASE_API_URL;
     
       config.baseURL = baseUrl
     

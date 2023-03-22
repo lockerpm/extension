@@ -23,7 +23,8 @@ const defaultLoginInfo = {
   clientId: uuid(),
   desktopAppInstalled: false,
   desktopAppData: null,
-  preloginData: null
+  preloginData: null,
+  baseApiUrl: null
 }
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
@@ -195,6 +196,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
             desktopAppInstalled: state.desktopAppInstalled,
             desktopAppData: state.desktopAppData,
             preloginData: state.preloginData,
+            baseApiUrl: state.baseApiUrl
           },
         });
       },

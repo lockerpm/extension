@@ -13,7 +13,7 @@ router.beforeEach(async (to, from, next) => {
       await store.dispatch("LoadCurrentUser");
       await store.dispatch("LoadCurrentUserPw");
     }
-    if (store.state.userPw.is_pwd_manager === false) {
+    if (store.state.userPw.is_pwd_manager === false && (!store.state.preloginData || !store.state.preloginData[0].require_passwordless)) {
       router.push({ name: "set-master-password" });
     } else {
       next();
