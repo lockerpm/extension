@@ -519,12 +519,14 @@ Vue.mixin({
       }, 100)
       this.loginInfo.ws2.onmessage = (message) => {
         const data = JSON.parse(message.data)
-        console.log(data);
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           desktopAppData: data,
         })
         if (data.msgType === 9) {
           this.logout();
+        } else if (data.msgType === 4) {
+          // Update base URL
+          console.log(this.loginInfo);
         }
       }
     },
@@ -532,7 +534,7 @@ Vue.mixin({
       try {
         const message = {
           msgType: 1,
-          clientId: this.clientId,
+          clientId: this.loginInfo?.clientId,
           email
         }
         await this.loginInfo.ws2.sendObj(message)
