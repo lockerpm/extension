@@ -64,6 +64,9 @@
 import Vue from 'vue'
 import InputText from '@/components/input/InputText'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: { PasswordStrengthBar, InputText },
   data () {
@@ -123,7 +126,7 @@ export default Vue.extend({
 
         const masterPasswordHash = await this.$cryptoService.hashPassword(this.oldMasterPassword, null)
 
-        await this.axios.post('cystack_platform/pm/users/me/password', {
+        await cystackPlatformAPI.users_me_password({
           key: encKey[1].encryptedString,
           new_master_password_hash: newMasterPasswordHash,
           master_password_hash: masterPasswordHash

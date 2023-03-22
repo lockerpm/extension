@@ -163,7 +163,10 @@
 
 <script>
 import Vue from 'vue'
-import BlankLayout from '@/components/layout/blank'
+import BlankLayout from '@/components/layout/blank';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   layout: 'blank',
   middleware: ['NotHaveAccountService'],
@@ -208,15 +211,13 @@ export default Vue.extend({
     },
     sendHint () {
       this.loadingSend = true
-      this.axios.post('cystack_platform/pm/users/password_hint', {
+      cystackPlatformAPI.users_password_hint({
         email: this.currentUser.email
+      }).then(() => {
+        this.loadingSend = false
+        this.step = 3
       })
-        .then(() => {
-          this.loadingSend = false
-          this.step = 3
-        })
     }
-    // TODO change masterpass if have account
   }
 })
 </script>

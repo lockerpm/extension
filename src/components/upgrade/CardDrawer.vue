@@ -237,6 +237,9 @@
 import Vue from 'vue'
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 
+import cystackPlatformAPI from '@/api/cystack_platform'
+import resourceAPI from '@/api/resource'
+
 export default Vue.extend({
   components: {
     ValidationProvider, ValidationObserver
@@ -337,9 +340,7 @@ export default Vue.extend({
         }
         this.stripe.createToken(this.cardNumber, tokenData).then(result => {
           if (result.token) {
-            // Handle result.error or result.token
-            const url = 'cystack_platform/payments/cards'
-            this.axios.post(url, {
+            cystackPlatformAPI.create_payments_card({
               token_card: result.token.id,
               metadata: {
                 email: this.user.metadata.email,
@@ -363,11 +364,9 @@ export default Vue.extend({
         })
       }
     },
-    getCountries () {
-      this.axios.get('resources/countries')
-        .then(res => {
-          this.countries = res
-        })
+    async getCountries () {
+      const res = await resourceAPI.countries()
+      this.countries = res
     }
   }
 })

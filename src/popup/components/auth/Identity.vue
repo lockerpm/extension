@@ -58,6 +58,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { load } from 'recaptcha-v3';
+import authAPI from '@/api/auth'
+
 export default Vue.extend({
   components: {},
   props: {
@@ -92,18 +94,16 @@ export default Vue.extend({
         this.callingAPI = true;
         this.recaptcha = await load(this.siteKey);
         const token = await this.recaptcha.execute('login');
-        const url = '/sso/auth/otp/mail'
-        this.axios.post(url, {
+        authAPI.sso_auth_otp_mail({
           ...this.loginInfo.user_info,
           request_code: token
+        }).then(() => {
+          this.$emit('next')
+          this.callingAPI = false
+        }).catch((error) => {
+          this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+          this.callingAPI = false
         })
-          .then(() => {
-            this.$emit('next')
-            this.callingAPI = false
-          }).catch((error) => {
-            this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
-            this.callingAPI = false
-          })
       } else {
         this.$emit('next')
       }

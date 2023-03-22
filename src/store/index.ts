@@ -4,6 +4,10 @@ import JSLib from "@/popup/services/services";
 import {StorageService} from "jslib-common/abstractions/storage.service";
 import uuid from 'uuid';
 
+import meAPI from '@/api/me';
+import cystackPlatformAPI from '@/api/cystack_platform';
+import notificationAPI from '@/api/notification';
+
 Vue.use(Vuex)
 
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
@@ -33,7 +37,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       ...oldStore
     }
   }
-  console.log('oldStoreParsed', oldStoreParsed)
 
   return new Vuex.Store({
     state: {
@@ -206,54 +209,43 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
           if (state.isLoggedIn) {
             const data = Object.assign({}, state.user)
             data.language = payload
-            Vue.axios.put('me', data)
+            meAPI.update(data);
           }
           resolve(payload)
         })
       },
-      LoadCurrentUser ({ commit }) {
-        return Vue.axios.get('me')
-          .then(res => {
-            commit('UPDATE_IS_LOGGEDIN', true)
-            commit('UPDATE_USER', res)
-            return res
-          })
+      async LoadCurrentUser ({ commit }) {
+        const res = await meAPI.me();
+        commit('UPDATE_IS_LOGGEDIN', true)
+        commit('UPDATE_USER', res)
+        return res
       },
-      LoadCurrentUserPw ({ commit }) {
-        return Vue.axios.get('/cystack_platform/pm/users/me').then(res => {
-          commit('UPDATE_USER_PW', res)
-          return res
-        })
+      async LoadCurrentUserPw ({ commit }) {
+        const res = await cystackPlatformAPI.users_me();
+        commit('UPDATE_USER_PW', res)
+        return res
       },
-      LoadCurrentIntercom ({ commit }) {
-        return Vue.axios.get('me/intercom')
-          .then(res => {
-            window.intercomSettings = res
-            commit('UPDATE_USER_INTERCOM', res)
-            Intercom('update')
-          })
+      async LoadCurrentIntercom ({ commit }) {
+        const res: any = await meAPI.me_intercom();
+        window.intercomSettings = res
+        commit('UPDATE_USER_INTERCOM', res)
+        Intercom('update')
       },
-      LoadNotification ({ commit }) {
-        return Vue.axios.get('notifications?scope=cloud')
-          .then(res => {
-            commit('UPDATE_NOTIFICATION', res)
-          })
+      async LoadNotification ({ commit }) {
+        const res = await notificationAPI.get({ scope: 'cloud' });
+        commit('UPDATE_NOTIFICATION', res)
+        return res
       },
-      LoadTeams ({ commit }) {
-        return Vue.axios.get('cystack_platform/pm/teams')
-          .then(res => {
-            commit('UPDATE_TEAMS', res)
-            return res
-          })
+      async LoadTeams ({ commit }) {
+        const res = await cystackPlatformAPI.teams();
+        commit('UPDATE_TEAMS', res)
+        return res
       },
-      LoadCurrentPlan ({ commit }) {
-        return Vue.axios.get('cystack_platform/pm/payments/plan')
-          .then(res => {
-            commit('UPDATE_CURRENT_PLAN', res)
-            return res
-          })
+      async LoadCurrentPlan ({ commit }) {
+        const res = await cystackPlatformAPI.payments_plan();
+        commit('UPDATE_CURRENT_PLAN', res)
+        return res
       },
-
     },
     modules: {
     },

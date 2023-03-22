@@ -69,6 +69,9 @@ import Vue from 'vue'
 import { ValidationProvider } from 'vee-validate'
 import InputSelectTeam from '@/components/input/InputSelectTeam'
 import InputText from '@/components/input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputSelectTeam,
@@ -105,7 +108,7 @@ export default Vue.extend({
         this.loading = true
         const orgKey = await this.$cryptoService.getOrgKey(folder.organizationId)
         const name = (await this.$cryptoService.encrypt(folder.name, orgKey)).encryptedString
-        const res = await this.axios.post(`cystack_platform/pm/teams/${folder.organizationId}/folders`, { name })
+        const res = await cystackPlatformAPI.create_team_folder(folder.organizationId, { name })
         this.$emit('done')
         this.closeDialog()
         if (this.shouldRedirect) {
@@ -122,7 +125,7 @@ export default Vue.extend({
         this.loading = true
         const orgKey = await this.$cryptoService.getOrgKey(folder.organizationId)
         const name = (await this.$cryptoService.encrypt(folder.name, orgKey)).encryptedString
-        await this.axios.put(`cystack_platform/pm/teams/${folder.organizationId}/folders/${folder.id}`, { name })
+        await cystackPlatformAPI.update_team_folder(folder.organizationId, folder.id, { name })
         this.$emit('done')
         this.closeDialog()
       } catch (e) {
@@ -139,7 +142,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.post(`cystack_platform/pm/teams/${folder.organizationId}/folders/${folder.id}/delete`)
+          await cystackPlatformAPI.delete_team_folder(folder.organizationId, folder.id)
           this.$emit('done')
           this.closeDialog()
           this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')

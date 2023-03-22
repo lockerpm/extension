@@ -61,6 +61,9 @@
 <script>
 import Vue from 'vue'
 import InputText from '@/components/input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputText
@@ -106,7 +109,7 @@ export default Vue.extend({
     },
     async deauthorizeSessions (hashedPassword) {
       try {
-        await this.axios.post('cystack_platform/pm/users/session/revoke_all', {
+        await cystackPlatformAPI.users_session_revoke_all({
           master_password_hash: hashedPassword
         })
         this.closeDialog()

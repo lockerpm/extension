@@ -133,6 +133,8 @@ import {KvpRequest} from "jslib-common/models/request/kvpRequest";
 import {CollectionWithId as CollectionExport} from "jslib-common/models/export/collectionWithId";
 import {CipherWithIds as CipherExport} from "jslib-common/models/export/cipherWithIds";
 
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     Instructions,
@@ -480,8 +482,7 @@ export default Vue.extend({
         importResult.folderRelationships.forEach(r =>
           request.folderRelationships.push(new KvpRequest(r[0], r[1])))
       }
-      const url = this.teamId ? `cystack_platform/pm/teams/${this.teamId}/import` : 'cystack_platform/pm/ciphers/import'
-      await this.axios.post(url, request)
+      await this.teamId ? cystackPlatformAPI.team_import(this.teamId, request) : cystackPlatformAPI.ciphers_import(request)
       this.notify('Nhập dữ liệu thành công', 'success')
       this.$router.push({name: 'vault' })
     },

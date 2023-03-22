@@ -36,6 +36,8 @@ import Vue from 'vue'
 import HeaderAdmin from '../HeaderAdmin'
 const BroadcasterSubscriptionId = 'AppComponent'
 
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     HeaderAdmin
@@ -115,7 +117,7 @@ export default Vue.extend({
     async getTeam () {
       let shouldRedirect = false
       try {
-        const team = await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}`)
+        const team = await cystackPlatformAPI.team_detail(this.$route.params.teamId)
         shouldRedirect = ['member', 'manager'].includes(team.role) || !team.is_business
         this.$store.commit('UPDATE_TEAM', team)
       } catch (e) {

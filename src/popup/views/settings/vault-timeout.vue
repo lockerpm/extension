@@ -45,7 +45,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VAULT_TIMEOUTS } from '@/constants/index'
+import { VAULT_TIMEOUTS } from '@/config/constants';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default Vue.extend({
   data() {
@@ -71,7 +73,7 @@ export default Vue.extend({
       this.user.timeout = timeoutValue
       try {
         this.loading = true;
-        await this.axios.put("cystack_platform/pm/users/me", this.user);
+        await cystackPlatformAPI.update_users_me(this.user);
         this.$store.commit("UPDATE_USER_PW", this.user);
         this.$vaultTimeoutService.setVaultTimeoutOptions(
           this.user.timeout,

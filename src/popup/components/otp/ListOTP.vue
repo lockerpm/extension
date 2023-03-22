@@ -53,7 +53,9 @@
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
-import OTPRow from './OTPRow.vue'
+import OTPRow from './OTPRow.vue';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   name: 'ListOTP',
@@ -138,7 +140,7 @@ export default {
       }).then(async () => {
         try {
           this.callingAPI = true
-          await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
+          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$t('type.5', ids.length) }), 'success')
           this.callingAPI = false
         } catch (e) {

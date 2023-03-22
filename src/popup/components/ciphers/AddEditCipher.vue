@@ -548,6 +548,9 @@ import Vnodes from "@/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 import { Utils } from 'jslib-common/misc/utils';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7
 export default Vue.extend({
@@ -761,7 +764,7 @@ export default Vue.extend({
         const data = new CipherRequest(cipherEnc)
         data.type = type_
         this.cipher.type = type_
-        await this.axios.post('cystack_platform/pm/ciphers/vaults', {
+        await cystackPlatformAPI.create_ciphers_vault({
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
@@ -791,7 +794,7 @@ export default Vue.extend({
         const data = new CipherRequest(cipherEnc)
         data.type = type_
         this.cipher.type = type_
-        await this.axios.put(`cystack_platform/pm/ciphers/${cipher.id}`, {
+        await cystackPlatformAPI.update_cipher(cipher.id, {
           ...data,
           score: this.passwordStrength.score,
           collectionIds: cipher.collectionIds,
@@ -816,7 +819,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.put('cystack_platform/pm/ciphers/permanent_delete', { ids })
+          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.$router.back()
         } catch (e) {
@@ -835,7 +838,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.put('cystack_platform/pm/ciphers/delete', { ids })
+          await cystackPlatformAPI.ciphers_delete({ ids })
           this.notify(this.$tc('data.notifications.trash_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.$emit('trashed-cipher')
         } catch (e) {
@@ -854,7 +857,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.put('cystack_platform/pm/ciphers/restore', { ids })
+          await cystackPlatformAPI.ciphers_restore({ ids })
           this.notify(this.$tc('data.notifications.restore_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           this.$emit('reset-selection')
         } catch (e) {

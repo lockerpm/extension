@@ -61,6 +61,9 @@
 <script>
 import Vue from 'vue'
 import InputText from '@/components/input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputText
@@ -106,7 +109,7 @@ export default Vue.extend({
     },
     async purgeAccount (hashedPassword) {
       try {
-        await this.axios.post(`cystack_platform/pm/teams/${this.$route.params.teamId}/purge`, {
+        await cystackPlatformAPI.team_purge(this.$route.params.teamId, {
           master_password_hash: hashedPassword
         })
         this.closeDialog()

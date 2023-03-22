@@ -56,6 +56,9 @@
 
 <script>
 import Vue from 'vue'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
   },
@@ -92,12 +95,12 @@ export default Vue.extend({
       this.dialogVisible = false
     },
     async getUserGroups (user) {
-      this.userGroups = await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/${user.id}/groups`)
+      this.userGroups = await cystackPlatformAPI.team_member_groups(this.$route.params.teamId, user.id)
     },
     async putGroupUsers (user) {
       try {
         this.loading = true
-        await this.axios.put(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/${user.id}/groups`, {
+        await cystackPlatformAPI.update_team_member_groups(this.$route.params.teamId, user.id, {
           group_ids: this.multipleSelection.map(e => e.id)
         })
 
@@ -113,7 +116,7 @@ export default Vue.extend({
       }
     },
     async getGroups () {
-      this.groups = await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups`)
+      this.groups = await cystackPlatformAPI.team_groups(this.$route.params.teamId)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val

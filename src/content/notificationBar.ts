@@ -7,7 +7,7 @@ import {
   SIGN_UP_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
-} from '@/constants/index'
+} from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
   if (window.location.hostname.indexOf('id.locker.io') > -1) {

@@ -101,6 +101,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
+
+import authAPI from '@/api/auth'
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   props: {
     isEnterprise: Boolean,
@@ -239,7 +243,7 @@ export default Vue.extend({
         ...this.form,
         language: this.language
       }
-      this.axios.post('/sso/auth', payload).then(async (response) => {
+      authAPI.sso_auth(payload).then(async (response: any) => {
         if (response.is_factor2) {
           this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
             auth_info: response,
@@ -248,9 +252,7 @@ export default Vue.extend({
           this.$emit('next');
         } else {
           try {
-            this.axios.post('/sso/me/last_active',{}, {
-              headers: { Authorization: `Bearer ${response.token}` }
-            })
+            await this.$storageService.save('cs_token', response.token)
             await this.$emit('get-access-token', response.token)
           }
           catch (e) {
@@ -271,7 +273,7 @@ export default Vue.extend({
         email: this.enterpriseForm.email,
         language: this.language
       }
-      this.axios.post('/cystack_platform/pm/users/onpremise/prelogin', payload).then(async (response) => {
+      cystackPlatformAPI.users_onpremise_prelogin(payload).then(async (response) => {
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           preloginData: response,
           user_info: payload

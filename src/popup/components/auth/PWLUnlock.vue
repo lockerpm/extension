@@ -8,10 +8,16 @@
       <small>{{ $t('data.login.unlock.enter_otp') }}</small>
     </p>
     <div class="otp">
-      <div class="otp__item" v-for="item in otpNumbers" :key="item">
+      <div class="otp__item" v-for="(item, index) in otpNumbers" :key="index">
         {{ item }}
       </div>
     </div>
+    <el-button
+      class="w-full mt-10"
+      type="text"
+      icon="el-icon-back"
+      @click="() => $emit('back')"
+    >{{ $t('common.back') }}</el-button>
   </div>
 </template>
 

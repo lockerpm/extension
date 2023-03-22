@@ -71,6 +71,9 @@
 <script>
 import Vue from 'vue'
 import InputText from '../input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputText
@@ -113,12 +116,12 @@ export default Vue.extend({
       this.dialogVisible = false
     },
     async getGroup (group) {
-      return await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups/${group.id}`)
+      return await cystackPlatformAPI.team_group(this.$route.params.teamId, group.id)
     },
     async postGroup (group) {
       try {
         this.loading = true
-        await this.axios.post(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups`, group)
+        await cystackPlatformAPI.create_team_group(this.$route.params.teamId, group)
         this.notify(this.$t('data.notifications.add_group_success'), 'success')
         this.closeDialog()
         this.$emit('done')
@@ -133,7 +136,7 @@ export default Vue.extend({
     async putGroup (group) {
       try {
         this.loading = true
-        await this.axios.put(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups/${group.id}`, group)
+        await cystackPlatformAPI.update_team_group(this.$route.params.teamId, group.id, group)
         this.notify(this.$t('data.notifications.update_group_success'), 'success')
         this.closeDialog()
         this.$emit('done')
@@ -153,7 +156,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.$delete(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups/${group.id}`)
+          await cystackPlatformAPI.delete_team_group(this.$route.params.teamId, group.id)
           this.closeDialog()
           this.$emit('done')
           this.notify(this.$t('data.notifications.delete_group_success'), 'success')

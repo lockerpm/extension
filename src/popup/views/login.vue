@@ -44,6 +44,7 @@
     />
     <PWLUnlock
       v-if="loginInfo.login_step === 5"
+      @back="() => updateLoginStep(2)"
     />
     <Identity
       v-else-if="loginInfo.login_step === 3"
@@ -70,7 +71,9 @@ import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
-import PWLUnlock from '../components/auth/PWLUnlock.vue'
+import PWLUnlock from '../components/auth/PWLUnlock.vue';
+
+import authAPI from '@/api/auth'
 
 export default Vue.extend({
   name: 'Login',
@@ -127,24 +130,17 @@ export default Vue.extend({
         login_step: value
       })
     },
-    async getAccessToken(token){
-      const url = '/sso/access_token'
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+    async getAccessToken(){
       const payload = {
         SERVICE_URL: "/sso",
         SERVICE_SCOPE: "pwdmanager",
         CLIENT: "browser"
       }
       try {
-        this.axios.post('/sso/me/last_active', {}, config)
-        const data = await this.axios.post(url, payload, config)
-        if(data.url){
-          const url = data.url
-          let token = url.substring(url.indexOf("token")+6)
-          token = token.indexOf("&") === -1?token:token.substring(0, token.indexOf("&"))
-          await this.$storageService.save('cs_token', token)
+        await authAPI.sso_last_active();
+        const data: any = await authAPI.sso_access_token(payload);
+        if(data.access_token){
+          await this.$storageService.save('cs_token', data.access_token)
           chrome.runtime.sendMessage({
             command: 'updateStoreService',
             sender: { key: 'isLoggedIn', value: true },

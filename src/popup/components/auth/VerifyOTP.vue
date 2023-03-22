@@ -45,6 +45,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import authAPI from '@/api/auth'
+
 export default Vue.extend({
   props: {
     otpMethod: Object,
@@ -65,14 +67,14 @@ export default Vue.extend({
     async verifyOtp () {
       try {
         this.callingAPI = true
-        const res = await this.axios.post('/sso/auth/otp', {
+        const res: any = await authAPI.sso_auth_otp({
           ...this.loginInfo.user_info,
           otp: this.form.otpCode,
           method: this.loginInfo.identity,
           save_device: this.form.saveDevice
         })
         try {
-          this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
+          await this.$storageService.save('cs_token', res.token)
           await this.$emit('get-access-token', res.token)
         } catch (error) {
           this.notify(error?.response?.data?.message, 'error')

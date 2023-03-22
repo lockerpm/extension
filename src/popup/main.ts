@@ -3,8 +3,6 @@
 import Vue from 'vue'
 
 import AsyncComputed from 'vue-async-computed'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -22,6 +20,9 @@ import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+import userAPI from '@/api/user'
 
 Vue.config.productionTip = false;
 
@@ -148,7 +149,7 @@ Vue.mixin({
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
-      await this.axios.post('/users/logout')
+      await userAPI.logout();
       await Promise.all([
         this.$cryptoService.clearKeys(),
         this.$userService.clear(),
@@ -227,7 +228,7 @@ Vue.mixin({
         await this.clearKeys()
         const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
-        const res = await this.axios.post('cystack_platform/pm/users/session', {
+        const res = await cystackPlatformAPI.users_session({
           client_id: 'browser',
           password: hashedPassword,
           device_name: this.$platformUtilsService.getDeviceString(),
@@ -267,7 +268,11 @@ Vue.mixin({
         this.$messagingService.send('syncStarted')
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
+          let res = await cystackPlatformAPI.sync({
+            paging: 1,
+            size: pageSize,
+            page
+          })
           if (res.count && res.count.ciphers) {
             this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
           }
@@ -517,7 +522,7 @@ Vue.mixin({
       setTimeout(async () => {
         this.wsDesktopAppSendMessage(email);
       }, 100)
-      this.loginInfo.ws2.onmessage = (message) => {
+      this.loginInfo.ws2.onmessage = async (message) => {
         const data = JSON.parse(message.data)
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           desktopAppData: data,
@@ -525,8 +530,16 @@ Vue.mixin({
         if (data.msgType === 9) {
           this.logout();
         } else if (data.msgType === 4) {
+          await this.$storageService.save('cs_token', this.loginInfo.desktopAppData.data?.accessToken)
           // Update base URL
           console.log(this.loginInfo);
+          
+          chrome.runtime.sendMessage({
+            command: 'updateStoreService',
+            sender: { key: 'isLoggedIn', value: true },
+          });
+          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+          this.$router.push({ name: 'lock' })
         }
       }
     },
@@ -567,50 +580,8 @@ Vue.filter('filterString', function (value) {
 })
 
 storePromise.then((store) => {
-  const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
-  axios.interceptors.request.use(
-    async (config) => {
-      const token = await browserStorageService.get('cs_token')
-      const deviceId = await browserStorageService.get('device_id')
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`
-      }
-      if (deviceId) {
-        config.headers['device-id'] = deviceId
-      }
-      config.baseURL = process.env.VUE_APP_BASE_API_URL
-      return config
-    },
-    (error) => {
-      return Promise.reject(error)
-    }
-  )
-  axios.interceptors.response.use(
-    (response) => {
-      if (response.headers['device-id']) {
-        browserStorageService.save("device_id", response.headers["device-id"]);
-      }
-      return response && response.data
-    },
-    (error) => {
-      if (error.response) {
-        if (error.response.status === 404) {
-          router.push({ name: 'Home' })
-        }
-        if (error.response.status === 401) {
-          browserStorageService.remove('cs_token')
-          store.commit('UPDATE_IS_LOGGEDIN', false)
-          if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
-          }
-        }
-      }
-      return Promise.reject(error)
-    }
-  )
-  Vue.use(VueAxios, axios)
   new Vue({
     router,
     store,

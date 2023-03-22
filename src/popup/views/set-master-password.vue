@@ -97,6 +97,9 @@
 import Vue from 'vue'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
 import BlankLayout from '@/components/layout/blank'
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   components: { BlankLayout, PasswordStrengthBar },
   layout: 'blank',
@@ -149,7 +152,7 @@ export default Vue.extend({
         // const orgKey = shareKey[0].encryptedString
         // const collection = await this.$cryptoService.encrypt('defaultCollection', shareKey[1])
         // const collectionName = collection.encryptedString
-        await this.axios.post('cystack_platform/pm/users/register', {
+        await cystackPlatformAPI.users_register({
           name: this.currentUser.full_name,
           email: this.currentUser.email,
           master_password_hash: hashedPassword,
