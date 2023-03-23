@@ -345,7 +345,7 @@ export default Vue.extend({
     },
     async reconnectSocket () {
       const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${URLS.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
+      this.$connect(this.sanitizeUrl(`${URLS.WS_CYSTACK_PLATFORM_SYNC}?token=${token}`), {
         format: 'json',
         reconnection: true,
         reconnectionAttempts: 60,

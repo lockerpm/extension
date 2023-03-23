@@ -16,7 +16,7 @@ import { CipherType } from 'jslib-common/enums/cipherType';
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
 
-import URLS from '@/config/urls'
+import ENDPOINT from '@/config/endpoint'
 
 export default Vue.extend({
   props: {
@@ -75,8 +75,12 @@ export default Vue.extend({
       }
     },
     async reconnectSocket () {
+      const cs_store = await this.$storageService.get('cs_store')
+      const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
+      
       const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${URLS.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
+
+      this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
         format: 'json',
         reconnection: true,
         reconnectionAttempts: 60,

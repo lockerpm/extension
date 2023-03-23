@@ -117,7 +117,7 @@ export default Vue.extend({
         password: null
       },
       enterpriseForm: {
-        email: 'quyetnv@cystack.net',
+        email: null,
         password: null,
       }
     }
@@ -154,14 +154,12 @@ export default Vue.extend({
     },
     isPasswordMethod () {
       return this.loginInfo.preloginData
-        && this.loginInfo.preloginData[0]
-        && this.loginInfo.preloginData[0].login_method === 'password'
-        && !this.loginInfo.preloginData[0].require_passwordless
+        && this.loginInfo.preloginData.login_method === 'password'
+        && !this.loginInfo.preloginData.require_passwordless
     },
     isPasswordlessMethod () {
       return this.loginInfo.preloginData
-        && this.loginInfo.preloginData[0]
-        && (this.loginInfo.preloginData[0].login_method === 'passwordless' || this.loginInfo.preloginData[0].require_passwordless)
+        && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)
     },
     notLoginDesktopApp () {
       return (!this.loginInfo.desktopAppInstalled || this.loginInfo.desktopAppData?.msgType === 6) && this.isPasswordlessMethod
@@ -170,20 +168,18 @@ export default Vue.extend({
       if (!this.enterpriseForm.email) {
         return null
       }
-      if (this.loginInfo.preloginData) {
-        const alertData = this.loginInfo.preloginData[0]
-        if (!alertData) {
+      const alertData = this.loginInfo.preloginData
+      if (alertData && alertData.toString() == '{}') {
+        return {
+          type: 'warning',
+          title: this.$t('data.login.alert.th1')
+        }
+      }
+      if (this.isPasswordlessMethod) {
+        if (this.notLoginDesktopApp) {
           return {
             type: 'warning',
-            title: this.$t('data.login.alert.th1')
-          }
-        }
-        if (this.isPasswordlessMethod) {
-          if (this.notLoginDesktopApp) {
-            return {
-              type: 'warning',
-              title: this.$t('data.login.alert.th2')
-            }
+            title: this.$t('data.login.alert.th2')
           }
         }
       }
@@ -216,7 +212,8 @@ export default Vue.extend({
         preloginData: null,
         user_info: null,
         auth_info: null,
-        baseApiUrl: null
+        baseApiUrl: null,
+        baseWsUrl: null,
       })
       this.$emit('back')
     },
@@ -276,7 +273,7 @@ export default Vue.extend({
       }
       cystackPlatformAPI.users_onpremise_prelogin(payload).then(async (response) => {
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          preloginData: response,
+          preloginData: response[0] || {},
           user_info: payload
         })
         if (this.isPasswordlessMethod) {
@@ -287,7 +284,7 @@ export default Vue.extend({
         }, 1000);
       }).catch ((error) => {
         this.callingAPI = false
-        this.notify(error?.response?.data?.message, 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       })
     },
 

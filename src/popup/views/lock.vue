@@ -16,7 +16,7 @@
           <div class="text-head-4 font-semibold mb-2.5">
             {{ $t('master_password.enter_password_title') }}
           </div>
-          <div class="text-base mb-4">
+          <div v-if="loginInfo.optionValue !== 'enterprise_vault'" class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}
           </div>
           <div class="inline-block mb-8 select-none">
@@ -71,7 +71,7 @@
               </div>
             </div>
           </form>
-          <div v-else class="mb-8">
+          <div v-else-if="lockedInDesktopApp" class="mb-8">
             <el-alert              
               :title="$t('data.login.alert.lock')"
               type="warning"
@@ -86,6 +86,14 @@
                 class="btn btn-primary w-full"
                 :disabled="loading"
                 @click="setMasterPass"
+              >
+                {{ $t('master_password.unlock') }}
+              </button>
+              <button
+                v-else
+                class="btn btn-primary w-full"
+                :disabled="loading || lockedInDesktopApp"
+                @click="reconnectDesktopAppSocket()"
               >
                 {{ $t('master_password.unlock') }}
               </button>
@@ -183,6 +191,11 @@ export default Vue.extend({
       showHint: false,
       step: 1,
       loadingSend: false
+    }
+  },
+  computed: {
+    lockedInDesktopApp() {
+      return this.loginInfo.desktopAppData && this.loginInfo.desktopAppData.msgType === 7
     }
   },
   mounted() {

@@ -87,6 +87,7 @@ module.exports = {
     dr: 'Bác sĩ',
     next: 'Tiếp tục',
     download: 'Tải ứng dụng',
+    system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!'
   },
   sort: {
     name_asc: 'Tên tăng dần',

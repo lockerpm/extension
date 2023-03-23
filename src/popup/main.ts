@@ -208,7 +208,7 @@ Vue.mixin({
         return ''
       }
     },
-    async login(isPwl = false) {
+    async login(isPwl = false, decryptData: any) {
       await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
@@ -243,25 +243,40 @@ Vue.mixin({
           await this.$cryptoService.setKeyHash(hashedPassword)
           await this.$cryptoService.setEncKey(res.key)
           await this.$cryptoService.setEncPrivateKey(res.private_key)
-        } else {
-          chrome.runtime.sendMessage({ command: 'loggedIn' })
-          await this.$tokenService.setTokens(
-            this.loginInfo.desktopAppData.data?.accessToken,
-            this.loginInfo.desktopAppData.data?.refreshToken
-          )
-          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
-          await this.$cryptoService.setKey(this.loginInfo.desktopAppData.data?.key)
-          await this.$cryptoService.setKeyHash(this.loginInfo.desktopAppData.data?.hashedPassword)
-          await this.$cryptoService.setEncKey(this.loginInfo.desktopAppData.data?.encKey)
-          await this.$cryptoService.setEncPrivateKey(this.loginInfo.desktopAppData.data?.encPrivateKey)
-        }
 
-        if (this.$vaultTimeoutService != null) {
-          this.$vaultTimeoutService.biometricLocked = false
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          chrome.runtime.sendMessage({ command: "unlocked" });
+          this.$router.push({ name: 'home' });
+
+        } else {
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: decryptData.keyHash,
+            email: this.loginInfo.user_info.email,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceIdentifier
+          })
+          await this.$storageService.save("cs_token", res.access_token),
+          setTimeout( async () => {
+            await this.$store.dispatch("LoadCurrentUser");
+            chrome.runtime.sendMessage({ command: 'loggedIn' })
+            await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+            await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
+            await this.$cryptoService.setKey(decryptData.key)
+            await this.$cryptoService.setKeyHash(decryptData.keyHash)
+            await this.$cryptoService.setEncKey(res.key)
+            await this.$cryptoService.setEncPrivateKey(res.private_key)
+
+            if (this.$vaultTimeoutService != null) {
+              this.$vaultTimeoutService.biometricLocked = false
+            }
+            chrome.runtime.sendMessage({ command: "unlocked" });
+            this.$router.push({ name: 'home' });
+          }, 1000);
         }
-        chrome.runtime.sendMessage({ command: "unlocked" });
-        this.$router.push({ name: 'home' });
-        console.log(11111);
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }
@@ -526,7 +541,7 @@ Vue.mixin({
         });
       }
     },
-    async reconnectDesktopAppSocket (email = this.loginInfo.user_info ? this.loginInfo.user_info.email : '') {
+    async reconnectDesktopAppSocket (email = this.loginInfo.user_info ? this.loginInfo.user_info.email : this.currentUser.email) {
       this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
         format: 'json',
       })
@@ -539,28 +554,30 @@ Vue.mixin({
       this.loginInfo.ws2.onmessage = async (message) => {
         const data = JSON.parse(message.data)
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          desktopAppData: data,
+          desktopAppData: {
+            ...this.loginInfo.desktopAppData,
+            ...data
+          },
         })
-        if (data.msgType === 9) {
-          this.logout();
-        } else if (data.msgType === 3) {
-          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-            login_step: 5
-          })
+        if (data.msgType === 3) {
+          this.$router.push({ name: 'pwl-unlock' })
         } else if (data.msgType === 4) {
-          // Update access Token
-          await this.$storageService.save('cs_token', this.loginInfo.desktopAppData.data?.accessToken)
           // Update base URL
           this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-            baseApiUrl: this.loginInfo.preloginData[0].base_api + '/v3',
-            isLoggedIn: true,
+            baseApiUrl: this.loginInfo.preloginData.base_api + '/v3',
+            baseWsUrl: this.loginInfo.preloginData.base_ws + '/ws',
           })
-          // Update base URL
           setTimeout(async () => {
-            await this.$store.dispatch('LoadCurrentUser');
-            await this.login(true);
+            const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
+            this.login(true, decryptData);
           }, 1000);
-        }
+        } else if (data.msgType === 6) {
+          this.$router.push({ name: 'login' })
+        } else if (data.msgType === 7) {
+          this.lock();
+        } else if (data.msgType === 9) {
+          this.logout();
+        } 
       }
     },
     async wsDesktopAppSendMessage(email = null) {
@@ -580,7 +597,7 @@ Vue.mixin({
           desktopAppInstalled: false
         })
       }
-    }
+    },
   }
 })
 

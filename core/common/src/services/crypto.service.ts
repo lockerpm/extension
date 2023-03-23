@@ -886,4 +886,30 @@ export class CryptoService implements CryptoServiceAbstraction {
         }
         return [new SymmetricCryptoKey(encKey), encKeyEnc];
     }
+
+    async decryptData (otp: any, qr: any) {
+      const kdf = KdfType.PBKDF2_SHA256
+      const kdfIterations = 100000
+      const keyStr = (`${otp}${otp}${otp}`).slice(0, 16)
+      const keyBuff = Utils.fromUtf8ToArray(keyStr).buffer
+
+      // parse qr
+      const iv = Utils.fromB64ToArray(qr.split(".")[0]).buffer
+      const encryptB64 = Utils.fromB64ToArray(qr.split(".")[1]).buffer
+
+      const dataBuffer = await this.cryptoFunctionService.aesDecrypt(encryptB64, iv, keyBuff)
+      const data = Utils.fromBufferToUtf8(dataBuffer)
+
+      const [keyHash, keyB64, encType] = data.split(".")
+
+      const key = new SymmetricCryptoKey(Utils.fromB64ToArray(keyB64).buffer, parseInt(encType))
+      // Online session login
+
+      return {
+        key,
+        keyHash,
+        kdf,
+        kdfIterations
+      }
+    }
 }

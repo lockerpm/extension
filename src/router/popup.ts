@@ -45,6 +45,12 @@ const routes: Array<RouteConfig> = [
       import("../popup/views/lock.vue")
   },
   {
+    path: "/pwl-unlock",
+    name: "pwl-unlock",
+    component: () =>
+      import("../popup/views/pwl-unlock.vue")
+  },
+  {
     path: "/login",
     name: "login",
     component: () =>

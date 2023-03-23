@@ -13,12 +13,12 @@ router.beforeEach(async (to, from, next) => {
       await store.dispatch("LoadCurrentUser");
       await store.dispatch("LoadCurrentUserPw");
     }
-    if (store.state.userPw.is_pwd_manager === false && (!store.state.preloginData || !store.state.preloginData[0].require_passwordless)) {
+    if (store.state.userPw.is_pwd_manager === false && !store.state.preloginData?.require_passwordless) {
       router.push({ name: "set-master-password" });
     } else {
       next();
     }
-  } else if (to.name !== 'login') {
+  } else if (!['login', 'pwl-unlock'].includes(to.name)) {
     router.push({ name: "login" });
   } else {
     next();

@@ -42,10 +42,6 @@
       @next="() => updateLoginStep(3)"
       @get-access-token="getAccessToken"
     />
-    <PWLUnlock
-      v-if="loginInfo.login_step === 5"
-      @back="() => updateLoginStep(2)"
-    />
     <Identity
       v-else-if="loginInfo.login_step === 3"
       @back="() => updateLoginStep(2)"
@@ -71,7 +67,6 @@ import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
-import PWLUnlock from '../components/auth/PWLUnlock.vue';
 
 import authAPI from '@/api/auth'
 
@@ -82,8 +77,7 @@ export default Vue.extend({
     LogInWith,
     Form,
     Identity,
-    VerifyOTP,
-    PWLUnlock
+    VerifyOTP
   },
   data () {
     return {}

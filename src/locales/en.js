@@ -88,6 +88,7 @@ module.exports = {
     dr: 'Dr',
     next: 'Next',
     download: 'Download Desktop App',
+    system_error: 'An error occurred, please try again later!'
   },
   sort: {
     name_asc: 'Name Ascending',

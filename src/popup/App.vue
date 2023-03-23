@@ -24,7 +24,7 @@ export default Vue.extend({
       console.log(sender)
       console.log(sendResponse)
     }
-    await this.reconnectDesktopAppSocket();
+    this.reconnectDesktopAppSocket();
   },
   methods: {}
 })

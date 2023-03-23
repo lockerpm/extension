@@ -24,7 +24,8 @@ const defaultLoginInfo = {
   desktopAppInstalled: false,
   desktopAppData: null,
   preloginData: null,
-  baseApiUrl: null
+  baseApiUrl: null,
+  baseWsUrl: null
 }
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
@@ -98,6 +99,10 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
+        chrome.runtime.sendMessage({
+          command: 'updateStoreService',
+          sender: { key: 'isLoggedIn', value: isLoggedIn },
+        });
       },
       CLEAR_ALL_DATA (state) {
         // Auth
@@ -196,7 +201,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
             desktopAppInstalled: state.desktopAppInstalled,
             desktopAppData: state.desktopAppData,
             preloginData: state.preloginData,
-            baseApiUrl: state.baseApiUrl
+            baseApiUrl: state.baseApiUrl,
+            baseWsUrl: state.baseWsUrl
           },
         });
       },
