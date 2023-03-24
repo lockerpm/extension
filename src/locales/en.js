@@ -709,7 +709,7 @@ module.exports = {
       options: {
         individual_vault: 'Individual',
         business_vault: 'Business',
-        enterprise_vault: 'Enterprise',
+        enterprise_vault: 'On-Premise',
       },
       message: {
         required: '{name} is required!',

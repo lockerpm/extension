@@ -600,10 +600,16 @@ Vue.mixin({
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           desktopAppInstalled: true,
         })
+        setTimeout(() => {
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            sending: false
+          })
+        }, 10000);
       } catch (error) {
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           desktopAppData: null,
-          desktopAppInstalled: false
+          desktopAppInstalled: false,
+          sending: false
         })
       }
     },
