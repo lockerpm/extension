@@ -603,7 +603,6 @@ export default class NotificationBackground {
         const cipherResponse = new CipherResponse(res)
         const userId = await this.userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId);
-        console.log(res, cipherResponse, cipherData);
         await this.cipherService.upsert(cipherData);
         this.notificationAlert('username_password_updated')
       } catch (e) {

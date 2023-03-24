@@ -64,6 +64,7 @@ export default {
   CYSTACK_PLATFORM_USERS_ME_PURGE: '/cystack_platform/pm/users/me/purge',
   CYSTACK_PLATFORM_USERS_ME_PASSWORD: '/cystack_platform/pm/users/me/password',
   CYSTACK_PLATFORM_USERS_ME_DELETE: '/cystack_platform/pm/users/me/delete',
+  CYSTACK_PLATFORM_USERS_ME_LOGIN_METHOD: '/cystack_platform/pm/users/me/login_method',
   CYSTACK_PLATFORM_USERS_ONPREMISE_PRELOGIN: '/cystack_platform/pm/users/onpremise/prelogin',
   CYSTACK_PLATFORM_USERS_INVITATIONS: '/cystack_platform/pm/users/invitations',
   CYSTACK_PLATFORM_USERS_INVITATION_DETAIL: '/cystack_platform/pm/users/invitations/:id',

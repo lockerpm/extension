@@ -53,8 +53,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: null,
-        password: null
+        username: 'demo8@locker.io',
+        password: 'demo8@123'
       },
     }
   },
@@ -97,18 +97,22 @@ export default Vue.extend({
       }
     },
     handleBack() {
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        user_info: null,
+        auth_info: null,
+      })
       this.$emit('back')
     },
 
     handleLogin() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.originalLogin();
+          this.businessLogin();
         }
       })
     },
 
-    async originalLogin() {
+    async businessLogin() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
       const payload =  {
@@ -136,7 +140,7 @@ export default Vue.extend({
         this.callingAPI = false
         this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
       })
-    },
+    }
   }
 })
 </script>

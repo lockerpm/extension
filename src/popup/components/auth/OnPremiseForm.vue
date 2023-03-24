@@ -3,19 +3,20 @@
     <el-form
       ref="form"
       :model="form"
-      :rules="rules"
+      :rules="enterpriseRules"
     >
-      <el-form-item prop="username">
+      <el-form-item v-if="!isPasswordMethod" prop="email">
         <el-input
-          v-model="form.username"
-          ref="username"
+          v-model="form.email"
+          ref="email"
           :disabled="callingAPI"
-          :placeholder="$t('data.login.username_placeholder')"
+          :placeholder="$t('common.email_placeholder')"
           @keyup.native.enter="handleLogin"
         ></el-input>
       </el-form-item>
       <el-form-item
         prop="password"
+        v-if="isPasswordMethod"
       >
         <el-input
           type="password"
@@ -35,10 +36,17 @@
         @click="handleBack"
       >{{ $t(`common.back`) }}</el-button>
       <el-button
+        v-if="!isPasswordMethod"
         type="primary"
         :loading="callingAPI"
         @click="handleLogin"
       >{{ $t(`data.login.sign_in`) }}</el-button>
+      <el-button
+        v-else
+        type="primary"
+        :loading="callingAPI"
+        @click="handleNext"
+      >{{ $t(`common.next`) }}</el-button>
     </el-row>
   </div>
 </template>
@@ -46,37 +54,35 @@
 <script lang="ts">
 import Vue from 'vue'
 
-import authAPI from '@/api/auth'
+import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
   data () {
     return {
       callingAPI: false,
       form: {
-        username: null,
-        password: null
-      },
+        email: null,
+        password: null,
+      }
     }
   },
   computed: {
-    rules () {
+    enterpriseRules () {
       return {
-        username: [
+        email: [
           {
             required: true,
-            message: this.$t('data.login.message.required', { name: this.$t('data.login.username_placeholder') }),
+            message: this.$t('data.login.message.required', { name: this.$t('common.email_placeholder') }),
             trigger: ['change']
           },
         ],
-        password: [
-          {
-            required: true,
-            message: this.$t('data.login.message.required', { name: this.$t('data.login.password_placeholder') }),
-            trigger: ['change']
-          },
-        ]
       }
     },
+    isPasswordMethod () {
+      return this.loginInfo.preloginData
+        && this.loginInfo.preloginData.login_method === 'password'
+        && !this.loginInfo.preloginData.require_passwordless
+    }
   },
   mounted() {
     this.$nextTick(() => this.$refs.username.focus())
@@ -92,51 +98,63 @@ export default Vue.extend({
   },
   methods: {
     loadData() {
-      if (this.loginInfo?.user_info?.username) {
-        this.form.username = this.loginInfo?.user_info?.username
+      if (this.loginInfo?.user_info?.email) {
+        this.form.email = this.loginInfo?.user_info?.email
       }
     },
     handleBack() {
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        preloginData: null,
+        user_info: null,
+        auth_info: null,
+        baseApiUrl: null,
+        baseWsUrl: null,
+      })
       this.$emit('back')
     },
 
     handleLogin() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.originalLogin();
+          this.handleOnPremiseLogin();
         }
       })
     },
 
-    async originalLogin() {
+    async handleOnPremiseLogin() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
       const payload =  {
-        ...this.form,
+        email: this.form.email,
         language: this.language
       }
-      authAPI.sso_auth(payload).then(async (response: any) => {
+      cystackPlatformAPI.users_onpremise_prelogin(payload).then(async (res) => {
+        const response = res[0] || {}
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          auth_info: response,
+          preloginData: response,
           user_info: payload
         })
-        if (response.is_factor2) {
-          this.$emit('next');
-        } else {
-          try {
-            await this.$storageService.save('cs_token', response.token)
-            await this.$emit('get-access-token', () => { this.callingAPI = false })
-          }
-          catch (e) {
-            this.notify(e, 'warning')
-            this.callingAPI = false
-          }
+        if (JSON.stringify(response) == '{}' || response.login_method === 'passwordless' || response.require_passwordless) {
+          this.$router.push({ name: 'pwl-unlock' })
         }
+        this.callingAPI = false
       }).catch ((error) => {
         this.callingAPI = false
         this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
       })
     },
+
+    async handleNext() {
+      if (this.callingAPI) { return }
+      this.callingAPI = true;
+      const payload =  {
+        email: this.form.email,
+        password: this.form.password,
+        language: this.language
+      }
+      // auth email + password
+      console.log(payload);
+    }
   }
 })
 </script>

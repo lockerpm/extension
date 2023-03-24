@@ -77,11 +77,11 @@ export default Vue.extend({
           await this.$storageService.save('cs_token', res.token)
           await this.$emit('get-access-token', res.token)
         } catch (error) {
-          this.notify(error?.response?.data?.message, 'error')
+          this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
         }
         this.callingAPI = false
       } catch (error) {
-        this.notify(error?.response?.data?.message, 'error')
+        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
         this.callingAPI = false
       }
     },

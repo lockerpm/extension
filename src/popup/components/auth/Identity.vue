@@ -101,7 +101,7 @@ export default Vue.extend({
           this.$emit('next')
           this.callingAPI = false
         }).catch((error) => {
-          this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+          this.notify(error?.response?.message || error?.response?.data?.detail, 'error')
           this.callingAPI = false
         })
       } else {

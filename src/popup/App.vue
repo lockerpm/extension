@@ -24,7 +24,12 @@ export default Vue.extend({
       console.log(sender)
       console.log(sendResponse)
     }
-    this.reconnectDesktopAppSocket();
+    const locked = await this.vaultTimeoutService.isLocked()
+    if (locked) {
+      if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
+        this.reconnectDesktopAppSocket(undefined, true);
+      }
+    }
   },
   methods: {}
 })

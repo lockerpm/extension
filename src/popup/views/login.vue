@@ -7,7 +7,7 @@
         class="h-[36px] mx-auto"
       >
     </div>
-    <div v-if="loginInfo.login_step !== 5">
+    <div>
       <div
         class="font-bold text-head-5 text-black-700 text-center mt-10">
         {{$t('data.login.login')}}
@@ -35,13 +35,24 @@
       v-if="loginInfo.login_step === 1"
       @next="() => updateLoginStep(2)"
     />
-    <Form
-      v-else-if="loginInfo.login_step === 2"
-      :isEnterprise="isEnterprise"
-      @back="() => updateLoginStep(1)"
-      @next="() => updateLoginStep(3)"
-      @get-access-token="getAccessToken"
-    />
+    <div v-else-if="loginInfo.login_step === 2">
+      <Form
+        v-if="isIndividual"
+        @back="() => updateLoginStep(1)"
+        @next="() => updateLoginStep(3)"
+        @get-access-token="getAccessToken"
+      />
+      <BusinessForm
+        v-if="isBusiness"
+        @back="() => updateLoginStep(1)"
+        @next="() => updateLoginStep(3)"
+        @get-access-token="getBusinessAccessToken"
+      />
+      <OnPremiseForm
+        v-if="isEnterprise"
+        @back="() => updateLoginStep(1)"
+      />
+    </div>
     <Identity
       v-else-if="loginInfo.login_step === 3"
       @back="() => updateLoginStep(2)"
@@ -54,7 +65,7 @@
       @get-access-token="getAccessToken"
     />
     <LogInWith
-      v-if="[1, 2].includes(loginInfo.login_step) && !isEnterprise"
+      v-if="[2].includes(loginInfo.login_step) && !isEnterprise"
       :login_step="loginInfo.login_step"
     />
   </div>
@@ -65,10 +76,14 @@ import Vue from 'vue'
 import Options from '../components/auth/Options.vue';
 import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
+import BusinessForm from '../components/auth/BusinessForm.vue'
+import OnPremiseForm from '../components/auth/OnPremiseForm.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
 import authAPI from '@/api/auth'
+import meAPI from '@/api/me'
+import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
   name: 'Login',
@@ -76,6 +91,8 @@ export default Vue.extend({
     Options,
     LogInWith,
     Form,
+    BusinessForm,
+    OnPremiseForm,
     Identity,
     VerifyOTP
   },
@@ -83,8 +100,14 @@ export default Vue.extend({
     return {}
   },
   computed: {
+    isIndividual() {
+      return this.loginInfo.optionValue == 'individual_vault'
+    },
+    isBusiness() {
+      return this.loginInfo.optionValue == 'business_vault'
+    },
     isEnterprise() {
-      return this.loginInfo.optionValue === 'enterprise_vault' && this.loginInfo.login_step !== 1
+      return this.loginInfo.optionValue == 'enterprise_vault'
     },
     loginSubtitle() {
       if (this.loginInfo.login_step === 1) {
@@ -124,7 +147,7 @@ export default Vue.extend({
         login_step: value
       })
     },
-    async getAccessToken(){
+    async getAccessToken(callback){
       const payload = {
         SERVICE_URL: "/sso",
         SERVICE_SCOPE: "pwdmanager",
@@ -141,9 +164,52 @@ export default Vue.extend({
           });
           this.$store.commit('UPDATE_IS_LOGGEDIN', true)
           this.$router.push({ name: 'lock' })
+          callback()
         }
       } catch (error) {
-        this.notify(error?.response?.data?.message, 'error')
+        callback()
+        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+      }
+    },
+
+    async getBusinessAccessToken(callback){
+      const payload = {
+        SERVICE_URL: "/sso",
+        SERVICE_SCOPE: "pwdmanager",
+        CLIENT: "browser"
+      }
+      try {
+        await authAPI.sso_last_active();
+        const data: any = await authAPI.sso_access_token(payload);
+        if(data.access_token){
+          await this.$storageService.save('cs_token', data.access_token)
+          const userInfo = await meAPI.me();
+          cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
+            this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+              preloginData: {
+                ...userInfo,
+                ...response,
+              }
+            })
+            if (response.login_method === 'passwordless' || response.require_passwordless) {
+              this.$router.push({ name: 'pwl-unlock' })
+            } else {
+              chrome.runtime.sendMessage({
+                command: 'updateStoreService',
+                sender: { key: 'isLoggedIn', value: true },
+              });
+              this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+              this.$router.push({ name: 'lock' })
+            }
+            callback()
+          }).catch ((error) => {
+            callback()
+            this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+          })
+        }
+      } catch (error) {
+        callback()
+        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
       }
     },
   }

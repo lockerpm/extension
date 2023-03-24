@@ -16,7 +16,7 @@
           <div class="text-head-4 font-semibold mb-2.5">
             {{ $t('master_password.enter_password_title') }}
           </div>
-          <div v-if="loginInfo.optionValue !== 'enterprise_vault'" class="text-base mb-4">
+          <div v-if="!isPasswordlessMethod" class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}
           </div>
           <div class="inline-block mb-8 select-none">
@@ -30,7 +30,7 @@
             </div>
           </div>
           <form
-            v-if="loginInfo.optionValue !== 'enterprise_vault'"
+            v-if="!isPasswordlessMethod"
             class="mb-8"
             @submit.prevent="setMasterPass"
           >
@@ -71,7 +71,7 @@
               </div>
             </div>
           </form>
-          <div v-else-if="lockedInDesktopApp" class="mb-8">
+          <div v-else-if="isPasswordlessMethod" class="mb-8">
             <el-alert              
               :title="$t('data.login.alert.lock')"
               type="warning"
@@ -82,7 +82,7 @@
           <div class="form-group">
             <div class="grid lg:grid-cols-2 grid-cols-1 gap-2">
               <button
-                v-if="loginInfo.optionValue !== 'enterprise_vault'"
+                v-if="!isPasswordlessMethod"
                 class="btn btn-primary w-full"
                 :disabled="loading"
                 @click="setMasterPass"
@@ -194,6 +194,10 @@ export default Vue.extend({
     }
   },
   computed: {
+    isPasswordlessMethod () {
+      return this.loginInfo.preloginData
+        && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)
+    },
     lockedInDesktopApp() {
       return this.loginInfo.desktopAppData && this.loginInfo.desktopAppData.msgType === 7
     }

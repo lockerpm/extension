@@ -25,7 +25,8 @@ const defaultLoginInfo = {
   desktopAppData: null,
   preloginData: null,
   baseApiUrl: null,
-  baseWsUrl: null
+  baseWsUrl: null,
+  sending: false
 }
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
@@ -202,7 +203,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
             desktopAppData: state.desktopAppData,
             preloginData: state.preloginData,
             baseApiUrl: state.baseApiUrl,
-            baseWsUrl: state.baseWsUrl
+            baseWsUrl: state.baseWsUrl,
+            sending: state.sending
           },
         });
       },

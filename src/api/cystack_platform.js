@@ -375,7 +375,7 @@ async function users(params) {
 async function users_register(data) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_USERS_REGISTER,
-    method: "data",
+    method: "post",
     data
   });
 }
@@ -383,7 +383,7 @@ async function users_register(data) {
 async function users_password_hint(data) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_USERS_PASSWORD_HINT,
-    method: "data",
+    method: "post",
     data
   });
 }
@@ -420,6 +420,13 @@ async function users_me_delete(data = {}) {
   });
 }
 
+async function users_me_login_method(params = {}) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_USERS_ME_LOGIN_METHOD,
+    method: "get",
+    params
+  });
+}
 
 async function update_users_me(data, params = {}) {
   return await request({
@@ -563,6 +570,7 @@ export default {
   users_me_purge,
   users_me_password,
   users_me_delete,
+  users_me_login_method,
   update_users_me,
   users_onpremise_prelogin,
   user_invitations,

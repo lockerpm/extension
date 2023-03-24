@@ -71,6 +71,7 @@ Vue.mixin({
         desktopAppInstalled: this.$store.state.desktopAppInstalled,
         desktopAppData: this.$store.state.desktopAppData,
         preloginData: this.$store.state.preloginData,
+        sending: this.$store.state.sending,
       }
     },
     language() { return this.$store.state.user.language },
@@ -250,6 +251,9 @@ Vue.mixin({
           chrome.runtime.sendMessage({ command: "unlocked" });
           this.$router.push({ name: 'home' });
 
+          setTimeout(() => {
+            this.setupFillPage();
+          }, 1000);
         } else {
           const res = await cystackPlatformAPI.users_session({
             client_id: 'browser',
@@ -259,7 +263,9 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceIdentifier
           })
-          await this.$storageService.save("cs_token", res.access_token),
+          if (this.loginInfo.optionValue == 'enterprise_vault') {
+            await this.$storageService.save("cs_token", res.access_token)
+          }
           setTimeout( async () => {
             await this.$store.dispatch("LoadCurrentUser");
             chrome.runtime.sendMessage({ command: 'loggedIn' })
@@ -275,14 +281,15 @@ Vue.mixin({
             }
             chrome.runtime.sendMessage({ command: "unlocked" });
             this.$router.push({ name: 'home' });
+
+            setTimeout(() => {
+              this.setupFillPage();
+            }, 1000);
           }, 1000);
         }
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }
-      setTimeout(() => {
-        this.setupFillPage();
-      }, 1000);
     },
     async clearKeys() {
       await this.$cryptoService.clearKeys()
@@ -541,38 +548,40 @@ Vue.mixin({
         });
       }
     },
-    async reconnectDesktopAppSocket (email = this.loginInfo.user_info ? this.loginInfo.user_info.email : this.currentUser.email) {
-      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, {
-        format: 'json',
-      })
-      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-        ws2: this.$socket
-      })
+    async reconnectDesktopAppSocket (email = this.loginInfo.preloginData.email || this.loginInfo.preloginData.name || this.currentUser.email, isCreatedApp = false) {
+      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, { format: 'json' })
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', { ws2: this.$socket, sending: true })
+
       setTimeout(async () => {
         this.wsDesktopAppSendMessage(email);
       }, 100)
+
       this.loginInfo.ws2.onmessage = async (message) => {
         const data = JSON.parse(message.data)
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          sending: false,
           desktopAppData: {
             ...this.loginInfo.desktopAppData,
             ...data
           },
         })
         if (data.msgType === 3) {
-          this.$router.push({ name: 'pwl-unlock' })
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' })
+          }
         } else if (data.msgType === 4) {
-          // Update base URL
           this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-            baseApiUrl: this.loginInfo.preloginData.base_api + '/v3',
-            baseWsUrl: this.loginInfo.preloginData.base_ws + '/ws',
+            baseApiUrl: this.loginInfo.preloginData.base_api ? `${this.loginInfo.preloginData.base_api}/v3` : null,
+            baseWsUrl: this.loginInfo.preloginData.base_ws ? `${this.loginInfo.preloginData.base_ws}/ws` : null,
           })
           setTimeout(async () => {
             const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
             this.login(true, decryptData);
           }, 1000);
         } else if (data.msgType === 6) {
-          this.$router.push({ name: 'login' })
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' })
+          }
         } else if (data.msgType === 7) {
           this.lock();
         } else if (data.msgType === 9) {
