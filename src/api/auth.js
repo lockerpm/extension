@@ -56,9 +56,16 @@ function sso_reset_password(data) {
   });
 }
 
-function sso_token(data) {
+function sso_reset_password_verify_token(token) {
   return request({
-    url: ENDPOINT.SSO_TOKEN,
+    url: ENDPOINT.SSO_RESET_PASSWORD_VERIFY_TOKEN.replace(':token', token),
+    method: "get"
+  });
+}
+
+function sso_reset_password_token(data) {
+  return request({
+    url: ENDPOINT.SSO_RESET_PASSWORD_TOKEN,
     method: "post",
     data
   });
@@ -80,6 +87,7 @@ export default {
   sso_access_token,
   sso_account_recovery,
   sso_reset_password,
-  sso_token,
+  sso_reset_password_token,
+  sso_reset_password_verify_token,
   sso_new_password
 };

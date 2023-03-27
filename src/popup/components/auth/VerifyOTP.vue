@@ -94,9 +94,11 @@ export default Vue.extend({
       }
     },
     async resetPassword () {
-      authAPI.sso_token({
-        ...this.loginInfo.user_info,
-        otp: this.form.otpCode,
+      authAPI.sso_reset_password_token({
+        username: this.loginInfo.user_info.username,
+        account_recovery: this.loginInfo.user_info.username,
+        code: this.form.otpCode,
+        language: this.language,
         method: this.loginInfo.identity
       }).then((response) => {
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {

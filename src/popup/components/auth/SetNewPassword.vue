@@ -103,9 +103,19 @@ export default Vue.extend({
       this.$emit('back')
     },
 
-    handleSetNewPassword() {
+    async handleVerifyToken() {
+      await authAPI.sso_reset_password_verify_token(this.login_info.forgot_token).then(async () => {
+        return true
+      }).catch ((error) => {
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
+        return false
+      })
+    },
+
+    async handleSetNewPassword() {
+      const validToken = await this.handleVerifyToken()
       this.$refs.form.validate((valid) => {
-        if (valid) {
+        if (valid && validToken) {
           if (this.callingAPI) { return }
           this.callingAPI = true;
           const payload =  {
