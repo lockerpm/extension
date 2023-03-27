@@ -90,7 +90,8 @@ module.exports = {
     download: 'Download Desktop App',
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
-    update_title: "Upgrade to Premium to get Unlimited Storage"
+    update_title: "Upgrade to Premium to get Unlimited Storage",
+    submit: "Submit"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -697,6 +698,8 @@ module.exports = {
       login_option_locker: 'Sign in to your Locker {option}',
       username_placeholder: 'Email or Username',
       password_placeholder: 'Password',
+      new_password_placeholder: 'New password',
+      confirm_new_password_placeholder: 'Confirm new password',
       alert: {
         th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
         th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',
@@ -715,6 +718,7 @@ module.exports = {
       },
       message: {
         required: '{name} is required!',
+        invalid: '{name} is invalid'
       }
     },
     set_master_pass: {

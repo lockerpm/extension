@@ -72,6 +72,8 @@ Vue.mixin({
         desktopAppData: this.$store.state.desktopAppData,
         preloginData: this.$store.state.preloginData,
         sending: this.$store.state.sending,
+        forgot_step: this.$store.state.forgot_step,
+        forgot_token: this.$store.state.forgot_token
       }
     },
     language() { return this.$store.state.user.language },

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full px-6 text-center mt-10">
+  <div class="w-full px-6 text-center mt-4">
     <div>
       <div v-if="login_step === 2">
         <div class="text-center mt-2">

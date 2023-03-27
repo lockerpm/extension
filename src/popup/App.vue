@@ -61,11 +61,11 @@ export default Vue.extend({
 }
 .el-input {
   &__inner {
-    border-radius: 8px !important;
+    border-radius: 4px !important;
   }
 }
 .el-button {
-  border-radius: 8px !important;
+  border-radius: 4px !important;
 }
 .el-message-box {
   width: 260px !important;

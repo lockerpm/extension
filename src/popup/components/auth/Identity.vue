@@ -77,15 +77,17 @@ export default Vue.extend({
   computed: {},
   async mounted () {
     this.recaptcha = await load(this.siteKey);
-    this.newIdentity = this.loginInfo.identity;
+    const currentIdentity = this.getOtpMethod(this.loginInfo.identity)
+    this.newIdentity = currentIdentity ? this.loginInfo.identity : this.loginInfo?.auth_info?.methods[0].type;
+    this.changeIdentity(this.newIdentity)
   },
   methods: {
-    changeIdentity (identity) {
+    changeIdentity (identity: any) {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
         identity: identity
       })
     },
-    getOtpMethod (type) {
+    getOtpMethod (type: any) {
       return this.loginInfo?.auth_info?.methods?.find((m) => m.type === type)
     },
     async nextMethod () {
@@ -94,19 +96,39 @@ export default Vue.extend({
         this.callingAPI = true;
         this.recaptcha = await load(this.siteKey);
         const token = await this.recaptcha.execute('login');
-        authAPI.sso_auth_otp_mail({
-          ...this.loginInfo.user_info,
-          request_code: token
-        }).then(() => {
-          this.$emit('next')
-          this.callingAPI = false
-        }).catch((error) => {
-          this.notify(error?.response?.message || error?.response?.data?.detail, 'error')
-          this.callingAPI = false
-        })
+        if (this.$route.name === 'login') {
+          await this.authOtpMail(token)
+        } else {
+          await this.resetPassword(token)
+        }
       } else {
         this.$emit('next')
       }
+    },
+    async authOtpMail (token: any) {
+      authAPI.sso_auth_otp_mail({
+        ...this.loginInfo.user_info,
+        request_code: token
+      }).then(() => {
+        this.$emit('next')
+        this.callingAPI = false
+      }).catch((error) => {
+        this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+        this.callingAPI = false
+      })
+    },
+    async resetPassword (token: any) {
+      authAPI.sso_reset_password({
+        ...this.loginInfo.user_info,
+        request_code: token,
+        method: this.loginInfo.identity
+      }).then(() => {
+        this.$emit('next')
+        this.callingAPI = false
+      }).catch((error) => {
+        this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+        this.callingAPI = false
+      })
     },
   }
 })

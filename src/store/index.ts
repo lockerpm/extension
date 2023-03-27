@@ -26,10 +26,13 @@ const defaultLoginInfo = {
   preloginData: null,
   baseApiUrl: null,
   baseWsUrl: null,
-  sending: false
+  sending: false,
+  forgot_step: 1,
+  forgot_token: null
 }
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
+  console.log(oldStore);
   let oldStoreParsed = {
     language: 'en',
     ...JSON.parse(JSON.stringify(defaultLoginInfo)),
@@ -204,7 +207,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
             preloginData: state.preloginData,
             baseApiUrl: state.baseApiUrl,
             baseWsUrl: state.baseWsUrl,
-            sending: state.sending
+            sending: state.sending,
+            forgot_step: state.forgot_step,
+            forgot_token: state.forgot_token
           },
         });
       },

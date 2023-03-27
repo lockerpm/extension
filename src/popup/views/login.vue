@@ -168,7 +168,7 @@ export default Vue.extend({
         }
       } catch (error) {
         callback()
-        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       }
     },
 
@@ -204,12 +204,12 @@ export default Vue.extend({
             callback()
           }).catch ((error) => {
             callback()
-            this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+            this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
           })
         }
       } catch (error) {
         callback()
-        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       }
     },
   }

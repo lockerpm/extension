@@ -26,5 +26,5 @@ export function handleResponseErrorMessage(error) {
       })
     }
   }
-  return Promise.reject(error)
+  return error
 }

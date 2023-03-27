@@ -89,7 +89,8 @@ module.exports = {
     download: 'Tải ứng dụng',
     system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
     upgrade_now: 'Nâng cấp ngay',
-    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn"
+    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn",
+    submit: "Gửi"
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -687,6 +688,8 @@ module.exports = {
       login_option_locker: 'Tài khoản {option}',
       username_placeholder: 'Email hoặc Tên đăng nhập',
       password_placeholder: 'Mật khẩu',
+      new_password_placeholder: 'Mật khẩu mới',
+      confirm_new_password_placeholder: 'Xác nhận mật khẩu mới',
       alert: {
         th1: 'Email của bạn không thuộc về doanh nghiệp nào. Vui lòng thử lại với email khác.',
         th2: 'Tài khoản của bạn được cài đặt đăng nhập không mật khẩu. Vui lòng đăng nhập vào ứng dụng máy tính trước để tiếp tục sử dụng tiện ích.',

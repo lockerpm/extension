@@ -28,6 +28,10 @@
         </el-input>
       </el-form-item>
     </el-form>
+    <el-button
+      type="text"
+      :disabled="true"
+    >{{ $t(`data.login.forgot_password`) }}</el-button>
     <el-row type="flex" align="middle" justify="space-between">
       <el-button
         type="text"
@@ -140,7 +144,7 @@ export default Vue.extend({
         this.callingAPI = false
       }).catch ((error) => {
         this.callingAPI = false
-        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       })
     },
 

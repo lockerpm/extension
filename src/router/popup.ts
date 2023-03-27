@@ -57,6 +57,12 @@ const routes: Array<RouteConfig> = [
       import("../popup/views/login.vue")
   },
   {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: () =>
+      import("../popup/views/forgot-password.vue")
+  },
+  {
     path: "/vault",
     component: Layout,
     children: [

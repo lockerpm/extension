@@ -7,6 +7,10 @@ export default {
   SSO_AUTH_OTP_MAIL: '/sso/auth/otp/mail',
   SSO_LAST_ACTIVE: '/sso/me/last_active',
   SSO_ACCESS_TOKEN: '/sso/access_token',
+  SSO_ACCOUNT_RECOVERY: '/sso/users/account_recovery',
+  SSO_RESET_PASSWORD: '/sso/users/reset_password',
+  SSO_TOKEN: '/sso/users/token',
+  SSO_NEW_PASSWORD: '/sso/users/new_password',
 
   LOGOUT: '/users/logout',
 

@@ -17,6 +17,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item
+        v-if="$route.name === 'login'"
         prop="saveDevice"
       >
         <el-checkbox
@@ -67,23 +68,46 @@ export default Vue.extend({
     async verifyOtp () {
       try {
         this.callingAPI = true
-        const res: any = await authAPI.sso_auth_otp({
-          ...this.loginInfo.user_info,
-          otp: this.form.otpCode,
-          method: this.loginInfo.identity,
-          save_device: this.form.saveDevice
-        })
-        try {
-          await this.$storageService.save('cs_token', res.token)
-          await this.$emit('get-access-token', res.token)
-        } catch (error) {
-          this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+        if (this.$route.name === 'login') {
+          await this.authOtp();
+        } else {
+          await this.resetPassword();
         }
         this.callingAPI = false
       } catch (error) {
-        this.notify(error?.response?.message || this.$t('common.system_error'), 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
         this.callingAPI = false
       }
+    },
+    async authOtp () {
+      const res: any = await authAPI.sso_auth_otp({
+        ...this.loginInfo.user_info,
+        otp: this.form.otpCode,
+        method: this.loginInfo.identity,
+        save_device: this.form.saveDevice
+      })
+      try {
+        await this.$storageService.save('cs_token', res.token)
+        await this.$emit('get-access-token', res.token)
+      } catch (error) {
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
+      }
+    },
+    async resetPassword () {
+      authAPI.sso_token({
+        ...this.loginInfo.user_info,
+        otp: this.form.otpCode,
+        method: this.loginInfo.identity
+      }).then((response) => {
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          forgot_token: response
+        })
+        this.$emit('next')
+        this.callingAPI = false
+      }).catch((error) => {
+        this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+        this.callingAPI = false
+      })
     },
   }
 })
