@@ -24,8 +24,16 @@ export default Vue.extend({
       console.log(sendResponse)
     }
   },
-  methods: {
-  }
+  async mounted () {
+    const currrentRouter = await this.$storageService.get('currrent_router')
+    this.$router.push({ name: JSON.parse(currrentRouter)?.name || 'home'})
+  },
+  watch: {
+    '$route' (newValue) {
+      this.$storageService.save('currrent_router', JSON.stringify(newValue))
+    },
+  },
+  methods: {}
 })
 </script>
 
