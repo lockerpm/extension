@@ -88,7 +88,9 @@ module.exports = {
     dr: 'Dr',
     next: 'Next',
     download: 'Download Desktop App',
-    system_error: 'An error occurred, please try again later!'
+    system_error: 'An error occurred, please try again later!',
+    upgrade_now: 'Upgrade now',
+    update_title: "Upgrade to Premium to get Unlimited Storage"
   },
   sort: {
     name_asc: 'Name Ascending',

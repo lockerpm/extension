@@ -504,13 +504,22 @@
           </div>
         </template>
       </div>
-      <div v-if="cipher.id" @click="deleteCiphers([cipher.id])" class="text-red mt-4 bg-white cursor-pointer" style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;">
+      <div
+        v-if="cipher.id"
+        @click="deleteCiphers([cipher.id])"
+        class="text-red mt-4 bg-white cursor-pointer"
+        style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;"
+      >
         <i class="el-icon-delete">&nbsp; Delete</i>
       </div>
     </div>
     <AddEditFolder
       ref="addEditFolder"
       @created-folder="handleCreatedFolder"
+    />
+    <UpgrateToPremium
+      :visible="popupVisible"
+      @close="() => popupVisible = false"
     />
   </div>
 </template>
@@ -550,6 +559,7 @@ import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 import { Utils } from 'jslib-common/misc/utils';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
+import UpgrateToPremium from '@/components/cipher/UpgrateToPremium.vue'
 
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7
@@ -567,7 +577,8 @@ export default Vue.extend({
     InputSelectCryptoWallet,
     InputSelectCryptoNetworks,
     InputSeedPhrase,
-    InputCustomFields
+    InputCustomFields,
+    UpgrateToPremium
   },
   props: {
     type: {
@@ -599,6 +610,7 @@ export default Vue.extend({
       errors: {},
       writeableCollections: [],
       cloneMode: false,
+      popupVisible: false,
       cryptoAccount: {
         username: null,
         password: null,
@@ -774,6 +786,8 @@ export default Vue.extend({
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           this.notify(this.$t('errors.5002', { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'error')
+          // Open popup upgrade premium
+          this.popupVisible = true
         } else {
           this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         }
