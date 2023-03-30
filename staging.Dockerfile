@@ -1,6 +1,6 @@
 FROM node:14.17.1
 
-RUN apt install curl jq -y
+RUN apt update && apt install curl jq -y
 
 WORKDIR /app
 
