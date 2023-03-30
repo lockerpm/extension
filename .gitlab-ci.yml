@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-deploy:
+deploy-staging:
   stage: deploy
   script:
 #    - sed -i 's/"version": "[0-9].[0-9].[0-9]"/"version": "'$(date +"%Y")'.'$(date +"%m")'.'$CI_PIPELINE_IID'"/' package.json
@@ -11,4 +11,4 @@ deploy:
   tags:
     - cs_bot
   only:
-    - main
+    - staging
