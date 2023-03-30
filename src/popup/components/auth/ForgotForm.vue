@@ -1,31 +1,15 @@
 <template>
   <div class="w-full px-10">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="enterpriseRules"
-    >
+    <el-form ref="form" :model="form" :rules="enterpriseRules">
       <el-form-item prop="username">
-        <el-input
-          v-model="form.username"
-          ref="username"
-          :disabled="callingAPI"
-          @keyup.native.enter="handleRestore"
-        ></el-input>
+        <el-input v-model="form.username" ref="username" placeholder="Ex: test@example.com" :disabled="callingAPI"
+          @keyup.native.enter="handleRestore"></el-input>
       </el-form-item>
     </el-form>
     <el-row type="flex" align="middle" justify="space-between">
-      <el-button
-        type="text"
-        icon="el-icon-back"
-        :disabled="callingAPI"
-        @click="handleBack"
-      >{{ $t(`common.back`) }}</el-button>
-      <el-button
-        type="primary"
-        :loading="callingAPI"
-        @click="handleRestore"
-      >{{ $t(`common.restore`) }}</el-button>
+      <el-button type="text" icon="el-icon-back" :disabled="callingAPI" @click="handleBack">{{ $t(`common.back`)
+      }}</el-button>
+      <el-button type="primary" :loading="callingAPI" @click="handleRestore">{{ $t(`common.restore`) }}</el-button>
     </el-row>
   </div>
 </template>
@@ -36,7 +20,7 @@ import Vue from 'vue'
 import authAPI from '@/api/auth'
 
 export default Vue.extend({
-  data () {
+  data() {
     return {
       callingAPI: false,
       form: {
@@ -45,7 +29,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    enterpriseRules () {
+    enterpriseRules() {
       return {
         username: [
           {
@@ -76,6 +60,10 @@ export default Vue.extend({
       }
     },
     handleBack() {
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        user_info: null,
+        auth_info: null,
+      })
       this.$router.push({ name: 'login' })
     },
 
@@ -90,7 +78,7 @@ export default Vue.extend({
     handleRequest() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
-      const payload =  {
+      const payload = {
         username: this.form.username,
         language: this.language
       }
@@ -104,7 +92,7 @@ export default Vue.extend({
         })
         this.$emit('next');
         this.callingAPI = false
-      }).catch ((error) => {
+      }).catch((error) => {
         this.callingAPI = false
         this.notify(error?.response?.data?.detail || this.$t('common.system_error'), 'error')
       })
@@ -113,5 +101,4 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -1,56 +1,23 @@
 <template>
   <div class="w-full px-10 auth-form">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="enterpriseRules"
-    >
+    <el-form ref="form" :model="form" :rules="enterpriseRules">
       <el-form-item v-if="!isPasswordMethod" prop="email">
-        <el-input
-          v-model="form.email"
-          ref="email"
-          :disabled="callingAPI"
-          :placeholder="$t('common.email_placeholder')"
-          @keyup.native.enter="handleLogin"
-        ></el-input>
+        <el-input v-model="form.email" ref="email" :disabled="callingAPI" :placeholder="$t('common.email_placeholder')"
+          @keyup.native.enter="handleLogin"></el-input>
       </el-form-item>
-      <el-form-item
-        prop="password"
-        v-if="isPasswordMethod"
-      >
-        <el-input
-          type="password"
-          v-model="form.password"
-          :disabled="callingAPI"
-          :placeholder="$t('data.login.password_placeholder')"
-          @keyup.native.enter="handleLogin"
-        >
+      <el-form-item prop="password" v-if="isPasswordMethod">
+        <el-input type="password" v-model="form.password" :disabled="callingAPI"
+          :placeholder="$t('data.login.password_placeholder')" @keyup.native.enter="handleLogin">
         </el-input>
       </el-form-item>
     </el-form>
-    <el-button
-      type="text"
-      :disabled="true"
-    >{{ $t(`data.login.forgot_password`) }}</el-button>
+    <el-button type="text" :disabled="true">{{ $t(`data.login.forgot_password`) }}</el-button>
     <el-row type="flex" align="middle" justify="space-between">
-      <el-button
-        type="text"
-        icon="el-icon-back"
-        :disabled="callingAPI"
-        @click="handleBack"
-      >{{ $t(`common.back`) }}</el-button>
-      <el-button
-        v-if="!isPasswordMethod"
-        type="primary"
-        :loading="callingAPI"
-        @click="handleLogin"
-      >{{ $t(`data.login.sign_in`) }}</el-button>
-      <el-button
-        v-else
-        type="primary"
-        :loading="callingAPI"
-        @click="handleNext"
-      >{{ $t(`common.next`) }}</el-button>
+      <el-button type="text" icon="el-icon-back" :disabled="callingAPI" @click="handleBack">{{ $t(`common.back`)
+      }}</el-button>
+      <el-button v-if="!isPasswordMethod" type="primary" :loading="callingAPI" @click="handleLogin">{{
+        $t(`data.login.sign_in`) }}</el-button>
+      <el-button v-else type="primary" :loading="callingAPI" @click="handleNext">{{ $t(`common.next`) }}</el-button>
     </el-row>
   </div>
 </template>
@@ -61,7 +28,7 @@ import Vue from 'vue'
 import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
-  data () {
+  data() {
     return {
       callingAPI: false,
       form: {
@@ -71,7 +38,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    enterpriseRules () {
+    enterpriseRules() {
       return {
         email: [
           {
@@ -82,7 +49,7 @@ export default Vue.extend({
         ],
       }
     },
-    isPasswordMethod () {
+    isPasswordMethod() {
       return this.loginInfo.preloginData
         && this.loginInfo.preloginData.login_method === 'password'
         && !this.loginInfo.preloginData.require_passwordless
@@ -128,7 +95,7 @@ export default Vue.extend({
     async handleOnPremiseLogin() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
-      const payload =  {
+      const payload = {
         email: this.form.email,
         language: this.language
       }
@@ -142,7 +109,7 @@ export default Vue.extend({
           this.$router.push({ name: 'pwl-unlock' })
         }
         this.callingAPI = false
-      }).catch ((error) => {
+      }).catch((error) => {
         this.callingAPI = false
         this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       })
@@ -151,7 +118,7 @@ export default Vue.extend({
     async handleNext() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
-      const payload =  {
+      const payload = {
         email: this.form.email,
         password: this.form.password,
         language: this.language

@@ -1,48 +1,22 @@
 <template>
   <div class="w-full px-10">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="rules"
-    >
-      <el-form-item
-        prop="password"
-      >
-        <el-input
-          ref="password"
-          type="password"
-          v-model="form.password"
-          :disabled="callingAPI"
-          :placeholder="$t('data.login.new_password_placeholder')"
-          @keyup.native.enter="handleSetNewPassword"
-        >
+    <el-form ref="form" :model="form" :rules="rules">
+      <el-form-item prop="password">
+        <el-input ref="password" type="password" v-model="form.password" :disabled="callingAPI"
+          :placeholder="$t('data.login.new_password_placeholder')" @keyup.native.enter="handleSetNewPassword">
         </el-input>
       </el-form-item>
-      <el-form-item
-        prop="confirmPassword"
-      >
-        <el-input
-          type="password"
-          v-model="form.confirmPassword"
-          :disabled="callingAPI"
-          :placeholder="$t('data.login.confirm_new_password_placeholder')"
-          @keyup.native.enter="handleSetNewPassword"
-        >
+      <el-form-item prop="confirmPassword">
+        <el-input type="password" v-model="form.confirmPassword" :disabled="callingAPI"
+          :placeholder="$t('data.login.confirm_new_password_placeholder')" @keyup.native.enter="handleSetNewPassword">
         </el-input>
       </el-form-item>
     </el-form>
     <el-row type="flex" align="middle" justify="space-between">
-      <el-button
-        type="text"
-        icon="el-icon-back"
-        :disabled="callingAPI"
-        @click="handleBack"
-      >{{ $t(`common.back`) }}</el-button>
-      <el-button
-        type="primary"
-        :loading="callingAPI"
-        @click="() => handleSetNewPassword()"
-      >{{ $t(`common.submit`) }}</el-button>
+      <el-button type="text" icon="el-icon-back" :disabled="callingAPI" @click="handleBack">{{ $t(`common.back`)
+      }}</el-button>
+      <el-button type="primary" :loading="callingAPI" @click="() => handleSetNewPassword()">{{ $t(`common.submit`)
+      }}</el-button>
     </el-row>
   </div>
 </template>
@@ -56,7 +30,7 @@ export default Vue.extend({
   props: {
     token: String
   },
-  data () {
+  data() {
     return {
       callingAPI: false,
       form: {
@@ -66,7 +40,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    rules () {
+    rules() {
       const validatorConfirmPassword = (rule, value, callback) => {
         if (value !== this.form.password) {
           callback(new Error(this.$t('data.login.message.invalid', { name: this.$t('data.login.confirm_new_password_placeholder') })));
@@ -93,6 +67,11 @@ export default Vue.extend({
           },
         ]
       }
+    },
+    resetToken() {
+      const resetPasswordUrl = this.loginInfo.forgot_token?.reset_password_url || '';
+      const paths = resetPasswordUrl.split('/')
+      return paths.slice(-1) ? paths.slice(-1)[0] : ''
     }
   },
   mounted() {
@@ -104,23 +83,23 @@ export default Vue.extend({
     },
 
     async handleVerifyToken() {
-      await authAPI.sso_reset_password_verify_token(this.login_info.forgot_token).then(async () => {
+      return await authAPI.sso_reset_password_verify_token(this.resetToken).then(() => {
         return true
-      }).catch ((error) => {
+      }).catch((error) => {
         this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
         return false
       })
     },
 
     async handleSetNewPassword() {
-      const validToken = await this.handleVerifyToken()
-      this.$refs.form.validate((valid) => {
-        if (valid && validToken) {
-          if (this.callingAPI) { return }
+      this.$refs.form.validate(async (valid: any) => {
+        if (valid) {
+          const validToken = await this.handleVerifyToken()
+          if (this.callingAPI || !validToken) { return }
           this.callingAPI = true;
-          const payload =  {
+          const payload = {
             password: this.form.password,
-            token: this.login_info.forgot_token
+            token: this.resetToken
           }
           authAPI.sso_new_password(payload).then(async () => {
             this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
@@ -129,7 +108,7 @@ export default Vue.extend({
             })
             this.$router.push({ name: 'login' });
             this.callingAPI = false
-          }).catch ((error) => {
+          }).catch((error) => {
             this.callingAPI = false
             this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
           })
@@ -140,5 +119,4 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

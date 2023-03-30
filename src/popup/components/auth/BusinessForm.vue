@@ -1,49 +1,22 @@
 <template>
   <div class="w-full px-10 auth-form">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="rules"
-    >
+    <el-form ref="form" :model="form" :rules="rules">
       <el-form-item prop="username">
-        <el-input
-          v-model="form.username"
-          ref="username"
-          :disabled="callingAPI"
-          :placeholder="$t('data.login.username_placeholder')"
-          @keyup.native.enter="handleLogin"
-        ></el-input>
+        <el-input v-model="form.username" ref="username" :disabled="callingAPI"
+          :placeholder="$t('data.login.username_placeholder')" @keyup.native.enter="handleLogin"></el-input>
       </el-form-item>
-      <el-form-item
-        prop="password"
-      >
-        <el-input
-          type="password"
-          v-model="form.password"
-          :disabled="callingAPI"
-          :placeholder="$t('data.login.password_placeholder')"
-          @keyup.native.enter="handleLogin"
-        >
+      <el-form-item prop="password">
+        <el-input type="password" v-model="form.password" :disabled="callingAPI"
+          :placeholder="$t('data.login.password_placeholder')" @keyup.native.enter="handleLogin">
         </el-input>
       </el-form-item>
     </el-form>
-    <el-button
-      type="text"
-      :disabled="callingAPI"
-      @click="handleForgotPassword"
-    >{{ $t(`data.login.forgot_password`) }}</el-button>
+    <el-button type="text" :disabled="callingAPI" @click="handleForgotPassword">{{ $t(`data.login.forgot_password`)
+    }}</el-button>
     <el-row type="flex" align="middle" justify="space-between">
-      <el-button
-        type="text"
-        icon="el-icon-back"
-        :disabled="callingAPI"
-        @click="handleBack"
-      >{{ $t(`common.back`) }}</el-button>
-      <el-button
-        type="primary"
-        :loading="callingAPI"
-        @click="handleLogin"
-      >{{ $t(`data.login.sign_in`) }}</el-button>
+      <el-button type="text" icon="el-icon-back" :disabled="callingAPI" @click="handleBack">{{ $t(`common.back`)
+      }}</el-button>
+      <el-button type="primary" :loading="callingAPI" @click="handleLogin">{{ $t(`data.login.sign_in`) }}</el-button>
     </el-row>
   </div>
 </template>
@@ -54,7 +27,7 @@ import Vue from 'vue'
 import authAPI from '@/api/auth'
 
 export default Vue.extend({
-  data () {
+  data() {
     return {
       callingAPI: false,
       form: {
@@ -64,7 +37,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    rules () {
+    rules() {
       return {
         username: [
           {
@@ -120,7 +93,7 @@ export default Vue.extend({
     async businessLogin() {
       if (this.callingAPI) { return }
       this.callingAPI = true;
-      const payload =  {
+      const payload = {
         ...this.form,
         language: this.language
       }
@@ -141,7 +114,7 @@ export default Vue.extend({
             this.callingAPI = false
           }
         }
-      }).catch ((error) => {
+      }).catch((error) => {
         this.callingAPI = false
         this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       })
@@ -149,7 +122,8 @@ export default Vue.extend({
 
     handleForgotPassword() {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-        user_info: this.form
+        user_info: this.form,
+        forgot_step: 1,
       })
       this.$router.push({ name: 'forgot-password' })
     }
