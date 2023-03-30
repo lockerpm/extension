@@ -90,7 +90,8 @@ export abstract class BaseImporter {
     protected parseCsv(data: string, header: boolean, options: any = {}): any[] {
         const parseOptions = Object.assign({ header: header }, this.parseCsvOptions, options);
         data = this.splitNewLine(data).join('\n').trim();
-        const result = papa.parse(data, parseOptions);
+        // @ts-ignore
+        const result = papa.parse(data, parseOptions) || ({} as any);
         if (result.errors && result.errors.length > 0) {
             result.errors.forEach(e => {
                 if (e.row) {
