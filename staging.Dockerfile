@@ -1,5 +1,7 @@
 FROM node:14.17.1
 
+RUN apt install curl jq -y
+
 WORKDIR /app
 
 COPY . /app

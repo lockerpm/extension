@@ -1,3 +1,6 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 stages:
   - build
 
@@ -11,7 +14,7 @@ build:
     - main
     - tags
 
-build-staging:
+build_staging:
   stage: build
   script:
     - cystack-deployer
@@ -20,5 +23,3 @@ build-staging:
   only:
     - staging
     - tags
-
-
