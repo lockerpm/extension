@@ -5,16 +5,20 @@ stages:
   - build
 
 build:
+  environment:
+    name: production
   stage: build
   script:
     - cystack-deployer
   tags:
     - cs_bot
   only:
-    - main
+    - production
     - tags
 
 build_staging:
+  environment:
+    name: staging
   stage: build
   script:
     - cystack-deployer
