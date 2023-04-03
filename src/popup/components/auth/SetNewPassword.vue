@@ -98,7 +98,7 @@ export default Vue.extend({
           if (this.callingAPI || !validToken) { return }
           this.callingAPI = true;
           const payload = {
-            password: this.form.password,
+            new_password: this.form.password,
             token: this.resetToken
           }
           authAPI.sso_new_password(payload).then(async () => {
@@ -106,6 +106,7 @@ export default Vue.extend({
               login_step: 2,
               forgot_step: 1
             })
+            this.notify(this.$t('data.notifications.change_password_success'), 'success')
             this.$router.push({ name: 'login' });
             this.callingAPI = false
           }).catch((error) => {

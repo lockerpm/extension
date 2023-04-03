@@ -126,7 +126,7 @@ module.exports = {
     billing: 'Billing',
     family_members: 'Family Members',
     policies: 'Policies'
-    
+
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -276,7 +276,8 @@ module.exports = {
       min_password_length: 'Minimum password length is {length}',
       max_password_length: 'Maximum password length is {length}',
       password_composition: 'Password must contain at least 1 special character',
-      authentication_failed: 'Authentication failed'
+      authentication_failed: 'Authentication failed',
+      change_password_success: 'Change password success.'
     },
     profile_menu: {
       lock: 'Lock your account',
