@@ -85,7 +85,11 @@ module.exports = {
     mrs: 'Bà',
     ms: 'Chị',
     dr: 'Bác sĩ',
-    next: 'Tiếp tục'
+    next: 'Tiếp tục',
+    download: 'Tải ứng dụng',
+    system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
+    upgrade_now: 'Nâng cấp ngay',
+    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn"
   },
   sort: {
     name_asc: 'Tên tăng dần',
