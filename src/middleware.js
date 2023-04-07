@@ -2,24 +2,33 @@ import router from './router/popup'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import storePromise from "./store";
-import i18n from './locales/i18n';
+import JSLib from "@/popup/services/services";
+const browserStorageService = JSLib.getBgService('storageService')()
 
 NProgress.configure({ showSpinner: false })
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const store = await storePromise;
-  if (store.state.isLoggedIn === true) {
+  const accessToken = await browserStorageService.get('cs_token')
+  if (store.state.isLoggedIn === true && accessToken) {
     if (!store.state.user.email) {
-      const res = await store.dispatch("LoadCurrentUser");
-      i18n.locale = res.language
+      await store.dispatch("LoadCurrentUser");
       await store.dispatch("LoadCurrentUserPw");
     }
-    if (store.state.userPw.is_pwd_manager === false) {
-      router.push({ name: "set-master-password" });
+    if (store.state.user.email) {
+      if (store.state.userPw.is_pwd_manager === false) {
+        router.push({ name: "set-master-password" });
+      } else {
+        if (to.name === 'login') {
+          router.push({ name: "home" });
+        } else {
+          next();
+        }
+      }
     } else {
-      if (to.name === 'login') {
-        router.push({ name: "home" });
+      if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
+        router.push({ name: "login" });
       } else {
         next();
       }
