@@ -231,6 +231,8 @@ Vue.mixin({
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
         chrome.runtime.sendMessage({ command: "unlocked" });
         this.$router.push({ name: 'home' });
       } catch (e) {
@@ -545,7 +547,7 @@ storePromise.then((store) => {
           router.push({ name: 'Home' })
         }
         if (error.response.status === 401) {
-          browserStorageService.remove('cs_token')
+          chrome.runtime.sendMessage({ command: "logout" });
           store.commit('UPDATE_IS_LOGGEDIN', false)
           if (router.currentRoute.name !== 'login') {
             router.push({ name: "login" });
