@@ -81,6 +81,8 @@ export default Vue.extend({
           this.$t("data.notifications.update_settings_success"),
           "success"
         );
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
       } catch (e) {
         console.log(e);
         this.notify(

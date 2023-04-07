@@ -53,7 +53,6 @@ export class CryptoService implements CryptoServiceAbstraction {
 
     async setKey(key: SymmetricCryptoKey): Promise<any> {
         this.key = key;
-
         await this.storeKey(key);
     }
 
@@ -114,7 +113,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
         keySuffix ||= 'auto';
         const symmetricKey = await this.getKeyFromStorage(keySuffix);
-
+        
         if (symmetricKey) {
             this.setKey(symmetricKey);
         }
@@ -336,11 +335,11 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     async hasKey(): Promise<boolean> {
-        return this.hasKeyInMemory() || await this.hasKeyStored('auto') || await this.hasKeyStored('biometric');
+        return await this.hasKeyInMemory() || await this.hasKeyStored('auto') || await this.hasKeyStored('biometric');
     }
 
-    hasKeyInMemory(): boolean {
-        return !!this.key;
+    async hasKeyInMemory(): Promise<boolean> {
+      return !!this.key;
     }
 
     hasKeyStored(keySuffix: KeySuffixOptions): Promise<boolean> {
@@ -354,6 +353,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
     async clearKey(clearSecretStorage: boolean = true): Promise<any> {
         this.key = this.legacyEtmKey = null;
+        await this.secureStorageService.remove(Keys.key);
         if (clearSecretStorage) {
             this.clearStoredKey('auto');
             this.clearStoredKey('biometric');
@@ -729,7 +729,7 @@ export class CryptoService implements CryptoServiceAbstraction {
         let shouldStoreKey = false;
         if (keySuffix === 'auto') {
             const vaultTimeout = await this.storageService.get<number>(ConstantsService.vaultTimeoutKey);
-            shouldStoreKey = vaultTimeout == null;
+            shouldStoreKey = !vaultTimeout;
         } else if (keySuffix === 'biometric') {
             const biometricUnlock = await this.storageService.get<boolean>(ConstantsService.biometricUnlockKey);
             shouldStoreKey = biometricUnlock && this.platformUtilService.supportsSecureStorage();

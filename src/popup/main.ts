@@ -231,6 +231,8 @@ Vue.mixin({
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
         chrome.runtime.sendMessage({ command: "unlocked" });
         this.$router.push({ name: 'home' });
       } catch (e) {

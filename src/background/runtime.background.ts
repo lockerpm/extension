@@ -412,7 +412,7 @@ export default class RuntimeBackground {
   private async authAccessToken(type: string, provider: string) {
     // check open popup
     const tab = await BrowserApi.getTabFromCurrentWindow()
-    let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url}`;
+    let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab ? tab.url : ''}`;
     if (provider) {
       url += `&provider=${provider}`
     }
