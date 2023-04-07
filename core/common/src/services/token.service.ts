@@ -106,7 +106,7 @@ export class TokenService implements TokenServiceAbstraction {
         const clientSecret = await this.getClientSecret();
         const timeout = await this.storageService.get(ConstantsService.vaultTimeoutKey);
         const action = await this.storageService.get(ConstantsService.vaultTimeoutActionKey);
-        if ((timeout != null || timeout === 0) && action === 'logOut') {
+        if ((!timeout || timeout === 0) && action === 'logOut') {
             // if we have a vault timeout and the action is log out, reset tokens
             await this.clearToken();
             this.token = token;
