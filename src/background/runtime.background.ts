@@ -19,6 +19,7 @@ import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGen
 import { CipherData } from 'jslib-common/models/data/cipherData';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 import { PassService } from 'jslib-common/abstractions/pass.service';
+import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 
 import { BrowserApi } from '../browser/browserApi';
 
@@ -54,7 +55,8 @@ export default class RuntimeBackground {
     private tokenService: TokenService,
     private passwordGenerator: PasswordGenerationService,
     private passService: PassService,
-    private request: RequestBackground
+    private request: RequestBackground,
+    private vaultTimeoutService: VaultTimeoutService
   ) {
     chrome.runtime?.onInstalled?.addListener((details: any) => {
       this.onInstalledReason = details.reason;
@@ -204,23 +206,31 @@ export default class RuntimeBackground {
         } catch { }
         break;
       case "cs-authResult":
-        await Promise.all([
-          this.cryptoService.clearKeys(),
-          this.storageService.remove("cs_token"),
-        ]);
-        try {
-          await this.storageService.save("cs_token", msg.token);
-          const store: any = await this.storageService.get("cs_store");
-          await this.updateStoreService('isLoggedIn', true);
-          if (store && store.savePopup) {
-            setTimeout(async () => {
-              const tab = await BrowserApi.getTabFromCurrentWindow();
-              await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
-            }, 1000);
+        const token: any = await this.storageService.get("cs_token");
+        if (!token) {
+          try {
+            await this.storageService.save("cs_token", msg.token);
+            this.request.sso_access_token({
+              SERVICE_URL: "/sso",
+              SERVICE_SCOPE: "pwdmanager",
+              CLIENT: "browser"
+            }).then(async (result: any) => {
+              const access_token = result.data ? result.data.access_token : "";
+              await this.storageService.save("cs_token", access_token);
+              await this.updateStoreService('isLoggedIn', true);
+              await this.messagingService.send('loggedIn');
+
+              const store: any = await this.storageService.get("cs_store");
+              if (store && store.savePopup) {
+                setTimeout(async () => {
+                  const tab = await BrowserApi.getTabFromCurrentWindow();
+                  await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
+                }, 1000);
+              }
+            });
+          } catch (e) {
+            console.log(e);
           }
-          sendResponse({ success: true });
-        } catch (e) {
-          console.log(e);
         }
         break;
       case "cs-logout":
@@ -239,21 +249,6 @@ export default class RuntimeBackground {
         ]);
         break;
       case "locker-authResult":
-        await this.storageService.save("cs_token", msg.token);
-        try {
-          this.request.sso_access_token({
-            SERVICE_URL: "/sso",
-            SERVICE_SCOPE: "pwdmanager",
-            CLIENT: "browser"
-          }).then(async (result: any) => {
-            const access_token = result.data ? result.data.access_token : "";
-            await this.storageService.save("cs_token", access_token);
-            await this.updateStoreService('isLoggedIn', true);
-            sendResponse({ success: true });
-          });
-        } catch (e) {
-          console.log(e);
-        }
         break;
       case "webAuthnResult":
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
@@ -398,18 +393,20 @@ export default class RuntimeBackground {
 
   private async authAccessToken(type: string, provider: string) {
     // check open popup
-    const tab = await BrowserApi.getTabFromCurrentWindow()
-    let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url}`;
-    if (provider) {
-      url += `&provider=${provider}`
+    const tab: any = await BrowserApi.getTabFromCurrentWindow()
+    if (tab) {
+      let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
+      if (provider) {
+        url += `&provider=${provider}`
+      }
+      if (process.env.VUE_APP_ENVIRONMENT) {
+        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+      }
+      await BrowserApi.updateCurrentTab(tab, url);
     }
-    if (process.env.VUE_APP_ENVIRONMENT) {
-      url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-    }
-    await BrowserApi.updateCurrentTab(tab, url);
   }
 
-  private async updateStoreService(key: string, value: any) {
+  async updateStoreService(key: string, value: any) {
     const store = await this.storageService.get("cs_store");
     let oldStoreParsed = {};
     if (typeof store === "object") {

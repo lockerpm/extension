@@ -22,7 +22,11 @@ router.beforeEach(async (to, from, next) => {
         next();
       }
     } else {
-      next();
+      if (to.name === 'login') {
+        router.push({ name: "home" });
+      } else {
+        next();
+      }
     }
   } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
     router.push({ name: "login" });

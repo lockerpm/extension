@@ -126,20 +126,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    chrome.runtime.onMessage.addListener(
-      async (msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-        switch(msg.command){
-        case 'collectPageDetailsResponse':
-          if (this.$route.name === 'login') {
-            await this.$store.dispatch('LoadCurrentUser')
-            this.$router.push({ name: 'lock' });
-          }
-          break;
-        default:
-          break;
-        }
-      }
-    );
+    await this.$storageService.remove('cs_token')
   },
   methods: {
     updateLoginStep (value) {

@@ -289,6 +289,10 @@ Vue.mixin({
             }, 1000);
           }, 1000);
         }
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
+        chrome.runtime.sendMessage({ command: "unlocked" });
+        this.$router.push({ name: 'home' });
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }

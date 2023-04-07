@@ -12,6 +12,7 @@ export function handleResponseErrorMessage(error) {
     if (error.response.status === 401) {
       if (error.response.config.url !== ENDPOINT.SSO_AUTH) {
         console.log('error', error.response);
+        chrome.runtime.sendMessage({ command: "logout" });
         browserStorageService.remove('cs_token')
         storePromise.then((store) => {
           store.commit('UPDATE_LOGIN_PAGE_INFO', null)
