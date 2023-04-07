@@ -215,18 +215,19 @@ export default class RuntimeBackground {
               SERVICE_SCOPE: "pwdmanager",
               CLIENT: "browser"
             }).then(async (result: any) => {
-              const access_token = result.data ? result.data.access_token : "";
+              const access_token = result ? result.access_token : "";
               await this.storageService.save("cs_token", access_token);
               await this.updateStoreService('isLoggedIn', true);
-              await this.messagingService.send('loggedIn');
-
-              const store: any = await this.storageService.get("cs_store");
-              if (store && store.savePopup) {
-                setTimeout(async () => {
-                  const tab = await BrowserApi.getTabFromCurrentWindow();
-                  await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
-                }, 1000);
-              }
+              setTimeout(async () => {
+                this.messagingService.send('loggedIn');
+                const store: any = await this.storageService.get("cs_store");
+                if (store && store.savePopup) {
+                  setTimeout(async () => {
+                    const tab = await BrowserApi.getTabFromCurrentWindow();
+                    await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
+                  }, 1000);
+                }
+              }, 1000);
             });
           } catch (e) {
             console.log(e);

@@ -44,7 +44,6 @@ export default Vue.extend({
           this.$router.push({ name: 'login' });
           break;
         case 'loggedIn':
-          console.log(111);
           if (this.$route.name === 'login') {
             await this.$store.dispatch('LoadCurrentUser')
             this.$router.push({ name: 'lock' });

@@ -13,6 +13,15 @@ Vue.use(Vuex)
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
 const STORAGE_KEY = 'cs_store'
 
+const defaultUser = {
+  email: null,
+  language: 'en',
+  full_name: '',
+  avatar: '',
+  organization: '',
+  phone: ''
+}
+
 const defaultLoginInfo = {
   optionValue: '',
   login_step: 1,
@@ -32,7 +41,6 @@ const defaultLoginInfo = {
 }
 
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
-  console.log(oldStore);
   let oldStoreParsed = {
     language: 'en',
     ...JSON.parse(JSON.stringify(defaultLoginInfo)),
@@ -49,12 +57,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       init: false,
       isLoggedIn: false,
       user: {
-        email: null,
+        ...JSON.parse(JSON.stringify(defaultUser)),
         language: oldStoreParsed.language,
-        full_name: '',
-        avatar: '',
-        organization: '',
-        phone: ''
       },
       notifications: {
         results: [],
@@ -86,14 +90,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
     mutations: {
       INIT_STORE (state, payload) {
         state.isLoggedIn = payload.isLoggedIn || false
-        state.user = payload.user || {
-          email: null,
-          language: 'en',
-          full_name: '',
-          avatar: '',
-          organization: '',
-          phone: ''
-        }
+        state.user = payload.user || JSON.parse(JSON.stringify(defaultUser)),
         state.userPw = payload.userPw || {}
         state.currentPath = payload.currentPath || '/'
         state.previousPath = payload.previousPath || ''
@@ -109,14 +106,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         });
       },
       CLEAR_ALL_DATA (state) {
-        // Auth
+        state.use = JSON.parse(JSON.stringify(defaultUser)),
         state.isLoggedIn = false
-        // User
-        state.user.full_name = ''
-        state.user.email = ''
-        state.user.avatar = ''
-        state.user.organization = ''
-        state.user.phone = ''
         state.notifications = {
           results: [],
           unread_count: 0,
@@ -125,7 +116,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.teams = []
       },
       UPDATE_USER (state, user) {
-        state.user = user
+        state.user = user || JSON.parse(JSON.stringify(defaultUser))
       },
       UPDATE_USER_PW (state, user) {
         state.userPw = user
@@ -230,10 +221,16 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         })
       },
       async LoadCurrentUser ({ commit }) {
-        const res = await meAPI.me();
-        commit('UPDATE_IS_LOGGEDIN', true)
-        commit('UPDATE_USER', res)
-        return res
+        return await meAPI.me().then((response) => {
+          commit('UPDATE_IS_LOGGEDIN', true)
+          commit('UPDATE_USER', response)
+          return response
+        }).catch(() => {
+          commit('UPDATE_IS_LOGGEDIN', false)
+          commit('UPDATE_USER', null)
+          return JSON.parse(JSON.stringify(defaultUser))
+        });
+        
       },
       async LoadCurrentUserPw ({ commit }) {
         const res = await cystackPlatformAPI.users_me();

@@ -10,23 +10,24 @@ export function handleResponseErrorMessage(error) {
       router.push({ name: 'Home' })
     }
     if (error.response.status === 401) {
-      if (error.response.config.url !== ENDPOINT.SSO_AUTH) {
+      if ([ENDPOINT.SSO_AUTH].includes(error.response.config.url)) {
         console.log('error', error.response);
-        chrome.runtime.sendMessage({ command: "logout" });
         browserStorageService.remove('cs_token')
         storePromise.then((store) => {
           store.commit('UPDATE_LOGIN_PAGE_INFO', null)
           store.commit('UPDATE_IS_LOGGEDIN', false)
           store.commit('CLEAR_ALL_DATA')
 
-          chrome.runtime.sendMessage({
-            command: 'updateStoreService',
-            sender: { key: 'isLoggedIn', value: false },
-          });
-
-          if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
-          }
+          setTimeout(() => {
+            chrome.runtime.sendMessage({
+              command: 'updateStoreService',
+              sender: { key: 'isLoggedIn', value: false },
+            });
+  
+            if (router.currentRoute.name !== 'login') {
+              router.push({ name: "login" });
+            }
+          }, 1000);
         })
       }
     }
