@@ -28,13 +28,20 @@ export default Vue.extend({
     const currrentRouter = await this.$storageService.get('currrent_router')
     this.$router.push({ name: JSON.parse(currrentRouter)?.name || 'home'})
     chrome.runtime.onMessage.addListener(
-      (msg, sender, response) => {
+      async (msg, sender, response) => {
         switch(msg.command){
         case 'locked':
           this.$router.push({ name: 'lock' });
           break;
         case 'doneLoggingOut':
           this.$router.push({ name: 'login' });
+          break;
+        case 'loggedIn':
+          console.log(111);
+          if (this.$route.name === 'login') {
+            await this.$store.dispatch('LoadCurrentUser')
+            this.$router.push({ name: 'lock' });
+          }
           break;
         default:
           break;
