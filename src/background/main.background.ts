@@ -253,7 +253,7 @@ export default class MainBackground {
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
       this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
       this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
-      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService);
+      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService, this.vaultTimeoutService);
     this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
       this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
       this.platformUtilsService);
@@ -357,6 +357,8 @@ export default class MainBackground {
     await this.eventService.uploadEvents();
     const userId = await this.userService.getUserId();
 
+    await this.passService.clearGeneratePassword();
+
     await Promise.all([
       this.eventService.clearEvents(),
       this.syncService.setLastSync(new Date(0)),
@@ -370,14 +372,18 @@ export default class MainBackground {
       this.policyService.clear(userId),
       this.passwordGenerationService.clear(),
       this.vaultTimeoutService.clear(),
+      this.storageService.remove("cs_token"),
     ]);
 
     this.searchService.clearIndex();
     this.messagingService.send('doneLoggingOut', { expired: expired });
 
+    await this.runtimeBackground.updateStoreService('isLoggedIn', false)
+
     await this.setIcon();
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
+
     this.notificationsService.updateConnection(false);
     this.systemService.startProcessReload();
     await this.systemService.clearPendingClipboard();

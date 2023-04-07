@@ -18,7 +18,11 @@ router.beforeEach(async (to, from, next) => {
     if (store.state.userPw.is_pwd_manager === false) {
       router.push({ name: "set-master-password" });
     } else {
-      next();
+      if (to.name === 'login') {
+        router.push({ name: "home" });
+      } else {
+        next();
+      }
     }
   } else if (to.name !== 'login') {
     router.push({ name: "login" });
