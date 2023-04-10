@@ -11,12 +11,11 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <el-button type="text" :disabled="callingAPI" @click="handleForgotPassword">{{ $t(`data.login.forgot_password`)
-    }}</el-button>
+    <div class="">
+      <el-button type="text" :disabled="callingAPI" @click="handleForgotPassword">{{ $t(`data.login.forgot_password`) }}</el-button>
+    </div>
     <el-row type="flex" align="middle" justify="space-between">
-      <el-button type="text" icon="el-icon-back" :disabled="callingAPI" @click="handleBack">{{ $t(`common.back`)
-      }}</el-button>
-      <el-button type="primary" :loading="callingAPI" @click="handleLogin">{{ $t(`data.login.sign_in`) }}</el-button>
+      <el-button class="w-full" type="primary" :loading="callingAPI" @click="handleLogin">{{ $t(`data.login.sign_in`) }}</el-button>
     </el-row>
   </div>
 </template>
@@ -66,6 +65,14 @@ export default Vue.extend({
         this.loadData();
       },
       deep: true
+    },
+    language: {
+      handler() {
+        setTimeout(() => {
+          this.$refs.form.clearValidate();
+        }, 10);
+      },
+      deep: true
     }
   },
   methods: {
@@ -76,8 +83,11 @@ export default Vue.extend({
     },
     handleBack() {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        preloginData: null,
         user_info: null,
         auth_info: null,
+        baseApiUrl: null,
+        baseWsUrl: null,
       })
       this.$emit('back')
     },

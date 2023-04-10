@@ -10,7 +10,7 @@ window.addEventListener('message', event => {
         });
     }
 
-  if (event.data.command && event.data.command === "locker-authResult") {
+  if (event.data.command && event.data.command === "sso-authResult") {
     chrome.runtime.sendMessage({
       command: event.data.command,
       token: event.data.token,

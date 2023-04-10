@@ -1,7 +1,7 @@
 <template>
   <div class="w-full px-6 text-center mt-4">
     <div>
-      <div v-if="login_step === 2">
+      <div>
         <div class="text-center mt-2">
         </div>
         <div
@@ -20,11 +20,13 @@
             class="m-btn--icon btn-icon-login m-btn--pill"
             @click="loginWith(s.key)"
           >
-            <img
-              class="social__app-icon"
-              :src="require(`@/assets/images/icons/${s.key}.svg`)"
-              :alt="s.key"
-            >
+            <el-tooltip class="item" effect="light" :content="s.name" placement="bottom">
+              <img
+                class="social__app-icon"
+                :src="require(`@/assets/images/icons/${s.key}.svg`)"
+                :alt="s.key"
+              >
+            </el-tooltip>
           </button>
         </div>
       </div>
@@ -33,12 +35,12 @@
           <span>
             {{$t('data.login.dont_have_account')}}
             <a
-            @click.prevent="openRegister"
-            tag="a"
-            class="text-[#0476e9] no-underline"
-          >
-            {{$t('data.login.sign_up')}}
-          </a>
+              @click.prevent="openRegister"
+              tag="a"
+              class="text-[#0476e9] no-underline"
+            >
+              {{$t('data.login.sign_up')}}
+            </a>
           </span>
         </div>
       </div>
@@ -49,10 +51,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  name: 'SignIn',
-  props: {
-    login_step: Number
-  },
+  props: {},
   data () {
     return {}
   },

@@ -54,7 +54,8 @@ Vue.mixin({
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
-        { key: "github", name: "GitHub", color: "#202326" }
+        { key: "github", name: "GitHub", color: "#202326" },
+        { key: "sso", name: "Enterprise Single Sign-On", color: "#268334" },
       ]
     };
   },

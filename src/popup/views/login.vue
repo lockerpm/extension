@@ -31,41 +31,23 @@
         </div>
       </el-row>
     </div>
-    <Options
+    <Form
       v-if="loginInfo.login_step === 1"
       @next="() => updateLoginStep(2)"
+      @get-access-token="getAccessToken"
     />
-    <div v-else-if="loginInfo.login_step === 2">
-      <Form
-        v-if="isIndividual"
-        @back="() => updateLoginStep(1)"
-        @next="() => updateLoginStep(3)"
-        @get-access-token="getAccessToken"
-      />
-      <BusinessForm
-        v-if="isBusiness"
-        @back="() => updateLoginStep(1)"
-        @next="() => updateLoginStep(3)"
-        @get-access-token="getBusinessAccessToken"
-      />
-      <OnPremiseForm
-        v-if="isEnterprise"
-        @back="() => updateLoginStep(1)"
-      />
-    </div>
     <Identity
-      v-else-if="loginInfo.login_step === 3"
-      @back="() => updateLoginStep(2)"
-      @next="() => updateLoginStep(4)"
+      v-else-if="loginInfo.login_step === 2"
+      @back="() => updateLoginStep(1)"
+      @next="() => updateLoginStep(3)"
     />
     <VerifyOTP
-      v-else-if="loginInfo.login_step === 4"
+      v-else-if="loginInfo.login_step === 3"
       :otp-method="otpMethod"
-      @back="() => updateLoginStep(3)"
+      @back="() => updateLoginStep(2)"
       @get-access-token="getAccessToken"
     />
     <LogInWith
-      v-if="[2].includes(loginInfo.login_step) && !isEnterprise"
       :login_step="loginInfo.login_step"
     />
   </div>
@@ -73,11 +55,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Options from '../components/auth/Options.vue';
 import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
-import BusinessForm from '../components/auth/BusinessForm.vue'
-import OnPremiseForm from '../components/auth/OnPremiseForm.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
@@ -88,11 +67,8 @@ import cystackPlatformAPI from '@/api/cystack_platform'
 export default Vue.extend({
   name: 'Login',
   components: {
-    Options,
     LogInWith,
     Form,
-    BusinessForm,
-    OnPremiseForm,
     Identity,
     VerifyOTP
   },
@@ -100,23 +76,11 @@ export default Vue.extend({
     return {}
   },
   computed: {
-    isIndividual() {
-      return this.loginInfo.optionValue == 'individual_vault'
-    },
-    isBusiness() {
-      return this.loginInfo.optionValue == 'business_vault'
-    },
-    isEnterprise() {
-      return this.loginInfo.optionValue == 'enterprise_vault'
-    },
     loginSubtitle() {
       if (this.loginInfo.login_step === 1) {
         return this.$t('data.login.login_option')
       }
       if (this.loginInfo.login_step === 2) {
-        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.loginInfo.optionValue}`) })
-      }
-      if (this.loginInfo.login_step === 3) {
         return this.$t('data.login.verify')
       }
       return this.$t('data.login.enter_code')
@@ -135,31 +99,6 @@ export default Vue.extend({
       })
     },
     async getAccessToken(callback){
-      const payload = {
-        SERVICE_URL: "/sso",
-        SERVICE_SCOPE: "pwdmanager",
-        CLIENT: "browser"
-      }
-      try {
-        await authAPI.sso_last_active();
-        const data: any = await authAPI.sso_access_token(payload);
-        if(data.access_token){
-          await this.$storageService.save('cs_token', data.access_token)
-          chrome.runtime.sendMessage({
-            command: 'updateStoreService',
-            sender: { key: 'isLoggedIn', value: true },
-          });
-          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.$router.push({ name: 'lock' })
-          callback()
-        }
-      } catch (error) {
-        callback()
-        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
-      }
-    },
-
-    async getBusinessAccessToken(callback){
       const payload = {
         SERVICE_URL: "/sso",
         SERVICE_SCOPE: "pwdmanager",

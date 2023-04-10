@@ -249,7 +249,8 @@ export default class RuntimeBackground {
           this.userService.clear()
         ]);
         break;
-      case "locker-authResult":
+      case "sso-authResult":
+        console.log(msg);
         break;
       case "webAuthnResult":
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
@@ -396,14 +397,20 @@ export default class RuntimeBackground {
     // check open popup
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
-      if (provider) {
-        url += `&provider=${provider}`
+      let url = ''
+      if (provider == 'sso') {
+        url = process.env.VUE_APP_ID_SSO_URL;
+        BrowserApi.createNewTab(url);
+      } else {
+        url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
+        if (provider) {
+          url += `&provider=${provider}`
+        }
+        if (process.env.VUE_APP_ENVIRONMENT) {
+          url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+        }
+        await BrowserApi.updateCurrentTab(tab, url);
       }
-      if (process.env.VUE_APP_ENVIRONMENT) {
-        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-      }
-      await BrowserApi.updateCurrentTab(tab, url);
     }
   }
 
