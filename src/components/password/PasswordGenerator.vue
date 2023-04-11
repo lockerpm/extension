@@ -117,7 +117,6 @@ export default Vue.extend({
         this.options.lowercase = true
       }
       this.password = await this.$passwordGenerationService.generatePassword(this.options)
-      // this.$emit('generated', this.password)
     },
     fill () {
       this.$emit('fill-password', this.password)

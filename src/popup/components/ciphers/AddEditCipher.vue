@@ -324,8 +324,9 @@
                 trigger="click"
                 popper-class="locker-pw-generator"
               >
-                <PasswordGenerator @fill="fillPassword" />
-
+                <PasswordGenerator
+                  @fill-password="fillPassword"
+                />
                 <button
                   slot="reference"
                   class="btn btn-clean !text-primary"
@@ -374,12 +375,45 @@
             :is-password="false"
           />
           <InputText
-            v-model="cryptoWallet.password"
-            :label="$t('data.ciphers.password_pin')"
+            v-model="cryptoWallet.pin"
+            :label="$t('data.ciphers.pin')"
             class="w-full"
             :disabled="isDeleted"
             is-password
           />
+          <InputText
+            v-model="cryptoWallet.password"
+            :label="$t('data.ciphers.password')"
+            class="w-full"
+            :disabled="isDeleted"
+            is-password
+          />
+          <PasswordStrengthBar
+            :score="passwordStrength.score"
+            class="mt-2"
+            :class="{ 'my-2' : !!this.data.id}"
+          />
+          <div
+            v-if="!isDeleted && !cipher.id"
+            class="text-right"
+          >
+            <el-popover
+              placement="right"
+              width="280"
+              trigger="click"
+              popper-class="locker-pw-generator"
+            >
+              <PasswordGenerator
+                @fill-password="fillPassword"
+              />
+              <button
+                slot="reference"
+                class="btn btn-clean !text-primary"
+              >
+                {{ $t('data.ciphers.generate_random_password') }}
+              </button>
+            </el-popover>
+          </div>
           <InputText
             v-model="cryptoWallet.address"
             :label="$t('data.ciphers.wallet_address')"
@@ -631,6 +665,7 @@ export default Vue.extend({
         },
         username: '',
         password: '',
+        pin: '',
         address: '',
         privateKey: '',
         seed: '',
@@ -680,9 +715,6 @@ export default Vue.extend({
   watch: {
     cryptoAccount () {
       this.cipher.cryptoAccount = this.cryptoAccount
-    },
-    cryptoWallet () {
-      this.cipher.cryptoWallet = this.cryptoWallet
     }
   },
   computed: {
@@ -739,14 +771,14 @@ export default Vue.extend({
       return !!this.cipher.deletedDate
     },
     passwordStrength () {
-      if (this.cipher.login) {
+      if (this.cipher.type === CipherType.Login && this.cipher.login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
       }
-      if (this.cipher.cryptoAccount) {
+      if (this.cipher.type === 6 && this.cipher.cryptoAccount) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
       }
-      if (this.cipher.cryptoWallet) {
-        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
+      if (this.cipher.type === 7 && this.cryptoWallet) {
+        return this.$passwordGenerationService.passwordStrength(this.cryptoWallet.password, ['cystack']) || {}
       }
       return {}
     },
@@ -927,6 +959,8 @@ export default Vue.extend({
     setPassword (p) {
       if (!this.cipher.login.password) {
         this.cipher.login.password = p
+      } else if (!this.cryptoWallet.password) {
+        this.cryptoWallet.password = p
       }
     },
     fillPassword (p) {
