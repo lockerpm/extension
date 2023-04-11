@@ -62,7 +62,6 @@ Vue.mixin({
   computed: {
     loginInfo() {
       return {
-        optionValue: this.$store.state.optionValue,
         login_step: this.$store.state.login_step,
         identity: this.$store.state.identity,
         auth_info: this.$store.state.auth_info,
@@ -153,7 +152,11 @@ Vue.mixin({
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
-      await userAPI.logout();
+      try {
+        await userAPI.logout();
+      } catch (error) {
+        //
+      }
       await Promise.all([
         this.$cryptoService.clearKeys(),
         this.$userService.clear(),
@@ -213,6 +216,7 @@ Vue.mixin({
       }
     },
     async login(isPwl = false, decryptData: any) {
+      this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
@@ -253,6 +257,7 @@ Vue.mixin({
           }
           chrome.runtime.sendMessage({ command: "unlocked" });
           this.$router.push({ name: 'home' });
+          this.$store.commit('UPDATE_CALLING_API', false)
 
           setTimeout(() => {
             this.setupFillPage();
@@ -266,12 +271,9 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceIdentifier
           })
-          if (this.loginInfo.optionValue == 'enterprise_vault') {
-            await this.$storageService.save("cs_token", res.access_token)
-          }
+          await this.$storageService.save('cs_token', res.access_token)
           setTimeout( async () => {
             await this.$store.dispatch("LoadCurrentUser");
-            chrome.runtime.sendMessage({ command: 'loggedIn' })
             await this.$tokenService.setTokens(res.access_token, res.refresh_token)
             await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
             await this.$cryptoService.setKey(decryptData.key)
@@ -284,6 +286,7 @@ Vue.mixin({
             }
             chrome.runtime.sendMessage({ command: "unlocked" });
             this.$router.push({ name: 'home' });
+            this.$store.commit('UPDATE_CALLING_API', false)
 
             setTimeout(() => {
               this.setupFillPage();
@@ -292,10 +295,9 @@ Vue.mixin({
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
-        chrome.runtime.sendMessage({ command: "unlocked" });
-        this.$router.push({ name: 'home' });
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
+        this.$store.commit('UPDATE_CALLING_API', false)
       }
     },
     async clearKeys() {
@@ -574,6 +576,7 @@ Vue.mixin({
         })
         if (data.msgType === 3) {
           if (!isCreatedApp) {
+            console.log(data, isCreatedApp);
             this.$router.push({ name: 'pwl-unlock' })
           }
         } else if (data.msgType === 4) {

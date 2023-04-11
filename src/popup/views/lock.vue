@@ -195,8 +195,7 @@ export default Vue.extend({
   },
   computed: {
     isPasswordlessMethod () {
-      return this.loginInfo.preloginData
-        && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)
+      return this.loginInfo.preloginData && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)
     },
     lockedInDesktopApp() {
       return this.loginInfo.desktopAppData && this.loginInfo.desktopAppData.msgType === 7

@@ -31,9 +31,11 @@ export default Vue.extend({
       }
     }
   },
+  async beforeMount () {
+    const currentRouter = await this.$storageService.get('current_router')
+    this.$router.push({ name: currentRouter || 'home'})
+  },
   async mounted () {
-    const currrentRouter = await this.$storageService.get('currrent_router')
-    this.$router.push({ name: JSON.parse(currrentRouter)?.name || 'home'})
     chrome.runtime.onMessage.addListener(
       async (msg, sender, response) => {
         switch(msg.command){
@@ -57,7 +59,7 @@ export default Vue.extend({
   },
   watch: {
     '$route' (newValue) {
-      this.$storageService.save('currrent_router', JSON.stringify(newValue))
+      this.$storageService.save('current_router', newValue.name)
     },
   },
   methods: {}

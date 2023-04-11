@@ -13,8 +13,7 @@ window.addEventListener('message', event => {
   if (event.data.command && event.data.command === "sso-authResult") {
     chrome.runtime.sendMessage({
       command: event.data.command,
-      token: event.data.token,
-      state: event.data.state,
+      data: JSON.parse(event.data.data),
       referrer: event.source.location.hostname
     });
   }

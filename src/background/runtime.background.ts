@@ -35,6 +35,7 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
+  private currentLocation = ''
   constructor(
     private main: MainBackground,
     private autofillService: AutofillService,
@@ -250,7 +251,26 @@ export default class RuntimeBackground {
         ]);
         break;
       case "sso-authResult":
-        console.log(msg);
+        if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
+          this.storageService.save('current_router', 'pwl-unlock')
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            user_info: {
+              email: msg.data.name
+            }
+          })
+        } else {
+          await this.updateStoreService('isLoggedIn', true);
+          this.storageService.save('current_router', 'lock')
+          // await this.storageService.save("cs_token", access_token);
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
+            baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
+          })
+        }
+        const tab: any = await BrowserApi.getTabFromCurrentWindow()
+        await BrowserApi.updateCurrentTab(tab, this.currentLocation);
         break;
       case "webAuthnResult":
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
@@ -398,9 +418,9 @@ export default class RuntimeBackground {
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
       let url = ''
-      if (provider == 'sso') {
-        url = process.env.VUE_APP_ID_SSO_URL;
-        BrowserApi.createNewTab(url);
+      if (provider === 'sso') {
+        this.currentLocation = tab.url
+        await BrowserApi.updateCurrentTab(tab, `${process.env.VUE_APP_ID_SSO_URL}/login?sso=1&client=extension`);
       } else {
         url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
         if (provider) {

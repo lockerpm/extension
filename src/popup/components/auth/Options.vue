@@ -40,9 +40,6 @@ export default Vue.extend({
   },
   methods: {
     handleLogin(option) {
-      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-        optionValue: option.value
-      })
       this.$emit('next');
     }
   }

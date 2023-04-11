@@ -23,7 +23,6 @@ const defaultUser = {
 }
 
 const defaultLoginInfo = {
-  optionValue: '',
   login_step: 1,
   identity: 'mail',
   auth_info: null,
@@ -85,6 +84,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       hideIcons: false,
       showFolders: true,
       enableAutofill:  true,
+      callingAPI: false,
       ...oldStoreParsed
     },
     mutations: {
@@ -172,6 +172,9 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       UPDATE_ENABLE_AUTOFILL(state, value) {
         state.enableAutofill = value
       },
+      UPDATE_CALLING_API(state, value) {
+        state.callingAPI = value
+      },
       UPDATE_LOGIN_PAGE_INFO(state, info) {
         let keys = []
         const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
@@ -186,7 +189,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         chrome.runtime.sendMessage({
           command: 'updateStoreServiceInfo',
           sender: {
-            optionValue: state.optionValue,
             login_step: state.login_step,
             identity: state.identity,
             auth_info: state.auth_info,

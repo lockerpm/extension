@@ -4,6 +4,7 @@ import 'nprogress/nprogress.css'
 import storePromise from "./store";
 import JSLib from '@/popup/services/services'
 const browserStorageService = JSLib.getBgService('storageService')()
+let isFirst = true
 
 NProgress.configure({ showSpinner: false })
 
@@ -17,7 +18,7 @@ router.beforeEach(async (to, from, next) => {
       await store.dispatch("LoadCurrentUserPw");
     }
     if (store.state.user.email) {
-      const isPwl = store.state.preloginData && store.state.preloginData.require_passwordless
+      const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
       const isMpm = store.state.userPw && store.state.userPw.is_pwd_manager
       if (!isMpm && !isPwl) {
         if (to.name !== 'set-master-password') {
@@ -26,7 +27,7 @@ router.beforeEach(async (to, from, next) => {
           next();
         }
       } else {
-        if (['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
+        if (['login', 'forgot-password'].includes(to.name)) {
           router.push({ name: "home" });
         } else {
           next();
@@ -40,7 +41,10 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
-    router.push({ name: "login" });
+    if (!isFirst) {
+      router.push({ name: "login" });
+    }
+    isFirst = false
   } else {
     next();
   }
