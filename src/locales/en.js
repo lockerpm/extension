@@ -567,6 +567,7 @@ module.exports = {
       additional_info: 'Additional Information',
       private_key: 'Private Key',
       password_pin: 'Password/PIN',
+      pin: 'PIN',
       username: 'Username',
       wallet_app: 'Wallet App',
       networks: 'Networks',
