@@ -562,6 +562,7 @@ module.exports = {
       additional_info: 'Thông tin thêm',
       private_key: 'Khóa bí mật',
       password_pin: 'Mật khẩu/PIN',
+      pin: 'PIN',
       username: 'Tên người dùng',
       wallet_app: 'Ví Blockchain',
       networks: 'Mạng Blockchain',
