@@ -45,10 +45,9 @@ img {
 
 #close {
     width: 15px;
-    height: 25px;
+    height: 15px;
     display: block;
     padding: 5px 0;
-    margin-right: 10px;
 }
 
 button.link,
@@ -114,7 +113,7 @@ button.primary {
 input {
   margin-top: 8px;
   height: 36px !important;
-  width: 100%;
+  width: calc(100% - 24px);
   border-radius: 12px !important;
   border: 1px solid #AED1B3 !important;
   padding-left: 12px !important;

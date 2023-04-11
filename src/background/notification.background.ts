@@ -111,6 +111,8 @@ export default class NotificationBackground {
         switch (msg.sender) {
           case 'notificationBar':
             const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
+            console.log(msg.details);
+
             let passwordFields = [];
             let usernameFields = [];
             for (const form of forms) {
@@ -129,7 +131,7 @@ export default class NotificationBackground {
             chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
               if (autofillObj.enableAutofill === false) return;
               // check is login page
-              if (passwordFields.length === 1 && !passwordFields[0].value) {
+              if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
                 this.autofillFirstPage(sender.tab);
               }
             })
