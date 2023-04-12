@@ -54,17 +54,21 @@
 <script>
 export default {
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     currentTeam () {
       return this.$store.state.currentTeam
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     goVault () {
       this.$router.push({ name: 'vault' })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     goSetting () {
       this.$router.push({ name: 'admin-teamId-settings', params: { teamId: this.$route.params.teamId }})
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getAvatarString (string) {
       const matches = string.match(/\b(\w)/g)
       if (matches && matches.length > 1) {
@@ -73,6 +77,7 @@ export default {
 
       return string.substring(0, 2)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     hashCode (str) { // java String#hashCode
       let hash = 0
       for (let i = 0; i < str.length; i++) {
@@ -80,6 +85,7 @@ export default {
       }
       return hash
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     intToRGB (i) {
       const c = (i & 0x00FFFFFF)
         .toString(16)
@@ -87,6 +93,7 @@ export default {
 
       return '#' + '00000'.substring(0, 6 - c.length) + c
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     selectProgram (value) {
       this.$router.push(this.localeRoute({ name: 'admin-teamId', params: { teamId: value.id } }))
     }

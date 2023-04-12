@@ -840,12 +840,6 @@ export default Vue.extend({
         this.selectedCard = card.id_card
       })
     },
-    async genOrgKey () {
-      const shareKey = await this.$cryptoService.makeShareKey()
-      const orgKey = shareKey[0].encryptedString
-      const collection = await this.$cryptoService.encrypt('defaultCollection', shareKey[1])
-      const collectionName = collection.encryptedString
-    },
     async getCards () {
       this.cards = await this.axios.get('cystack_platform/payments/cards')
     },
@@ -961,7 +955,7 @@ export default Vue.extend({
     },
     postDeposit (order) {
       this.axios.post(`cystack_platform/pm/payments/invoices/${order.payment_id}/processing`)
-        .then(res => {
+        .then(() => {
           this.dialogTransfer = false
           this.dialogThank = true
         })

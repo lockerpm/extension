@@ -87,6 +87,7 @@ export default {
   components: {
     InputText
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       userAccessOptions: [
@@ -102,6 +103,7 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     waitTimeOptions () {
       return [
         { label: this.$t('data.wait_time_days.oneDay'), value: 1 },
@@ -114,6 +116,7 @@ export default {
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async openDialog (emergency_access = {}) {
       this.dialogVisible = true
       if (emergency_access.id) {
@@ -123,9 +126,11 @@ export default {
         }
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     closeDialog () {
       this.dialogVisible = false
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async postEmergencyAccess (emergency_access) {
       try {
         this.loading = true
@@ -134,13 +139,13 @@ export default {
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.invite_user_failed'), 'warning')
       } finally {
         this.loading = false
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async putEmergencyAccess (emergency_access) {
       try {
         this.loading = true
@@ -149,13 +154,13 @@ export default {
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.update_contact_failed'), 'warning')
       } finally {
         this.loading = false
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async deleteEmergencyAccess (emergency_access) {
       this.$confirm(this.$t('data.notifications.delete_emergency_contact'), this.$t('common.warning'), {
         confirmButtonText: 'OK',
@@ -174,8 +179,6 @@ export default {
         } finally {
           this.loading = false
         }
-      }).catch((e) => {
-        console.log(e)
       })
     }
   }

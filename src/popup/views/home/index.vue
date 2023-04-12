@@ -275,7 +275,7 @@ export default Vue.extend({
         this.notify(this.$t("errors.autofill"), "error");
       }
     },
-    async processMessage(msg, sender, sendResponse) {
+    async processMessage(msg, sender) {
       switch (msg.command) {
       case "syncCompleted":
         if (msg.successfully && msg.trigger) {

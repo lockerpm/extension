@@ -71,6 +71,7 @@ export default {
     item: Object
   },
   components: { },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       secretKeyInputType: 'password',
@@ -94,6 +95,7 @@ export default {
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleAddEdit () {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -105,6 +107,7 @@ export default {
         }
       })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async createOTP () {
       try {
         this.callingAPI = true;
@@ -130,6 +133,7 @@ export default {
       }
     },
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async updateOTP () {
       if (this.form.name == this.item.name) {
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t(`${CipherType[this.item.type]}`, 1) }), 'success')

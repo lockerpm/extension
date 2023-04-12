@@ -14,8 +14,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
     oldStoreParsed = oldStore
   }
 
-  console.log('oldStoreParsed', oldStoreParsed)
-
   return new Vuex.Store({
     state: {
       init: false,

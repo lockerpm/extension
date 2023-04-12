@@ -20,6 +20,7 @@
 
 <script>
 export default {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       menu: [

@@ -111,7 +111,6 @@ Vue.mixin({
       })
     },
     async logout () {
-      console.log('###### LOG OUT')
       await this.axios.post('/users/logout')
       await this.$cryptoService.clearKeys()
       await this.$userService.clear()
@@ -120,7 +119,6 @@ Vue.mixin({
       this.$router.push({ name: 'home' })
     },
     async lock () {
-      console.log('##### LOCK')
       await Promise.all([
         this.$cryptoService.clearKey(false),
         this.$cryptoService.clearOrgKeys(true),
@@ -338,7 +336,6 @@ Vue.filter('formatNumber', function (value) {
 
 storePromise.then((store) => {
   router.beforeEach(async (toRoute, fromRoute, next) => {
-    console.log('vao Before Each')
     if (fromRoute && toRoute && fromRoute.path && toRoute.path
       && !fromRoute.path.includes('/login')
       && !toRoute.path.includes('/login')
