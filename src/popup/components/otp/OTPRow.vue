@@ -49,6 +49,7 @@ export default {
   props: {
     item: Object
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       otp: '',
@@ -58,17 +59,20 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     start () {
       return this.period - Math.floor(this.now) % this.period
     }
   },
   watch: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     start(value) {
       if (value === this.period) {
         this.getOTP();
       }
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.getOTP();
     setInterval(() => {
@@ -76,10 +80,12 @@ export default {
     }, 1000);
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getOTP () {
       this.otp = await this.$totpService.getCode(this.item.notes);
       this.period = await this.$totpService.getTimeInterval(this.item.notes);
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     formatOTP (otp) {
       if (!otp) {
         return 'N/A'
@@ -88,6 +94,7 @@ export default {
       const last = otp.slice(3, otp.length);
       return `${first} ${last}`
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleCopy () {
       this.isCopied = true;
       setTimeout(() => {

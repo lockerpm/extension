@@ -157,7 +157,7 @@ export default Vue.extend({
       this.$store.commit('UPDATE_LOADING', true)
       const url = `cystack_platform/pm/payments/invoices/${item.id}`
       this.axios.post(url)
-        .then(res => {
+        .then(() => {
           this.notify(this.$t('data.billing.pay_success'), 'success')
           item.status = 'paid'
         })
@@ -192,7 +192,7 @@ export default Vue.extend({
         type: 'warning'
       }).then(() => {
         this.axios.post('cystack_platform/pm/payments/plan/cancel')
-          .then(res => {
+          .then(() => {
             this.notify(this.$t('data.billing.unsubscribe_success', { date: this.$moment(this.currentPlan.next_billing_time * 1000).format('LL') }), 'success')
             this.$store.dispatch('LoadCurrentPlan')
           })

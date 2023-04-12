@@ -60,6 +60,7 @@ export default {
   components: {
     PurgeTeamVault
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       loading: false,
@@ -68,13 +69,16 @@ export default {
   },
   computed: {
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.getTeam()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getTeam () {
       this.team = await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}`)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async putTeam () {
       try {
         this.loading = true
@@ -86,6 +90,7 @@ export default {
         this.loading = false
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     openPurgeTeamVault () {
       this.$refs.purgeTeamVault.openDialog()
     }

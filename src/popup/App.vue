@@ -18,17 +18,14 @@ export default Vue.extend({
     }
   },
   created () {
-    (window as any).bitwardenPopupMainMessageListener = async (msg: any, sender: any, sendResponse: any) => {
-      console.log(msg)
-      console.log(sender)
-      console.log(sendResponse)
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    (window as any).bitwardenPopupMainMessageListener = async () => {}
   },
   async mounted () {
     const currentRouter = JSON.parse(await this.$storageService.get('current_router'))
     this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'home'})
     chrome.runtime.onMessage.addListener(
-      async (msg, sender, response) => {
+      async (msg) => {
         switch(msg.command){
         case 'locked':
           this.$router.push({ name: 'lock' });

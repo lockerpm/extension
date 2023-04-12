@@ -221,7 +221,6 @@ export default Vue.extend({
         this.getUsers()
         this.notify(this.$t('data.notifications.confirm_member_success'), 'success')
       } catch (e) {
-        console.log(e)
         this.notify(this.$t('data.notifications.confirm_member_failed'), 'warning')
       } finally {
         this.loadingConfirm = false

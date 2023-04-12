@@ -400,7 +400,7 @@ export default Vue.extend({
         this.loadingSendEmail = true
         const url = '/sso/auth/otp/mail'
         this.axios.post(url, this.user)
-          .then((res) => {
+          .then(() => {
             this.loadingSendEmail = false
             this.step = 2
             this.$nextTick(() => this.$refs.otp.focus())

@@ -342,14 +342,11 @@ async function VaultGuard (to, from, next) {
     await store.dispatch('LoadCurrentUser')
     await store.dispatch('LoadCurrentUserPw')
     if (store.state.userPw.is_pwd_manager === false) {
-      console.log('Dieu huong set-master-password')
       next({name: 'set-master-password'});
     } else {
-      console.log('Dieu huong binh thuong')
       next();
     }
   } else {
-    console.log('Dieu huong Login')
     next({name: 'login'});
   }
 }

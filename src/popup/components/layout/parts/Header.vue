@@ -48,6 +48,7 @@
 <script>
 import debounce from 'lodash/debounce'
 export default {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
       inputText: ''
@@ -55,6 +56,7 @@ export default {
   },
   asyncComputed: {
     locked: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       async get () {
         return await this.$vaultTimeoutService.isLocked()
       },
@@ -62,9 +64,10 @@ export default {
     },
   },
   methods: {
-    handleSearch: debounce(function (e) {
+    handleSearch: debounce(function () {
       this.$store.commit('UPDATE_SEARCH', this.inputText)
     }, 800),
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     showPre() {
       const slider = document.querySelector('.catalog-list')
       const scrollLeft = slider.scrollLeft
@@ -73,6 +76,7 @@ export default {
         behavior: 'smooth'
       })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     showNext() {
       const slider = document.querySelector('.catalog-list')
       const scrollLeft = slider.scrollLeft
@@ -83,6 +87,7 @@ export default {
     },
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     type() {
       switch (this.$route.name) {
       case "home":
@@ -105,6 +110,7 @@ export default {
         return null;
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     vault_categories() {
       return [
         {
@@ -133,6 +139,7 @@ export default {
         }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     menu() {
       return [
         {

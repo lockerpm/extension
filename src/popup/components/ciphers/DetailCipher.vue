@@ -304,14 +304,9 @@
 import Vue from 'vue';
 import debounce from 'lodash/debounce'
 import find from 'lodash/find'
-import AddEditCipher from '@/components/cipher/AddEditCipher'
 import PasswordStrength from '@/components/password/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
 import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy'
-import Vnodes from '@/components/Vnodes'
-import ShareCipher from '@/components/cipher/ShareCipher'
-import MoveFolder from '@/components/folder/MoveFolder'
-import router from '@/router/popup';
 export default Vue.extend({
   components: {
     TextHaveCopy,
@@ -370,16 +365,14 @@ export default Vue.extend({
           if (item.type === CipherType.CryptoAccount) {
             try {
               item.cryptoAccount = JSON.parse(item.notes)
-            } catch (error) {
-              console.log(error)
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           if (item.type === CipherType.CryptoWallet) {
             try {
               item.cryptoWallet = JSON.parse(item.notes)
-            } catch (error) {
-              console.log(error)
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           return item
         })
