@@ -133,7 +133,6 @@ Vue.mixin({
       })
     },
     async logout() {
-      console.log('###### LOG OUT')
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
       await this.axios.post('/users/logout')

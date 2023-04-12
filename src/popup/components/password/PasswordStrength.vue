@@ -37,6 +37,7 @@ export default {
       default: 10
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       scores: {
@@ -48,9 +49,6 @@ export default {
         4: 'strong'
       }
     }
-  },
-  mounted () {
-    return
   }
 }
 </script>

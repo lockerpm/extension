@@ -73,19 +73,23 @@ export default {
   components: {
     AddEditGroup, AddEditGroupUsers
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       groups: [],
       loading: true
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.getGroups()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     postGroup () {
       this.$refs.addEditGroup.openDialog({})
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getGroups () {
       this.loading = true
       this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}/groups`)
@@ -94,12 +98,15 @@ export default {
           this.loading = false
         })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     putGroup (group) {
       this.$refs.addEditGroup.openDialog(group)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     putGroupUsers (group) {
       this.$refs.addEditGroupUsers.openDialog(group)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     deleteGroup (group) {
       this.$refs.addEditGroup.deleteUser(group)
     }

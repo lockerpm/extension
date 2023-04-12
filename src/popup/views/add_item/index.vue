@@ -30,17 +30,10 @@
 
 <script>
 import Vue from 'vue'
-import { BrowserApi } from '@/browser/browserApi';
 export default Vue.extend({
   data () {
     return {
       menu: [
-        // {
-        //   icon: 'fa-home',
-        //   queryParam: 'folder',
-        //   divided: true,
-        //   name: 'Add Folder'
-        // },
         {
           icon: 'fa-home',
           queryParam: 'passwords',
@@ -74,16 +67,7 @@ export default Vue.extend({
   },
   methods: {
     openRoute (item) {
-      // if (item.queryParam==='folder') {
-      //   this.$platformUtilsService.launchUri(`/web.html#/vault?dialog=${item.queryParam}`)
-      // } else {
-      //   this.$router.push({name: 'add-item-create', params: {type: item.type}})
-      // }
       this.$router.push({name: 'add-item-create', params: {type: item.type}})
-    },
-    async test () {
-      const test = await BrowserApi.getTabFromCurrentWindow()
-      console.log(test)
     }
   }
 })

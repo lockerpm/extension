@@ -21,16 +21,6 @@
         >
           Web Vault
         </button>
-        <!-- <button class="btn btn-default w-full mb-4"
-                @click="openLock"
-        >
-          Lock
-        </button>
-        <button class="btn btn-default w-full mb-4"
-                @click="openSet"
-        >
-          Set master
-        </button> -->
       </div>
     </div>
   </div>
@@ -38,7 +28,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { BrowserApi } from '@/browser/browserApi'
 
 export default Vue.extend({
   name: 'HomeWeb',

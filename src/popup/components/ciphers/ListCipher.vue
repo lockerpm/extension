@@ -227,16 +227,14 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-            } catch (error) {
-              console.log(error);
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-            } catch (error) {
-              console.log(error);
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           return {
             ...item,

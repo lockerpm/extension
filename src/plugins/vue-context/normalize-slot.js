@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const normalizeSlot = (name, scope = {}, $scopedSlots = {}, $slots = {}) => {
   // Note: in Vue 2.6.x, all named slots are also scoped slots
   const slot = $scopedSlots[name] || $slots[name]

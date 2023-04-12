@@ -103,7 +103,6 @@ import CipherRow from "../../components/ciphers/CipherRow.vue";
 import Header from "../../components/layout/parts/Header.vue";
 import Footer from "../../components/layout/parts/Footer.vue";
 const BroadcasterSubscriptionId = "ChildViewComponent";
-import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({
   components: {
@@ -281,16 +280,14 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-            } catch (error) {
-              console.log(error);
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-            } catch (error) {
-              console.log(error);
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           return {
             ...item,
