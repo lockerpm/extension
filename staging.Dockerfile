@@ -26,7 +26,7 @@ ARG VUE_APP_DESKTOP_WS_URL
 
 ARG VERSION_API_TOKEN
 
-RUN (curl 'https://api.cystack.net/v3/cystack_platform/pm/releases/new' --header 'Authorization: $VERSION_API_TOKEN' --header 'Content-Type: application/json' --data '{"build": true, "client_id": "browser", "environment": "prod"}' | jq -r .version) > version.txt
+RUN (curl 'https://api.cystack.net/v3/cystack_platform/pm/releases/new' --header 'Authorization: Token $VERSION_API_TOKEN' --header 'Content-Type: application/json' --data '{"build": true, "client_id": "browser", "environment": "prod"}' | jq -r .version) > version.txt
 
 RUN  sed -i 's|"version": "1.0.0"|"version": "'$(cat version.txt)'"|' package.json
 
