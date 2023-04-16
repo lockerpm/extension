@@ -24,9 +24,11 @@ ARG VUE_APP_RECAPTCHA_SITE_KEY
 
 ARG VUE_APP_DESKTOP_WS_URL
 
-RUN export VERSION=$(curl 'https://api.cystack.net/v3/cystack_platform/pm/releases/new' --header 'Authorization: Token am03RnR2Q4nRAdUUjAszIGggIbAEvSBx' --header 'Content-Type: application/json' --data '{"build": true, "client_id": "browser", "environment": "prod"}' | jq -r .version)
+ARG VERSION_API_TOKEN
 
-RUN  sed -i 's|"version": "1.0.0"|"version": "'$VERSION'"|' package.json
+RUN (curl -H 'Authorization: Token '$VERSION_API_TOKEN'' -H 'Content-Type: application/json' --data '{"client_id": "browser", "environment": "staging"}' ''$VERSION_API_URL'/current' | jq -r .version) > version.txt
+
+RUN  sed -i 's|"version": "1.0.0"|"version": "'$(cat version.txt)'"|' package.json
 
 RUN yarn build
 
@@ -38,10 +40,10 @@ ARG CLIENT_SECRET
 
 ARG REFRESH_TOKEN
 
-RUN export ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
+RUN (curl "https://accounts.google.com/o/oauth2/token" -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token) > access_token.txt
 
-# TODO: replace the zip file with path_to_built_file 
+RUN (curl -H "Authorization: Bearer $(cat access_token.txt)" -H "x-goog-api-version: 2" -X PUT -T artifacts/locker-extention-v$(cat version.txt)-production.zip "https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID" | jq .uploadState) > state.txt
 
-RUN curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "x-goog-api-version: 2" -X PUT -T locker_chrome_extension.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID"
+RUN if grep -q "SUCCESS" state.txt; then (curl -H "Authorization: Bearer $(cat access_token.txt)" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST "https://www.googleapis.com/chromewebstore/v1.1/items/$APP_ID/publish" | jq .status) > status.txt; fi
 
-RUN curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/$APP_ID/publish"
+RUN if grep -q "OK" status.txt; then curl -H 'Authorization: Token '$VERSION_API_TOKEN'' -H 'Content-Type: application/json' --data '{"build": true, "client_id": "browser", "environment": "staging"}' ''$VERSION_API_URL'/new'; fi
