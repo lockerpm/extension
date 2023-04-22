@@ -26,6 +26,8 @@ ARG VUE_APP_DESKTOP_WS_URL
 
 ARG VERSION_API_TOKEN
 
+ARG VERSION_API_URL
+
 RUN (curl -H 'Authorization: Token '$VERSION_API_TOKEN'' -H 'Content-Type: application/json' --data '{"client_id": "browser", "environment": "prod"}' ''$VERSION_API_URL'/current' | jq -r .version) > version.txt
 
 RUN  sed -i 's|"version": "1.0.0"|"version": "'$(cat version.txt)'"|' package.json
