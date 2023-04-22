@@ -79,16 +79,15 @@ export default {
   components: {
     AddEditTeamFolderGroups, AddEditTeamFolderUsers, AddEditTeamFolder
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       users: []
     }
   },
-  mounted () {
-    return
-  },
   asyncComputed: {
     collections: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       async get () {
         const collections = await this.$collectionService.getAllDecrypted() || []
         return collections.filter(c => !c.readOnly && c.organizationId === this.$route.params.teamId)
@@ -97,15 +96,19 @@ export default {
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     addEditFolder (folder) {
       this.$refs.addEditTeamFolder.openDialog(folder)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     deleteFolder (folder) {
       this.$refs.addEditTeamFolder.deleteFolder(folder)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     putTeamFolderGroups (folder) {
       this.$refs.addEditTeamFolderGroups.openDialog(folder)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     putTeamFolderUsers (folder) {
       this.$refs.addEditTeamFolderUsers.openDialog(folder)
     }

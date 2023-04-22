@@ -33,6 +33,7 @@ const contains = (parent, child) => {
 }
 
 // Attach an event listener to an element
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const eventOn = (el, eventName, handler) => {
   if (el && el.addEventListener) {
     el.addEventListener(eventName, handler)
@@ -40,6 +41,7 @@ export const eventOn = (el, eventName, handler) => {
 }
 
 // Remove an event listener from an element
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const eventOff = (el, eventName, handler) => {
   if (el && el.removeEventListener) {
     el.removeEventListener(eventName, handler)
@@ -47,6 +49,7 @@ export const eventOff = (el, eventName, handler) => {
 }
 
 // Filter visible elements
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const filterVisible = elements => (elements || []).filter(isVisible)
 
 // Return the Bounding Client Rect of an element
@@ -72,10 +75,12 @@ const isVisible = (el) => {
 }
 
 // Select all elements matching a selector. Returns `[]` if none found
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const selectAll = (selector, root) =>
   arrayFrom((isElement(root) ? root : document).querySelectorAll(selector))
 
 // Set an attribute on an element
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const setAttr = (el, attr, value) => {
   if (attr && isElement(el)) {
     el.setAttribute(attr, value)

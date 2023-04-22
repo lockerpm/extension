@@ -301,7 +301,6 @@ export default Vue.extend({
         this.$vaultTimeoutService.setVaultTimeoutOptions(this.user.timeout, this.user.timeout_action)
         this.notify(this.$t('data.notifications.update_settings_success'), 'success')
       } catch (e) {
-        console.log(e)
         this.notify(this.$t('data.notifications.update_settings_failed'), 'warning')
       } finally {
         this.loading = false

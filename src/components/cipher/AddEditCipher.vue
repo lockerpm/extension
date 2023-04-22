@@ -549,7 +549,6 @@ export default Vue.extend({
           this.$emit('reset-selection')
         } catch (e) {
           this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }
@@ -587,7 +586,6 @@ export default Vue.extend({
           this.$emit('reset-selection')
         } catch (e) {
           this.notify(this.$tc('data.notifications.restore_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }

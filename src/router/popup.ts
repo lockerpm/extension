@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import storePromise from "../store/index";
 import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
-import i18n from '@/locales/i18n';
 import sentryConfig from './index'
 
 Vue.use(VueRouter)

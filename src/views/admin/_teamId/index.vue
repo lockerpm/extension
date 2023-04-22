@@ -49,6 +49,7 @@
 export default {
   components: {
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       dashboard: {
@@ -76,6 +77,7 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     strongRate () {
       if (this.dashboard.login && this.dashboard.login.scores) {
         const strongScores = this.dashboard.login.scores.filter(e => e.score > 0)
@@ -85,16 +87,17 @@ export default {
       return 0
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.getDashboard()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getDashboard () {
       try {
         this.dashboard = await this.axios.get(`cystack_platform/pm/teams/${this.$route.params.teamId}/dashboard`)
-      } catch (e) {
-        console.log(e)
-      }
+      // eslint-disable-next-line no-empty
+      } catch (e) {}
     }
   }
 }

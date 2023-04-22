@@ -20,11 +20,8 @@ export default Vue.extend({
     }
   },
   created () {
-    (window as any).bitwardenPopupMainMessageListener = async (msg: any, sender: any, sendResponse: any) => {
-      console.log(msg)
-      console.log(sender)
-      console.log(sendResponse)
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    (window as any).bitwardenPopupMainMessageListener = async () => {}
   },
   methods: {
   }

@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { BrowserApi } from '@/browser/browserApi'
 import isString from "lodash/isString";
 export default Vue.extend({
   components: {
@@ -20,9 +19,6 @@ export default Vue.extend({
       this.$router.replace({ name: 'vault' })
     }
     this.$store.commit('UPDATE_LOADING', false)
-    // BrowserApi.reloadOpenWindows();
-    // const thisWindow = window.open('', '_self');
-    // thisWindow.close();
   }
 });
 </script>

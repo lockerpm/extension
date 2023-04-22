@@ -64,6 +64,7 @@
 export default {
   components: {
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       users: [],
@@ -78,11 +79,13 @@ export default {
       loading: false
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.dateRange = [this.$moment().subtract(1, 'weeks').format('YYYY-MM-DD'), this.$moment().format('YYYY-MM-DD')]
     this.getLogs()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getLogs () {
       if (this.dateRange && this.dateRange.length === 2) {
         const from = this.$moment.utc(this.dateRange[0]).startOf('day').unix()
@@ -104,7 +107,8 @@ export default {
           })
       }
     },
-    handleChange (value) {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    handleChange () {
       this.continuationToken = null
       this.logs = []
       this.getLogs()

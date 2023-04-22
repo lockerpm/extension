@@ -134,7 +134,6 @@ export default Vue.extend({
         await this.$userService.clear()
         await this.$messagingService.send('locked')
       } catch (e) {
-        console.log(e)
         this.notify(this.$t('data.notifications.update_master_failed'), 'warning')
         this.errors = (e.response && e.response.data && e.response.data.details) || { oldMasterPassword: 1 }
       } finally {

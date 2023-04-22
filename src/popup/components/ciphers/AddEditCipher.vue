@@ -560,10 +560,8 @@
 
 <script>
 import Vue from 'vue'
-import { Dialog } from 'element-ui'
 import { ValidationProvider } from 'vee-validate'
 import { CipherType, } from "jslib-common/enums/cipherType";
-import {FieldType} from "jslib-common/enums/fieldType"
 import { SecureNoteType } from "jslib-common/enums/secureNoteType";
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
@@ -574,7 +572,6 @@ import { IdentityView } from "jslib-common/models/view/identityView";
 import { CardView } from "jslib-common/models/view/cardView";
 import { LoginUriView } from "jslib-common/models/view/loginUriView";
 import { LoginView } from "jslib-common/models/view/loginView";
-import { FieldView } from "jslib-common/models/view/fieldView";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import PasswordGenerator from '@/components/password/PasswordGenerator'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
@@ -868,7 +865,6 @@ export default Vue.extend({
           this.$router.back()
         } catch (e) {
           this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }
@@ -906,7 +902,6 @@ export default Vue.extend({
           this.$emit('reset-selection')
         } catch (e) {
           this.notify(this.$tc('data.notifications.restore_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }
