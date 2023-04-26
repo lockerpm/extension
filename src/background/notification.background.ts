@@ -43,7 +43,7 @@ export default class NotificationBackground {
   }
 
   async init() {
-    this.main.storageService.remove('neverDomains');
+    // this.main.storageService.remove('neverDomains');
     if (chrome.runtime == null) {
       return;
     }
