@@ -1,4 +1,4 @@
-FROM node:14.17.1
+FROM node:16.20.0
 
 RUN apt update && apt install curl jq -y
 
