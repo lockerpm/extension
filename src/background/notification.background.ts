@@ -43,6 +43,7 @@ export default class NotificationBackground {
   }
 
   async init() {
+    // this.main.storageService.remove('neverDomains');
     if (chrome.runtime == null) {
       return;
     }
@@ -111,8 +112,6 @@ export default class NotificationBackground {
         switch (msg.sender) {
           case 'notificationBar':
             const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
-            console.log(msg.details);
-
             let passwordFields = [];
             let usernameFields = [];
             for (const form of forms) {
