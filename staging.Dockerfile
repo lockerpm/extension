@@ -1,4 +1,4 @@
-FROM node:14.17.1
+FROM node:16.20.0
 
 RUN apt update && apt install curl jq -y
 
@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN yarn
+RUN npm install
 
 ARG VUE_APP_ID_URL
 
@@ -32,7 +32,7 @@ RUN (curl -H 'Authorization: Token '$VERSION_API_TOKEN'' -H 'Content-Type: appli
 
 RUN  sed -i 's|"version": "1.0.0"|"version": "'$(cat version.txt)'"|' package.json
 
-RUN yarn build
+RUN npm run build
 
 ARG APP_ID
 
