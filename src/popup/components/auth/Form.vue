@@ -54,8 +54,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: '', //quyetnguyencr7@gmail.com
-        password: '' //tienquyet1997@
+        username: 'quyetnguyencr7@gmail.com', //quyetnguyencr7@gmail.com
+        password: 'tienquyet1997@' //tienquyet1997@
       }
     }
   },
@@ -103,9 +103,11 @@ export default Vue.extend({
       }
       this.axios.post('/sso/auth', payload).then(async (response) => {
         if (response.is_factor2) {
-          this.$emit('update-auth', response)
-          this.$emit('update-user', payload)
-          this.$emit('next');
+          const msg: any = {
+            command: 'authAccessToken',
+            sender: { type: 'login' },
+          };
+          chrome.runtime.sendMessage(msg);
         } else {
           try {
             this.axios.post('/sso/me/last_active',{}, {

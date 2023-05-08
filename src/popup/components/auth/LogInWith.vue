@@ -59,13 +59,6 @@ export default Vue.extend({
       };
       chrome.runtime.sendMessage(msg);
     },
-    async openLogin() {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'login' },
-      };
-      chrome.runtime.sendMessage(msg);
-    },
     async loginWith (provider) {
       const msg: any = {
         command: 'authAccessToken',

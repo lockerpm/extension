@@ -37,27 +37,7 @@
     <Form
       v-else-if="login_step === 2"
       :isEnterprise="isEnterprise"
-      @update-auth="(v) => auth_info = v"
-      @update-user="(v) => user_info = v"
       @back="() => updateLoginStep(1)"
-      @next="() => updateLoginStep(3)"
-      @get-access-token="getAccessToken"
-    />
-    <Identity
-      v-else-if="login_step === 3"
-      :identity="identity"
-      :auth_info="auth_info"
-      :user_info="user_info"
-      @change-identity="(value) => identity = value"
-      @back="() => updateLoginStep(2)"
-      @next="() => updateLoginStep(4)"
-    />
-    <VerifyOTP
-      v-else-if="login_step === 4"
-      :identity="identity"
-      :otp-method="otpMethod"
-      :user_info="user_info"
-      @back="() => updateLoginStep(3)"
       @get-access-token="getAccessToken"
     />
     <LogInWith v-if="[1, 2].includes(login_step)"/>
@@ -69,8 +49,6 @@ import Vue from 'vue'
 import Options from '../components/auth/Options.vue';
 import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
-import Identity from '../components/auth/Identity.vue'
-import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
 export default Vue.extend({
   name: 'Login',
@@ -78,16 +56,11 @@ export default Vue.extend({
     Options,
     LogInWith,
     Form,
-    Identity,
-    VerifyOTP
   },
   data () {
     return {
       optionValue: 'individual_vault',
       login_step: 1,
-      identity: 'mail',
-      auth_info: null,
-      user_info: null,
     }
   },
   computed: {
@@ -98,17 +71,8 @@ export default Vue.extend({
       if (this.login_step === 1) {
         return this.$t('data.login.login_option')
       }
-      if (this.login_step === 2) {
-        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.optionValue}`) })
-      }
-      if (this.login_step === 3) {
-        return this.$t('data.login.verify')
-      }
-      return this.$t('data.login.enter_code')
+      return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.optionValue}`) })
     },
-    otpMethod () {
-      return this.auth_info?.methods?.find((m) => m.type === this.identity)
-    }
   },
   async mounted() {
     await this.$storageService.remove('cs_token')

@@ -294,7 +294,7 @@ export default class RuntimeBackground {
         });
         break;
       case "authAccessToken":
-        await this.authAccessToken(msg.sender.type, msg.sender.provider)
+        await this.authAccessToken(msg.sender)
         break;
       case "openPopupIframe":
         if (!this.platformUtilsService.isFirefox()) {
@@ -403,13 +403,13 @@ export default class RuntimeBackground {
     this.passwordGenerator.addHistory(password);
   }
 
-  private async authAccessToken(type: string, provider: string) {
+  private async authAccessToken(sender: any) {
     // check open popup
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
-      if (provider) {
-        url += `&provider=${provider}`
+      let url = `${process.env.VUE_APP_ID_URL}/${sender.type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
+      if (sender.provider) {
+        url += `&provider=${sender.provider}`
       }
       if (process.env.VUE_APP_ENVIRONMENT) {
         url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
