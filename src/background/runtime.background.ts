@@ -206,6 +206,7 @@ export default class RuntimeBackground {
         break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
+        console.log(token);
         if (!token) {
           const myHeaders = {
             headers: { Authorization: `Bearer ${msg.token}` }
