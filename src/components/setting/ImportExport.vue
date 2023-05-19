@@ -390,9 +390,8 @@ export default Vue.extend({
           if (content != null) {
             fileContents = content
           }
-        } catch (e) {
-          console.log(e)
-        }
+        // eslint-disable-next-line no-empty
+        } catch (e) {}
       }
       if (!fileContents) {
         this.notify('Vui lòng chọn File phù hợp', 'warning')

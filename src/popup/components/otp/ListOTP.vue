@@ -60,6 +60,7 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 export default {
   name: 'ListOTP',
   components: { OTPRow },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       otps: [],
@@ -72,6 +73,7 @@ export default {
   },
   asyncComputed: {
     ciphers: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       async get() {
         this.loading = true;
         let result = await this.$cipherService.getAllDecrypted();
@@ -92,6 +94,7 @@ export default {
     },
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     sortBy () {
       return [
         {
@@ -112,12 +115,14 @@ export default {
         }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     currentSort () {
       const key = `${this.orderField}_${this.orderDirection}`
       return this.sortBy.find((s) => s.value === key) || this.sortBy[0]
     },
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleCreateOTP (command) {
       if (command === 'setup-key') {
         this.$emit('add-edit');
@@ -125,6 +130,7 @@ export default {
         this.scanQRCode();
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     changeSort (sortValue) {
       if (sortValue === 'custom') {
         return;
@@ -132,6 +138,7 @@ export default {
       this.orderField = sortValue.split('_')[0];
       this.orderDirection = sortValue.split('_')[1];
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async deleteOTPs (ids) {
       this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
         confirmButtonText: this.$t('common.delete'),
@@ -150,6 +157,7 @@ export default {
         }
       })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async scanQRCode () {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       if (tab) {

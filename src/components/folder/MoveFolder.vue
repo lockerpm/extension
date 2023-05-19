@@ -103,7 +103,6 @@ export default Vue.extend({
         this.$emit('reset-selection')
       } catch (e) {
         this.notify(this.$tc('data.notifications.move_failed', this.ids.length), 'warning')
-        console.log(e)
       } finally {
         this.loading = false
       }

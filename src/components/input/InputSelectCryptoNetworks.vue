@@ -84,6 +84,7 @@ export default {
       default: ''
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       focusing: false,
@@ -94,26 +95,31 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     shouldShowPlaceHolder () {
       return this.placeholder && this.focusing && !this.value
     }
   },
   watch: {
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.$nextTick(() => {
       this.value = this.initialValue
     })
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleFocus () {
       if (this.disabled) { return }
       this.focusing = true
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleHover () {
       if (this.disabled) { return }
       this.hovering = true
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleChange (value) {
       if (this.disabled) { return }
       this.$emit('change', value)

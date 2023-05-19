@@ -255,7 +255,6 @@ export default Vue.extend({
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.add_member_failed'), 'warning')
       } finally {
@@ -270,7 +269,6 @@ export default Vue.extend({
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.update_member_failed'), 'warning')
       } finally {

@@ -208,6 +208,7 @@ export default class RuntimeBackground {
         break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
+        console.log(token);
         if (!token) {
           try {
             await this.storageService.save("cs_token", msg.token);

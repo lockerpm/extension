@@ -30,7 +30,6 @@
 
 <script>
 import Vue from 'vue'
-import { BrowserApi } from '@/browser/browserApi';
 export default Vue.extend({
   data () {
     return {

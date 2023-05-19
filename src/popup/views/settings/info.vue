@@ -79,7 +79,6 @@ export default Vue.extend({
           "success"
         );
       } catch (e) {
-        console.log(e);
         this.notify(
           this.$t("data.notifications.update_settings_failed"),
           "warning"

@@ -126,7 +126,6 @@ export default Vue.extend({
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.add_group_failed'), 'warning')
       } finally {
@@ -141,7 +140,6 @@ export default Vue.extend({
         this.closeDialog()
         this.$emit('done')
       } catch (e) {
-        console.log(e)
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$t('data.notifications.update_group_failed'), 'warning')
       } finally {
@@ -166,8 +164,6 @@ export default Vue.extend({
         } finally {
           this.loading = false
         }
-      }).catch((e) => {
-        console.log(e)
       })
     }
   }

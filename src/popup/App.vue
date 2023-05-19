@@ -19,12 +19,8 @@ export default Vue.extend({
     }
   },
   async created () {
-    (window as any).bitwardenPopupMainMessageListener = async (msg: any, sender: any, sendResponse: any) => {
-      console.log(msg)
-      console.log(sender)
-      console.log(sendResponse)
-    }
-    const locked = await this.vaultTimeoutService.isLocked()
+    (window as any).bitwardenPopupMainMessageListener = async () => ({});
+    const locked = await this.vaultTimeoutService.isLocked();
     if (locked) {
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
         this.reconnectDesktopAppSocket(undefined, true);
@@ -37,7 +33,7 @@ export default Vue.extend({
   },
   async mounted () {
     chrome.runtime.onMessage.addListener(
-      async (msg, sender, response) => {
+      async (msg) => {
         switch(msg.command){
         case 'locked':
           this.$router.push({ name: 'lock' });

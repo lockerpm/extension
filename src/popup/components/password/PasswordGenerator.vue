@@ -91,6 +91,7 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       password: '',
@@ -106,6 +107,7 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
       if (this.password) {
         return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
@@ -113,10 +115,12 @@ export default {
       return {}
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.regenerate(true)
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async regenerate (isReload = false) {
       const oldGeneratePassword = await this.$passService.getGeneratePassword()
       if (isReload && oldGeneratePassword) {
@@ -131,15 +135,18 @@ export default {
         await this.$passService.setInformation(this.password, this.options, tab)
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
       this.$router.push({ name: 'add-item-create', params: { password: this.password } })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {
       const numString = num.toString()
       return numString.length >= width
         ? numString
         : new Array(width - numString.length + 1).join(padCharacter) + numString
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async postCipher (cipher) {
       if (!cipher.name) { return }
       try {

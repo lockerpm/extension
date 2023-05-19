@@ -211,7 +211,6 @@ export default Vue.extend({
       try {
         await this.login()
       } catch (e) {
-        console.log(e)
         this.errors = true
       } finally {
         this.loading = false

@@ -132,7 +132,6 @@ export default Vue.extend({
           this.$emit('updated-cipher')
         } catch (e) {
           this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }

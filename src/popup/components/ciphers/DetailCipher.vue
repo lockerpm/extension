@@ -365,16 +365,14 @@ export default Vue.extend({
           if (item.type === CipherType.CryptoAccount) {
             try {
               item.cryptoAccount = JSON.parse(item.notes)
-            } catch (error) {
-              console.log(error)
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           if (item.type === CipherType.CryptoWallet) {
             try {
               item.cryptoWallet = JSON.parse(item.notes)
-            } catch (error) {
-              console.log(error)
-            }
+            // eslint-disable-next-line no-empty
+            } catch (error) {}
           }
           return item
         })
