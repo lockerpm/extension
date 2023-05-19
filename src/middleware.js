@@ -46,8 +46,10 @@ router.beforeEach(async (to, from, next) => {
   } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
     if (!isFirst) {
       router.push({ name: "login" });
+      isFirst = false
+    } else {
+      next()
     }
-    isFirst = false
   } else {
     next();
   }

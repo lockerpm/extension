@@ -19,7 +19,7 @@
           <div v-if="!isPasswordlessMethod" class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}
           </div>
-          <div class="inline-block mb-8 select-none">
+          <div v-if="!isPasswordlessMethod" class="inline-block mb-8 select-none">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
               <img
                 :src="currentUser.avatar"
@@ -27,6 +27,16 @@
                 class="w-[28px] h-[28px] rounded-full mr-2"
               >
               <div class="mr-2">{{ currentUser.email }}</div>
+            </div>
+          </div>
+          <div v-else class="inline-block mb-8 select-none">
+            <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
+              <img
+                :src="loginInfo.preloginData.avatar"
+                alt=""
+                class="w-[28px] h-[28px] rounded-full mr-2"
+              >
+              <div class="mr-2">{{ loginInfo.preloginData.email || loginInfo.preloginData.name }}</div>
             </div>
           </div>
           <form

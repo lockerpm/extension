@@ -257,13 +257,12 @@ export default class RuntimeBackground {
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
             user_info: {
-              email: msg.data.name
+              email: msg.data.email
             }
           })
         } else {
           await this.updateStoreService('isLoggedIn', true);
           this.storageService.save('current_router', 'lock')
-          // await this.storageService.save("cs_token", access_token);
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
             baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,

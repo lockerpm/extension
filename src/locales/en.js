@@ -720,7 +720,8 @@ module.exports = {
       },
       message: {
         required: '{name} is required!',
-        invalid: '{name} is invalid'
+        invalid: '{name} is invalid',
+        otp_invalid: 'The OTP input on desktop app is invalid. Please try again.'
       }
     },
     set_master_pass: {

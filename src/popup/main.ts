@@ -557,6 +557,14 @@ Vue.mixin({
         });
       }
     },
+    generateOTP() {
+      const digits = '0123456789';
+      let OTP = '';
+      for (let i = 0; i < 6; i++ ) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
+      return OTP;
+    },
     async reconnectDesktopAppSocket (email = this.loginInfo.preloginData.email || this.loginInfo.preloginData.name || this.currentUser.email, isCreatedApp = false) {
       this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, { format: 'json' })
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', { ws2: this.$socket, sending: true })
@@ -566,7 +574,14 @@ Vue.mixin({
       }, 100)
 
       this.loginInfo.ws2.onmessage = async (message) => {
-        const data = JSON.parse(message.data)
+        let data = JSON.parse(message.data)
+        // Gen OTP
+        if (data.msgType === 3) {
+          data = {
+            ...data,
+            otp: this.generateOTP()
+          }
+        }
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
           sending: false,
           desktopAppData: {
@@ -575,26 +590,35 @@ Vue.mixin({
           },
         })
         if (data.msgType === 3) {
+          // Connect success and show OTP
           if (!isCreatedApp) {
-            console.log(data, isCreatedApp);
             this.$router.push({ name: 'pwl-unlock' })
           }
         } else if (data.msgType === 4) {
+          // Unlock success
           this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
             baseApiUrl: this.loginInfo.preloginData.base_api ? `${this.loginInfo.preloginData.base_api}/v3` : null,
             baseWsUrl: this.loginInfo.preloginData.base_ws ? `${this.loginInfo.preloginData.base_ws}/ws` : null,
           })
           setTimeout(async () => {
-            const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
-            this.login(true, decryptData);
+            try {
+              const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
+              this.login(true, decryptData);
+            } catch (error) {
+              this.notify(error?.response?.data?.message || this.$t('data.login.message.otp_invalid'), 'error')
+              this.reconnectDesktopAppSocket();
+            }
           }, 1000);
         } else if (data.msgType === 6) {
+          // Not Install Desktop App or Not Unlock
           if (!isCreatedApp) {
             this.$router.push({ name: 'pwl-unlock' })
           }
         } else if (data.msgType === 7) {
+          // Desktop Lock
           this.lock();
         } else if (data.msgType === 9) {
+          // Desktop Logout
           this.logout();
         } 
       }
