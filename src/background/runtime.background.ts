@@ -421,7 +421,7 @@ export default class RuntimeBackground {
       let url = ''
       if (provider === 'sso') {
         this.currentLocation = tab.url
-        await BrowserApi.updateCurrentTab(tab, `${process.env.VUE_APP_ID_SSO_URL}/login?sso=1&client=extension`);
+        await BrowserApi.updateCurrentTab(tab, `${process.env.VUE_APP_ID_SSO_URL}/login/sso?client=extension`);
       } else {
         url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
         if (provider) {
