@@ -7,107 +7,86 @@
         class="h-[36px] mx-auto"
       >
     </div>
-    <div class="font-bold text-head-5 text-black-700 text-center mt-10">
-      {{$t('data.login.login')}}
-    </div>
-    <el-row type="flex" justify="space-between my-4 px-10" align="middle">
-      <div class="text-base font-medium">
-        {{ loginSubtitle }}
-      </div>
+    <div>
       <div
-        v-if="language !== 'vi'"
-        class="cursor-pointer"
-        @click="changeLang('vi')"
-      >
-        <span class="flag flag-us"></span>
+        class="font-bold text-head-5 text-black-700 text-center mt-10">
+        {{$t('data.login.login')}}
       </div>
-      <div v-else
-        class="cursor-pointer"
-        @click="changeLang('en')"
-      >
-        <span class="flag flag-vn"></span>
-      </div>
-    </el-row>
-    <Options
-      v-if="login_step === 1"
-      :optionValue="optionValue"
-      @change-option="(value) => optionValue = value"
-      @next="() => updateLoginStep(2)"
-    />
+      <el-row type="flex" justify="space-between my-4 px-10" align="middle">
+        <div class="text-base font-medium">
+          {{ loginSubtitle }}
+        </div>
+        <div
+          v-if="language !== 'vi'"
+          class="cursor-pointer"
+          @click="changeLang('vi')"
+        >
+          <span class="flag flag-us"></span>
+        </div>
+        <div v-else
+          class="cursor-pointer"
+          @click="changeLang('en')"
+        >
+          <span class="flag flag-vn"></span>
+        </div>
+      </el-row>
+    </div>
     <Form
-      v-else-if="login_step === 2"
-      :isEnterprise="isEnterprise"
-      @update-auth="(v) => auth_info = v"
-      @update-user="(v) => user_info = v"
-      @back="() => updateLoginStep(1)"
-      @next="() => updateLoginStep(3)"
+      v-if="loginInfo.login_step === 1"
+      @next="() => updateLoginStep(2)"
       @get-access-token="getAccessToken"
     />
     <Identity
-      v-else-if="login_step === 3"
-      :identity="identity"
-      :auth_info="auth_info"
-      :user_info="user_info"
-      @change-identity="(value) => identity = value"
-      @back="() => updateLoginStep(2)"
-      @next="() => updateLoginStep(4)"
+      v-else-if="loginInfo.login_step === 2"
+      @back="() => updateLoginStep(1)"
+      @next="() => updateLoginStep(3)"
     />
     <VerifyOTP
-      v-else-if="login_step === 4"
-      :identity="identity"
+      v-else-if="loginInfo.login_step === 3"
       :otp-method="otpMethod"
-      :user_info="user_info"
-      @back="() => updateLoginStep(3)"
+      @back="() => updateLoginStep(2)"
       @get-access-token="getAccessToken"
     />
-    <LogInWith v-if="[1, 2].includes(login_step)"/>
+    <LogInWith
+      :login_step="loginInfo.login_step"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import Options from '../components/auth/Options.vue';
 import LogInWith from '../components/auth/LogInWith.vue'
 import Form from '../components/auth/Form.vue'
 import Identity from '../components/auth/Identity.vue'
 import VerifyOTP from '../components/auth/VerifyOTP.vue'
 
+import authAPI from '@/api/auth'
+import meAPI from '@/api/me'
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   name: 'Login',
   components: {
-    Options,
     LogInWith,
     Form,
     Identity,
     VerifyOTP
   },
   data () {
-    return {
-      optionValue: 'individual_vault',
-      login_step: 1,
-      identity: 'mail',
-      auth_info: null,
-      user_info: null,
-    }
+    return {}
   },
   computed: {
-    isEnterprise() {
-      return this.optionValue === 'enterprise_vault'
-    },
     loginSubtitle() {
-      if (this.login_step === 1) {
+      if (this.loginInfo.login_step === 1) {
         return this.$t('data.login.login_option')
       }
-      if (this.login_step === 2) {
-        return this.$t('data.login.login_option_locker', { option: this.$t(`data.login.options.${this.optionValue}`) })
-      }
-      if (this.login_step === 3) {
+      if (this.loginInfo.login_step === 2) {
         return this.$t('data.login.verify')
       }
       return this.$t('data.login.enter_code')
     },
     otpMethod () {
-      return this.auth_info?.methods?.find((m) => m.type === this.identity)
+      return this.loginInfo.auth_info?.methods?.find((m) => m.type === this.loginInfo.identity)
     }
   },
   async mounted() {
@@ -115,35 +94,48 @@ export default Vue.extend({
   },
   methods: {
     updateLoginStep (value) {
-      this.login_step = value
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+        login_step: value
+      })
     },
-    async getAccessToken(token){
-      const url = '/sso/access_token'
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+    async getAccessToken(callback){
       const payload = {
         SERVICE_URL: "/sso",
         SERVICE_SCOPE: "pwdmanager",
         CLIENT: "browser"
       }
       try {
-        this.axios.post('/sso/me/last_active', {}, config)
-        const data = await this.axios.post(url, payload, config)
-        if(data.url){
-          const url = data.url
-          let token = url.substring(url.indexOf("token")+6)
-          token = token.indexOf("&") === -1?token:token.substring(0, token.indexOf("&"))
-          await this.$storageService.save('cs_token', token)
-          chrome.runtime.sendMessage({
-            command: 'updateStoreService',
-            sender: { key: 'isLoggedIn', value: true },
-          });
-          this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-          this.$router.push({ name: 'lock' })
+        await authAPI.sso_last_active();
+        const data: any = await authAPI.sso_access_token(payload);
+        if(data.access_token){
+          await this.$storageService.save('cs_token', data.access_token)
+          const userInfo = await meAPI.me();
+          cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
+            this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+              preloginData: {
+                ...userInfo,
+                ...response,
+              }
+            })
+            if (response.login_method === 'passwordless' || response.require_passwordless) {
+              this.$router.push({ name: 'pwl-unlock' })
+            } else {
+              chrome.runtime.sendMessage({
+                command: 'updateStoreService',
+                sender: { key: 'isLoggedIn', value: true },
+              });
+              this.$store.commit('UPDATE_IS_LOGGEDIN', true)
+              this.$router.push({ name: 'lock' })
+            }
+            callback()
+          }).catch ((error) => {
+            callback()
+            this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
+          })
         }
       } catch (error) {
-        this.notify(error?.response?.data?.message, 'error')
+        callback()
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
       }
     },
   }

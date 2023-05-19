@@ -143,6 +143,9 @@
 <script>
 import Vue from 'vue'
 import InputText from '@/components/input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputText
@@ -227,11 +230,7 @@ export default Vue.extend({
         if (this.file && this.inviteByFile) {
           const formData = new FormData()
           formData.append('members', this.file)
-          await this.axios.post(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/multiple/file`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          })
+          await cystackPlatformAPI.upload_team_member_file(this.$route.params.teamId, formData)
         } else {
           user.collections = this.tableData.filter(item => item.selected === true)
           user.collections = user.collections.map(item => {
@@ -250,7 +249,7 @@ export default Vue.extend({
           const payload = {
             members
           }
-          await this.axios.post(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/multiple`, payload)
+          await cystackPlatformAPI.create_team_members(this.$route.params.teamId, payload)
         }
         this.notify(this.$t('data.notifications.add_member_success'), 'success')
         this.closeDialog()
@@ -265,7 +264,7 @@ export default Vue.extend({
     async putUser (user) {
       try {
         this.loading = true
-        await this.axios.put(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/${user.id}`, user)
+        await cystackPlatformAPI.update_team_member(this.$route.params.teamId, user.id, user)
         this.notify(this.$t('data.notifications.update_member_success'), 'success')
         this.closeDialog()
         this.$emit('done')
@@ -284,7 +283,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.delete(`cystack_platform/pm/teams/${this.$route.params.teamId}/members/${user.id}`)
+          await cystackPlatformAPI.delete_team_member(this.$route.params.teamId, user.id)
           this.closeDialog()
           this.$emit('done')
           this.notify(this.$t('data.notifications.delete_member_success'), 'success')

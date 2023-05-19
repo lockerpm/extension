@@ -85,7 +85,10 @@
 <script>
 import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default {
   components: { PasswordStrength },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -151,7 +154,7 @@ export default {
         this.errors = {}
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
-        await this.axios.post('cystack_platform/pm/ciphers/vaults', {
+        await cystackPlatformAPI.create_ciphers_vault({
           ...data,
           score: this.passwordStrength.score
         })

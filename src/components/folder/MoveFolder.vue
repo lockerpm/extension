@@ -57,6 +57,9 @@
 import Vue from 'vue'
 import InputSelectFolder from '@/components/input/InputSelectFolder'
 import AddEditFolder from './AddEditFolder'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputSelectFolder,
@@ -91,7 +94,7 @@ export default Vue.extend({
     async putCiphersFolder () {
       try {
         this.loading = true
-        await this.axios.put('cystack_platform/pm/ciphers/move', {
+        await cystackPlatformAPI.ciphers_move({
           ids: this.ids,
           folderId: this.folderId
         })
@@ -108,7 +111,6 @@ export default Vue.extend({
       this.$refs.addEditFolder.openDialog({})
     },
     async handleCreatedFolder (folder) {
-      // this.folders = await this.getFolders()
       setTimeout(async () => {
         this.folders = await this.getFolders()
       }, 300);

@@ -16,10 +16,10 @@
           <div class="text-head-4 font-semibold mb-2.5">
             {{ $t('master_password.enter_password_title') }}
           </div>
-          <div class="text-base mb-4">
+          <div v-if="!isPasswordlessMethod" class="text-base mb-4">
             {{ $t('master_password.enter_password_desc') }}
           </div>
-          <div class="inline-block mb-8 select-none">
+          <div v-if="!isPasswordlessMethod" class="inline-block mb-8 select-none">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
               <img
                 :src="currentUser.avatar"
@@ -29,11 +29,22 @@
               <div class="mr-2">{{ currentUser.email }}</div>
             </div>
           </div>
+          <div v-else class="inline-block mb-8 select-none">
+            <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
+              <img
+                :src="loginInfo.preloginData.avatar"
+                alt=""
+                class="w-[28px] h-[28px] rounded-full mr-2"
+              >
+              <div class="mr-2">{{ loginInfo.preloginData.email || loginInfo.preloginData.name }}</div>
+            </div>
+          </div>
           <form
+            v-if="!isPasswordlessMethod"
             class="mb-8"
             @submit.prevent="setMasterPass"
           >
-            <div class="form-group !mb-4">
+            <div class="form-group mb-4">
               <label class="text-left">
                 {{ $t('master_password.enter_password') }}
               </label>
@@ -70,12 +81,29 @@
               </div>
             </div>
           </form>
+          <div v-else-if="isPasswordlessMethod" class="mb-8">
+            <el-alert              
+              :title="$t('data.login.alert.lock')"
+              type="warning"
+              :closable="false"
+            >
+            </el-alert>
+          </div>
           <div class="form-group">
             <div class="grid lg:grid-cols-2 grid-cols-1 gap-2">
               <button
+                v-if="!isPasswordlessMethod"
                 class="btn btn-primary w-full"
                 :disabled="loading"
                 @click="setMasterPass"
+              >
+                {{ $t('master_password.unlock') }}
+              </button>
+              <button
+                v-else
+                class="btn btn-primary w-full"
+                :disabled="loading || lockedInDesktopApp"
+                @click="reconnectDesktopAppSocket()"
               >
                 {{ $t('master_password.unlock') }}
               </button>
@@ -153,7 +181,10 @@
 
 <script>
 import Vue from 'vue'
-import BlankLayout from '@/components/layout/blank'
+import BlankLayout from '@/components/layout/blank';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   layout: 'blank',
   middleware: ['NotHaveAccountService'],
@@ -170,6 +201,14 @@ export default Vue.extend({
       showHint: false,
       step: 1,
       loadingSend: false
+    }
+  },
+  computed: {
+    isPasswordlessMethod () {
+      return this.loginInfo.preloginData && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)
+    },
+    lockedInDesktopApp() {
+      return this.loginInfo.desktopAppData && this.loginInfo.desktopAppData.msgType === 7
     }
   },
   mounted() {
@@ -197,15 +236,13 @@ export default Vue.extend({
     },
     sendHint () {
       this.loadingSend = true
-      this.axios.post('cystack_platform/pm/users/password_hint', {
+      cystackPlatformAPI.users_password_hint({
         email: this.currentUser.email
+      }).then(() => {
+        this.loadingSend = false
+        this.step = 3
       })
-        .then(() => {
-          this.loadingSend = false
-          this.step = 3
-        })
     }
-    // TODO change masterpass if have account
   }
 })
 </script>

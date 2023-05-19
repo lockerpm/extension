@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+
 export default Vue.extend({
   name: 'App',
   data () {
@@ -17,13 +18,20 @@ export default Vue.extend({
       return this.$store.state.previousPath
     }
   },
-  created () {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    (window as any).bitwardenPopupMainMessageListener = async () => {}
+  async created () {
+    (window as any).bitwardenPopupMainMessageListener = async () => ({});
+    const locked = await this.vaultTimeoutService.isLocked();
+    if (locked) {
+      if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
+        this.reconnectDesktopAppSocket(undefined, true);
+      }
+    }
   },
-  async mounted () {
+  async beforeMount () {
     const currentRouter = JSON.parse(await this.$storageService.get('current_router'))
     this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'home'})
+  },
+  async mounted () {
     chrome.runtime.onMessage.addListener(
       async (msg) => {
         switch(msg.command){
@@ -71,11 +79,11 @@ export default Vue.extend({
 }
 .el-input {
   &__inner {
-    border-radius: 8px !important;
+    border-radius: 4px !important;
   }
 }
 .el-button {
-  border-radius: 8px !important;
+  border-radius: 4px !important;
 }
 .el-message-box {
   width: 260px !important;

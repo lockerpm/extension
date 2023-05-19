@@ -115,7 +115,10 @@
 import Vue from 'vue'
 import Header from './parts/Header'
 const BroadcasterSubscriptionId = 'AppComponent'
-const IdleTimeout = 60000 * 10 // 10 minutes
+const IdleTimeout = 60000 * 10
+
+import URLS from '@/config/urls'
+import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
   components: {
@@ -280,12 +283,12 @@ export default Vue.extend({
   },
   methods: {
     async getInvitations () {
-      this.invitations = await this.axios.get('cystack_platform/pm/users/invitations')
+      this.invitations = await cystackPlatformAPI.users_invitations()
     },
     async putInvitation (id, status) {
       try {
         this.loading = true
-        await this.axios.put(`cystack_platform/pm/users/invitations/${id}`, {
+        await cystackPlatformAPI.update_user_invitation(id, {
           status
         })
         this.notify(this.$t(`data.notifications.${status}_member_success`), 'success')
@@ -341,7 +344,7 @@ export default Vue.extend({
     },
     async reconnectSocket () {
       const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${process.env.VUE_APP_WS_URL}/cystack_platform/pm/sync?token=${token}`), {
+      this.$connect(this.sanitizeUrl(`${URLS.WS_CYSTACK_PLATFORM_SYNC}?token=${token}`), {
         format: 'json',
         reconnection: true,
         reconnectionAttempts: 60,

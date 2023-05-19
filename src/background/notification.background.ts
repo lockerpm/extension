@@ -17,6 +17,7 @@ import { AutofillService } from '../services/abstractions/autofill.service';
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
+import Requestground from './request.backgroud';
 
 import { Utils } from 'jslib-common/misc/utils';
 
@@ -29,7 +30,6 @@ import ChangePasswordRuntimeMessage from './models/changePasswordRuntimeMessage'
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 import { NotificationQueueMessageType } from './models/notificationQueueMessageType';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import axios from 'axios';
 import { CipherData } from 'jslib-common/models/data/cipherData';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 export default class NotificationBackground {
@@ -39,8 +39,9 @@ export default class NotificationBackground {
   constructor(private main: MainBackground, private autofillService: AutofillService,
     private cipherService: CipherService, private storageService: StorageService,
     private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-    private folderService: FolderService, private userService: UserService, private totpService: TotpService) {
-  }
+    private folderService: FolderService, private userService: UserService,
+    private totpService: TotpService, private request: Requestground
+  ) {}
 
   async init() {
     // this.main.storageService.remove('neverDomains');
@@ -541,16 +542,11 @@ export default class NotificationBackground {
     }
 
     const cipher = await this.cipherService.encrypt(model);
-    const csToken = await this.main.storageService.get<string>("cs_token");
-    const headers = {
-      "Authorization": "Bearer " + csToken,
-      "Content-Type": "application/json; charset=utf-8"
-    };
     const data = new CipherRequest(cipher)
     try {
-      const res = await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, { headers: headers })
+      const res: any = await this.request.create_ciphers_vault(data);
 
-      const cipherResponse = new CipherResponse({ ...data, id: res.data ? res.data.id : '' })
+      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
@@ -572,15 +568,10 @@ export default class NotificationBackground {
     const cipherEnc = await this.cipherService.encrypt(cipher)
     const data = new CipherRequest(cipherEnc)
     data.type = CipherType.OTP;
-    const csToken = await this.main.storageService.get<string>("cs_token");
-    const headers = {
-      "Authorization": "Bearer " + csToken,
-      "Content-Type": "application/json; charset=utf-8"
-    };
     try {
-      const res = await axios.post(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/vaults`, data, { headers: headers })
+      const res: any = await this.request.create_ciphers_vault(data);
 
-      const cipherResponse = new CipherResponse({ ...data, id: res.data ? res.data.id : '' })
+      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
       this.cipherService.upsert(cipherData)
@@ -607,15 +598,10 @@ export default class NotificationBackground {
         cipher.login.username = username;
       }
       const newCipher = await this.cipherService.encrypt(cipher);
-      const csToken = await this.main.storageService.get<string>("cs_token");
-      const headers = {
-        "Authorization": "Bearer " + csToken,
-        "Content-Type": "application/json; charset=utf-8"
-      };
       const data = new CipherRequest(newCipher)
       try {
-        const res = await axios.put(`${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipher.id}`, data, { headers: headers })
-        const cipherResponse = new CipherResponse(res.data)
+        const res: any = await this.request.update_cipher(cipher.id, data)
+        const cipherResponse = new CipherResponse(res)
         const userId = await this.userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId);
         await this.cipherService.upsert(cipherData);

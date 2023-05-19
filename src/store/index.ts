@@ -2,14 +2,47 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import {StorageService} from "jslib-common/abstractions/storage.service";
+import uuid from 'uuid';
+
+import meAPI from '@/api/me';
+import cystackPlatformAPI from '@/api/cystack_platform';
+import notificationAPI from '@/api/notification';
+
 Vue.use(Vuex)
 
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
 const STORAGE_KEY = 'cs_store'
 
+const defaultUser = {
+  email: null,
+  language: 'en',
+  full_name: '',
+  avatar: '',
+  organization: '',
+  phone: ''
+}
+
+const defaultLoginInfo = {
+  login_step: 1,
+  identity: 'mail',
+  auth_info: null,
+  user_info: null,
+  ws2: null,
+  clientId: uuid(),
+  desktopAppInstalled: false,
+  desktopAppData: null,
+  preloginData: null,
+  baseApiUrl: null,
+  baseWsUrl: null,
+  sending: false,
+  forgot_step: 1,
+  forgot_token: null
+}
+
 export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   let oldStoreParsed = {
-    language: 'en'
+    language: 'en',
+    ...JSON.parse(JSON.stringify(defaultLoginInfo)),
   }
   if (typeof oldStore === 'object') {
     oldStoreParsed = {
@@ -23,12 +56,8 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       init: false,
       isLoggedIn: false,
       user: {
-        email: null,
+        ...JSON.parse(JSON.stringify(defaultUser)),
         language: oldStoreParsed.language,
-        full_name: '',
-        avatar: '',
-        organization: '',
-        phone: ''
       },
       notifications: {
         results: [],
@@ -55,19 +84,13 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       hideIcons: false,
       showFolders: true,
       enableAutofill:  true,
+      callingAPI: false,
       ...oldStoreParsed
     },
     mutations: {
       INIT_STORE (state, payload) {
         state.isLoggedIn = payload.isLoggedIn || false
-        state.user = payload.user || {
-          email: null,
-          language: 'en',
-          full_name: '',
-          avatar: '',
-          organization: '',
-          phone: ''
-        }
+        state.user = payload.user || JSON.parse(JSON.stringify(defaultUser)),
         state.userPw = payload.userPw || {}
         state.currentPath = payload.currentPath || '/'
         state.previousPath = payload.previousPath || ''
@@ -77,16 +100,14 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
+        chrome.runtime.sendMessage({
+          command: 'updateStoreService',
+          sender: { key: 'isLoggedIn', value: isLoggedIn },
+        });
       },
       CLEAR_ALL_DATA (state) {
-        // Auth
+        state.use = JSON.parse(JSON.stringify(defaultUser)),
         state.isLoggedIn = false
-        // User
-        state.user.full_name = ''
-        state.user.email = ''
-        state.user.avatar = ''
-        state.user.organization = ''
-        state.user.phone = ''
         state.notifications = {
           results: [],
           unread_count: 0,
@@ -95,7 +116,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.teams = []
       },
       UPDATE_USER (state, user) {
-        state.user = user
+        state.user = user || JSON.parse(JSON.stringify(defaultUser))
       },
       UPDATE_USER_PW (state, user) {
         state.userPw = user
@@ -150,7 +171,41 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_ENABLE_AUTOFILL(state, value) {
         state.enableAutofill = value
-      }
+      },
+      UPDATE_CALLING_API(state, value) {
+        state.callingAPI = value
+      },
+      UPDATE_LOGIN_PAGE_INFO(state, info) {
+        let keys = []
+        const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
+        if (info) {
+          keys = Object.keys(defaultData)
+        } else {
+          keys = Object.keys(defaultData)
+        }
+        keys.forEach((key) => {
+          state[key] = defaultData[key]
+        });
+        chrome.runtime.sendMessage({
+          command: 'updateStoreServiceInfo',
+          sender: {
+            login_step: state.login_step,
+            identity: state.identity,
+            auth_info: state.auth_info,
+            user_info: state.user_info,
+            ws2: state.ws2,
+            clientId: state.clientId,
+            desktopAppInstalled: state.desktopAppInstalled,
+            desktopAppData: state.desktopAppData,
+            preloginData: state.preloginData,
+            baseApiUrl: state.baseApiUrl,
+            baseWsUrl: state.baseWsUrl,
+            sending: state.sending,
+            forgot_step: state.forgot_step,
+            forgot_token: state.forgot_token
+          },
+        });
+      },
     },
     actions: {
       InitStore (context, payload) {
@@ -162,53 +217,49 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
           if (state.isLoggedIn) {
             const data = Object.assign({}, state.user)
             data.language = payload
-            Vue.axios.put('me', data)
+            meAPI.update(data);
           }
           resolve(payload)
         })
       },
-      LoadCurrentUser ({ commit }) {
-        return Vue.axios.get('me')
-          .then(res => {
-            commit('UPDATE_IS_LOGGEDIN', true)
-            commit('UPDATE_USER', res)
-            return res
-          })
+      async LoadCurrentUser ({ commit }) {
+        return await meAPI.me().then((response) => {
+          commit('UPDATE_IS_LOGGEDIN', true)
+          commit('UPDATE_USER', response)
+          return response
+        }).catch(() => {
+          commit('UPDATE_IS_LOGGEDIN', false)
+          commit('UPDATE_USER', null)
+          return JSON.parse(JSON.stringify(defaultUser))
+        });
+        
       },
-      LoadCurrentUserPw ({ commit }) {
-        return Vue.axios.get('/cystack_platform/pm/users/me').then(res => {
-          commit('UPDATE_USER_PW', res)
-          return res
-        })
+      async LoadCurrentUserPw ({ commit }) {
+        const res = await cystackPlatformAPI.users_me();
+        commit('UPDATE_USER_PW', res)
+        return res
       },
-      LoadCurrentIntercom ({ commit }) {
-        return Vue.axios.get('me/intercom')
-          .then(res => {
-            window.intercomSettings = res
-            commit('UPDATE_USER_INTERCOM', res)
-            Intercom('update')
-          })
+      async LoadCurrentIntercom ({ commit }) {
+        const res: any = await meAPI.me_intercom();
+        window.intercomSettings = res
+        commit('UPDATE_USER_INTERCOM', res)
+        Intercom('update')
       },
-      LoadNotification ({ commit }) {
-        return Vue.axios.get('notifications?scope=cloud')
-          .then(res => {
-            commit('UPDATE_NOTIFICATION', res)
-          })
+      async LoadNotification ({ commit }) {
+        const res = await notificationAPI.get({ scope: 'cloud' });
+        commit('UPDATE_NOTIFICATION', res)
+        return res
       },
-      LoadTeams ({ commit }) {
-        return Vue.axios.get('cystack_platform/pm/teams')
-          .then(res => {
-            commit('UPDATE_TEAMS', res)
-            return res
-          })
+      async LoadTeams ({ commit }) {
+        const res = await cystackPlatformAPI.teams();
+        commit('UPDATE_TEAMS', res)
+        return res
       },
-      LoadCurrentPlan ({ commit }) {
-        return Vue.axios.get('cystack_platform/pm/payments/plan')
-          .then(res => {
-            commit('UPDATE_CURRENT_PLAN', res)
-            return res
-          })
-      }
+      async LoadCurrentPlan ({ commit }) {
+        const res = await cystackPlatformAPI.payments_plan();
+        commit('UPDATE_CURRENT_PLAN', res)
+        return res
+      },
     },
     modules: {
     },

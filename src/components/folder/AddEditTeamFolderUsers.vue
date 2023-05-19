@@ -67,6 +67,8 @@
 
 <script>
 import Vue from 'vue'
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   data () {
     return {
@@ -105,7 +107,7 @@ export default Vue.extend({
     async putTeamFolderUsers (folder) {
       try {
         this.loading = true
-        await this.axios.put(`cystack_platform/pm/teams/${folder.organizationId}/folders/${folder.id}/users`, {
+        await cystackPlatformAPI.update_team_folder_users(folder.organizationId, folder.id, {
           members: this.multipleSelection.map(e => e.id)
         })
         this.closeDialog()
@@ -119,11 +121,11 @@ export default Vue.extend({
       }
     },
     async getUsers (folder) {
-      const users = await this.axios.get(`cystack_platform/pm/teams/${folder.organizationId}/members`)
+      const users = await cystackPlatformAPI.team_members(folder.organizationId);
       this.users = users.filter(e => e.status === 'confirmed')
     },
     async getTeamFolderUsers (folder) {
-      this.teamFolderUsers = await this.axios.get(`cystack_platform/pm/teams/${folder.organizationId}/folders/${folder.id}/users`)
+      this.teamFolderUsers = await cystackPlatformAPI.team_folder_users(folder.organizationId, folder.id)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
