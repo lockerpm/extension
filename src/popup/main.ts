@@ -135,7 +135,11 @@ Vue.mixin({
     async logout() {
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
-      await this.axios.post('/users/logout')
+      try {
+        await this.axios.post('/users/logout')
+      } catch (error) {
+        //
+      }
       await Promise.all([
         this.$cryptoService.clearKeys(),
         this.$userService.clear(),
@@ -148,6 +152,7 @@ Vue.mixin({
         this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
+      this.$store.commit('CLEAR_ALL_DATA', false)
       this.$router.push({ name: 'login' });
 
       chrome.runtime.sendMessage({
