@@ -606,7 +606,7 @@ Vue.mixin({
               this.login(true, decryptData);
             } catch (error) {
               this.notify(error?.response?.data?.message || this.$t('data.login.message.otp_invalid'), 'error')
-              this.reconnectDesktopAppSocket();
+              this.reconnectDesktopAppSocket(this.loginInfo.preloginData.email || this.loginInfo.preloginData.name, true);
             }
           }, 1000);
         } else if (data.msgType === 6) {
