@@ -91,19 +91,19 @@ export default Vue.extend({
       return this.loginInfo?.auth_info?.methods?.find((m) => m.type === type)
     },
     async nextMethod () {
-      if (this.callingAPI) { return }
-      if (this.loginInfo.identity === 'mail') {
-        this.callingAPI = true;
-        this.recaptcha = await load(this.siteKey);
-        const token = await this.recaptcha.execute('login');
-        if (this.$route.name === 'login') {
-          await this.authOtpMail(token)
-        } else {
-          await this.resetPassword(token)
-        }
-      } else {
-        this.$emit('next')
-      }
+      // if (this.callingAPI) { return }
+      // if (this.loginInfo.identity === 'mail') {
+      //   this.callingAPI = true;
+      //   this.recaptcha = await load(this.siteKey);
+      //   const token = await this.recaptcha.execute('login');
+      //   if (this.$route.name === 'login') {
+      //     await this.authOtpMail(token)
+      //   } else {
+      //     await this.resetPassword(token)
+      //   }
+      // } else {
+      //   this.$emit('next')
+      // }
     },
     async authOtpMail (token: any) {
       authAPI.sso_auth_otp_mail({
