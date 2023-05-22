@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "__MSG_extName__",
   "homepage_url": "http://localhost:8080/",
   "description": "__MSG_extDesc__",
@@ -12,13 +12,19 @@
     "clipboardRead",
     "clipboardWrite",
     "idle",
-    "http://*/*",
-    "https://*/*",
-    "webRequest",
-    "webRequestBlocking",
     "identity",
     "activeTab",
+    "scripting",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*",
     "<all_urls>"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
   ],
   "optional_permissions": [
     "nativeMessaging"
@@ -29,10 +35,8 @@
     "128": "icons/128.png"
   },
   "background": {
-    "scripts": [
-      "js/background.js"
-    ],
-    "persistent": true
+    "service_worker": "js/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -87,7 +91,7 @@
       "run_at": "document_end"
     }
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_title": "__MSG_extName__",
     "default_icon": {
@@ -96,11 +100,22 @@
     }
   },
   "web_accessible_resources": [
-    "bar.html",
-    "menu.html",
-    "popup.html"
+    {
+      "resources": [
+        "bar.html",
+        "menu.html",
+        "popup.html"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+    
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; script-src-elem https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/* 'self' *",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'",
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
+  },
   "externally_connectable": {
     "matches": [
       "https://*.demo.cystack.net:3011/*",

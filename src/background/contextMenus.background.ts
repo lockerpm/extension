@@ -60,8 +60,8 @@ export default class ContextMenusBackground {
   private async cipherAction(info: any) {
     const id = info.menuItemId.split('_')[1];
     if (id === 'noop') {
-      if (chrome.browserAction && (chrome.browserAction as any).openPopup) {
-        (chrome.browserAction as any).openPopup();
+      if (chrome.action && (chrome.action as any).openPopup) {
+        (chrome.action as any).openPopup();
       }
       return;
     }

@@ -31,10 +31,18 @@ import { ImportService } from "jslib-common/abstractions/import.service";
 import AutofillService from '@/services/autofill.service'
 import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
+
+import MainBackground from '../../background/main.background';
+
 function getBgService<T>(service: string) {
   return (): T => {
     const page = BrowserApi.getBackgroundPage();
-    return page ? page.bitwardenMain[service] as T : null;
+    if (page) {
+      return page.bitwardenMain[service] as T
+    }
+    const bitwardenMain = new MainBackground()
+    bitwardenMain.bootstrap()
+    return bitwardenMain[service] ;
   };
 }
 

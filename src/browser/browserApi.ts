@@ -2,8 +2,6 @@ import { SafariApp } from './safariApp';
 
 import { Utils } from 'jslib-common/misc/utils';
 
-import MainBackground from '../background/main.background';
-
 export class BrowserApi {
   static isWebExtensionsApi: boolean = (typeof browser !== 'undefined');
   static isSafariApi: boolean = navigator.userAgent.indexOf(' Safari/') !== -1 &&

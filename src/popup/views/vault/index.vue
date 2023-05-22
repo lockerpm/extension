@@ -259,6 +259,7 @@ export default Vue.extend({
         const deletedFilter = (c) => {
           return c.isDeleted === false;
         };
+        console.log('this.$searchService', this.$searchService);
         let result =
           (await this.$searchService.searchCiphers(
             this.searchText,

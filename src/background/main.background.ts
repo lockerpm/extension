@@ -313,7 +313,7 @@ export default class MainBackground {
   }
 
   async setIcon() {
-    if (!chrome.browserAction && !this.sidebarAction) {
+    if (!chrome.action && !this.sidebarAction) {
       return;
     }
     const isAuthenticated = await this.userService.isAuthenticated();
@@ -326,7 +326,7 @@ export default class MainBackground {
       suffix = '_locked';
     }
 
-    await this.actionSetIcon(chrome.browserAction, suffix);
+    await this.actionSetIcon(chrome.action, suffix);
     await this.actionSetIcon(this.sidebarAction, suffix);
   }
 
@@ -519,10 +519,10 @@ export default class MainBackground {
   }
 
   private async loadMenuAndUpdateBadge(url: string, tabId: number, contextMenuEnabled: boolean) {
-    if (!url || (!chrome.browserAction && !this.sidebarAction)) {
+    if (!url || (!chrome.action && !this.sidebarAction)) {
       return;
     }
-    this.actionSetBadgeBackgroundColor(chrome.browserAction);
+    this.actionSetBadgeBackgroundColor(chrome.action);
     this.actionSetBadgeBackgroundColor(this.sidebarAction);
 
     this.menuOptionsLoaded = [];
@@ -728,8 +728,8 @@ export default class MainBackground {
   }
 
   private async browserActionSetBadgeText(text: string, tabId: number) {
-    if (chrome.browserAction && chrome.browserAction.setBadgeText) {
-      await chrome.browserAction.setBadgeText({
+    if (chrome.action && chrome.action.setBadgeText) {
+      await chrome.action.setBadgeText({
         text: text,
         tabId: tabId,
       });
@@ -737,8 +737,8 @@ export default class MainBackground {
   }
 
   private async browserActionSetIcon(tabId: number, locked: boolean) {
-    if (chrome.browserAction && chrome.browserAction.setIcon) {
-      await chrome.browserAction.setIcon({
+    if (chrome.action && chrome.action.setIcon) {
+      await chrome.action.setIcon({
         path: locked ? "icons/locked.png" : 'icons/19.png',
         tabId: tabId,
       });

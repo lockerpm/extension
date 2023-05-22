@@ -6,7 +6,6 @@ import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { SystemService } from 'jslib-common/abstractions/system.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
-import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import { CryptoService } from 'jslib-common/abstractions/crypto.service';
 import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
@@ -27,6 +26,8 @@ import MainBackground from './main.background';
 import RequestBackground from './request.backgroud';
 
 import { Utils } from 'jslib-common/misc/utils';
+
+import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 
 export default class RuntimeBackground {
@@ -81,6 +82,7 @@ export default class RuntimeBackground {
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
+    console.log('msg', msg);
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
@@ -208,7 +210,6 @@ export default class RuntimeBackground {
         break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
-        console.log(token);
         if (!token) {
           try {
             await this.storageService.save("cs_token", msg.token);
@@ -319,6 +320,7 @@ export default class RuntimeBackground {
       case "closePopupIframe":
         await this.updateStoreService('savePopup', false);
       case "updateStoreService":
+        console.log(111, 222);
         if (msg.sender) {
           await this.updateStoreService(msg.sender.key, msg.sender.value);
         }

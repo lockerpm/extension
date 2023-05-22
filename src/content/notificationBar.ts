@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', event => {
     if (document.getElementById(iframeId)) {
       return;
     }
-    const barPageUrl: string = chrome.extension.getURL(
+    const barPageUrl: string = chrome.runtime.getURL(
       "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
@@ -717,7 +717,7 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
 
-    const barPageUrl: string = chrome.extension.getURL(barPage);
+    const barPageUrl: string = chrome.runtime.getURL(barPage);
 
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', event => {
       return
     }
 
-    let barPageUrl: string = chrome.extension.getURL('popup.html');
+    let barPageUrl: string = chrome.runtime.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: 602px;
