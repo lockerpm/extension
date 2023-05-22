@@ -54,15 +54,10 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
             await this.cryptoService.getKey('auto');
         }
 
-        return !this.cryptoService.hasKeyInMemory();
+        return !(await this.cryptoService.hasKeyInMemory());
     }
 
     async checkVaultTimeout(): Promise<void> {
-        if (await this.platformUtilsService.isViewOpen()) {
-            // Do not lock
-            return;
-        }
-
         // "is logged out check" - similar to isLocked, below
         const authed = await this.userService.isAuthenticated();
         if (!authed) {
@@ -74,19 +69,20 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         const vaultTimeout = await this.getVaultTimeout();
-        if (vaultTimeout == null || vaultTimeout < 0) {
+        if (!vaultTimeout || vaultTimeout < 0) {
             return;
         }
 
         const lastActive = await this.storageService.get<number>(ConstantsService.lastActiveKey);
-        if (lastActive == null) {
+        if (!lastActive) {
             return;
         }
 
         const vaultTimeoutSeconds = vaultTimeout * 60;
+        
         const diffSeconds = ((new Date()).getTime() - lastActive) / 1000;
+
         if (diffSeconds >= vaultTimeoutSeconds) {
-            // Pivot based on the saved vault timeout action
             const timeoutAction = await this.storageService.get<string>(ConstantsService.vaultTimeoutActionKey);
             timeoutAction === 'logOut' ? await this.logOut() : await this.lock(true);
         }
@@ -140,13 +136,12 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     async getVaultTimeout(): Promise<number> {
         const vaultTimeout = await this.storageService.get<number>(ConstantsService.vaultTimeoutKey);
-
         if (await this.policyService.policyAppliesToUser(PolicyType.MaximumVaultTimeout)) {
             const policy = await this.policyService.getAll(PolicyType.MaximumVaultTimeout);
             // Remove negative values, and ensure it's smaller than maximum allowed value according to policy
             let timeout = Math.min(vaultTimeout, policy[0].data.minutes);
 
-            if (vaultTimeout == null || timeout < 0) {
+            if (vaultTimeout || timeout < 0) {
                 timeout = policy[0].data.minutes;
             }
 

@@ -2,16 +2,15 @@
 // @ts-nocheck
 import Vue from 'vue'
 
+import AsyncComputed from 'vue-async-computed'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import AsyncComputed from 'vue-async-computed'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
 import moment from "moment";
 import VueMomentJS from "vue-momentjs";
 import VueNativeSock from "vue-native-websocket";
-
 
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
@@ -24,29 +23,31 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 
-Vue.config.productionTip = false
-Vue.use(JSLib)
+Vue.config.productionTip = false;
+
 Vue.use(AsyncComputed)
+Vue.use(JSLib)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
 Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
-if (process.env.NODE_ENV==='development') {
-  require('@/assets/buildtw.css')
-}
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import '@/assets/buildtw.css'
 import '@/assets/tailwind.css'
 import '@/assets/app.scss'
+import '@/assets/flags/flags.css'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
+import '../middleware'
+
 Vue.mixin({
-  data () {
+  data() {
     return {
       folders: [],
       strategies: [
@@ -54,23 +55,23 @@ Vue.mixin({
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
         { key: "github", name: "GitHub", color: "#202326" }
       ],
-      enableAutofillKey : 'enableAutofill',
-      showFoldersKey : 'showFolders',
-      hideIconsKey : 'hideIcons',
+      enableAutofillKey: 'enableAutofill',
+      showFoldersKey: 'showFolders',
+      hideIconsKey: 'hideIcons',
     };
   },
   computed: {
-    language () { return this.$store.state.user.language },
-    currentUser () { return this.$store.state.user },
-    currentUserPw () { return this.$store.state.userPw },
-    environment () { return this.$store.state.environment },
-    isLoggedIn () { return this.$store.state.isLoggedIn },
-    isAllPage () { return this.$route.name === 'vault' },
-    searchText () { return this.$store.state.searchText },
-    teams () { return this.$store.state.teams || [] },
-    currentOrg () { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
+    language() { return this.$store.state.user.language },
+    currentUser() { return this.$store.state.user },
+    currentUserPw() { return this.$store.state.userPw },
+    environment() { return this.$store.state.environment },
+    isLoggedIn() { return this.$store.state.isLoggedIn },
+    isAllPage() { return this.$route.name === 'vault' },
+    searchText() { return this.$store.state.searchText },
+    teams() { return this.$store.state.teams || [] },
+    currentOrg() { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
     currentPlan() { return this.$store.state.currentPlan },
-    cipherCount () {
+    cipherCount() {
       return this.$store.state.cipherCount
     },
     hideIcons() {
@@ -84,7 +85,7 @@ Vue.mixin({
     }
   },
   methods: {
-    changeLang (value) {
+    changeLang(value) {
       if (value === 'vi') {
         this.$moment.locale('vi', {
           months: 'tháng 1_tháng 2_tháng 3_tháng 4_tháng 5_tháng 6_tháng 7_tháng 8_tháng 9_tháng 10_tháng 11_tháng 12'.split('_'),
@@ -125,13 +126,20 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
+        chrome.runtime.sendMessage({
+          command: 'updateStoreService',
+          sender: { key: 'language', value: value },
+        });
       })
     },
-    async logout () {
-      console.log('###### LOG OUT')
+    async logout() {
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
-      await this.axios.post('/users/logout')
+      try {
+        await this.axios.post('/users/logout')
+      } catch (error) {
+        //
+      }
       await Promise.all([
         this.$cryptoService.clearKeys(),
         this.$userService.clear(),
@@ -144,15 +152,17 @@ Vue.mixin({
         this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
+      this.$store.commit('CLEAR_ALL_DATA', false)
       this.$router.push({ name: 'login' });
-      
+
       chrome.runtime.sendMessage({
         command: 'updateStoreService',
         sender: { key: 'isLoggedIn', value: false },
       });
       await this.setupFillPage();
     },
-    async lock () {
+    async lock() {
+      await this.$passService.clearGeneratePassword()
       await Promise.all([
         this.$cryptoService.clearKey(),
         this.$cryptoService.clearOrgKeys(true),
@@ -166,10 +176,10 @@ Vue.mixin({
       this.$router.push({ name: 'lock' });
       await this.setupFillPage();
     },
-    randomString () {
+    randomString() {
       return nanoid()
     },
-    notify (message, type, html = false, duration = 8000) {
+    notify(message, type, html = false, duration = 8000) {
       this.$notify({
         title: String(this.$t(`common.${type}`)),
         message,
@@ -178,7 +188,7 @@ Vue.mixin({
         dangerouslyUseHTMLString: html
       })
     },
-    async genKey (masterPassword, email) {
+    async genKey(masterPassword, email) {
       try {
         const key = await this.$cryptoService.makeKey(masterPassword, email, 0, 100000)
         const hashedPassword = await this.$cryptoService.hashPassword(masterPassword, key)
@@ -188,6 +198,7 @@ Vue.mixin({
       }
     },
     async login() {
+      await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
         browserStorageService.get("device_id"),
@@ -213,7 +224,7 @@ Vue.mixin({
           device_type: this.$platformUtilsService.getDevice(),
           device_identifier: deviceIdentifier
         })
-        chrome.runtime.sendMessage({command: 'loggedIn'})
+        chrome.runtime.sendMessage({ command: 'loggedIn' })
         await this.$tokenService.setTokens(res.access_token, res.refresh_token)
         await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
         await this.$cryptoService.setKey(key)
@@ -224,20 +235,21 @@ Vue.mixin({
         if (this.$vaultTimeoutService != null) {
           this.$vaultTimeoutService.biometricLocked = false
         }
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
         chrome.runtime.sendMessage({ command: "unlocked" });
         this.$router.push({ name: 'home' });
       } catch (e) {
-        console.log(e)
         this.notify(this.$t("errors.invalid_master_password"), "error");
       }
       setTimeout(() => {
         this.setupFillPage();
       }, 1000);
     },
-    async clearKeys () {
+    async clearKeys() {
       await this.$cryptoService.clearKeys()
     },
-    async getSyncData (trigger=false) {
+    async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
       const pageSize = 100
       try {
@@ -289,10 +301,10 @@ Vue.mixin({
         this.$store.commit('UPDATE_SYNCING', false)
       }
     },
-    async getFolders () {
+    async getFolders() {
       return await this.$folderService.getAllDecrypted()
     },
-    clipboardSuccessHandler () {
+    clipboardSuccessHandler() {
       this.notify(this.$t('common.copied'), 'success')
     },
     getIconCipher(cipher, size = 70, defaultIcon = false) {
@@ -382,7 +394,7 @@ Vue.mixin({
         return "";
       }
     },
-    getIconDefaultCipher (type, size = 70) {
+    getIconDefaultCipher(type, size = 70) {
       return this.$createElement('img', {
         attrs: {
           src: require(`@/assets/images/icons/icon_${type}.svg`),
@@ -391,7 +403,7 @@ Vue.mixin({
         }
       })
     },
-    routerCipher (cipher, callbackDeleted) {
+    routerCipher(cipher, callbackDeleted) {
       if (cipher.isDeleted) {
         callbackDeleted(cipher)
         return
@@ -446,17 +458,17 @@ Vue.mixin({
         params: { id: cipher.id }
       })
     },
-    getTeam (teams, orgId) {
+    getTeam(teams, orgId) {
       return find(teams, e => e.id === orgId) || {}
     },
-    canManageItem (teams, item) {
+    canManageItem(teams, item) {
       const team = this.getTeam(teams, item.organizationId)
       if (team.id) {
         return [0, 1].includes(team.type);
       }
       return true
     },
-    canManageFolder (teams, item) {
+    canManageFolder(teams, item) {
       const team = this.getTeam(teams, item.organizationId)
       if (team.organization_id) {
         return ['owner', 'admin'].includes(team.role)
@@ -469,7 +481,7 @@ Vue.mixin({
       }
       window.open(link, '_blank')
     },
-    sanitizeUrl (connectionUrl) {
+    sanitizeUrl(connectionUrl) {
       if (connectionUrl.startsWith('//')) {
         const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
         connectionUrl = `${scheme}:${connectionUrl}`
@@ -507,12 +519,14 @@ Vue.filter('filterString', function (value) {
 
 storePromise.then((store) => {
   const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+  store.commit('SET_LANG', store.state.language)
+  i18n.locale = store.state.language
   axios.interceptors.request.use(
     async (config) => {
       const token = await browserStorageService.get('cs_token')
       const deviceId = await browserStorageService.get('device_id')
       if (token) {
-        config.headers['Authorization'] = `Bearer ${ token }`
+        config.headers['Authorization'] = `Bearer ${token}`
       }
       if (deviceId) {
         config.headers['device-id'] = deviceId
@@ -534,13 +548,13 @@ storePromise.then((store) => {
     (error) => {
       if (error.response) {
         if (error.response.status === 404) {
-          router.push({name: 'Home'})
+          router.push({ name: 'Home' })
         }
         if (error.response.status === 401) {
-          browserStorageService.remove('cs_token')
+          chrome.runtime.sendMessage({ command: "logout" });
           store.commit('UPDATE_IS_LOGGEDIN', false)
           if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });  
+            router.push({ name: "login" });
           }
         }
       }

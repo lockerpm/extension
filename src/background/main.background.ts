@@ -190,7 +190,7 @@ export default class MainBackground {
     this.settingsService = new SettingsService(this.userService, this.storageService);
     this.fileUploadService = new FileUploadService(this.logService, this.apiService);
     this.cipherService = new CipherService(this.cryptoService, this.userService, this.settingsService,
-      this.apiService, this.fileUploadService, this.storageService, this.i18nService, () => this.searchService,
+      this.apiService, this.fileUploadService, this.storageService, this.i18nService, () => this.searchService, this.platformUtilsService,
       this.logService);
     this.folderService = new FolderService(this.cryptoService, this.userService, this.apiService,
       this.storageService, this.i18nService, this.cipherService);
@@ -247,13 +247,13 @@ export default class MainBackground {
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ?
-      opr.sidebarAction : (window as any).chrome.sidebarAction;
+      opr.sidebarAction : (window as any).chrome?.sidebarAction;
 
     // Background
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
       this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
       this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
-      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService);
+      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService, this.vaultTimeoutService);
     this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
       this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
       this.platformUtilsService);
@@ -357,6 +357,8 @@ export default class MainBackground {
     await this.eventService.uploadEvents();
     const userId = await this.userService.getUserId();
 
+    await this.passService.clearGeneratePassword();
+
     await Promise.all([
       this.eventService.clearEvents(),
       this.syncService.setLastSync(new Date(0)),
@@ -370,14 +372,18 @@ export default class MainBackground {
       this.policyService.clear(userId),
       this.passwordGenerationService.clear(),
       this.vaultTimeoutService.clear(),
+      this.storageService.remove("cs_token"),
     ]);
 
     this.searchService.clearIndex();
     this.messagingService.send('doneLoggingOut', { expired: expired });
 
+    await this.runtimeBackground.updateStoreService('isLoggedIn', false)
+
     await this.setIcon();
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
+
     this.notificationsService.updateConnection(false);
     this.systemService.startProcessReload();
     await this.systemService.clearPendingClipboard();
@@ -403,6 +409,10 @@ export default class MainBackground {
     // Chrome APIs cannot open popup
 
     // TODO: Do we need to open this popup?
+    if (this.platformUtilsService.isFirefox()) {
+      browser.browserAction.openPopup();
+      return;
+    }
     if (!this.isSafari) {
       return;
     }
@@ -728,7 +738,7 @@ export default class MainBackground {
   private async browserActionSetIcon(tabId: number, locked: boolean) {
     if (chrome.browserAction && chrome.browserAction.setIcon) {
       await chrome.browserAction.setIcon({
-        path : locked ? "icons/locked.png" : 'icons/19.png',
+        path: locked ? "icons/locked.png" : 'icons/19.png',
         tabId: tabId,
       });
     }

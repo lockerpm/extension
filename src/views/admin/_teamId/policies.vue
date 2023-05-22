@@ -106,6 +106,8 @@
 
 <script>
 import Vue from 'vue'
+import { VAULT_TIMEOUTS } from '@/constants/index'
+
 export default Vue.extend({
   components: {
   },
@@ -117,15 +119,7 @@ export default Vue.extend({
   },
   computed: {
     loginDurations () {
-      return [
-        { label: this.$t('data.timeouts.oneMinute'), value: 60 },
-        { label: this.$t('data.timeouts.fiveMinutes'), value: 300 },
-        { label: this.$t('data.timeouts.tenMinutes'), value: 600 },
-        { label: this.$t('data.timeouts.fifteenMinutes'), value: 900 },
-        { label: this.$t('data.timeouts.thirtyMinutes'), value: 1800 },
-        { label: this.$t('data.timeouts.oneHour'), value: 3600 },
-        { label: this.$t('data.timeouts.fourHours'), value: 14400 }
-      ]
+      return VAULT_TIMEOUTS
     }
   },
   mounted () {

@@ -29,7 +29,7 @@ export class CipherResponse extends BaseResponse {
     attachments: AttachmentResponse[];
     passwordHistory: PasswordHistoryResponse[];
     collectionIds: string[];
-    deletedDate: string;
+    deletedDate: any;
     lastUseDate: number;
     numUse: number;
     reprompt: CipherRepromptType;

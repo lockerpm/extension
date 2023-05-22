@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import storePromise from "../store/index";
 import Home from '../popup/views/home/index.vue'
 import Layout from '@/popup/components/layout/default.vue'
-import i18n from '@/locales/i18n';
 import sentryConfig from './index'
 
 Vue.use(VueRouter)
@@ -22,7 +20,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/home/:id",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -44,7 +41,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/lock",
     name: "lock",
-    beforeEnter: VaultGuard,
     component: () =>
       import("../popup/views/lock.vue")
   },
@@ -56,7 +52,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/vault",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -71,7 +66,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/vault/:id",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -84,7 +78,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/passwords",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -99,7 +92,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/passwords/:id",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -114,7 +106,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/notes",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -129,7 +120,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/notes/:id",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -142,7 +132,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/cards",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -157,7 +146,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/cards/:id",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -170,7 +158,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/identities",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -199,7 +186,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/crypto-backups",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -228,7 +214,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/folders",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -243,7 +228,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/folders/:folderId",
-    beforeEnter: VaultGuard,
     component: Layout,
     children: [
       {
@@ -259,7 +243,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/folders/:folderId/:id",
     name: "folders-folderId-id",
-    beforeEnter: VaultGuard,
     component: () =>
       import(
         "../popup/views/folders/_folderId/_id.vue"
@@ -268,7 +251,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/vault/folders/:folderId",
     name: "vault-folders-folderId",
-    beforeEnter: VaultGuard,
     component: () =>
       import(
         "../popup/views/vault/folders/_folderId/index.vue"
@@ -277,7 +259,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/vault/folders/:folderId/:id",
     name: "vault-folders-folderId-id",
-    beforeEnter: VaultGuard,
     component: () =>
       import(
         "../popup/views/vault/folders/_folderId/_id.vue"
@@ -286,7 +267,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/vault/teams/:teamId?/tfolders/:tfolderId",
     name: "vault-teams-teamId-tfolders-tfolderId",
-    beforeEnter: VaultGuard,
     component: () =>
       import(
         "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
@@ -295,7 +275,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/vault/teams/:teamId?/tfolders/:tfolderId/:id",
     name: "vault-teams-teamId-tfolders-tfolderId-id",
-    beforeEnter: VaultGuard,
     component: () =>
       import(
         "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
@@ -304,7 +283,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/add_item",
     component: Layout,
-    beforeEnter: VaultGuard,
     children: [
       {
         path: "",
@@ -327,7 +305,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/generator",
     component: Layout,
-    beforeEnter: VaultGuard,
     children: [
       {
         name: "generator",
@@ -340,7 +317,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/settings",
     component: Layout,
-    beforeEnter: VaultGuard,
     children: [
       {
         path: "",
@@ -379,7 +355,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/otp",
     component: Layout,
-    beforeEnter: VaultGuard,
     children: [
       {
         path: "",
@@ -398,22 +373,4 @@ const router = new VueRouter({
 })
 
 sentryConfig(router);
-
-async function VaultGuard(to, from, next) {
-  console.log(from.path, to.path)
-  const store = await storePromise;
-  if (store.state.isLoggedIn === true) {
-    const res = await store.dispatch("LoadCurrentUser");
-    i18n.locale = res.language
-    await store.dispatch("LoadCurrentUserPw");
-    if (store.state.userPw.is_pwd_manager === false) {
-      next({ name: "set-master-password" });
-    } else {
-      next();
-    }
-  } else {
-    console.log("Dieu huong Login");
-    next({ name: "login" });
-  }
-}
 export default router

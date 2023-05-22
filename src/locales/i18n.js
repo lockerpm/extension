@@ -5,7 +5,6 @@ import vnLocale from 'element-ui/lib/locale/lang/vi'
 import viVee from 'vee-validate/dist/locale/vi.json'
 import enVee from 'vee-validate/dist/locale/en.json'
 
-import storePromise from '../store'
 import * as rules from 'vee-validate/dist/rules'
 import { extend, configure } from 'vee-validate'
 
@@ -25,7 +24,7 @@ const messages = {
 }
 
 const i18n = new VueI18n({
-  locale: navigator.language !== 'vi' ? 'en' : 'vi', // set locale
+  locale: navigator.language !== 'vi' ? 'en' : 'vi',
   messages,
   fallbackLocale: 'en'
 })
@@ -38,10 +37,6 @@ configure({
     // override the field name.
     return i18n.t(`messages.${values._rule_}`, values)
   }
-})
-
-storePromise.then(store => {
-  store.commit('SET_LANG', i18n.locale)
 })
 
 export default i18n

@@ -32,6 +32,7 @@ export default {
   components: {
     ListCipher
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       folders: []
@@ -39,21 +40,17 @@ export default {
   },
   asyncComputed: {
     folders: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       async get () {
         let folders = (await this.$folderService.getAllDecrypted()) || [];
         folders = folders.filter((f) => f.id);
-        // folders.forEach((f) => {
-        //   const ciphers =
-        //     this.ciphers &&
-        //     (this.ciphers.filter((c) => c.folderId === f.id) || []);
-        //   f.ciphersCount = ciphers && ciphers.length;
-        // });
         return folders;
       },
       watch: ["ciphers"],
     },
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     folder () {
       if (this.folders) {
         return find(this.folders, e => e.id === this.$route.params.folderId) || {}

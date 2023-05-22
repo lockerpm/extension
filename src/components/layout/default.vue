@@ -266,9 +266,12 @@ export default Vue.extend({
     this.init()
   },
   asyncComputed: {
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked()
-    }
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
   },
   beforeDestroy () {
     this.$broadcasterService.unsubscribe(BroadcasterSubscriptionId)
@@ -289,7 +292,6 @@ export default Vue.extend({
         this.getInvitations()
       } catch (e) {
         this.notify(this.$t(`data.notifications.${status}_member_failed`), 'warning')
-        console.log(e)
       } finally {
         this.loading = false
       }
@@ -381,8 +383,7 @@ export default Vue.extend({
       this.shouldWelcome = 'false'
     },
     async test () {
-      const data = await this.$vaultTimeoutService.isLocked()
-      console.log(data)
+      await this.$vaultTimeoutService.isLocked()
     }
   }
 }

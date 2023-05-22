@@ -314,6 +314,7 @@ export default {
       default: ''
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       cipher: new CipherView(),
@@ -330,6 +331,7 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     typeOptions () {
       return [
         { label: this.$tc('type.Login', 1), value: CipherType.Login },
@@ -338,6 +340,7 @@ export default {
         { label: this.$tc('type.SecureNote', 1), value: CipherType.SecureNote }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     cardBrandOptions () {
       return [
         { label: '----', value: null },
@@ -352,6 +355,7 @@ export default {
         { label: this.$t('other'), value: 'Other' }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     cardExpMonthOptions () {
       return [
         { label: '----', value: null },
@@ -369,6 +373,7 @@ export default {
         { label: '12 - ' + this.$t('december'), value: '12' }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     identityTitleOptions () {
       return [
         { label: '-- ' + this.$t('select') + ' --', value: null },
@@ -378,20 +383,24 @@ export default {
         { label: this.$t('dr'), value: this.$t('dr') }
       ]
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     isDeleted () {
       return !!this.cipher.deletedDate
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
       if (this.cipher.login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
       }
       return {}
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     shouldDisableBtn () {
       return this.loading || !this.cipher.name || (this.cipher.type === CipherType.Card || !this.cipher.card.cardholderName)
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async openDialog (data, cloneMode = false) {
       this.currentComponent = Dialog
       this.folders = await this.getFolders()
@@ -406,11 +415,13 @@ export default {
         this.newCipher('Login', data)
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     closeDialog () {
       this.dialogVisible = false
       this.$emit('close')
       this.currentComponent = Dialog
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     newCipher (type, data) {
       this.cipher = new CipherView()
       this.cipher.organizationId = data.organizationId ? data.organizationId : null
@@ -427,6 +438,7 @@ export default {
         this.handleChangeOrg(this.cipher.organizationId)
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleChangeType (type) {
       this.newCipher(type)
     }

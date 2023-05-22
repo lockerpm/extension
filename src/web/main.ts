@@ -24,9 +24,9 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 
 
 Vue.config.productionTip = false
+Vue.use(AsyncComputed)
 Vue.use(JSLib)
 Vue.use(VueCookies)
-Vue.use(AsyncComputed)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
@@ -34,11 +34,8 @@ Vue.use(VueNativeSock, 'ws://192.168.0.186:8000', {
   connectManually: true
 })
 
-if (process.env.NODE_ENV==='development') {
-  require('@/assets/buildtw.css')
-}
-
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import '@/assets/buildtw.css'
 import '@/assets/tailwind.css'
 import '@/assets/app.scss'
 import find from "lodash/find";
@@ -114,7 +111,6 @@ Vue.mixin({
       })
     },
     async logout () {
-      console.log('###### LOG OUT')
       await this.axios.post('/users/logout')
       await this.$cryptoService.clearKeys()
       await this.$userService.clear()
@@ -123,7 +119,6 @@ Vue.mixin({
       this.$router.push({ name: 'home' })
     },
     async lock () {
-      console.log('##### LOCK')
       await Promise.all([
         this.$cryptoService.clearKey(false),
         this.$cryptoService.clearOrgKeys(true),
@@ -341,7 +336,6 @@ Vue.filter('formatNumber', function (value) {
 
 storePromise.then((store) => {
   router.beforeEach(async (toRoute, fromRoute, next) => {
-    console.log('vao Before Each')
     if (fromRoute && toRoute && fromRoute.path && toRoute.path
       && !fromRoute.path.includes('/login')
       && !toRoute.path.includes('/login')

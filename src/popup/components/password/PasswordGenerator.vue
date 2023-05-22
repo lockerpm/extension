@@ -8,7 +8,7 @@
         <div class="ml-2">
           <button
             class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
-            @click="regenerate"
+            @click="regenerate()"
           >
             <i class="fas fa-redo-alt" />
           </button>
@@ -40,41 +40,41 @@
           :min="8"
           :max="64"
           :debounce="800"
-          @change="regenerate"
+          @change="regenerate()"
         />
       </div>
       <el-checkbox
         v-model="options.uppercase"
         class="generator-option"
-        @change="regenerate"
+        @change="regenerate()"
       >
         {{ $t('data.tools.uppercase') }}
       </el-checkbox>
       <el-checkbox
         v-model="options.lowercase"
         class="generator-option"
-        @change="regenerate"
+        @change="regenerate()"
       >
         {{ $t('data.tools.lowercase') }}
       </el-checkbox>
       <el-checkbox
         v-model="options.number"
         class="generator-option"
-        @change="regenerate"
+        @change="regenerate()"
       >
         {{ $t('data.tools.digits') }}
       </el-checkbox>
       <el-checkbox
         v-model="options.special"
         class="generator-option"
-        @change="regenerate"
+        @change="regenerate()"
       >
         {{ $t('data.tools.symbols') }}
       </el-checkbox>
       <el-checkbox
         v-model="options.ambiguous"
         class="generator-option"
-        @change="regenerate"
+        @change="regenerate()"
       >
         {{ $t('data.tools.ambiguous') }}
       </el-checkbox>
@@ -84,9 +84,11 @@
 
 <script>
 import PasswordStrength from './PasswordStrength'
+import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 export default {
   components: { PasswordStrength },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       password: '',
@@ -102,6 +104,7 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
       if (this.password) {
         return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
@@ -109,32 +112,38 @@ export default {
       return {}
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
-    this.regenerate()
+    this.regenerate(true)
   },
   methods: {
-    async regenerate () {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async regenerate (isReload = false) {
       const oldGeneratePassword = await this.$passService.getGeneratePassword()
-      if (oldGeneratePassword) {
+      if (isReload && oldGeneratePassword) {
         this.password = oldGeneratePassword.password
-        this.options = oldGeneratePassword.options
-      }
-      if (!this.options.lowercase && !this.options.uppercase && !this.options.lowercase && !this.options.number && !this.options.special) {
-        this.options.lowercase = true
-      }
-      if (!this.password) {
+        this.options = JSON.parse(oldGeneratePassword.options)
+      } else {
+        if (!this.options.lowercase && !this.options.uppercase && !this.options.number && !this.options.special) {
+          this.options.lowercase = true
+        }
         this.password = await this.$passwordGenerationService.generatePassword(this.options)
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        await this.$passService.setInformation(this.password, this.options, tab)
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
       this.$router.push({ name: 'add-item-create', params: { password: this.password } })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {
       const numString = num.toString()
       return numString.length >= width
         ? numString
         : new Array(width - numString.length + 1).join(padCharacter) + numString
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async postCipher (cipher) {
       if (!cipher.name) { return }
       try {
@@ -160,5 +169,6 @@ export default {
 <style>
 .generator-option {
   @apply w-full py-2;
+  margin-right: 0 !important;
 }
 </style>

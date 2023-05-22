@@ -84,7 +84,12 @@ module.exports = {
     mr: 'Ông',
     mrs: 'Bà',
     ms: 'Chị',
-    dr: 'Bác sĩ'
+    dr: 'Bác sĩ',
+    next: 'Tiếp tục',
+    download: 'Tải ứng dụng',
+    system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
+    upgrade_now: 'Nâng cấp ngay',
+    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn"
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -359,6 +364,7 @@ module.exports = {
       thirtyMinutes: '30 phút',
       oneHour: '1 giờ',
       fourHours: '4 giờ',
+      twoWeeks: '2 tuần',
       onRefresh: 'Khi tải lại trình duyệt'
     },
     exportFile: {
@@ -556,6 +562,7 @@ module.exports = {
       additional_info: 'Thông tin thêm',
       private_key: 'Khóa bí mật',
       password_pin: 'Mật khẩu/PIN',
+      pin: 'PIN',
       username: 'Tên người dùng',
       wallet_app: 'Ví Blockchain',
       networks: 'Mạng Blockchain',
@@ -663,7 +670,6 @@ module.exports = {
       verify: 'Xác minh danh tính của bạn',
       authentication_app: 'Ứng dụng xác thực',
       have_code: 'Tôi đã có code',
-      next: 'Tiếp',
       enter_code: 'Nhập code',
       check_email: 'Thư đã được gửi đến {email}. Kiểm tra hòm thư/spam để lấy mã xác thực.',
       use_authentication_app: 'Xử dụng ứng dụng xác thực (như Duo hoặc Google Authenticator) để lấy mã.',
@@ -677,7 +683,19 @@ module.exports = {
       login_with: 'Hoặc Đăng nhập với',
       dont_have_account: 'Chưa có tài khoản?',
       sign_up: 'Đăng ký',
-      sign_in: 'Đăng nhập'
+      sign_in: 'Đăng nhập',
+      login_option: 'Tài khoản dành cho',
+      login_option_locker: 'Tài khoản {option}',
+      username_placeholder: 'Email hoặc Tên đăng nhập',
+      password_placeholder: 'Mật khẩu',
+      options: {
+        individual_vault: 'Cá nhân',
+        business_vault: 'Doanh nghiệp',
+        enterprise_vault: 'Doanh nghiệp on-premise',
+      },
+      message: {
+        required: '{name} là bắt buộc!',
+      }
     },
     set_master_pass: {
       create: 'Tạo Mật khẩu chính',

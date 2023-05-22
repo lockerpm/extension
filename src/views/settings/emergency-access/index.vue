@@ -377,6 +377,7 @@ export default {
     EmergencyContact,
     PasswordStrengthBar
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       list_trusted: [],
@@ -401,11 +402,13 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
       return this.$passwordGenerationService.passwordStrength(this.masterPassword, ['cystack']) || {}
     }
   },
   watch: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     masterRePassword (newValue) {
       if (this.masterPassword && newValue && this.masterPassword !== newValue) {
         this.errors.masterRePassword = 1
@@ -414,18 +417,22 @@ export default {
       }
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     this.getListTrusted()
     this.getListGranted()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getEmergencyAccess () {
       this.getListTrusted()
       this.getListGranted()
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     postEmergencyAccess () {
       this.$refs.emergencyContact.openDialog({})
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getListTrusted () {
       this.loading = true
       this.axios.get('cystack_platform/pm/emergency_access/trusted')
@@ -434,6 +441,7 @@ export default {
           this.loading = false
         })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     getListGranted () {
       this.loading2 = true
       this.axios.get('cystack_platform/pm/emergency_access/granted')
@@ -442,23 +450,28 @@ export default {
           this.loading2 = false
         })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     putEmergencyAccess (emergency_contact) {
       this.$refs.emergencyContact.openDialog(emergency_contact)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     deleteEmergencyAccess (emergency_contact) {
       this.$refs.emergencyContact.deleteEmergencyAccess(emergency_contact)
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async generateAccessKey () {
       const pk = Utils.fromB64ToArray(this.publicKey)
       const encKey = await this.$cryptoService.getEncKey()
       const key = await this.$cryptoService.rsaEncrypt(encKey.key, pk.buffer)
       return key.encryptedString
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getPublicKey (emergency_access) {
       this.userFingerPrint = ''
       const { public_key: publicKey } = await this.axios.get(`cystack_platform/pm/emergency_access/${emergency_access.id}/public_key`)
       return publicKey
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async promptConfirmEmergencyAccess (emergency_access) {
       this.selectedEmergencyAccess = emergency_access
       this.publicKey = await this.getPublicKey(emergency_access)
@@ -470,12 +483,15 @@ export default {
       this.dontAskAgain = await this.$storageService.get('autoConfirmFingerprints')
       this.openDialogConfirm()
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     openDialogConfirm () {
       this.dialogConfirmVisible = true
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     closeDialogConfirm () {
       this.dialogConfirmVisible = false
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async confirmEmergencyAccess (emergency_access) {
       try {
         this.loadingConfirm = true
@@ -487,22 +503,25 @@ export default {
         this.getListTrusted()
         this.notify(this.$t('data.notifications.confirm_emergency_access_success', { user: emergency_access.email }), 'success')
       } catch (e) {
-        console.log(e)
         this.notify(this.$t('data.notifications.confirm_emergency_access_failed', { user: emergency_access.email }), 'warning')
       } finally {
         this.loadingConfirm = false
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     promptRequestAccess (emergency_access) {
       this.selectedEmergencyAccess = emergency_access
       this.openDialogRequest()
     },
-    openDialogRequest (emergency_access) {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    openDialogRequest () {
       this.dialogConfirmVisible = true
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     closeDialogRequest () {
       this.dialogConfirmVisible = false
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async requestAccess (emergency_access) {
       try {
         await this.axios.post(`cystack_platform/pm/emergency_access/${emergency_access.id}/initiate`)
@@ -510,10 +529,10 @@ export default {
         this.getListGranted()
         this.notify(this.$t('data.notifications.request_send_success', { user: emergency_access.email }), 'success')
       } catch (e) {
-        console.log(e)
         this.notify(this.$t('data.notifications.request_send_failed'), 'warning')
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async approveEmergencyAccess (emergency_access) {
       try {
         await this.axios.post(`cystack_platform/pm/emergency_access/${emergency_access.id}/approve`)
@@ -523,6 +542,7 @@ export default {
         this.notify(this.$t('data.notifications.emergency_access_approved_failed'), 'warning')
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async rejectEmergencyAccess (emergency_access) {
       try {
         await this.axios.post(`cystack_platform/pm/emergency_access/${emergency_access.id}/reject`)
@@ -532,6 +552,7 @@ export default {
         this.notify(this.$t('data.notifications.emergency_access_rejected_failed'), 'warning')
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async acceptInvite (emergency_access) {
       try {
         await this.axios.post(`cystack_platform/pm/emergency_access/${emergency_access.id}/accept`)
@@ -541,6 +562,7 @@ export default {
         this.notify(this.$t('data.notifications.accept_invitation_failed'), 'warning')
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async reinvite (emergency_access) {
       try {
         await this.axios.post(`cystack_platform/pm/emergency_access/${emergency_access.id}/reinvite`)
@@ -550,16 +572,19 @@ export default {
         this.notify(this.$t('data.notifications.reinvited_user_failed', { user: emergency_access.email }), 'warning')
       }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     viewGrantorVault (item) {
       this.$router.push({
         name: 'settings-emergency-access-id',
         params: { id: item.id }
       })
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     takeoverGrantorVault (item) {
       this.dialogTakeoverVisible = true
       this.selectedEmergencyAccess = item
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async setPasswordForGrantor () {
       try {
         this.loadingSetPassword = true

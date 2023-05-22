@@ -91,8 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         command: 'bgGeneratePassword',
         responseCommand: responseGeneratePasswordNoOptions
       });
-    }
-    else {
+    } else {
       document.getElementById('header-title').innerHTML = i18n.informMenuSavedLogin
       setContent(document.getElementById('template-list-ciphers'));
       sendPlatformMessage({

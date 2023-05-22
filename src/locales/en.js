@@ -85,7 +85,12 @@ module.exports = {
     mr: 'Mr',
     mrs: 'Mrs',
     ms: 'Ms',
-    dr: 'Dr'
+    dr: 'Dr',
+    next: 'Next',
+    download: 'Download Desktop App',
+    system_error: 'An error occurred, please try again later!',
+    upgrade_now: 'Upgrade now',
+    update_title: "Upgrade to Premium to get Unlimited Storage"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -363,6 +368,7 @@ module.exports = {
       thirtyMinutes: '30 minutes',
       oneHour: '1 hour',
       fourHours: '4 hours',
+      twoWeeks: '2 weeks',
       onRefresh: 'On Browser Reload'
     },
     exportFile: {
@@ -561,6 +567,7 @@ module.exports = {
       additional_info: 'Additional Information',
       private_key: 'Private Key',
       password_pin: 'Password/PIN',
+      pin: 'PIN',
       username: 'Username',
       wallet_app: 'Wallet App',
       networks: 'Networks',
@@ -673,7 +680,6 @@ module.exports = {
       verify: 'Verify your identity',
       authentication_app: 'Authentication App',
       have_code: 'I have a code',
-      next: 'Next',
       enter_code: 'Enter code',
       check_email: 'An email has been sent to {email}. Check you inbox/spam to get verification code.',
       use_authentication_app: 'Please use your authentication app (such as Duo or Google Authenticator) to get the code.',
@@ -687,7 +693,19 @@ module.exports = {
       login_with: 'Or Log in with',
       dont_have_account: 'Don\'t have an account yet?',
       sign_up: 'Sign Up',
-      sign_in: 'Sign In'
+      sign_in: 'Sign In',
+      login_option: 'Sign in to your account',
+      login_option_locker: 'Sign in to your Locker {option}',
+      username_placeholder: 'Email or Username',
+      password_placeholder: 'Password',
+      options: {
+        individual_vault: 'Individual',
+        business_vault: 'Business',
+        enterprise_vault: 'Enterprise',
+      },
+      message: {
+        required: '{name} is required!',
+      }
     },
     set_master_pass: {
       create: 'Create Master Password',

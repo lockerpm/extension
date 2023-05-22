@@ -258,9 +258,12 @@ export default Vue.extend({
     this.init()
   },
   asyncComputed: {
-    async locked () {
-      return await this.$vaultTimeoutService.isLocked()
-    }
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
   },
   beforeDestroy () {
     this.$broadcasterService.unsubscribe(BroadcasterSubscriptionId)
@@ -373,8 +376,7 @@ export default Vue.extend({
       this.shouldWelcome = 'false'
     },
     async test () {
-      const data = await this.$vaultTimeoutService.isLocked()
-      console.log(data)
+      await this.$vaultTimeoutService.isLocked()
     }
   }
 }

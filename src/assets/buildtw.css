@@ -879,6 +879,11 @@ select {
   margin-right: 1.25rem;
 }
 
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -1075,7 +1080,7 @@ select {
 }
 
 .flex {
-  display: flex;
+  display: flex !important;
 }
 
 .\!flex {
@@ -1083,11 +1088,11 @@ select {
 }
 
 .grid {
-  display: grid;
+  display: grid !important;
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .h-full {
@@ -1247,15 +1252,15 @@ select {
 }
 
 .flex-1 {
-  flex: 1 1 0%;
+  flex: 1 1 0% !important;
 }
 
 .flex-shrink-0 {
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
 }
 
 .flex-grow {
-  flex-grow: 1;
+  flex-grow: 1 !important;
 }
 
 .transform {
@@ -1310,7 +1315,7 @@ select {
 }
 
 .flex-col {
-  flex-direction: column;
+  flex-direction: column !important;
 }
 
 .items-start {

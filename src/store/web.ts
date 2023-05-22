@@ -14,8 +14,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
     oldStoreParsed = oldStore
   }
 
-  console.log('oldStoreParsed', oldStoreParsed)
-
   return new Vuex.Store({
     state: {
       init: false,
@@ -65,7 +63,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.currentPath = payload.currentPath || '/'
         state.previousPath = payload.previousPath || ''
       },
-      SET_LANG (state, {language}) {
+      SET_LANG (state, language) {
         state.user.language = language
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
@@ -140,11 +138,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
           if (state.isLoggedIn) {
             const data = Object.assign({}, state.user)
             data.language = payload
-            // eslint-disable-next-line no-undef
-            // if (Intercom) {
-            //   // eslint-disable-next-line no-undef
-            //   Intercom('update', { language_override: payload })
-            // }
             Vue.axios.put('me', data)
           }
           resolve(payload)

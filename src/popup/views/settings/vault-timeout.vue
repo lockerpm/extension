@@ -29,7 +29,7 @@
           @click="putUser(option.value)"
         >
           {{option.label}}
-          <div v-if="user.timeout===option.value" class="text-primary" style="font-size: 8px; line-height: 8px; padding: 5px; border-radius: 50%; border: 1px solid green">
+          <div v-if="user.timeout === option.value" class="text-primary" style="font-size: 8px; line-height: 8px; padding: 5px; border-radius: 50%; border: 1px solid green">
             <i
               class="fas fa-circle"
             />
@@ -45,6 +45,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { VAULT_TIMEOUTS } from '@/constants/index'
+
 export default Vue.extend({
   data() {
     return {
@@ -54,15 +56,7 @@ export default Vue.extend({
   },
   computed: {
     vaultTimeouts() {
-      return [
-        { label: this.$t("data.timeouts.oneMinute"), value: 1 },
-        { label: this.$t("data.timeouts.fiveMinutes"), value: 5 },
-        { label: this.$t("data.timeouts.fifteenMinutes"), value: 15 },
-        { label: this.$t("data.timeouts.thirtyMinutes"), value: 30 },
-        { label: this.$t("data.timeouts.oneHour"), value: 60 },
-        { label: this.$t("data.timeouts.fourHours"), value: 240 },
-        { label: this.$t("data.timeouts.onRefresh"), value: -1 },
-      ];
+      return VAULT_TIMEOUTS;
     },
   },
   async mounted() {
@@ -87,8 +81,9 @@ export default Vue.extend({
           this.$t("data.notifications.update_settings_success"),
           "success"
         );
+        const now = (new Date()).getTime()
+        this.$storageService.save('lastActive', now)
       } catch (e) {
-        console.log(e);
         this.notify(
           this.$t("data.notifications.update_settings_failed"),
           "warning"

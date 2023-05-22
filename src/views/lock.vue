@@ -144,7 +144,6 @@ export default Vue.extend({
       try {
         await this.login()
       } catch (e) {
-        console.log(e)
         this.errors = true
       } finally {
         this.loading = false
@@ -168,7 +167,6 @@ export default Vue.extend({
           this.step = 3
         })
     }
-    // TODO change masterpass if have account
   }
 })
 </script>

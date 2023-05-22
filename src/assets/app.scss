@@ -14,9 +14,6 @@
 }
 
 html {
-  //width: 375px;
-  //height: 600px;
-  //background: grey;
   height: 100%;
 }
 
@@ -32,6 +29,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-width: 400px;
+  height: 600px;
   &.body-full {
     @apply w-full h-full;
   }
@@ -92,10 +90,6 @@ select:focus {
     @apply px-8 py-5;
   }
 }
-//.col-actions {
-//  display: none;
-//  visibility: hidden;
-//}
 .hover-table-row:hover {
   .col-actions {
     display: block;
@@ -141,13 +135,8 @@ a {
 .v-context {
   background-color: #fff;
   background-clip: padding-box;
-  //border-radius:.25rem;
-  //border:1px solid rgba(0,0,0,.15);
-  //box-shadow:0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
-  //padding:10px 0;
   display: block;
   margin: 0;
-  //min-width:10rem;
   z-index: 1500;
   position: fixed;
   list-style: none;
@@ -465,7 +454,7 @@ input:-webkit-autofill:active {
   visibility: visible !important;
 }
 .timeout-option{
-  @apply flex items-center justify-between p-4;
+  @apply flex items-center justify-between px-4 py-2;
 }
 .timeout-option:hover {
   background-color: #E8E8E9;

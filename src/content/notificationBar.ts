@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       sendResponse();
       return true;
-    } 
+    }
   }
 
   function observeDom() {
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       });
 
-      observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter : ['style'] });
+      observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter: ['style'] });
     }
   }
 
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', event => {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
         } else {
-          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30 }px`;
+          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30}px`;
           logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
         }
         if (isLocked) {
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
     const barPageUrl: string = chrome.extension.getURL(
-      "inform-menu/menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+      "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
-    let barPage = 'notification/bar.html';
+    let barPage = 'bar.html';
     switch (type) {
       case 'add':
         barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
@@ -720,15 +720,30 @@ document.addEventListener('DOMContentLoaded', event => {
     const barPageUrl: string = chrome.extension.getURL(barPage);
 
     const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'height: 320px; width: 450px; border: 0; min-height: initial; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); border-radius: 12px;';
+    iframe.style.cssText = `
+      height: 320px !important;
+      width: 450px;
+      border: 0;
+      min-height: initial;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
+      border-radius: 12px;
+    `;
     iframe.id = 'bit-notification-bar-iframe';
     iframe.src = barPageUrl;
 
     const frameDiv = document.createElement('div');
     frameDiv.setAttribute('aria-live', 'polite');
     frameDiv.id = 'bit-notification-bar';
-    frameDiv.style.cssText = 'height: 325px; width: 450px; top: 40px; right: 40px; padding: 0; position: fixed; ' +
-      'z-index: 2147483647; visibility: visible;';
+    frameDiv.style.cssText = `
+      height: 325px !important;
+      width: 450px;
+      top: 40px;
+      right: 40px;
+      padding: 0;
+      position: fixed;
+      z-index: 2147483647;
+      visibility: visible;
+    `
     frameDiv.appendChild(iframe);
     document.body.appendChild(frameDiv);
 
@@ -819,8 +834,8 @@ document.addEventListener('DOMContentLoaded', event => {
     let barPageUrl: string = chrome.extension.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
-      height: 600px;
-      width: 400px;
+      height: 602px;
+      width: 402px;
       border: 1px solid rgb(189 190 190);
       background-color: white
     `;
@@ -838,9 +853,9 @@ document.addEventListener('DOMContentLoaded', event => {
       visibility: visible;
     `;
     frameDiv.appendChild(iframe);
-    window.addEventListener('click', function(e: any){   
-      if (frameDiv.contains(e.target)){
-      } else{
+    window.addEventListener('click', function (e: any) {
+      if (frameDiv.contains(e.target)) {
+      } else {
         sendPlatformMessage({
           command: 'closePopupIframe',
         });

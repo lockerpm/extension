@@ -37,7 +37,7 @@ export class Cipher extends Domain {
     fields: Field[];
     passwordHistory: Password[];
     collectionIds: string[];
-    deletedDate: Date;
+    deletedDate: any;
     lastUseDate: number;
     numUse: number;
     reprompt: CipherRepromptType;
@@ -69,7 +69,7 @@ export class Cipher extends Domain {
         this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null;
         this.collectionIds = obj.collectionIds;
         this.localData = localData;
-        this.deletedDate = obj.deletedDate != null ? new Date(obj.deletedDate) : null;
+        this.deletedDate = obj.deletedDate ? new Date(obj.deletedDate) : null;
         this.lastUseDate = obj.lastUseDate;
         this.numUse = obj.numUse;
         this.reprompt = obj.reprompt;
@@ -181,15 +181,15 @@ export class Cipher extends Domain {
         c.id = this.id;
         c.organizationId = this.organizationId;
         c.folderId = this.folderId;
-        c.userId = this.organizationId != null ? userId : null;
+        c.userId = this.organizationId ? userId : null;
         c.edit = this.edit;
         c.viewPassword = this.viewPassword;
         c.organizationUseTotp = this.organizationUseTotp;
         c.favorite = this.favorite;
-        c.revisionDate = this.revisionDate != null ? this.revisionDate.toISOString() : null;
+        c.revisionDate = this.revisionDate ? this.revisionDate.toISOString() : null;
         c.type = this.type;
         c.collectionIds = this.collectionIds;
-        c.deletedDate = this.deletedDate != null ? this.deletedDate.toISOString() : null;
+        c.deletedDate = this.deletedDate ? this.deletedDate.toISOString() : null;
         c.reprompt = this.reprompt;
 
         this.buildDataModel(this, c, {

@@ -20,16 +20,21 @@ export default Vue.extend({
     }
   },
   created () {
-    (window as any).bitwardenPopupMainMessageListener = async (msg: any, sender: any, sendResponse: any) => {
-      console.log(msg)
-      console.log(sender)
-      console.log(sendResponse)
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    (window as any).bitwardenPopupMainMessageListener = async () => {}
   },
   methods: {
   }
 })
 </script>
 
-<style>
+<style lang="scss">
+.el-input {
+  &__inner {
+    border-radius: 8px !important;
+  }
+}
+.el-button {
+  border-radius: 8px
+}
 </style>

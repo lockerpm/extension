@@ -324,8 +324,9 @@
                 trigger="click"
                 popper-class="locker-pw-generator"
               >
-                <PasswordGenerator @fill="fillPassword" />
-
+                <PasswordGenerator
+                  @fill-password="fillPassword"
+                />
                 <button
                   slot="reference"
                   class="btn btn-clean !text-primary"
@@ -374,12 +375,45 @@
             :is-password="false"
           />
           <InputText
-            v-model="cryptoWallet.password"
-            :label="$t('data.ciphers.password_pin')"
+            v-model="cryptoWallet.pin"
+            :label="$t('data.ciphers.pin')"
             class="w-full"
             :disabled="isDeleted"
             is-password
           />
+          <InputText
+            v-model="cryptoWallet.password"
+            :label="$t('data.ciphers.password')"
+            class="w-full"
+            :disabled="isDeleted"
+            is-password
+          />
+          <PasswordStrengthBar
+            :score="passwordStrength.score"
+            class="mt-2"
+            :class="{ 'my-2' : !!this.data.id}"
+          />
+          <div
+            v-if="!isDeleted"
+            class="text-right"
+          >
+            <el-popover
+              placement="right"
+              width="280"
+              trigger="click"
+              popper-class="locker-pw-generator"
+            >
+              <PasswordGenerator
+                @fill-password="fillPassword"
+              />
+              <button
+                slot="reference"
+                class="btn btn-clean !text-primary"
+              >
+                {{ $t('data.ciphers.generate_random_password') }}
+              </button>
+            </el-popover>
+          </div>
           <InputText
             v-model="cryptoWallet.address"
             :label="$t('data.ciphers.wallet_address')"
@@ -504,7 +538,12 @@
           </div>
         </template>
       </div>
-      <div v-if="cipher.id" @click="deleteCiphers([cipher.id])" class="text-red mt-4 bg-white cursor-pointer" style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;">
+      <div
+        v-if="cipher.id"
+        @click="deleteCiphers([cipher.id])"
+        class="text-red mt-4 bg-white cursor-pointer"
+        style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;"
+      >
         <i class="el-icon-delete">&nbsp; Delete</i>
       </div>
     </div>
@@ -512,15 +551,17 @@
       ref="addEditFolder"
       @created-folder="handleCreatedFolder"
     />
+    <UpgrateToPremium
+      :visible="popupVisible"
+      @close="() => popupVisible = false"
+    />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
-import { Dialog } from 'element-ui'
 import { ValidationProvider } from 'vee-validate'
 import { CipherType, } from "jslib-common/enums/cipherType";
-import {FieldType} from "jslib-common/enums/fieldType"
 import { SecureNoteType } from "jslib-common/enums/secureNoteType";
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
@@ -531,7 +572,6 @@ import { IdentityView } from "jslib-common/models/view/identityView";
 import { CardView } from "jslib-common/models/view/cardView";
 import { LoginUriView } from "jslib-common/models/view/loginUriView";
 import { LoginView } from "jslib-common/models/view/loginView";
-import { FieldView } from "jslib-common/models/view/fieldView";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import PasswordGenerator from '@/components/password/PasswordGenerator'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
@@ -548,6 +588,8 @@ import Vnodes from "@/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 import { Utils } from 'jslib-common/misc/utils';
+import UpgrateToPremium from '@/components/cipher/UpgrateToPremium.vue'
+
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7
 export default Vue.extend({
@@ -564,7 +606,8 @@ export default Vue.extend({
     InputSelectCryptoWallet,
     InputSelectCryptoNetworks,
     InputSeedPhrase,
-    InputCustomFields
+    InputCustomFields,
+    UpgrateToPremium
   },
   props: {
     type: {
@@ -596,6 +639,7 @@ export default Vue.extend({
       errors: {},
       writeableCollections: [],
       cloneMode: false,
+      popupVisible: false,
       cryptoAccount: {
         username: null,
         password: null,
@@ -616,6 +660,7 @@ export default Vue.extend({
         },
         username: '',
         password: '',
+        pin: '',
         address: '',
         privateKey: '',
         seed: '',
@@ -665,9 +710,6 @@ export default Vue.extend({
   watch: {
     cryptoAccount () {
       this.cipher.cryptoAccount = this.cryptoAccount
-    },
-    cryptoWallet () {
-      this.cipher.cryptoWallet = this.cryptoWallet
     }
   },
   computed: {
@@ -724,14 +766,14 @@ export default Vue.extend({
       return !!this.cipher.deletedDate
     },
     passwordStrength () {
-      if (this.cipher.login) {
+      if (this.cipher.type === CipherType.Login && this.cipher.login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
       }
-      if (this.cipher.cryptoAccount) {
+      if (this.cipher.type === 6 && this.cipher.cryptoAccount) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
       }
-      if (this.cipher.cryptoWallet) {
-        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
+      if (this.cipher.type === 7 && this.cryptoWallet) {
+        return this.$passwordGenerationService.passwordStrength(this.cryptoWallet.password, ['cystack']) || {}
       }
       return {}
     },
@@ -771,6 +813,8 @@ export default Vue.extend({
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           this.notify(this.$t('errors.5002', { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'error')
+          // Open popup upgrade premium
+          this.popupVisible = true
         } else {
           this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         }
@@ -821,7 +865,6 @@ export default Vue.extend({
           this.$router.back()
         } catch (e) {
           this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }
@@ -859,7 +902,6 @@ export default Vue.extend({
           this.$emit('reset-selection')
         } catch (e) {
           this.notify(this.$tc('data.notifications.restore_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          console.log(e)
         } finally {
           this.loading = false
         }
@@ -910,6 +952,8 @@ export default Vue.extend({
     setPassword (p) {
       if (!this.cipher.login.password) {
         this.cipher.login.password = p
+      } else if (!this.cryptoWallet.password) {
+        this.cryptoWallet.password = p
       }
     },
     fillPassword (p) {

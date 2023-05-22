@@ -120,6 +120,7 @@ export default {
     Vnodes,
     ViewGrantorCipher
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       id: null,
@@ -127,6 +128,7 @@ export default {
       CipherType
     }
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   mounted () {
     if (this.$route.params.id === null) {
       return this.$router.push({name: 'settings-emergency-access'})
@@ -135,14 +137,15 @@ export default {
     this.load()
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async load () {
       try {
         const data = await this.axios.post(`/cystack_platform/pm/emergency_access/${this.id}/view`)
         this.ciphers = await this.getAllCiphers(data)
-      } catch (error) {
-        console.log(error)
-      }
+      // eslint-disable-next-line no-empty
+      } catch (error) {}
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getAllCiphers (response) {
       const ciphers = response.ciphers
       const decCiphers = []
@@ -161,6 +164,7 @@ export default {
 
       return decCiphers
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     addEdit (cipher) {
       this.$refs.addEditCipherDialog.openDialog(cloneDeep(cipher))
     }

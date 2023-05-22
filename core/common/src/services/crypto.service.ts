@@ -29,6 +29,7 @@ import { ProfileProviderResponse } from '../models/response/profileProviderRespo
 
 export const Keys = {
     key: 'key', // Master Key
+    memoryKey: 'memoryKey',
     encOrgKeys: 'encOrgKeys',
     encProviderKeys: 'encProviderKeys',
     encPrivateKey: 'encPrivateKey',
@@ -53,7 +54,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
     async setKey(key: SymmetricCryptoKey): Promise<any> {
         this.key = key;
-
+        await this.secureStorageService.save(Keys.memoryKey, key)
         await this.storeKey(key);
     }
 
@@ -108,18 +109,24 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     async getKey(keySuffix?: KeySuffixOptions): Promise<SymmetricCryptoKey> {
-        if (this.key) {
-            return this.key;
-        }
+      if (this.key) {
+        return this.key;
+      }
 
-        keySuffix ||= 'auto';
-        const symmetricKey = await this.getKeyFromStorage(keySuffix);
+      const memoryKey: SymmetricCryptoKey = await this.secureStorageService.get(Keys.memoryKey)
+      if (memoryKey) {
+        this.setKey(this.key);
+        return this.key;
+      }
 
-        if (symmetricKey) {
-            this.setKey(symmetricKey);
-        }
+      keySuffix ||= 'auto';
+      const symmetricKey = await this.getKeyFromStorage(keySuffix);
+      
+      if (symmetricKey) {
+        this.setKey(symmetricKey);
+      }
 
-        return symmetricKey;
+      return symmetricKey;
     }
 
     async getKeyFromStorage(keySuffix: KeySuffixOptions): Promise<SymmetricCryptoKey> {
@@ -336,11 +343,11 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     async hasKey(): Promise<boolean> {
-        return this.hasKeyInMemory() || await this.hasKeyStored('auto') || await this.hasKeyStored('biometric');
+        return await this.hasKeyInMemory() || await this.hasKeyStored('auto') || await this.hasKeyStored('biometric');
     }
 
-    hasKeyInMemory(): boolean {
-        return !!this.key;
+    async hasKeyInMemory(): Promise<boolean> {
+      return !!this.key;
     }
 
     hasKeyStored(keySuffix: KeySuffixOptions): Promise<boolean> {
@@ -354,6 +361,8 @@ export class CryptoService implements CryptoServiceAbstraction {
 
     async clearKey(clearSecretStorage: boolean = true): Promise<any> {
         this.key = this.legacyEtmKey = null;
+        await this.secureStorageService.remove(Keys.memoryKey)
+        await this.secureStorageService.remove(Keys.key);
         if (clearSecretStorage) {
             this.clearStoredKey('auto');
             this.clearStoredKey('biometric');
@@ -424,6 +433,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
     async makeKey(password: string, salt: string, kdf: KdfType, kdfIterations: number):
         Promise<SymmetricCryptoKey> {
+
         let key: ArrayBuffer = null;
         if (kdf == null || kdf === KdfType.PBKDF2_SHA256) {
             if (kdfIterations == null) {
@@ -728,7 +738,7 @@ export class CryptoService implements CryptoServiceAbstraction {
         let shouldStoreKey = false;
         if (keySuffix === 'auto') {
             const vaultTimeout = await this.storageService.get<number>(ConstantsService.vaultTimeoutKey);
-            shouldStoreKey = vaultTimeout == null;
+            shouldStoreKey = !vaultTimeout;
         } else if (keySuffix === 'biometric') {
             const biometricUnlock = await this.storageService.get<boolean>(ConstantsService.biometricUnlockKey);
             shouldStoreKey = biometricUnlock && this.platformUtilService.supportsSecureStorage();
