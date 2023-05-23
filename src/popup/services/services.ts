@@ -46,10 +46,8 @@ function getBgService<T>(service: string) {
   };
 }
 
-const isPrivateMode = BrowserApi.getBackgroundPage() == null;
-
 const stateService = new StateService();
-const searchService = isPrivateMode ? null : new PopupSearchService(getBgService<SearchService>('searchService')(),
+const searchService = new PopupSearchService(getBgService<SearchService>('searchService')(),
   getBgService<CipherService>('cipherService')(), getBgService<ConsoleLogService>('consoleLogService')(),
   getBgService<I18nService>('i18nService')());
 
@@ -92,25 +90,23 @@ export default {
       window.document.body.classList.add('body-sm');
     }
 
-    if (!isPrivateMode) {
-      await stateService.save(ConstantsService.disableFaviconKey,
-        await storageService.get<boolean>(ConstantsService.disableFaviconKey));
+    await stateService.save(ConstantsService.disableFaviconKey,
+      await storageService.get<boolean>(ConstantsService.disableFaviconKey));
 
-      await stateService.save(ConstantsService.disableBadgeCounterKey,
-        await storageService.get<boolean>(ConstantsService.disableBadgeCounterKey));
+    await stateService.save(ConstantsService.disableBadgeCounterKey,
+      await storageService.get<boolean>(ConstantsService.disableBadgeCounterKey));
 
-      let theme = await storageService.get<string>(ConstantsService.themeKey);
-      if (theme == null) {
-        theme = await platformUtilsService.getDefaultSystemTheme();
+    let theme = await storageService.get<string>(ConstantsService.themeKey);
+    if (theme == null) {
+      theme = await platformUtilsService.getDefaultSystemTheme();
 
-        platformUtilsService.onDefaultSystemThemeChange(sysTheme => {
-          window.document.documentElement.classList.remove('theme_light', 'theme_dark');
-          window.document.documentElement.classList.add('theme_' + sysTheme);
-        });
-      }
-      window.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
-      window.document.documentElement.classList.add('theme_' + theme);
+      platformUtilsService.onDefaultSystemThemeChange(sysTheme => {
+        window.document.documentElement.classList.remove('theme_light', 'theme_dark');
+        window.document.documentElement.classList.add('theme_' + sysTheme);
+      });
     }
+    window.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
+    window.document.documentElement.classList.add('theme_' + theme);
   },
   getBgService
 }
