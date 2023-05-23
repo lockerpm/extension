@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import RuntimeBackground from '../background/runtime.background';
 import {StorageService} from "jslib-common/abstractions/storage.service";
+
 import { v4 as uuidv4 } from 'uuid';
 
 import meAPI from '@/api/me';
@@ -11,7 +12,7 @@ import notificationAPI from '@/api/notification';
 
 Vue.use(Vuex)
 
-const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
 
 const STORAGE_KEY = 'cs_store'
@@ -42,7 +43,7 @@ const defaultLoginInfo = {
   forgot_token: null
 }
 
-export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
+export default storageService.get(STORAGE_KEY).then(async oldStore => {
   let oldStoreParsed = {
     language: 'en',
     ...JSON.parse(JSON.stringify(defaultLoginInfo)),
@@ -50,7 +51,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   if (typeof oldStore === 'object') {
     oldStoreParsed = {
       ...oldStoreParsed,
-      ...oldStore
+      ...oldStore,
     }
   }
 

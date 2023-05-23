@@ -48,6 +48,8 @@ export default Vue.extend({
       watch: []
     },
   },
+  computed: {
+  },
   watch: {
     '$store.state.userPw' (newValue) {
       if (newValue.is_pwd_manager === false) {
@@ -55,11 +57,10 @@ export default Vue.extend({
       }
     },
     'locked' (newValue) {
-      if (newValue === true) {
+      if (newValue) {
         this.$router.push({ name: 'lock' })
         this.disconnectSocket()
-      }
-      if (newValue === false) {
+      } else {
         this.$store.dispatch('LoadTeams')
         this.getSyncData()
         this.reconnectSocket()

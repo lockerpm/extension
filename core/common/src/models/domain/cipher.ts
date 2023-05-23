@@ -112,12 +112,10 @@ export class Cipher extends Domain {
 
     async decrypt(encKey?: SymmetricCryptoKey): Promise<CipherView> {
         const model = new CipherView(this);
-
         await this.decryptObj(model, {
             name: null,
             notes: null,
         }, this.organizationId, encKey);
-
         switch (this.type) {
             case CipherType.Login:
                 model.login = await this.login.decrypt(this.organizationId, encKey);

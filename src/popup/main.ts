@@ -333,6 +333,7 @@ Vue.mixin({
 
         const deletedIds = [];
         const cipherIds = allCiphers.map(c => c.id);
+        
         const storageRes = await this.$storageService.get(`ciphers_${userId}`);
         for (const id in { ...storageRes }) {
           if (!cipherIds.includes(id)) {
@@ -341,7 +342,6 @@ Vue.mixin({
           }
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
-
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })

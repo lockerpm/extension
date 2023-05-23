@@ -194,7 +194,7 @@ export default Vue.extend({
   data () {
     return {
       invalidPinAttempts: 0,
-      masterPassword: '',
+      masterPassword: 'tienquyet1997@',
       loading: false,
       errors: false,
       showPassword: false,
