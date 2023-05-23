@@ -150,11 +150,7 @@ export default Vue.extend({
       this.$router.push({ name: "login" });
     },
     openRegister() {
-      const msg = {
-        command: 'authAccessToken',
-        sender: { type: 'register'},
-      };
-      chrome.runtime.sendMessage(msg);
+      this.$runtimeBackground.authAccessToken('register')
     },
     openVault() {
       this.$platformUtilsService.launchUri("https://locker.io/vault");

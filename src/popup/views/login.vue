@@ -120,10 +120,7 @@ export default Vue.extend({
             if (response.login_method === 'passwordless' || response.require_passwordless) {
               this.$router.push({ name: 'pwl-unlock' })
             } else {
-              chrome.runtime.sendMessage({
-                command: 'updateStoreService',
-                sender: { key: 'isLoggedIn', value: true },
-              });
+              await this.$runtimeBackground.updateStoreService('isLoggedIn', true)
               this.$store.commit('UPDATE_IS_LOGGEDIN', true)
               this.$router.push({ name: 'lock' })
             }

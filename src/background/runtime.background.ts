@@ -82,33 +82,10 @@ export default class RuntimeBackground {
   }
 
   async processMessage(msg: any, sender: any, sendResponse: any) {
-    console.log('msg', msg);
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
-        let item: LockedVaultPendingNotificationsItem;
-
-        if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
-          await BrowserApi.closeLoginTab();
-
-          item = this.lockedVaultPendingNotifications.pop() || this.lockedVaultPendingInformMenu.pop();
-          if (item.commandToRetry.sender?.tab?.id) {
-            await BrowserApi.focusSpecifiedTab(
-              item.commandToRetry.sender.tab.id
-            );
-          }
-        }
-        await this.main.refreshBadgeAndMenu(false);
-        this.notificationsService.updateConnection(msg.command === "unlocked");
-        this.systemService.cancelProcessReload();
-
-        if (item) {
-          await BrowserApi.tabSendMessageData(
-            item.commandToRetry.sender.tab,
-            "unlockCompleted",
-            item
-          );
-        }
+        this.handleUnlocked(msg.command)
         break;
       case "addToLockedVaultPendingNotifications":
         this.lockedVaultPendingNotifications.push(msg.data);
@@ -131,24 +108,12 @@ export default class RuntimeBackground {
           true
         );
         break;
-      case "showDialogResolve":
-        this.platformUtilsService.resolveDialogPromise(
-          msg.dialogId,
-          msg.confirmed
-        );
-        break;
       case "bgCollectPageDetails":
         await this.main.collectPageDetailsForContentScript(
           sender.tab,
           msg.sender,
           sender.frameId
         );
-        break;
-      case "deletedCipher":
-        await this.main.refreshBadgeAndMenu();
-        break;
-      case "bgReseedStorage":
-        await this.main.reseedStorage();
         break;
       case "collectPageDetailsResponse":
         switch (msg.sender) {
@@ -189,25 +154,6 @@ export default class RuntimeBackground {
         break;
       case "bgGeneratePassword":
         this.generatePassword(sender.tab, msg.responseCommand, msg.options, msg.isReplace);
-      case "authResult":
-        const vaultUrl = this.environmentService.getWebVaultUrl();
-
-        if (
-          msg.referrer == null ||
-          Utils.getHostname(vaultUrl) !== msg.referrer
-        ) {
-          return;
-        }
-
-        try {
-          BrowserApi.createNewTab(
-            "popup/index.html?uilocation=popout#/sso?code=" +
-            msg.code +
-            "&state=" +
-            msg.state
-          );
-        } catch { }
-        break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
@@ -233,7 +179,6 @@ export default class RuntimeBackground {
               }, 1000);
             });
           } catch (e) {
-            console.log(e);
           }
         }
         break;
@@ -273,59 +218,11 @@ export default class RuntimeBackground {
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
         await BrowserApi.updateCurrentTab(tab, this.currentLocation);
         break;
-      case "webAuthnResult":
-        const vaultUrl2 = this.environmentService.getWebVaultUrl();
-
-        if (
-          msg.referrer == null ||
-          Utils.getHostname(vaultUrl2) !== msg.referrer
-        ) {
-          return;
-        }
-
-        const params = `webAuthnResponse=${encodeURIComponent(
-          msg.data
-        )};remember=${msg.remember}`;
-        BrowserApi.createNewTab(
-          `popup/index.html?uilocation=popout#/2fa;${params}`,
-          undefined,
-          false
-        );
-        break;
-      case "reloadPopup":
-        this.messagingService.send("reloadPopup");
-        break;
-      case "emailVerificationRequired":
-        this.messagingService.send("showDialog", {
-          dialogId: "emailVerificationRequired",
-          title: this.i18nService.t("emailVerificationRequired"),
-          text: this.i18nService.t("emailVerificationRequiredDesc"),
-          confirmText: this.i18nService.t("ok"),
-          type: "info"
-        });
-        break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
           window: window
         });
         break;
-      case "authAccessToken":
-        await this.authAccessToken(msg.sender.type, msg.sender.provider)
-        break;
-      case "openPopupIframe":
-        if (!this.platformUtilsService.isFirefox()) {
-          await this.updateStoreService('savePopup', true);
-        }
-        break;
-      case "closePopupIframe":
-        await this.updateStoreService('savePopup', false);
-      case "updateStoreService":
-        console.log(111, 222);
-        if (msg.sender) {
-          await this.updateStoreService(msg.sender.key, msg.sender.value);
-        }
-      case "updateStoreServiceInfo":
-        await this.updateStoreServiceInfo(msg.sender);
       default:
         break;
     }
@@ -415,7 +312,7 @@ export default class RuntimeBackground {
     this.passwordGenerator.addHistory(password);
   }
 
-  private async authAccessToken(type: string, provider: string) {
+  async authAccessToken(type: string, provider: string) {
     // check open popup
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
@@ -448,7 +345,7 @@ export default class RuntimeBackground {
     });
   }
 
-  private async updateStoreServiceInfo(value = {}) {
+  async updateStoreServiceInfo(value = {}) {
     const store = await this.storageService.get("cs_store");
     let oldStoreParsed = {};
     if (typeof store === "object") {
@@ -458,5 +355,30 @@ export default class RuntimeBackground {
       ...oldStoreParsed,
       ...value
     });
+  }
+
+  async handleUnlocked(command: string) {
+    let item: LockedVaultPendingNotificationsItem;
+    if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
+      await BrowserApi.closeLoginTab();
+
+      item = this.lockedVaultPendingNotifications.pop() || this.lockedVaultPendingInformMenu.pop();
+      if (item.commandToRetry.sender?.tab?.id) {
+        await BrowserApi.focusSpecifiedTab(
+          item.commandToRetry.sender.tab.id
+        );
+      }
+    }
+    await this.main.refreshBadgeAndMenu(false);
+    this.notificationsService.updateConnection(command === "unlocked");
+    this.systemService.cancelProcessReload();
+
+    if (item) {
+      await BrowserApi.tabSendMessageData(
+        item.commandToRetry.sender.tab,
+        "unlockCompleted",
+        item
+      );
+    }
   }
 }

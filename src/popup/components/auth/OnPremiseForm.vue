@@ -124,7 +124,6 @@ export default Vue.extend({
         language: this.language
       }
       // auth email + password
-      console.log(payload);
     }
   }
 })

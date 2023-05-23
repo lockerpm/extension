@@ -28,11 +28,12 @@ import { StateService } from 'jslib-common/services/state.service';
 import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import { ImportService } from "jslib-common/abstractions/import.service";
-import AutofillService from '@/services/autofill.service'
 import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
 
+import AutofillService from '@/services/autofill.service';
 import MainBackground from '../../background/main.background';
+import RuntimeBackground from '../../background/runtime.background';
 
 function getBgService<T>(service: string) {
   return (): T => {
@@ -47,6 +48,7 @@ function getBgService<T>(service: string) {
 }
 
 const stateService = new StateService();
+
 const searchService = new PopupSearchService(getBgService<SearchService>('searchService')(),
   getBgService<CipherService>('cipherService')(), getBgService<ConsoleLogService>('consoleLogService')(),
   getBgService<I18nService>('i18nService')());
@@ -81,6 +83,7 @@ export default {
     Vue.prototype.$settingsService = getBgService<SettingsService>("settingsService")()
     Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
     Vue.prototype.$totpService = getBgService<TotpService>('totpService')();
+    Vue.prototype.$runtimeBackground = getBgService<RuntimeBackground>('runtimeBackground')();
 
     if (!popupUtilsService.inPopup(window)) {
       window.document.body.classList.add('body-full');

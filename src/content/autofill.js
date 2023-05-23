@@ -630,7 +630,7 @@
         if (fillScript.hasOwnProperty('autosubmit') && 'function' == typeof autosubmit) {
           fillScript.itemType && 'fillLogin' !== fillScript.itemType || (0 < operationsToDo.length ? setTimeout(function () {
             autosubmit(fillScript.autosubmit, fillScriptProperties.allow_clicky_autosubmit, operationsToDo);
-          }, AUTOSUBMIT_DELAY) : DEBUG_AUTOSUBMIT && console.log('[AUTOSUBMIT] Not attempting to submit since no fields were filled: ', operationsToDo))
+          }, AUTOSUBMIT_DELAY) : DEBUG_AUTOSUBMIT)
         }
 
         // handle protectedGlobalPage
@@ -1354,10 +1354,6 @@
       });
     }
   }
-
-  /*
-  End 1Password Extension
-  */
 
   chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {

@@ -1,46 +1,28 @@
 <template>
-  <div
-    class="relative mx-auto"
-    style="background: #E4F0E6; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px"
-  >
+  <div class="relative mx-auto"
+    style="background: #E4F0E6; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px">
     <Header></Header>
     <div v-loading="loading">
-      <template v-if="searchText.length>1">
+      <template v-if="searchText.length > 1">
         <ul>
-          <cipher-row
-            v-for="item in dataRendered"
-            :key="item.id"
-            :item="item"
-          >
+          <cipher-row v-for="item in dataRendered" :key="item.id" :item="item">
           </cipher-row>
         </ul>
       </template>
-      <ul
-        v-else
-        class=""
-      >
-        <div class="uppercase px-3 mt-4 mb-1">{{$t('common.type')}} ({{menu.length}})</div>
-        <li
-          v-for="(item, index) in menu"
-          :key="index"
+      <ul v-else class="">
+        <div class="uppercase px-3 mt-4 mb-1">{{ $t('common.type') }} ({{ menu.length }})</div>
+        <li v-for="(item, index) in menu" :key="index"
           class="flex items-center hover:bg-[#E4F2E1] hover:text-primary bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
-          @click="openRoute(item)"
-        >
-          <div
-            class="menu-icon mr-4"
-            style="padding-top: 4px"
-          >
-            <i
-              class="fas text-[20px]"
-              :class="[item.icon]"
-            ></i>
+          @click="openRoute(item)">
+          <div class="menu-icon mr-4" style="padding-top: 4px">
+            <i class="fas text-[20px]" :class="[item.icon]"></i>
           </div>
           <div class="flex-grow flex justify-between mr-2">
             <div>
-              {{  item.label  }}
+              {{ item.label }}
             </div>
             <div>
-              {{ciphersCount[`${item.name}`]}} {{ $tc('type.Vault', ciphersCount[`${item.name}`])}}
+              {{ ciphersCount[`${item.name}`] }} {{ $tc('type.Vault', ciphersCount[`${item.name}`]) }}
             </div>
           </div>
           <div>
@@ -49,28 +31,21 @@
         </li>
         <template v-if="folders">
           <div class="flex justify-between">
-            <div class="uppercase px-3 mt-4 mb-1">{{$t('type.folder')}} ({{folders.length}})</div>
+            <div class="uppercase px-3 mt-4 mb-1">{{ $t('type.folder') }} ({{ folders.length }})</div>
           </div>
-          <li
-            v-for="item in folders"
-            :key="item.id"
+          <li v-for="item in folders" :key="item.id"
             class="flex items-center hover:bg-[#E4F2E1] hover:text-primary bg-white cursor-pointer h-[44px] leading-[44px] px-5 border-b border-black-400"
-            @click="routerFolder(item)"
-          >
+            @click="routerFolder(item)">
             <div class="menu-icon mr-4">
               <!-- <i class="fas fa-folder text-[20px]"></i> -->
-              <img
-                src="@/assets/images/icons/folder.svg"
-                alt=""
-                class=""
-              >
+              <img src="@/assets/images/icons/folder.svg" alt="" class="">
             </div>
             <div class="flex-grow flex justify-between mr-2">
               <div class="w-[200px] truncate">
                 {{ item.name }}
               </div>
               <div>
-                {{ item.ciphersCount }} {{$tc('type.Vault', item.ciphersCount)}}
+                {{ item.ciphersCount }} {{ $tc('type.Vault', item.ciphersCount) }}
               </div>
             </div>
             <div>
@@ -78,13 +53,8 @@
             </div>
           </li>
         </template>
-        <div class="uppercase px-3 mt-4 mb-1">{{$t('type.no_folder')}} ({{noFolderCiphers.length}})</div>
-        <cipher-row
-          v-for="item in dataRendered"
-          :key="item.id"
-          :item="item"
-          @do-fill="fillCipher(item)"
-        >
+        <div class="uppercase px-3 mt-4 mb-1">{{ $t('type.no_folder') }} ({{ noFolderCiphers.length }})</div>
+        <cipher-row v-for="item in dataRendered" :key="item.id" :item="item" @do-fill="fillCipher(item)">
         </cipher-row>
 
       </ul>
@@ -128,8 +98,8 @@ export default Vue.extend({
           document.documentElement.scrollTop,
           document.body.scrollTop
         ) +
-          window.innerHeight +
-          500 >=
+        window.innerHeight +
+        500 >=
         document.documentElement.scrollHeight;
 
       if (bottomOfWindow) {
@@ -259,7 +229,6 @@ export default Vue.extend({
         const deletedFilter = (c) => {
           return c.isDeleted === false;
         };
-        console.log('this.$searchService', this.$searchService);
         let result =
           (await this.$searchService.searchCiphers(
             this.searchText,
@@ -281,14 +250,14 @@ export default Vue.extend({
           if (item.type === 6) {
             try {
               item.cryptoAccount = JSON.parse(item.notes);
-            // eslint-disable-next-line no-empty
-            } catch (error) {}
+              // eslint-disable-next-line no-empty
+            } catch (error) { }
           }
           if (item.type === 7) {
             try {
               item.cryptoWallet = JSON.parse(item.notes);
-            // eslint-disable-next-line no-empty
-            } catch (error) {}
+              // eslint-disable-next-line no-empty
+            } catch (error) { }
           }
           return {
             ...item,

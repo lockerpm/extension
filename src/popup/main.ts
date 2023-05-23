@@ -141,10 +141,7 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
-        chrome.runtime.sendMessage({
-          command: 'updateStoreService',
-          sender: { key: 'language', value: value },
-        });
+        this.$runtimeBackground.updateStoreService('language', value)
       })
     },
     async logout() {
@@ -172,11 +169,7 @@ Vue.mixin({
       this.$store.commit('CLEAR_ALL_DATA')
 
       this.$router.push({ name: 'login' });
-
-      chrome.runtime.sendMessage({
-        command: 'updateStoreService',
-        sender: { key: 'isLoggedIn', value: false },
-      });
+      await this.$runtimeBackground.updateStoreService('isLoggedIn', false)
       await this.setupFillPage();
     },
     async lock() {
@@ -244,7 +237,7 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceIdentifier
           })
-          chrome.runtime.sendMessage({ command: 'loggedIn' })
+          await this.$runtimeBackground.handleUnlocked('loggedIn')
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
           await this.$cryptoService.setKey(key)
@@ -255,7 +248,7 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          chrome.runtime.sendMessage({ command: "unlocked" });
+          await this.$runtimeBackground.handleUnlocked('unlocked')
           this.$router.push({ name: 'home' });
           this.$store.commit('UPDATE_CALLING_API', false)
 
@@ -284,7 +277,7 @@ Vue.mixin({
             if (this.$vaultTimeoutService != null) {
               this.$vaultTimeoutService.biometricLocked = false
             }
-            chrome.runtime.sendMessage({ command: "unlocked" });
+            await this.$runtimeBackground.handleUnlocked('unlocked')
             this.$router.push({ name: 'home' });
             this.$store.commit('UPDATE_CALLING_API', false)
 

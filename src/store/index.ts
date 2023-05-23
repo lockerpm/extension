@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
+import RuntimeBackground from '../background/runtime.background';
 import {StorageService} from "jslib-common/abstractions/storage.service";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,6 +12,8 @@ import notificationAPI from '@/api/notification';
 Vue.use(Vuex)
 
 const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+
 const STORAGE_KEY = 'cs_store'
 
 const defaultUser = {
@@ -100,10 +103,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
-        chrome.runtime.sendMessage({
-          command: 'updateStoreService',
-          sender: { key: 'isLoggedIn', value: isLoggedIn },
-        });
+        runtimeBackground.updateStoreService('isLoggedIn', true)
       },
       CLEAR_ALL_DATA (state) {
         state.use = JSON.parse(JSON.stringify(defaultUser)),
@@ -186,25 +186,22 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         keys.forEach((key) => {
           state[key] = defaultData[key]
         });
-        chrome.runtime.sendMessage({
-          command: 'updateStoreServiceInfo',
-          sender: {
-            login_step: state.login_step,
-            identity: state.identity,
-            auth_info: state.auth_info,
-            user_info: state.user_info,
-            ws2: state.ws2,
-            clientId: state.clientId,
-            desktopAppInstalled: state.desktopAppInstalled,
-            desktopAppData: state.desktopAppData,
-            preloginData: state.preloginData,
-            baseApiUrl: state.baseApiUrl,
-            baseWsUrl: state.baseWsUrl,
-            sending: state.sending,
-            forgot_step: state.forgot_step,
-            forgot_token: state.forgot_token
-          },
-        });
+        runtimeBackground.updateStoreServiceInfo({
+          login_step: state.login_step,
+          identity: state.identity,
+          auth_info: state.auth_info,
+          user_info: state.user_info,
+          ws2: state.ws2,
+          clientId: state.clientId,
+          desktopAppInstalled: state.desktopAppInstalled,
+          desktopAppData: state.desktopAppData,
+          preloginData: state.preloginData,
+          baseApiUrl: state.baseApiUrl,
+          baseWsUrl: state.baseWsUrl,
+          sending: state.sending,
+          forgot_step: state.forgot_step,
+          forgot_token: state.forgot_token
+        })
       },
     },
     actions: {
