@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import {StorageService} from "jslib-common/abstractions/storage.service";
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import meAPI from '@/api/me';
 import cystackPlatformAPI from '@/api/cystack_platform';
@@ -28,7 +28,7 @@ const defaultLoginInfo = {
   auth_info: null,
   user_info: null,
   ws2: null,
-  clientId: uuid(),
+  clientId: uuidv4(),
   desktopAppInstalled: false,
   desktopAppData: null,
   preloginData: null,
