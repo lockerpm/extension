@@ -54,8 +54,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: 'quyetnguyencr7@gmail.com', //quyetnguyencr7@gmail.com
-        password: 'tienquyet1997@' //tienquyet1997@
+        username: '',
+        password: ''
       }
     }
   },
