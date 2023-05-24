@@ -44,7 +44,7 @@
 <script>
 import { FieldView } from 'jslib-common/models/view/fieldView'
 import { FieldType } from 'jslib-common/enums/fieldType'
-import InputField from '../input/InputField.vue'
+import InputField from './InputField.vue'
 import Vue from 'vue'
 export default Vue.extend ({
   components: {

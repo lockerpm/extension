@@ -584,13 +584,13 @@ import InputSelectCryptoNetworks from '@/components/input/InputSelectCryptoNetwo
 import InputSeedPhrase from '@/components/input/InputSeedPhrase'
 import InputCustomFields from '@/components/input/InputCustomFields.vue'
 import { BrowserApi } from "@/browser/browserApi";
-import Vnodes from "@/components/Vnodes";
+import Vnodes from "@/popup/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 import { Utils } from 'jslib-common/misc/utils';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
-import UpgrateToPremium from '@/components/cipher/UpgrateToPremium.vue'
+import UpgrateToPremium from '@/popup/components/ciphers/UpgrateToPremium.vue'
 
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7

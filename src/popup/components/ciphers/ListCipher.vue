@@ -85,10 +85,10 @@
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import { CipherType } from "jslib-common/enums/cipherType";
-import NoCipher from "@/components/cipher/NoCipher";
 import { BrowserApi } from "@/browser/browserApi";
 const BroadcasterSubscriptionId = "ChildViewComponent";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
+import NoCipher from "@/popup/components/ciphers/NoCipher";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
 export default Vue.extend({
   components: {

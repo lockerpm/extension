@@ -40,9 +40,7 @@
 <script>
 import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
-// import Vnodes from '@/components/Vnodes'
 export default Vue.extend({
-  // components: { Vnodes },
   props: {
     type: {
       type: String,

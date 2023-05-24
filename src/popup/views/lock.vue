@@ -181,7 +181,7 @@
 
 <script>
 import Vue from 'vue'
-import BlankLayout from '@/components/layout/blank';
+import BlankLayout from '@/popup/components/layout/blank';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 

@@ -69,9 +69,9 @@ import orderBy from "lodash/orderBy";
 import groupBy from "lodash/groupBy";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
-import CipherRow from "../../components/ciphers/CipherRow.vue";
-import Header from "../../components/layout/parts/Header.vue";
-import Footer from "../../components/layout/parts/Footer.vue";
+import CipherRow from "@/popup/components/ciphers/CipherRow.vue";
+import Header from "@/popup/components/layout/parts/Header.vue";
+import Footer from "@/popup/components/layout/parts/Footer.vue";
 const BroadcasterSubscriptionId = "ChildViewComponent";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({

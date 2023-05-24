@@ -90,7 +90,7 @@
 <script>
 import Vue from 'vue'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
-import BlankLayout from '@/components/layout/blank'
+import BlankLayout from '@/popup/components/layout/blank'
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
