@@ -255,19 +255,6 @@ export default class NotificationBackground {
           sender: senderMessage,
         });
         break;
-      case 'openPopupIframe':
-        if (this.main.platformUtilsService.isFirefox()) {
-          await this.main.openPopup();
-        } else {
-          BrowserApi.tabSendMessage(sender.tab, {
-            command: 'openPopupIframe',
-            tab: sender.tab,
-          });
-        }
-        break
-      case 'closePopupIframe':
-        await BrowserApi.tabSendMessageData(sender.tab, 'closePopupIframe');
-        break;
       default:
         break;
     }

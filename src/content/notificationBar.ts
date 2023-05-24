@@ -185,15 +185,6 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       sendResponse();
       return true;
-    } else if (msg.command === "openPopupIframe") {
-      openPopupIframe();
-    } else if (msg.command === 'closePopupIframe') {
-      const frameDiv = document.getElementById('locker_popup-iframe-container');
-      if (frameDiv) {
-        frameDiv.remove();
-      }
-      sendResponse();
-      return true;
     }
   }
 
@@ -819,50 +810,5 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } while ((elem = elem.offsetParent));
     return offsetLeft;
-  }
-
-  function openPopupIframe() {
-    if (document.body == null) {
-      return;
-    }
-    let frameDiv = document.getElementById('locker_popup-iframe-container');
-    if (frameDiv) {
-      frameDiv.remove();
-      return
-    }
-
-    let barPageUrl: string = chrome.runtime.getURL('popup.html');
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = `
-      height: 602px;
-      width: 402px;
-      border: 1px solid rgb(189 190 190);
-      background-color: white
-    `;
-    iframe.id = 'popup-iframe';
-    iframe.src = barPageUrl;
-    frameDiv = document.createElement('div');
-    frameDiv.id = 'locker_popup-iframe-container';
-    frameDiv.style.cssText = `
-      height: 600px;
-      width: 402px;
-      top: 0px;
-      right: 0px;
-      position: fixed;
-      z-index: 2147483647;
-      visibility: visible;
-    `;
-    frameDiv.appendChild(iframe);
-    window.addEventListener('click', function (e: any) {
-      if (frameDiv.contains(e.target)) {
-      } else {
-        sendPlatformMessage({
-          command: 'closePopupIframe',
-        });
-      }
-    });
-    document.body.appendChild(frameDiv);
-
-    (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

@@ -141,9 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'none'
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         });
         btnDropdown.style.display = 'none'
         return
@@ -159,9 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'initial'
         lockBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         })
         btnDropdown.style.display = 'none'
         return

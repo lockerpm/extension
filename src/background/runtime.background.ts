@@ -167,16 +167,6 @@ export default class RuntimeBackground {
               const access_token = result ? result.access_token : "";
               await this.storageService.save("cs_token", access_token);
               await this.updateStoreService('isLoggedIn', true);
-              setTimeout(async () => {
-                this.messagingService.send('loggedIn');
-                const store: any = await this.storageService.get("cs_store");
-                if (store && store.savePopup) {
-                  setTimeout(async () => {
-                    const tab = await BrowserApi.getTabFromCurrentWindow();
-                    await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
-                  }, 1000);
-                }
-              }, 1000);
             });
           } catch (e) {
           }
