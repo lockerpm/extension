@@ -42,7 +42,8 @@ function getBgService<T>(service: string) {
       return page.bitwardenMain[service] as T
     }
     const bitwardenMain = new MainBackground()
-    bitwardenMain.bootstrap()
+    bitwardenMain.bootstrap();
+    (window as any).bitwardenMain = bitwardenMain;
     return bitwardenMain[service] ;
   };
 }

@@ -305,7 +305,6 @@ export default class MainBackground {
       setTimeout(async () => {
         await this.environmentService.setUrlsFromStorage();
         await this.setIcon();
-        // this.fullSync(true);
         setTimeout(() => this.notificationsService.init(), 2500);
         resolve();
       }, 500);
@@ -648,31 +647,6 @@ export default class MainBackground {
 
   private sanitizeContextMenuTitle(title: string): string {
     return title.replace(/&/g, '&&');
-  }
-
-  private async fullSync(override: boolean = false) {
-    const syncInternal = 6 * 60 * 60 * 1000; // 6 hours
-    const lastSync = await this.syncService.getLastSync();
-
-    let lastSyncAgo = syncInternal + 1;
-    if (lastSync) {
-      lastSyncAgo = new Date().getTime() - lastSync.getTime();
-    }
-
-    if (override || lastSyncAgo >= syncInternal) {
-      await this.syncService.fullSync(override);
-      this.scheduleNextSync();
-    } else {
-      this.scheduleNextSync();
-    }
-  }
-
-  private scheduleNextSync() {
-    if (this.syncTimeout) {
-      clearTimeout(this.syncTimeout);
-    }
-
-    this.syncTimeout = setTimeout(async () => await this.fullSync(), 5 * 60 * 1000); // check every 5 minutes
   }
 
   // Browser API Helpers

@@ -59,11 +59,11 @@ export default Vue.extend({
     'locked' (newValue) {
       if (newValue) {
         this.$router.push({ name: 'lock' })
-        this.disconnectSocket()
+        // this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')
         this.getSyncData()
-        this.reconnectSocket()
+        // this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }
     }

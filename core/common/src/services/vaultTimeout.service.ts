@@ -93,7 +93,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         if (!authed) {
             return;
         }
-
         this.biometricLocked = true;
         this.everBeenUnlocked = true;
         await this.cryptoService.clearKey(false);

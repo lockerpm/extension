@@ -1163,6 +1163,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
     await this.storageService.save(key, data);
     const decCiphers = await Promise.all(promises)
+    console.log('decCiphers', decCiphers);
     if (hasKey) {
       this.updateDecryptedCache(decCiphers)
     } else {

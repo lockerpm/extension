@@ -1,5 +1,4 @@
 window.addEventListener('message', event => {
-  console.log('e', event);
   if (event.source !== window)
     return;
   if (event.data.command && (event.data.command === 'cs-authResult')) {

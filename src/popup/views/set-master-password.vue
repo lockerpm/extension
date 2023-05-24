@@ -127,7 +127,7 @@ export default Vue.extend({
   methods: {
     async setMasterPass () {
       this.loading = true
-      await this.clearKeys()
+      await this.$cryptoService.clearKeys();
       try {
         const kdf = 0
         const kdfIterations = 100000

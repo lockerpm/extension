@@ -15,7 +15,6 @@ import router from '@/router/popup'
 import storePromise from '@/store'
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
-import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
@@ -145,7 +144,6 @@ Vue.mixin({
       })
     },
     async logout() {
-      console.log('###### LOG OUT')
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
@@ -180,10 +178,9 @@ Vue.mixin({
         this.$cryptoService.clearKeyPair(true),
         this.$cryptoService.clearEncKey(true)
       ])
-
-      this.$folderService.clearCache()
-      this.$cipherService.clearCache()
-      this.$collectionService.clearCache()
+      await this.$folderService.clearCache()
+      await this.$cipherService.clearCache()
+      await this.$collectionService.clearCache()
       this.$router.push({ name: 'lock' });
       await this.setupFillPage();
     },
@@ -211,22 +208,21 @@ Vue.mixin({
     async login(isPwl = false, decryptData: any) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
-      const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
-        browserStorageService.get("device_id"),
-        browserStorageService.get("hideIcons"),
-        browserStorageService.get("showFolders"),
-        browserStorageService.get("enableAutofill"),
+        this.$storageService.get("device_id"),
+        this.$storageService.get("hideIcons"),
+        this.$storageService.get("showFolders"),
+        this.$storageService.get("enableAutofill"),
       ]);
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       const deviceIdentifier = deviceId || this.randomString();
       if (!deviceId) {
-        browserStorageService.save("device_id", deviceIdentifier);
+        this.$storageService.save("device_id", deviceIdentifier);
       }
       try {
-        await this.clearKeys()
+        await this.$cryptoService.clearKeys();
         if (!isPwl) {
           const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
           const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
@@ -292,9 +288,6 @@ Vue.mixin({
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
-    },
-    async clearKeys() {
-      await this.$cryptoService.clearKeys()
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
@@ -452,61 +445,6 @@ Vue.mixin({
           style: `height: ${size}px`,
           class: 'rounded mx-auto'
         }
-      })
-    },
-    routerCipher(cipher, callbackDeleted) {
-      if (cipher.isDeleted) {
-        callbackDeleted(cipher)
-        return
-      }
-      if (this.$route.name === 'vault') {
-        this.$router.push({
-          name: 'vault-id',
-          params: { id: cipher.id }
-        })
-        return
-      }
-      if (this.$route.name === "home") {
-        this.$router.push({
-          name: "home-id",
-          params: { id: cipher.id }
-        });
-        return;
-      }
-      if (this.$route.name === 'vault-folders-folderId') {
-        this.$router.push({
-          name: 'vault-folders-folderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      if (this.$route.name === 'vault-teams-teamId-tfolders-tfolderId') {
-        this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      let name = ''
-      switch (cipher.type) {
-      case CipherType.Login:
-        name = 'passwords'
-        break
-      case CipherType.SecureNote:
-        name = 'notes'
-        break
-      case CipherType.Card:
-        name = 'cards'
-        break
-      case CipherType.Identity:
-        name = 'identities'
-        break
-      }
-      this.$router.push({
-        name: name + '-id',
-        params: { id: cipher.id }
       })
     },
     getTeam(teams, orgId) {
