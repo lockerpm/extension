@@ -206,14 +206,13 @@ export default class RuntimeBackground {
         break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
-        console.log(token);
         if (!token) {
           const myHeaders = {
             headers: { Authorization: `Bearer ${msg.token}` }
           };
           try {
             const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
-            axios
+            await axios
               .post(
                 url,
                 {
@@ -228,12 +227,12 @@ export default class RuntimeBackground {
                 const store: any = await this.storageService.get("cs_store");
                 await this.storageService.save("cs_token", access_token);
                 await this.updateStoreService('isLoggedIn', true);
-                await this.messagingService.send('loggedIn')
+                this.messagingService.send('loggedIn')
                 if (store && store.savePopup) {
                   setTimeout(async () => {
                     const tab = await BrowserApi.getTabFromCurrentWindow();
                     await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
-                  }, 1000);
+                  }, 4000);
                 }
               });
           } catch (e) {
@@ -406,6 +405,7 @@ export default class RuntimeBackground {
 
   private async authAccessToken(sender: any) {
     // check open popup
+    await this.updateStoreService('savePopup', true);
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
       let url = `${process.env.VUE_APP_ID_URL}/${sender.type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
@@ -415,7 +415,7 @@ export default class RuntimeBackground {
       if (process.env.VUE_APP_ENVIRONMENT) {
         url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
       }
-      await BrowserApi.updateCurrentTab(tab, url);
+      BrowserApi.createNewTab(url, true, true);
     }
   }
 

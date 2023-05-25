@@ -394,7 +394,7 @@
             :class="{ 'my-2' : !!this.data.id}"
           />
           <div
-            v-if="!isDeleted && !cipher.id"
+            v-if="!isDeleted"
             class="text-right"
           >
             <el-popover
