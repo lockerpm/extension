@@ -326,7 +326,6 @@ Vue.mixin({
 
         const deletedIds = [];
         const cipherIds = allCiphers.map(c => c.id);
-        
         const storageRes = await this.$storageService.get(`ciphers_${userId}`);
         for (const id in { ...storageRes }) {
           if (!cipherIds.includes(id)) {

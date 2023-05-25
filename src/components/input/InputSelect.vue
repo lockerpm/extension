@@ -76,7 +76,7 @@ export default Vue.extend({
     },
     initialValue: {
       type: [String, Number, Object, Array],
-      default: ''
+      default: () => ''
     },
     options: {
       type: Array,

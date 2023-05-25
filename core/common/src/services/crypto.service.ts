@@ -180,9 +180,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     if (!key) {
-      console.log('key', key);
       key = await this.getKey();
-      console.log('key1', key);
     }
     if (!key) {
       return null;

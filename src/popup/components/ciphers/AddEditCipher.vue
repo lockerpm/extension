@@ -622,7 +622,7 @@ export default Vue.extend({
     },
     data: {
       type: CipherView,
-      default: new CipherView()
+      default: () => new CipherView()
     },
     password: {
       type: String,
