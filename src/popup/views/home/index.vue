@@ -126,21 +126,16 @@ export default Vue.extend({
       loading: false,
     };
   },
+  watch: {
+    "$store.state.syncedCiphersToggle": 'load'
+  },
   async mounted() {
     chrome.runtime.onMessage.addListener(
       (msg, sender, response) => {
         this.processMessage(msg, sender, response);
       }
     );
-    if (!this.$syncService.syncInProgress) {
-      await this.load();
-    } else {
-      this.loadedTimeout = window.setTimeout(async () => {
-        if (!this.loaded) {
-          await this.load();
-        }
-      }, 5000);
-    }
+    await this.load();
   },
   destroyed() {
     window.clearTimeout(this.loadedTimeout);
@@ -202,7 +197,6 @@ export default Vue.extend({
         this.url,
         otherTypes.length > 0 ? otherTypes : null
       );
-
       this.loginCiphers = [];
       this.cardCiphers = [];
       this.identityCiphers = [];

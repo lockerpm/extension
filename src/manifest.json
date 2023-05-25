@@ -15,8 +15,8 @@
     "identity",
     "activeTab",
     "scripting",
-    "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
+    "webRequest",
+    "webNavigation"
   ],
   "host_permissions": [
     "http://*/*",

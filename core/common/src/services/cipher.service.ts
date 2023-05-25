@@ -337,8 +337,10 @@ export class CipherService implements CipherServiceAbstraction {
     });
   }
 
-  async getAllDecryptedForUrl(url: string, includeOtherTypes?: CipherType[],
-    defaultMatch: UriMatchType = null): Promise<CipherView[]> {
+  async getAllDecryptedForUrl(
+    url: string, includeOtherTypes?: CipherType[],
+    defaultMatch: UriMatchType = null
+  ): Promise<CipherView[]> {
     if (!url && !includeOtherTypes) {
       return Promise.resolve([]);
     }
@@ -370,7 +372,7 @@ export class CipherService implements CipherServiceAbstraction {
         defaultMatch = UriMatchType.Domain;
       }
     }
-    return ciphers.filter((cipher) => {
+    const resultCiphers = ciphers.filter((cipher) => {
       if (!!cipher.deletedDate) {
         return false;
       }
@@ -384,7 +386,6 @@ export class CipherService implements CipherServiceAbstraction {
           if (!u.uri) {
             continue;
           }
-
           const match = !u.match ? defaultMatch : u.match;
           switch (match) {
             case UriMatchType.Domain:
@@ -394,9 +395,8 @@ export class CipherService implements CipherServiceAbstraction {
                   if (!DomainMatchBlacklist.get(u.domain).has(domainUrlHost)) {
                     return true;
                   }
-                } else {
-                  return true;
                 }
+                return true;
               }
               break;
             case UriMatchType.Host:
@@ -431,9 +431,9 @@ export class CipherService implements CipherServiceAbstraction {
           }
         }
       }
-
       return false;
-    });
+    })
+    return resultCiphers;
   }
 
   async getAllFromApiForOrganization(organizationId: string): Promise<CipherView[]> {

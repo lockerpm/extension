@@ -6,7 +6,6 @@ import {
 
 export abstract class SyncService {
     syncInProgress: boolean;
-
     getLastSync: () => Promise<Date>;
     setLastSync: (date: Date) => Promise<any>;
     fullSync: (forceSync: boolean, allowThrowOnError?: boolean) => Promise<boolean>;

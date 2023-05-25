@@ -585,7 +585,7 @@ export default class MainBackground {
     }
 
     let title = cipher.name;
-    if (cipher.login.username && cipher.login.username !== '') {
+    if (cipher.login.username) {
       title += (' (' + cipher.login.username + ')');
     }
     await this.loadContextMenuOptions(title, cipher.id, cipher);
