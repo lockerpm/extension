@@ -304,12 +304,13 @@ export default class RuntimeBackground {
 
   async authAccessToken(type: string, provider: string) {
     // check open popup
+    await this.updateStoreService('savePopup', true);
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
       let url = ''
       if (provider === 'sso') {
         this.currentLocation = tab.url
-        await BrowserApi.updateCurrentTab(tab, `${process.env.VUE_APP_ID_SSO_URL}/login/sso?client=extension`);
+        BrowserApi.createNewTab(`${process.env.VUE_APP_ID_SSO_URL}/login/sso?client=extension`, true, true);
       } else {
         url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
         if (provider) {
@@ -318,7 +319,7 @@ export default class RuntimeBackground {
         if (process.env.VUE_APP_ENVIRONMENT) {
           url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
         }
-        await BrowserApi.updateCurrentTab(tab, url);
+        BrowserApi.createNewTab(url, true, true);
       }
     }
   }

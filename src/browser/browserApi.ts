@@ -107,17 +107,10 @@ export class BrowserApi {
   }
 
   static async closeLoginTab() {
-    const tabs = await BrowserApi.tabsQuery({
-      active: true,
-      title: 'Popup',
-      windowType: 'normal',
-      currentWindow: true,
-    });
-
+    const tabs = await BrowserApi.tabsQuery({});
     if (tabs.length === 0) {
       return;
     }
-
     const tabToClose = tabs[tabs.length - 1].id;
     chrome.tabs?.remove(tabToClose);
   }
