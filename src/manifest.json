@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extName__",
-  "homepage_url": "http://localhost:8080/",
+  "homepage_url": "https://locker.io",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "permissions": [
