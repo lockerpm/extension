@@ -182,7 +182,7 @@ button.neutral {
 }
 .cs-list-withScroll, .cs-vault-locked {
   overflow-y: auto;
-  max-height: 200px !important;
+  max-height: 192px !important;
   .cs-inform-locked {
     text-align: center;
     padding: 16px;
@@ -272,4 +272,23 @@ input.generated-password{
 }
 #inform-logo {
   cursor: pointer;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 10px;
+  transition: all;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  height: 90px;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-black-400;
+  cursor: pointer;
+}
+::-webkit-scrollbar-track {
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.05);
 }
