@@ -1355,7 +1355,7 @@
     }
   }
 
-  chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
+  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {
       const pageDetailsObj = JSON.parse(collect(document));
       chrome.runtime.sendMessage({

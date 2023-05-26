@@ -4,21 +4,23 @@ import { DeviceType } from 'jslib-common/enums/deviceType';
 
 const platformUtilsFactory = () => new BrowserPlatformUtilsService(null, null, null, null);
 
+const win = window ?? self
+
 describe('Browser Utils Service', () => {
   describe('getBrowser', () => {
     const originalUserAgent = navigator.userAgent;
-    const originalSafariAppExtension = (window as any).safariAppExtension;
-    const originalOpr = (window as any).opr;
+    const originalSafariAppExtension = (win as any).safariAppExtension;
+    const originalOpr = (win as any).opr;
 
     // Reset the userAgent.
     afterAll(() => {
       Object.defineProperty(navigator, 'userAgent', {
         value: originalUserAgent,
       });
-      Object.defineProperty(window, 'safari', {
+      Object.defineProperty(win, 'safari', {
         value: originalSafariAppExtension,
       });
-      Object.defineProperty(window, 'opr', {
+      Object.defineProperty(win, 'opr', {
         value: originalOpr,
       });
     });
@@ -49,7 +51,7 @@ describe('Browser Utils Service', () => {
         value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3175.3 Safari/537.36 OPR/49.0.2695.0 (Edition developer)',
       });
 
-      Object.defineProperty(window, 'opr', {
+      Object.defineProperty(win, 'opr', {
         configurable: true,
         value: {},
       });
@@ -74,7 +76,7 @@ describe('Browser Utils Service', () => {
         value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8',
       });
 
-      Object.defineProperty(window, 'safariAppExtension', {
+      Object.defineProperty(win, 'safariAppExtension', {
         configurable: true,
         value: true,
       });
@@ -82,7 +84,7 @@ describe('Browser Utils Service', () => {
       const browserPlatformUtilsService = platformUtilsFactory();
       expect(browserPlatformUtilsService.getDevice()).toBe(DeviceType.SafariExtension);
 
-      Object.defineProperty(window, 'safariAppExtension', {
+      Object.defineProperty(win, 'safariAppExtension', {
         configurable: true,
         value: false,
       });

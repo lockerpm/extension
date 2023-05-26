@@ -32,25 +32,26 @@ export default Vue.extend({
     this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'home'})
   },
   async mounted () {
-    chrome.runtime.onMessage.addListener(
-      async (msg) => {
-        switch(msg.command){
-        case 'locked':
-          this.$router.push({ name: 'lock' });
-          break;
-        case 'doneLoggingOut':
-          this.$router.push({ name: 'login' });
-          break;
-        case 'loggedIn':
-          if (this.$route.name === 'login') {
+    chrome.runtime.onMessage.addListener((msg) => {
+      switch(msg.command){
+      case 'locked':
+        this.$router.push({ name: 'lock' });
+        break;
+      case 'doneLoggingOut':
+        this.$router.push({ name: 'login' });
+        break;
+      case 'loggedIn':
+        if (this.$route.name === 'login') {
+          (async () => {
             await this.$store.dispatch('LoadCurrentUser')
             this.$router.push({ name: 'lock' });
-          }
-          break;
-        default:
-          break;
+          })()
         }
+        break;
+      default:
+        break;
       }
+    }
     );
   },
   watch: {

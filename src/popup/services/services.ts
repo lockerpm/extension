@@ -35,6 +35,8 @@ import AutofillService from '@/services/autofill.service';
 import MainBackground from '../../background/main.background';
 import RuntimeBackground from '../../background/runtime.background';
 
+const win = window ?? self
+
 function getBgService<T>(service: string) {
   return (): T => {
     const page = BrowserApi.getBackgroundPage();
@@ -43,7 +45,7 @@ function getBgService<T>(service: string) {
     }
     const bitwardenMain = new MainBackground()
     bitwardenMain.bootstrap();
-    (window as any).bitwardenMain = bitwardenMain;
+    (win as any).bitwardenMain = bitwardenMain;
     return bitwardenMain[service] ;
   };
 }
@@ -86,12 +88,12 @@ export default {
     Vue.prototype.$totpService = getBgService<TotpService>('totpService')();
     Vue.prototype.$runtimeBackground = getBgService<RuntimeBackground>('runtimeBackground')();
 
-    if (!popupUtilsService.inPopup(window)) {
-      window.document.body.classList.add('body-full');
-    } else if (window.screen.availHeight < 600) {
-      window.document.body.classList.add('body-xs');
-    } else if (window.screen.availHeight <= 800) {
-      window.document.body.classList.add('body-sm');
+    if (!popupUtilsService.inPopup(win)) {
+      win.document.body.classList.add('body-full');
+    } else if (win.screen.availHeight < 600) {
+      win.document.body.classList.add('body-xs');
+    } else if (win.screen.availHeight <= 800) {
+      win.document.body.classList.add('body-sm');
     }
 
     await stateService.save(ConstantsService.disableFaviconKey,
@@ -105,12 +107,12 @@ export default {
       theme = await platformUtilsService.getDefaultSystemTheme();
 
       platformUtilsService.onDefaultSystemThemeChange(sysTheme => {
-        window.document.documentElement.classList.remove('theme_light', 'theme_dark');
-        window.document.documentElement.classList.add('theme_' + sysTheme);
+        win.document.documentElement.classList.remove('theme_light', 'theme_dark');
+        win.document.documentElement.classList.add('theme_' + sysTheme);
       });
     }
-    window.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
-    window.document.documentElement.classList.add('theme_' + theme);
+    win.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
+    win.document.documentElement.classList.add('theme_' + theme);
   },
   getBgService
 }

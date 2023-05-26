@@ -52,7 +52,7 @@ export class BrowserApi {
       command: command,
     };
 
-    if (data != null) {
+    if (data) {
       obj.data = data;
     }
 
@@ -132,7 +132,7 @@ export class BrowserApi {
 
   static downloadFile(win: Window, blobData: any, blobOptions: any, fileName: string) {
     if (BrowserApi.isSafariApi) {
-      const type = blobOptions != null ? blobOptions.type : null;
+      const type = blobOptions ? blobOptions.type : null;
       let data: string = null;
       if (type === 'text/plain' && typeof (blobData) === 'string') {
         data = blobData;
@@ -163,13 +163,13 @@ export class BrowserApi {
     return process.env.ENV !== 'production';
   }
 
-  static getUILanguage(win: Window) {
+  static getUILanguage() {
     return chrome.i18n.getUILanguage();
   }
 
   static reloadExtension(win: Window) {
-    if (win != null) {
-      return win.location.reload(true);
+    if (win) {
+      return win.location.reload();
     } else {
       return chrome.runtime.reload();
     }
@@ -178,12 +178,11 @@ export class BrowserApi {
   static reloadOpenWindows() {
     if (chrome.extension.getViews) {
       const views = chrome.extension.getViews() as Window[];
-      views.filter(w => w.location.href != null).forEach(w => {
+      views.filter(w => !!w.location.href).forEach(w => {
         w.location.reload();
       });
     }
-    return window.location.reload()
-
+    this.reloadExtension(null)
   }
 
   static connectNative(application: string): browser.runtime.Port | chrome.runtime.Port {

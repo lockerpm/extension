@@ -91,6 +91,8 @@ import BrowserStorageService from '../services/browserStorage.service';
 import I18nService from '../services/i18n.service';
 import VaultTimeoutService from '../services/vaultTimeout.service';
 
+const win = window ?? self
+
 export default class MainBackground {
   messagingService: MessagingServiceAbstraction;
   storageService: StorageServiceAbstraction;
@@ -176,8 +178,8 @@ export default class MainBackground {
         }
       });
     this.secureStorageService = new BrowserStorageService();
-    this.i18nService = new I18nService(BrowserApi.getUILanguage(window));
-    this.cryptoFunctionService = new WebCryptoFunctionService(window, this.platformUtilsService);
+    this.i18nService = new I18nService(BrowserApi.getUILanguage());
+    this.cryptoFunctionService = new WebCryptoFunctionService(win, this.platformUtilsService);
     this.logService = new ConsoleLogService(false);
     this.cryptoService = new BrowserCryptoService(this.storageService, this.secureStorageService,
       this.cryptoFunctionService, this.platformUtilsService, this.logService);
@@ -240,14 +242,14 @@ export default class MainBackground {
       this.messagingService, this.platformUtilsService, () => {
         const forceWindowReload = this.platformUtilsService.isSafari() ||
           this.platformUtilsService.isFirefox() || this.platformUtilsService.isOpera();
-        BrowserApi.reloadExtension(forceWindowReload ? window : null);
+        BrowserApi.reloadExtension(forceWindowReload ? win : null);
         return Promise.resolve();
       });
 
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ?
-      opr.sidebarAction : (window as any).chrome?.sidebarAction;
+      opr.sidebarAction : (win as any).chrome?.sidebarAction;
 
     // Background
     this.requestBackground = new RequestBackground(this);
@@ -285,7 +287,7 @@ export default class MainBackground {
   }
 
   async bootstrap() {
-    this.containerService.attachToWindow(window);
+    this.containerService.attachToWindow(win);
 
     (this.authService as AuthService).init();
     await (this.vaultTimeoutService as VaultTimeoutService).init(true);

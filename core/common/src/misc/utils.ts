@@ -1,9 +1,9 @@
 import * as tldjs from 'tldjs';
 
 import { I18nService } from '../abstractions/i18n.service';
-
+const win = window ?? self
 // tslint:disable-next-line
-const nodeURL = typeof window === 'undefined' ? require('url') : null;
+const nodeURL = !win ? require('url') : null;
 
 export class Utils {
     static inited = false;
@@ -23,20 +23,20 @@ export class Utils {
         }
 
         Utils.inited = true;
-        Utils.isNode = typeof process !== 'undefined' && (process as any).release != null &&
+        Utils.isNode = process && (process as any).release &&
             (process as any).release.name === 'node';
-        Utils.isBrowser = typeof window !== 'undefined';
+        Utils.isBrowser = !!win;
         Utils.isNativeScript = !Utils.isNode && !Utils.isBrowser;
-        Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(window);
-        Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(window);
-        Utils.global = Utils.isNativeScript ? global : (Utils.isNode && !Utils.isBrowser ? global : window);
+        Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(win);
+        Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(win);
+        Utils.global = Utils.isNativeScript ? global : (Utils.isNode && !Utils.isBrowser ? global : win);
     }
 
     static fromB64ToArray(str: string): Uint8Array {
         if (Utils.isNode || Utils.isNativeScript) {
             return new Uint8Array(Buffer.from(str, 'base64'));
         } else {
-            const binaryString = window.atob(str);
+            const binaryString = win.atob(str);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
@@ -91,7 +91,7 @@ export class Utils {
             for (let i = 0; i < bytes.byteLength; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
-            return window.btoa(binary);
+            return win.btoa(binary);
         }
     }
 
@@ -155,7 +155,7 @@ export class Utils {
         if (Utils.isNode || Utils.isNativeScript) {
             return Buffer.from(utfStr, 'utf8').toString('base64');
         } else {
-            return decodeURIComponent(escape(window.btoa(utfStr)));
+            return decodeURIComponent(escape(win.btoa(utfStr)));
         }
     }
 
@@ -167,7 +167,7 @@ export class Utils {
         if (Utils.isNode || Utils.isNativeScript) {
             return Buffer.from(b64Str, 'base64').toString('utf8');
         } else {
-            return decodeURIComponent(escape(window.atob(b64Str)));
+            return decodeURIComponent(escape(win.atob(b64Str)));
         }
     }
 
@@ -189,7 +189,7 @@ export class Utils {
     static getHostname(uriString: string): string {
         const url = Utils.getUrl(uriString);
         try {
-            return url != null && url.hostname !== '' ? url.hostname : null;
+            return url && url.hostname ? url.hostname : null;
         } catch {
             return null;
         }
@@ -198,19 +198,19 @@ export class Utils {
     static getHost(uriString: string): string {
         const url = Utils.getUrl(uriString);
         try {
-            return url != null && url.host !== '' ? url.host : null;
+            return url && url.host ? url.host : null;
         } catch {
             return null;
         }
     }
 
     static getDomain(uriString: string): string {
-        if (uriString == null) {
+        if (!uriString) {
             return null;
         }
 
         uriString = uriString.trim();
-        if (uriString === '') {
+        if (!uriString) {
             return null;
         }
 
@@ -227,7 +227,7 @@ export class Utils {
         if (httpUrl) {
             try {
                 const url = Utils.getUrlObject(uriString);
-                const validHostname = tldjs?.isValid != null ? tldjs.isValid(url.hostname) : true;
+                const validHostname = tldjs?.isValid ? tldjs.isValid(url.hostname) : true;
                 if (!validHostname) {
                     return null;
                 }
@@ -236,17 +236,17 @@ export class Utils {
                     return url.hostname;
                 }
 
-                const urlDomain = tldjs != null && tldjs.getDomain != null ? tldjs.getDomain(url.hostname) : null;
-                return urlDomain != null ? urlDomain : url.hostname;
+                const urlDomain = tldjs && tldjs.getDomain ? tldjs.getDomain(url.hostname) : null;
+                return urlDomain ? urlDomain : url.hostname;
             } catch (e) {
                 // Invalid domain, try another approach below.
             }
         }
 
         try {
-            const domain = tldjs != null && tldjs.getDomain != null ? tldjs.getDomain(uriString) : null;
+            const domain = tldjs && tldjs.getDomain ? tldjs.getDomain(uriString) : null;
 
-            if (domain != null) {
+            if (domain) {
                 return domain;
             }
         } catch {
@@ -258,7 +258,7 @@ export class Utils {
 
     static getQueryParams(uriString: string): Map<string, string> {
         const url = Utils.getUrl(uriString);
-        if (url == null || url.search == null || url.search === '') {
+        if (!url || !url.search) {
             return null;
         }
         const map = new Map<string, string>();
@@ -268,20 +268,20 @@ export class Utils {
             if (parts.length < 1) {
                 return;
             }
-            map.set(decodeURIComponent(parts[0]).toLowerCase(), parts[1] == null ? '' : decodeURIComponent(parts[1]));
+            map.set(decodeURIComponent(parts[0]).toLowerCase(), !parts[1] ? '' : decodeURIComponent(parts[1]));
         });
         return map;
     }
 
     static getSortFunction(i18nService: I18nService, prop: string) {
         return (a: any, b: any) => {
-            if (a[prop] == null && b[prop] != null) {
+            if (!a[prop] && b[prop]) {
                 return -1;
             }
-            if (a[prop] != null && b[prop] == null) {
+            if (a[prop] && !b[prop]) {
                 return 1;
             }
-            if (a[prop] == null && b[prop] == null) {
+            if (!a[prop] && !b[prop]) {
                 return 0;
             }
 
@@ -291,7 +291,7 @@ export class Utils {
     }
 
     static isNullOrWhitespace(str: string): boolean {
-        return str == null || typeof str !== 'string' || str.trim() === '';
+        return !str || typeof str !== 'string' || !str.trim();
     }
 
     static nameOf<T>(name: string & keyof T) {
@@ -308,17 +308,17 @@ export class Utils {
 
 
     static getUrl(uriString: string): URL {
-        if (uriString == null) {
+        if (!uriString) {
             return null;
         }
 
         uriString = uriString.trim();
-        if (uriString === '') {
+        if (!uriString) {
             return null;
         }
 
         let url = Utils.getUrlObject(uriString);
-        if (url == null) {
+        if (!url) {
             const hasHttpProtocol = uriString.indexOf('http://') === 0 || uriString.indexOf('https://') === 0;
             if (!hasHttpProtocol && uriString.indexOf('.') > -1) {
                 url = Utils.getUrlObject('http://' + uriString);
@@ -345,27 +345,27 @@ export class Utils {
                 mobile = true;
             }
         })(win.navigator.userAgent || win.navigator.vendor || (win as any).opera);
-        return mobile || win.navigator.userAgent.match(/iPad/i) != null;
+        return !!(mobile || win.navigator.userAgent.match(/iPad/i));
     }
 
     private static isAppleMobile(win: Window) {
-        return win.navigator.userAgent.match(/iPhone/i) != null || win.navigator.userAgent.match(/iPad/i) != null;
+        return !!win.navigator.userAgent.match(/iPhone/i) || !!win.navigator.userAgent.match(/iPad/i);
     }
 
     private static getUrlObject(uriString: string): URL {
         try {
-            if (nodeURL != null) {
+            if (nodeURL) {
                 return nodeURL.URL ? new nodeURL.URL(uriString) : nodeURL.parse(uriString);
             } else if (typeof URL === 'function') {
                 return new URL(uriString);
-            } else if (window != null) {
+            } else if (win) {
                 const hasProtocol = uriString.indexOf('://') > -1;
                 if (!hasProtocol && uriString.indexOf('.') > -1) {
                     uriString = 'http://' + uriString;
                 } else if (!hasProtocol) {
                     return null;
                 }
-                const anchor = window.document.createElement('a');
+                const anchor = win.document.createElement('a');
                 anchor.href = uriString;
                 return anchor as any;
             }
