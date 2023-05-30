@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
+    var query = self.location.search.substring(1);
     var vars = query.split('&');
 
     for (var i = 0; i < vars.length; i++) {

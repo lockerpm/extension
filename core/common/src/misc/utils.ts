@@ -1,9 +1,8 @@
 import * as tldjs from 'tldjs';
 
 import { I18nService } from '../abstractions/i18n.service';
-const win = window ?? self
 // tslint:disable-next-line
-const nodeURL = !win ? require('url') : null;
+const nodeURL = !self ? require('url') : null;
 
 export class Utils {
     static inited = false;
@@ -25,18 +24,18 @@ export class Utils {
         Utils.inited = true;
         Utils.isNode = process && (process as any).release &&
             (process as any).release.name === 'node';
-        Utils.isBrowser = !!win;
+        Utils.isBrowser = !!self;
         Utils.isNativeScript = !Utils.isNode && !Utils.isBrowser;
-        Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(win);
-        Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(win);
-        Utils.global = Utils.isNativeScript ? global : (Utils.isNode && !Utils.isBrowser ? global : win);
+        Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(self);
+        Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(self);
+        Utils.global = Utils.isNativeScript ? global : (Utils.isNode && !Utils.isBrowser ? global : self);
     }
 
     static fromB64ToArray(str: string): Uint8Array {
         if (Utils.isNode || Utils.isNativeScript) {
             return new Uint8Array(Buffer.from(str, 'base64'));
         } else {
-            const binaryString = win.atob(str);
+            const binaryString = self.atob(str);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
@@ -91,7 +90,7 @@ export class Utils {
             for (let i = 0; i < bytes.byteLength; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
-            return win.btoa(binary);
+            return self.btoa(binary);
         }
     }
 
@@ -155,7 +154,7 @@ export class Utils {
         if (Utils.isNode || Utils.isNativeScript) {
             return Buffer.from(utfStr, 'utf8').toString('base64');
         } else {
-            return decodeURIComponent(escape(win.btoa(utfStr)));
+            return decodeURIComponent(escape(self.btoa(utfStr)));
         }
     }
 
@@ -167,7 +166,7 @@ export class Utils {
         if (Utils.isNode || Utils.isNativeScript) {
             return Buffer.from(b64Str, 'base64').toString('utf8');
         } else {
-            return decodeURIComponent(escape(win.atob(b64Str)));
+            return decodeURIComponent(escape(self.atob(b64Str)));
         }
     }
 
@@ -358,14 +357,14 @@ export class Utils {
                 return nodeURL.URL ? new nodeURL.URL(uriString) : nodeURL.parse(uriString);
             } else if (typeof URL === 'function') {
                 return new URL(uriString);
-            } else if (win) {
+            } else if (self) {
                 const hasProtocol = uriString.indexOf('://') > -1;
                 if (!hasProtocol && uriString.indexOf('.') > -1) {
                     uriString = 'http://' + uriString;
                 } else if (!hasProtocol) {
                     return null;
                 }
-                const anchor = win.document.createElement('a');
+                const anchor = self.document.createElement('a');
                 anchor.href = uriString;
                 return anchor as any;
             }

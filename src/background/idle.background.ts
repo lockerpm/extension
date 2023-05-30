@@ -6,8 +6,6 @@ import { ConstantsService } from 'jslib-common/services/constants.service';
 
 const IdleInterval = 60 * 5; // 5 minutes
 
-const win = window ?? self
-
 export default class IdleBackground {
     private idle: any;
     private idleTimer: number = null;
@@ -56,7 +54,7 @@ export default class IdleBackground {
 
     private pollIdle(handler: (newState: string) => void) {
         if (this.idleTimer != null) {
-            win.clearTimeout(this.idleTimer);
+            self.clearTimeout(this.idleTimer);
             this.idleTimer = null;
         }
         this.idle.queryState(IdleInterval, (state: string) => {
@@ -64,7 +62,7 @@ export default class IdleBackground {
                 this.idleState = state;
                 handler(state);
             }
-            this.idleTimer = win.setTimeout(() => this.pollIdle(handler), 5000);
+            this.idleTimer = self.setTimeout(() => this.pollIdle(handler), 5000);
         });
     }
 }

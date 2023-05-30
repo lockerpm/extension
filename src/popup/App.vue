@@ -19,7 +19,7 @@ export default Vue.extend({
     }
   },
   async created () {
-    (window as any).bitwardenPopupMainMessageListener = async () => ({});
+    (self as any).bitwardenPopupMainMessageListener = async () => ({});
     const locked = await this.vaultTimeoutService.isLocked();
     if (locked) {
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {

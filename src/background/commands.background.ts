@@ -6,8 +6,6 @@ import { PasswordGenerationService } from 'jslib-common/abstractions/passwordGen
 import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 
-const win = window ?? self
-
 export default class CommandsBackground {
   private isSafari: boolean;
   private isVivaldi: boolean;
@@ -54,7 +52,7 @@ export default class CommandsBackground {
   private async generatePasswordToClipboard() {
     const options = (await this.passwordGenerationService.getOptions())[0];
     const password = await this.passwordGenerationService.generatePassword(options);
-    this.platformUtilsService.copyToClipboard(password, { window: win });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerationService.addHistory(password);
   }
 

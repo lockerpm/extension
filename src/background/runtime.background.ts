@@ -28,8 +28,6 @@ import RequestBackground from './request.backgroud';
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 
-const win = window ?? self
-
 export default class RuntimeBackground {
   private autofillTimeout: any;
   private pageDetailsToAutoFill: any[] = [];
@@ -131,7 +129,7 @@ export default class RuntimeBackground {
             );
             if (totpCode != null) {
               this.platformUtilsService.copyToClipboard(totpCode, {
-                window: win
+                window: self
               });
             }
             break;
@@ -210,7 +208,7 @@ export default class RuntimeBackground {
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
-          window: win
+          window: self
         });
         break;
       default:
@@ -228,7 +226,7 @@ export default class RuntimeBackground {
     });
 
     if (totpCode != null) {
-      this.platformUtilsService.copyToClipboard(totpCode, { window: win });
+      this.platformUtilsService.copyToClipboard(totpCode, { window: self });
     }
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
@@ -298,7 +296,7 @@ export default class RuntimeBackground {
     responseData.password = password
     responseData.passwordStrength = passwordStrength
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-    this.platformUtilsService.copyToClipboard(password, { window: win });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerator.addHistory(password);
   }
 

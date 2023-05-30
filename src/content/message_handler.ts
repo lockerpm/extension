@@ -1,5 +1,5 @@
-window.addEventListener('message', event => {
-  if (event.source !== window)
+self.addEventListener('message', event => {
+  if (event.source !== self)
     return;
   if (event.data.command && (event.data.command === 'cs-authResult')) {
     chrome.runtime.sendMessage({

@@ -138,7 +138,7 @@ export default Vue.extend({
     await this.load();
   },
   destroyed() {
-    window.clearTimeout(this.loadedTimeout);
+    self.clearTimeout(this.loadedTimeout);
   },
   methods: {
     openLogin() {
@@ -233,7 +233,7 @@ export default Vue.extend({
 
       this.totpCode = null;
       if (this.totpTimeout != null) {
-        window.clearTimeout(this.totpTimeout);
+        self.clearTimeout(this.totpTimeout);
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
@@ -248,17 +248,17 @@ export default Vue.extend({
         });
         if (this.totpCode != null) {
           this.$platformUtilsService.copyToClipboard(this.totpCode, {
-            window: window,
+            window: self,
           });
         }
-        if (this.$popupUtilsService.inPopup(window)) {
+        if (this.$popupUtilsService.inPopup(self)) {
           if (
             this.$platformUtilsService.isFirefox() ||
             this.$platformUtilsService.isSafari()
           ) {
-            BrowserApi.closePopup(window);
+            BrowserApi.closePopup(self);
           } else {
-            setTimeout(() => BrowserApi.closePopup(window), 50);
+            setTimeout(() => BrowserApi.closePopup(self), 50);
           }
         }
       } catch (e) {
@@ -271,7 +271,7 @@ export default Vue.extend({
         if (msg.successfully && msg.trigger) {
           this.notify("Syncing complete", "success");
         }
-        window.setTimeout(() => {
+        self.setTimeout(() => {
           this.load();
         }, 500);
         break;

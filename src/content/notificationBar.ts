@@ -10,19 +10,9 @@ import {
 } from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
-  if (window.location.hostname.indexOf('id.locker.io') > -1) {
+  if (self.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
-  const test = window.document.createElement('div');
-  test.style.position = 'fixed';
-  test.style.top = '0px';
-  test.style.right = '0px';
-  test.style.height = '100vh';
-  test.style.width = '100%'
-  test.style.backgroundColor = 'red'
-  test.style.opacity = '0.2'
-  test.style.zIndex = '1000000000'
-  // window.document.body.appendChild(test)
 
   let pageDetails: any[] = [];
   const formData: any[] = [];
@@ -36,7 +26,7 @@ document.addEventListener('DOMContentLoaded', event => {
   let disabledChangedPasswordNotification = false;
   let inputWithLogo: any[] = []
   let isSignUp = false
-  const inIframe = !window || window.self !== window.top;
+  const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
   const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
   const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -46,7 +36,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
   chrome.storage.local.get('neverDomains', (ndObj: any) => {
     const domains = ndObj.neverDomains;
-    if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
+    if (domains != null && domains.hasOwnProperty(self.location.hostname)) {
       return;
     }
 
@@ -99,7 +89,7 @@ document.addEventListener('DOMContentLoaded', event => {
           const domains = ndObj.neverDomains;
           if (
             domains == null ||
-            !domains.hasOwnProperty(window.location.hostname)
+            !domains.hasOwnProperty(self.location.hostname)
           ) {
             for (let i = 0; i < msg.data.passwordFields.length; i++) {
               try {
@@ -192,7 +182,7 @@ document.addEventListener('DOMContentLoaded', event => {
     const bodies = document.querySelectorAll('body');
     if (bodies && bodies.length > 0) {
       observer = new MutationObserver(mutations => {
-        if (mutations == null || mutations.length === 0 || pageHref !== window.location.href) {
+        if (mutations == null || mutations.length === 0 || pageHref !== self.location.href) {
           return;
         }
 
@@ -235,10 +225,10 @@ document.addEventListener('DOMContentLoaded', event => {
 
         if (doCollect) {
           if (domObservationCollectTimeout != null) {
-            window.clearTimeout(domObservationCollectTimeout);
+            self.clearTimeout(domObservationCollectTimeout);
           }
 
-          domObservationCollectTimeout = window.setTimeout(() => {
+          domObservationCollectTimeout = self.setTimeout(() => {
             sendPlatformMessage({
               command: 'bgCollectPageDetails',
               sender: 'notificationBar',
@@ -253,14 +243,14 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function collectIfNeededWithTimeout() {
     if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
+      self.clearTimeout(collectIfNeededTimeout);
     }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
+    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function collectIfNeeded() {
-    if (pageHref !== window.location.href) {
-      pageHref = window.location.href;
+    if (pageHref !== self.location.href) {
+      pageHref = self.location.href;
       if (observer) {
         observer.disconnect();
         observer = null;
@@ -272,15 +262,15 @@ document.addEventListener('DOMContentLoaded', event => {
       });
 
       if (observeDomTimeout != null) {
-        window.clearTimeout(observeDomTimeout);
+        self.clearTimeout(observeDomTimeout);
       }
-      observeDomTimeout = window.setTimeout(observeDom, 1000);
+      observeDomTimeout = self.setTimeout(observeDom, 1000);
     }
 
     if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
+      self.clearTimeout(collectIfNeededTimeout);
     }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
+    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function watchForms(forms: any[]) {
@@ -674,7 +664,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function processedForm(form: HTMLFormElement) {
     form.dataset.bitwardenProcessed = '1';
-    window.setTimeout(() => {
+    self.setTimeout(() => {
       form.dataset.bitwardenProcessed = '0';
     }, 500);
   }

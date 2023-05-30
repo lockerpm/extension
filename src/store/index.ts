@@ -239,7 +239,7 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       async LoadCurrentIntercom ({ commit }) {
         const res: any = await meAPI.me_intercom();
-        window.intercomSettings = res
+        self.intercomSettings = res
         commit('UPDATE_USER_INTERCOM', res)
         Intercom('update')
       },

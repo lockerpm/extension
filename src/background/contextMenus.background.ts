@@ -12,8 +12,6 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 import { EventType } from 'jslib-common/enums/eventType';
 import { CipherView } from 'jslib-common/models/view/cipherView';
 
-const win = window ?? self
-
 export default class ContextMenusBackground {
   private contextMenus: any;
 
@@ -46,7 +44,7 @@ export default class ContextMenusBackground {
   private async generatePasswordToClipboard() {
     const options = (await this.passwordGenerationService.getOptions())[0];
     const password = await this.passwordGenerationService.generatePassword(options);
-    this.platformUtilsService.copyToClipboard(password, { window: win });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerationService.addHistory(password);
   }
 
@@ -81,13 +79,13 @@ export default class ContextMenusBackground {
     if (info.parentMenuItemId === 'autofill') {
       await this.startAutofillPage(cipher);
     } else if (info.parentMenuItemId === 'copy-username') {
-      this.platformUtilsService.copyToClipboard(cipher.login.username, { window: win });
+      this.platformUtilsService.copyToClipboard(cipher.login.username, { window: self });
     } else if (info.parentMenuItemId === 'copy-password') {
-      this.platformUtilsService.copyToClipboard(cipher.login.password, { window: win });
+      this.platformUtilsService.copyToClipboard(cipher.login.password, { window: self });
       this.eventService.collect(EventType.Cipher_ClientCopiedPassword, cipher.id);
     } else if (info.parentMenuItemId === 'copy-totp') {
       const totpValue = await this.totpService.getCode(cipher.login.totp);
-      this.platformUtilsService.copyToClipboard(totpValue, { window: win });
+      this.platformUtilsService.copyToClipboard(totpValue, { window: self });
     }
   }
 

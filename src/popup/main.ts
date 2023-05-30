@@ -467,11 +467,11 @@ Vue.mixin({
       if (!link.match(/^https?:\/\//i)) {
         link = "http://" + link;
       }
-      window.open(link, '_blank')
+      self.open(link, '_blank')
     },
     sanitizeUrl(connectionUrl) {
       if (connectionUrl.startsWith('//')) {
-        const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
+        const scheme = self.location.protocol === 'https:' ? 'wss' : 'ws'
         connectionUrl = `${scheme}:${connectionUrl}`
       }
 

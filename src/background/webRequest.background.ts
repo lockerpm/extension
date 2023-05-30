@@ -4,8 +4,6 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 
 import { UriMatchType } from 'jslib-common/enums/uriMatchType';
 
-const win = window ?? self
-
 export default class WebRequestBackground {
     private pendingAuthRequests: any[] = [];
     private webRequest: any;
@@ -13,7 +11,7 @@ export default class WebRequestBackground {
 
     constructor(platformUtilsService: PlatformUtilsService, private cipherService: CipherService,
         private vaultTimeoutService: VaultTimeoutService) {
-        this.webRequest = (win as any).chrome.webRequest;
+        this.webRequest = (self as any).chrome.webRequest;
         this.isFirefox = platformUtilsService.isFirefox();
     }
 

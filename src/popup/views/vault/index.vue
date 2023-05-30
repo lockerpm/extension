@@ -91,14 +91,14 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    window.onscroll = () => {
+    self.onscroll = () => {
       const bottomOfWindow =
         Math.max(
-          window.pageYOffset,
+          self.pageYOffset,
           document.documentElement.scrollTop,
           document.body.scrollTop
         ) +
-        window.innerHeight +
+        self.innerHeight +
         500 >=
         document.documentElement.scrollHeight;
 
@@ -379,7 +379,7 @@ export default Vue.extend({
 
       this.totpCode = null;
       if (this.totpTimeout != null) {
-        window.clearTimeout(this.totpTimeout);
+        self.clearTimeout(this.totpTimeout);
       }
 
       if (this.pageDetails == null || this.pageDetails.length === 0) {
@@ -395,18 +395,18 @@ export default Vue.extend({
         });
         if (this.totpCode != null) {
           this.$platformUtilsService.copyToClipboard(this.totpCode, {
-            window: window,
+            window: self,
           });
         }
-        if (this.$popupUtilsService.inPopup(window)) {
+        if (this.$popupUtilsService.inPopup(self)) {
           if (
             this.$platformUtilsService.isFirefox() ||
             this.$platformUtilsService.isSafari()
           ) {
-            BrowserApi.closePopup(window);
+            BrowserApi.closePopup(self);
           } else {
             // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
-            setTimeout(() => BrowserApi.closePopup(window), 50);
+            setTimeout(() => BrowserApi.closePopup(self), 50);
           }
         }
       } catch (e) {
