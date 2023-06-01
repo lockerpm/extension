@@ -165,8 +165,8 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   copyToClipboard(text: string, options?: any): void {
     let win = self;
     let doc = self.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
+    if (options && (options.window || options.win || self)) {
+      win = options.window || options.win || self;
       doc = win.document;
     } else if (options && options.doc) {
       doc = options.doc;
@@ -221,8 +221,8 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   async readFromClipboard(options?: any): Promise<string> {
     let win = self;
     let doc = self.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
+    if (options && (options.window || options.win || self)) {
+      win = options.window || options.win || self;
       doc = win.document;
     } else if (options && options.doc) {
       doc = options.doc;

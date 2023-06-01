@@ -15,7 +15,7 @@
             v-for="(item, index) in cate.items"
             :key="index"
             class="popup-setting-section"
-            @click="item.routeName || item.externalUrl ? openRoute(item) : item.lock? lock():''"
+            @click="item.routeName || item.externalUrl ? openRoute(item) : item.lock ? lock():''"
           >
 
             <div class="flex-grow">

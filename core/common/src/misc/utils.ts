@@ -28,7 +28,7 @@ export class Utils {
         Utils.isNativeScript = !Utils.isNode && !Utils.isBrowser;
         Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(self);
         Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(self);
-        Utils.global = Utils.isNativeScript ? global : (Utils.isNode && !Utils.isBrowser ? global : self);
+        Utils.global = Utils.isNativeScript ? global || self : (Utils.isNode && !Utils.isBrowser ? global || self : self);
     }
 
     static fromB64ToArray(str: string): Uint8Array {

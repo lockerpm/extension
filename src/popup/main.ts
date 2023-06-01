@@ -174,9 +174,9 @@ Vue.mixin({
       await this.$passService.clearGeneratePassword()
       await Promise.all([
         this.$cryptoService.clearKey(),
+        this.$cryptoService.clearEncKey(true),
         this.$cryptoService.clearOrgKeys(true),
         this.$cryptoService.clearKeyPair(true),
-        this.$cryptoService.clearEncKey(true)
       ])
       await this.$folderService.clearCache()
       await this.$cipherService.clearCache()

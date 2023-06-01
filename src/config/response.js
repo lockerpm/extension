@@ -13,6 +13,7 @@ export function handleResponseErrorMessage(error) {
       router.push({ name: 'Home' })
     }
     if (error.response.status === 401) {
+      console.log(error.response.config.url);
       if ([ENDPOINT.SSO_AUTH].includes(error.response.config.url)) {
         storageService.remove('cs_token')
         storePromise.then((store) => {
