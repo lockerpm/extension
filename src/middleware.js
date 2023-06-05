@@ -14,6 +14,7 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const store = await storePromise;
   const accessToken = await browserStorageService.get('cs_token')
+
   if (!!store.state.isLoggedIn && accessToken) {
     if (fistData) {
       await store.dispatch("LoadCurrentUser");
@@ -46,12 +47,12 @@ router.beforeEach(async (to, from, next) => {
   } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
     if (!isFirst) {
       router.push({ name: "login" });
-      isFirst = false
     } else {
       next()
     }
   } else {
     next();
   }
+  isFirst = false
   NProgress.done()
 })
