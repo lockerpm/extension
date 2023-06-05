@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import request from "@/config/request";
 import ENDPOINT from "@/config/endpoint";
 

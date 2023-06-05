@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import ENDPOINT from '@/config/endpoint'
 import router from '@/router/popup'
 import JSLib from '@/popup/services/services'
@@ -11,7 +12,6 @@ export function handleResponseErrorMessage(error) {
     }
     if (error.response.status === 401) {
       if ([ENDPOINT.SSO_AUTH].includes(error.response.config.url)) {
-        console.log('error', error.response);
         browserStorageService.remove('cs_token')
         storePromise.then((store) => {
           store.commit('UPDATE_LOGIN_PAGE_INFO', null)
