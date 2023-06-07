@@ -71,7 +71,7 @@ export class NotificationsService implements NotificationsServiceAbstraction {
         this.signalrConnection.on('ReceiveMessage',
             (data: any) => this.processNotification(new NotificationResponse(data)));
         this.signalrConnection.on('Heartbeat',
-            (data: any) => { /*console.log('Heartbeat!');*/ });
+            (data: any) => { });
         this.signalrConnection.onclose(() => {
             this.connected = false;
             this.reconnect(true);

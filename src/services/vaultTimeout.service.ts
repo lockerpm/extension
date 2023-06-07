@@ -21,8 +21,6 @@ export default class VaultTimeoutService extends BaseVaultTimeoutService {
                 await SafariApp.sendMessageToApp('sleep');
                 this.checkVaultTimeout();
             } catch (e) {
-                // tslint:disable-next-line
-                console.log('Exception Safari VaultTimeout', e);
             }
         }
     }
