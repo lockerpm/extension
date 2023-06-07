@@ -1,42 +1,46 @@
 <template>
-  <div class="w-full px-6 text-center mt-10">
+  <div class="w-full px-6 text-center mt-4">
     <div>
-      <div class="text-center mt-2">
-      </div>
-      <div
-        class="mx-auto border border-black-500 h-[1px]"
-        style="width: 30px"
-      >
-      </div>
-      <div class="mt-3 text-center">
-        <p class="mb-2">
-          {{$t('data.login.login_with')}}
-        </p>
-        <button
-          v-for="s in strategies"
-          :key="s.key"
-          type="button"
-          class="m-btn--icon btn-icon-login m-btn--pill"
-          @click="loginWith(s.key)"
+      <div>
+        <div class="text-center mt-2">
+        </div>
+        <div
+          class="mx-auto border border-black-500 h-[1px]"
+          style="width: 30px"
         >
-          <img
-            class="social__app-icon"
-            :src="require(`@/assets/images/icons/${s.key}.svg`)"
-            :alt="s.key"
+        </div>
+        <div class="mt-3 text-center">
+          <p class="mb-2">
+            {{$t('data.login.login_with')}}
+          </p>
+          <button
+            v-for="s in strategies"
+            :key="s.key"
+            type="button"
+            class="m-btn--icon btn-icon-login m-btn--pill"
+            @click="loginWith(s.key)"
           >
-        </button>
+            <el-tooltip class="item" effect="light" :content="s.name" placement="bottom">
+              <img
+                class="social__app-icon"
+                :src="require(`@/assets/images/icons/${s.key}.svg`)"
+                :alt="s.key"
+              >
+            </el-tooltip>
+          </button>
+        </div>
       </div>
       <div class="flex px-2 my-4 mx-auto">
         <div class="w-full pl-0 text-center">
           <span>
             {{$t('data.login.dont_have_account')}}
             <a
-            @click.prevent="openRegister"
-            tag="a"
-            class="text-[#0476e9] no-underline"
-          >
-            {{$t('data.login.sign_up')}}
-          </a>
+              @click.prevent="openRegister"
+              tag="a"
+              class="text-[#0476e9] no-underline"
+            >
+              {{$t('data.login.sign_up')}}
+            </a>
           </span>
         </div>
       </div>
@@ -47,7 +51,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  name: 'SignIn',
+  props: {},
   data () {
     return {}
   },
@@ -56,13 +60,6 @@ export default Vue.extend({
       const msg: any = {
         command: 'authAccessToken',
         sender: { type: 'register' },
-      };
-      chrome.runtime.sendMessage(msg);
-    },
-    async openLogin() {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'login' },
       };
       chrome.runtime.sendMessage(msg);
     },

@@ -15,6 +15,9 @@ import Vue from 'vue'
 import { CipherType } from 'jslib-common/enums/cipherType';
 import Header from "@/popup/components/layout/parts/Header";
 import Footer from "@/popup/components/layout/parts/Footer";
+
+import ENDPOINT from '@/config/endpoint'
+
 export default Vue.extend({
   props: {
     wrapperType: {
@@ -33,7 +36,8 @@ export default Vue.extend({
       lastActivity: null,
       idleTimer: null,
       isIdle: false,
-      CipherType
+      CipherType,
+      ws1: null,
     }
   },
   asyncComputed: {
@@ -65,18 +69,25 @@ export default Vue.extend({
   },
   methods: {
     disconnectSocket () {
-      delete this.$options.sockets.onmessage
-      this.$disconnect()
+      if (this.ws1) {
+        delete this.ws1.onmessage
+        this.ws1.close()
+      }
     },
     async reconnectSocket () {
+      const cs_store = await this.$storageService.get('cs_store')
+      const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
+      
       const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${process.env.VUE_APP_WS_URL}/cystack_platform/pm/sync?token=${token}`), {
+
+      this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
         format: 'json',
         reconnection: true,
         reconnectionAttempts: 60,
         reconnectionDelay: 3000
       })
-      this.$options.sockets.onmessage = message => {
+      this.ws1 = this.$socket
+      this.ws1.onmessage = message => {
         const data = JSON.parse(message.data)
         switch (data.event) {
         case 'sync':
@@ -86,7 +97,7 @@ export default Vue.extend({
           break
         }
       }
-    }
+    },
   }
 }
 )

@@ -57,7 +57,10 @@
 import Vue from 'vue'
 import { ValidationProvider } from 'vee-validate'
 import { FolderRequest } from "jslib-common/models/request/folderRequest";
-import InputText from '@/components/input/InputText'
+import InputText from '@/components/input/InputText';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   components: {
     InputText,
@@ -87,7 +90,7 @@ export default Vue.extend({
         this.loading = true
         const folderEnc = await this.$folderService.encrypt(folder)
         const data = new FolderRequest(folderEnc)
-        const res = await this.axios.post('cystack_platform/pm/folders', data)
+        const res = cystackPlatformAPI.create_folder(data)
         this.$emit('done')
         this.$emit('created-folder', { id: res.id, name: folder.name })
         this.closeDialog()
@@ -108,7 +111,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.delete(`cystack_platform/pm/folders/${folder.id}`)
+          await cystackPlatformAPI.delete_folder(folder.id)
           this.$emit('done')
           this.closeDialog()
           this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
@@ -125,7 +128,7 @@ export default Vue.extend({
         this.loading = true
         const folderEnc = await this.$folderService.encrypt(folder)
         const data = new FolderRequest(folderEnc)
-        await this.axios.put(`cystack_platform/pm/folders/${folder.id}`, data)
+        await cystackPlatformAPI.update_folder(folder.id, data)
         this.$emit('done')
         this.closeDialog()
       } catch (e) {

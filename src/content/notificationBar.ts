@@ -7,7 +7,7 @@ import {
   SIGN_UP_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
-} from '@/constants/index'
+} from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
   if (window.location.hostname.indexOf('id.locker.io') > -1) {
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false) {
-    const elements = document.getElementsByClassName(el.htmlClass)
+    const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
     for (let i = 0; i < elements.length; i++) {
       if (elements[i].id === el.htmlID && !elements[i].disabled) {

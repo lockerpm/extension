@@ -75,10 +75,13 @@ import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import Header from "../../components/layout/parts/Header.vue";
 import Footer from "../../components/layout/parts/Footer.vue";
 import i18n from '@/locales/i18n';
-import { VAULT_TIMEOUTS } from '@/constants/index'
+import { VAULT_TIMEOUTS } from '@/config/constants'
 const enableAutofillKey = 'enableAutofill'
 const showFoldersKey = 'showFolders'
 const hideIconsKey = 'hideIcons'
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   name: "Settings",
   components: {
@@ -219,7 +222,7 @@ export default Vue.extend({
     async putUser() {
       try {
         this.loading = true;
-        await this.axios.put("cystack_platform/pm/users/me", this.user);
+        await cystackPlatformAPI.update_users_me(this.user);
         this.$store.commit("UPDATE_USER_PW", this.user);
         this.$vaultTimeoutService.setVaultTimeoutOptions(
           this.user.timeout,

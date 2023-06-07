@@ -318,6 +318,9 @@ import AddEditTeamFolderGroups from '@/components//folder/AddEditTeamFolderGroup
 import ShareCipher from '@/components/cipher/ShareCipher'
 import MoveFolder from '@/components/folder/MoveFolder'
 import Vnodes from "@/components/Vnodes";
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     NoCipher,
@@ -500,7 +503,7 @@ export default Vue.extend({
               userInput.length > 0 ? userInput : null)
             weakPasswordScores[result.score]++
           })
-          await this.axios.put('/cystack_platform/pm/users/me', {
+          await cystackPlatformAPI.update_users_me({
             scores: weakPasswordScores
           })
         }

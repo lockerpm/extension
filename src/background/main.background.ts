@@ -68,8 +68,6 @@ import { UserService as UserServiceAbstraction } from 'jslib-common/abstractions
 import { VaultTimeoutService as VaultTimeoutServiceAbstraction } from 'jslib-common/abstractions/vaultTimeout.service';
 import { AutofillService as AutofillServiceAbstraction } from '../services/abstractions/autofill.service';
 
-import { Utils } from 'jslib-common/misc/utils';
-
 import { BrowserApi } from '../browser/browserApi';
 import { SafariApp } from '../browser/safariApp';
 
@@ -82,6 +80,7 @@ import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
 import WebRequestBackground from './webRequest.background';
 import WindowsBackground from './windows.background';
+import RequestBackground from './request.backgroud';
 
 import { PopupUtilsService } from '../popup/services/popup-utils.service';
 import AutofillService from '../services/autofill.service';
@@ -144,6 +143,7 @@ export default class MainBackground {
   private tabsBackground: TabsBackground;
   private webRequestBackground: WebRequestBackground;
   private windowsBackground: WindowsBackground;
+  private requestBackground: RequestBackground;
 
   private sidebarAction: any;
   private buildingContextMenu: boolean;
@@ -250,17 +250,18 @@ export default class MainBackground {
       opr.sidebarAction : (window as any).chrome?.sidebarAction;
 
     // Background
+    this.requestBackground = new RequestBackground(this);
     this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
       this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
       this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
-      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService, this.vaultTimeoutService);
+      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService, this.requestBackground, this.vaultTimeoutService);
     this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
       this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
       this.platformUtilsService);
     this.commandsBackground = new CommandsBackground(this, this.passwordGenerationService,
       this.platformUtilsService, this.vaultTimeoutService);
     this.notificationBackground = new NotificationBackground(this, this.autofillService, this.cipherService,
-      this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService, this.totpService);
+      this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService, this.totpService, this.requestBackground);
 
     this.tabsBackground = new TabsBackground(this, this.notificationBackground);
     this.contextMenusBackground = new ContextMenusBackground(this, this.cipherService, this.passwordGenerationService,

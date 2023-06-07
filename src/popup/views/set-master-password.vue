@@ -1,14 +1,8 @@
 <template>
   <BlankLayout>
     <div class="flex flex-grow flex-col items-center px-5 py-5">
-      <!-- <div class="mt-[5.625rem] mb-5">
-        <img src="@/assets/images/logo/logo_black.svg" alt="" class="h-[36px]">
-      </div> -->
       <div class="w-full max-w-[500px] text-center">
         <div class="text-head-4 font-semibold mb-2.5">{{$t('data.set_master_pass.create')}}</div>
-        <!--        <div class="text-base text-black-600 mb-4">-->
-        <!--          Master Password là mật khẩu mở khóa Locker của bạn-->
-        <!--        </div>-->
         <div class="inline-block mb-8 select-none">
           <div class="flex items-center">
             <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
@@ -97,6 +91,9 @@
 import Vue from 'vue'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
 import BlankLayout from '@/components/layout/blank'
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default Vue.extend({
   components: { BlankLayout, PasswordStrengthBar },
   layout: 'blank',
@@ -144,12 +141,7 @@ export default Vue.extend({
         await this.$cryptoService.setKeyHash(hashedPassword)
         await this.$cryptoService.setEncKey(encKey[1].encryptedString)
         await this.$cryptoService.setEncPrivateKey(keys[1].encryptedString)
-        // default org
-        // const shareKey = await this.$cryptoService.makeShareKey()
-        // const orgKey = shareKey[0].encryptedString
-        // const collection = await this.$cryptoService.encrypt('defaultCollection', shareKey[1])
-        // const collectionName = collection.encryptedString
-        await this.axios.post('cystack_platform/pm/users/register', {
+        await cystackPlatformAPI.users_register({
           name: this.currentUser.full_name,
           email: this.currentUser.email,
           master_password_hash: hashedPassword,

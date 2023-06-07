@@ -24,10 +24,10 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
+import RequestBackground from './request.backgroud';
 
 import { Utils } from 'jslib-common/misc/utils';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
-import axios from "axios";
 
 export default class RuntimeBackground {
   private autofillTimeout: any;
@@ -35,6 +35,7 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
+  private currentLocation = ''
   constructor(
     private main: MainBackground,
     private autofillService: AutofillService,
@@ -55,6 +56,7 @@ export default class RuntimeBackground {
     private tokenService: TokenService,
     private passwordGenerator: PasswordGenerationService,
     private passService: PassService,
+    private request: RequestBackground,
     private vaultTimeoutService: VaultTimeoutService
   ) {
     chrome.runtime?.onInstalled?.addListener((details: any) => {
@@ -207,34 +209,27 @@ export default class RuntimeBackground {
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
-          const myHeaders = {
-            headers: { Authorization: `Bearer ${msg.token}` }
-          };
           try {
-            const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
-            await axios
-              .post(
-                url,
-                {
-                  SERVICE_URL: "/sso",
-                  SERVICE_SCOPE: "pwdmanager",
-                  CLIENT: "browser"
-                },
-                myHeaders
-              )
-              .then(async result => {
-                const access_token = result.data ? result.data.access_token : "";
+            await this.storageService.save("cs_token", msg.token);
+            this.request.sso_access_token({
+              SERVICE_URL: "/sso",
+              SERVICE_SCOPE: "pwdmanager",
+              CLIENT: "browser"
+            }).then(async (result: any) => {
+              const access_token = result ? result.access_token : "";
+              await this.storageService.save("cs_token", access_token);
+              await this.updateStoreService('isLoggedIn', true);
+              setTimeout(async () => {
+                this.messagingService.send('loggedIn');
                 const store: any = await this.storageService.get("cs_store");
-                await this.storageService.save("cs_token", access_token);
-                await this.updateStoreService('isLoggedIn', true);
-                this.messagingService.send('loggedIn')
                 if (store && store.savePopup) {
                   setTimeout(async () => {
                     const tab = await BrowserApi.getTabFromCurrentWindow();
                     await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
                   }, 4000);
                 }
-              });
+              }, 1000);
+            });
           } catch (e) {
             console.log(e);
           }
@@ -255,7 +250,26 @@ export default class RuntimeBackground {
           this.userService.clear()
         ]);
         break;
-      case "locker-authResult":
+      case "sso-authResult":
+        if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
+          this.storageService.save('current_router', 'pwl-unlock')
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            user_info: {
+              email: msg.data.email
+            }
+          })
+        } else {
+          await this.updateStoreService('isLoggedIn', true);
+          this.storageService.save('current_router', 'lock')
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
+            baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
+          })
+        }
+        const tab: any = await BrowserApi.getTabFromCurrentWindow()
+        await BrowserApi.updateCurrentTab(tab, this.currentLocation);
         break;
       case "webAuthnResult":
         const vaultUrl2 = this.environmentService.getWebVaultUrl();
@@ -307,6 +321,8 @@ export default class RuntimeBackground {
         if (msg.sender) {
           await this.updateStoreService(msg.sender.key, msg.sender.value);
         }
+      case "updateStoreServiceInfo":
+        await this.updateStoreServiceInfo(msg.sender);
       default:
         break;
     }
@@ -327,18 +343,11 @@ export default class RuntimeBackground {
     this.main.loginToAutoFill = null;
     this.pageDetailsToAutoFill = [];
 
-    // Update used time
-    const csToken = await this.main.storageService.get<string>("cs_token");
-    const headers = {
-      "Authorization": "Bearer " + csToken,
-      "Content-Type": "application/json; charset=utf-8"
-    };
-    const res = await axios.put(
-      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
+    const res: any = await this.request.use_cipher(
+      cipherId,
       { use: true, favorite: cipherFavorite },
-      { headers: headers }
     )
-    const cipherResponse = new CipherResponse(res.data)
+    const cipherResponse = new CipherResponse(res)
     const userId = await this.userService.getUserId();
     const cipherData = new CipherData(cipherResponse, userId);
     this.cipherService.upsert(cipherData)
@@ -408,14 +417,20 @@ export default class RuntimeBackground {
     await this.updateStoreService('savePopup', true);
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      let url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
-      if (provider) {
-        url += `&provider=${provider}`
+      let url = ''
+      if (provider === 'sso') {
+        this.currentLocation = tab.url
+        BrowserApi.createNewTab(`${process.env.VUE_APP_ID_SSO_URL}/login/sso?client=extension`, true, true);
+      } else {
+        url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
+        if (provider) {
+          url += `&provider=${provider}`
+        }
+        if (process.env.VUE_APP_ENVIRONMENT) {
+          url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+        }
+        BrowserApi.createNewTab(url, true, true);
       }
-      if (process.env.VUE_APP_ENVIRONMENT) {
-        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-      }
-      BrowserApi.createNewTab(url, true, true);
     }
   }
 
@@ -428,6 +443,18 @@ export default class RuntimeBackground {
     await this.storageService.save("cs_store", {
       ...oldStoreParsed,
       [key]: value
+    });
+  }
+
+  private async updateStoreServiceInfo(value = {}) {
+    const store = await this.storageService.get("cs_store");
+    let oldStoreParsed = {};
+    if (typeof store === "object") {
+      oldStoreParsed = store;
+    }
+    await this.storageService.save("cs_store", {
+      ...oldStoreParsed,
+      ...value
     });
   }
 }

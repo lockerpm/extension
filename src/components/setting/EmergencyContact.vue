@@ -83,6 +83,9 @@
 
 <script>
 import InputText from '../input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default {
   components: {
     InputText
@@ -134,7 +137,7 @@ export default {
     async postEmergencyAccess (emergency_access) {
       try {
         this.loading = true
-        await this.$axios.$post('cystack_platform/pm/emergency_access/invite', emergency_access)
+        await cystackPlatformAPI.invite_emergency_access(emergency_access)
         this.notify(this.$t('data.notifications.invite_user_success'), 'success')
         this.closeDialog()
         this.$emit('done')
@@ -149,7 +152,7 @@ export default {
     async putEmergencyAccess (emergency_access) {
       try {
         this.loading = true
-        await this.$axios.$put(`cystack_platform/pm/emergency_access/${emergency_access.id}`, emergency_access)
+        await cystackPlatformAPI.update_emergency_access(emergency_access.id, emergency_access)
         this.notify(this.$t('data.notifications.update_contact_success'), 'success')
         this.closeDialog()
         this.$emit('done')
@@ -169,7 +172,7 @@ export default {
       }).then(async () => {
         try {
           this.loading = true
-          await this.$axios.$delete(`cystack_platform/pm/emergency_access/${emergency_access.id}`)
+          await cystackPlatformAPI.delete_emergency_access(emergency_access.id)
           this.closeDialog()
           this.$emit('done')
           this.notify(this.$t('data.notifications.remove_user_success', { user: emergency_access.email }), 'success')

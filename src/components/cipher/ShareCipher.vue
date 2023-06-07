@@ -69,7 +69,10 @@
 import InputSelectTeam from '@/components/input/InputSelectTeam'
 import {CipherType} from "jslib-common/enums/cipherType";
 import {CipherRequest} from "jslib-common/models/request/cipherRequest";
-import Vnodes from '@/components/Vnodes'
+import Vnodes from '@/components/Vnodes';
+
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 import Vue from 'vue'
 export default Vue.extend({
   components: { InputSelectTeam, Vnodes },
@@ -118,13 +121,12 @@ export default Vue.extend({
           this.loading = true
           const cipherEnc = await this.$cipherService.encrypt(cipher)
           const data = new CipherRequest(cipherEnc)
-          const url = this.isBelongToTeam ? `cystack_platform/pm/ciphers/${cipher.id}` : `cystack_platform/pm/ciphers/${cipher.id}/share`
-          await this.axios.put(url, {
+          const payload = {
             ...data,
             score: this.passwordStrength.score,
             collectionIds: cipher.collectionIds,
-            // view_password: cipher.viewPassword
-          })
+          }
+          await this.isBelongToTeam ? cystackPlatformAPI.update_cipher(cipher.id, payload) : cystackPlatformAPI.share_cipher(cipher.id, payload)
           this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${CipherType[this.cipher.type]}`, 1) }), 'success')
           this.closeDialog()
           this.$emit('updated-cipher')
@@ -158,7 +160,7 @@ export default Vue.extend({
       return allCollections.filter(c => !c.readOnly && c.organizationId === orgId)
     },
     async getTeamPolicies (teamId) {
-      this.policies = await this.axios.get(`cystack_platform/pm/teams/${teamId}/policy`)
+      this.policies = await cystackPlatformAPI.team_policy(teamId)
     },
     checkPolicies (cipher) {
       if (cipher.type === CipherType.Login) {

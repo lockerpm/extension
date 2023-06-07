@@ -3,8 +3,6 @@
 import Vue from 'vue'
 
 import AsyncComputed from 'vue-async-computed'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -22,6 +20,9 @@ import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+import userAPI from '@/api/user'
 
 Vue.config.productionTip = false;
 
@@ -44,7 +45,7 @@ import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import '../middleware'
+import '../middleware';
 
 Vue.mixin({
   data() {
@@ -53,14 +54,28 @@ Vue.mixin({
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
-        { key: "github", name: "GitHub", color: "#202326" }
-      ],
-      enableAutofillKey: 'enableAutofill',
-      showFoldersKey: 'showFolders',
-      hideIconsKey: 'hideIcons',
+        { key: "github", name: "GitHub", color: "#202326" },
+        { key: "sso", name: "Enterprise Single Sign-On", color: "#268334" },
+      ]
     };
   },
   computed: {
+    loginInfo() {
+      return {
+        login_step: this.$store.state.login_step,
+        identity: this.$store.state.identity,
+        auth_info: this.$store.state.auth_info,
+        user_info: this.$store.state.user_info,
+        ws2: this.$store.state.ws2,
+        clientId: this.$store.state.clientId,
+        desktopAppInstalled: this.$store.state.desktopAppInstalled,
+        desktopAppData: this.$store.state.desktopAppData,
+        preloginData: this.$store.state.preloginData,
+        sending: this.$store.state.sending,
+        forgot_step: this.$store.state.forgot_step,
+        forgot_token: this.$store.state.forgot_token
+      }
+    },
     language() { return this.$store.state.user.language },
     currentUser() { return this.$store.state.user },
     currentUserPw() { return this.$store.state.userPw },
@@ -133,10 +148,12 @@ Vue.mixin({
       })
     },
     async logout() {
+      console.log('###### LOG OUT')
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
       try {
-        await this.axios.post('/users/logout')
+        await userAPI.logout();
       } catch (error) {
         //
       }
@@ -152,7 +169,8 @@ Vue.mixin({
         this.$storageService.remove("cs_token"),
       ]);
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
-      this.$store.commit('CLEAR_ALL_DATA', false)
+      this.$store.commit('CLEAR_ALL_DATA')
+
       this.$router.push({ name: 'login' });
 
       chrome.runtime.sendMessage({
@@ -197,7 +215,8 @@ Vue.mixin({
         return ''
       }
     },
-    async login() {
+    async login(isPwl = false, decryptData: any) {
+      this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
       const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
@@ -215,36 +234,71 @@ Vue.mixin({
       }
       try {
         await this.clearKeys()
-        const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-        const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
-        const res = await this.axios.post('cystack_platform/pm/users/session', {
-          client_id: 'browser',
-          password: hashedPassword,
-          device_name: this.$platformUtilsService.getDeviceString(),
-          device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: deviceIdentifier
-        })
-        chrome.runtime.sendMessage({ command: 'loggedIn' })
-        await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-        await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
-        await this.$cryptoService.setKey(key)
-        await this.$cryptoService.setKeyHash(hashedPassword)
-        await this.$cryptoService.setEncKey(res.key)
-        await this.$cryptoService.setEncPrivateKey(res.private_key)
+        if (!isPwl) {
+          const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
+          const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: hashedPassword,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceIdentifier
+          })
+          chrome.runtime.sendMessage({ command: 'loggedIn' })
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
+          await this.$cryptoService.setKey(key)
+          await this.$cryptoService.setKeyHash(hashedPassword)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
 
-        if (this.$vaultTimeoutService != null) {
-          this.$vaultTimeoutService.biometricLocked = false
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          chrome.runtime.sendMessage({ command: "unlocked" });
+          this.$router.push({ name: 'home' });
+          this.$store.commit('UPDATE_CALLING_API', false)
+
+          setTimeout(() => {
+            this.setupFillPage();
+          }, 1000);
+        } else {
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: decryptData.keyHash,
+            email: this.loginInfo.user_info.email,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceIdentifier
+          })
+          await this.$storageService.save('cs_token', res.access_token)
+          setTimeout( async () => {
+            await this.$store.dispatch("LoadCurrentUser");
+            await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+            await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
+            await this.$cryptoService.setKey(decryptData.key)
+            await this.$cryptoService.setKeyHash(decryptData.keyHash)
+            await this.$cryptoService.setEncKey(res.key)
+            await this.$cryptoService.setEncPrivateKey(res.private_key)
+
+            if (this.$vaultTimeoutService != null) {
+              this.$vaultTimeoutService.biometricLocked = false
+            }
+            chrome.runtime.sendMessage({ command: "unlocked" });
+            this.$router.push({ name: 'home' });
+            this.$store.commit('UPDATE_CALLING_API', false)
+
+            setTimeout(() => {
+              this.setupFillPage();
+            }, 1000);
+          }, 1000);
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
-        chrome.runtime.sendMessage({ command: "unlocked" });
-        this.$router.push({ name: 'home' });
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
+        this.$store.commit('UPDATE_CALLING_API', false)
       }
-      setTimeout(() => {
-        this.setupFillPage();
-      }, 1000);
     },
     async clearKeys() {
       await this.$cryptoService.clearKeys()
@@ -259,7 +313,11 @@ Vue.mixin({
         this.$messagingService.send('syncStarted')
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
+          let res = await cystackPlatformAPI.sync({
+            paging: 1,
+            size: pageSize,
+            page
+          })
           if (res.count && res.count.ciphers) {
             this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
           }
@@ -498,7 +556,97 @@ Vue.mixin({
           sender: 'notificationBar',
         });
       }
-    }
+    },
+    generateOTP() {
+      const digits = '0123456789';
+      let OTP = '';
+      for (let i = 0; i < 6; i++ ) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
+      return OTP;
+    },
+    async reconnectDesktopAppSocket (email = this.loginInfo.preloginData.email || this.loginInfo.preloginData.name || this.currentUser.email, isCreatedApp = false) {
+      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, { format: 'json' })
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', { ws2: this.$socket, sending: true })
+
+      setTimeout(async () => {
+        this.wsDesktopAppSendMessage(email);
+      }, 100)
+
+      this.loginInfo.ws2.onmessage = async (message) => {
+        let data = JSON.parse(message.data)
+        // Gen OTP
+        if (data.msgType === 3) {
+          data = {
+            ...data,
+            otp: this.generateOTP()
+          }
+        }
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          sending: false,
+          desktopAppData: {
+            ...this.loginInfo.desktopAppData,
+            ...data
+          },
+        })
+        if (data.msgType === 3) {
+          // Connect success and show OTP
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' })
+          }
+        } else if (data.msgType === 4) {
+          // Unlock success
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            baseApiUrl: this.loginInfo.preloginData.base_api ? `${this.loginInfo.preloginData.base_api}/v3` : null,
+            baseWsUrl: this.loginInfo.preloginData.base_ws ? `${this.loginInfo.preloginData.base_ws}/ws` : null,
+          })
+          setTimeout(async () => {
+            try {
+              const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
+              this.login(true, decryptData);
+            } catch (error) {
+              this.notify(error?.response?.data?.message || this.$t('data.login.message.otp_invalid'), 'error')
+              this.reconnectDesktopAppSocket(this.loginInfo.preloginData.email || this.loginInfo.preloginData.name, true);
+            }
+          }, 1000);
+        } else if (data.msgType === 6) {
+          // Not Install Desktop App or Not Unlock
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' })
+          }
+        } else if (data.msgType === 7) {
+          // Desktop Lock
+          this.lock();
+        } else if (data.msgType === 9) {
+          // Desktop Logout
+          this.logout();
+        } 
+      }
+    },
+    async wsDesktopAppSendMessage(email = null) {
+      try {
+        const message = {
+          msgType: 1,
+          clientId: this.loginInfo?.clientId,
+          email
+        }
+        await this.loginInfo.ws2.sendObj(message)
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppInstalled: true,
+        })
+        setTimeout(() => {
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            sending: false
+          })
+        }, 10000);
+      } catch (error) {
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppData: null,
+          desktopAppInstalled: false,
+          sending: false
+        })
+      }
+    },
   }
 })
 
@@ -518,50 +666,8 @@ Vue.filter('filterString', function (value) {
 })
 
 storePromise.then((store) => {
-  const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
-  axios.interceptors.request.use(
-    async (config) => {
-      const token = await browserStorageService.get('cs_token')
-      const deviceId = await browserStorageService.get('device_id')
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`
-      }
-      if (deviceId) {
-        config.headers['device-id'] = deviceId
-      }
-      config.baseURL = process.env.VUE_APP_BASE_API_URL
-      return config
-    },
-    (error) => {
-      return Promise.reject(error)
-    }
-  )
-  axios.interceptors.response.use(
-    (response) => {
-      if (response.headers['device-id']) {
-        browserStorageService.save("device_id", response.headers["device-id"]);
-      }
-      return response && response.data
-    },
-    (error) => {
-      if (error.response) {
-        if (error.response.status === 404) {
-          router.push({ name: 'Home' })
-        }
-        if (error.response.status === 401) {
-          chrome.runtime.sendMessage({ command: "logout" });
-          store.commit('UPDATE_IS_LOGGEDIN', false)
-          if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
-          }
-        }
-      }
-      return Promise.reject(error)
-    }
-  )
-  Vue.use(VueAxios, axios)
   new Vue({
     router,
     store,

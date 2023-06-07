@@ -65,6 +65,8 @@ import { CipherView } from 'jslib-common/models/view/cipherView';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
 
+import cystackPlatformAPI from '@/api/cystack_platform';
+
 export default {
   name: 'CreateOTP',
   props: {
@@ -120,7 +122,7 @@ export default {
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = CipherType.OTP;
-        await this.axios.post(`cystack_platform/pm/ciphers/vaults`, {
+        await cystackPlatformAPI.create_ciphers_vault({
           ...data,
           collectionIds: [],
         })
@@ -158,7 +160,7 @@ export default {
         data.type = type_
         cipher.type = type_
 
-        await this.axios.put(`cystack_platform/pm/ciphers/${cipher.id}`, {
+        await cystackPlatformAPI.update_cipher(cipher.id, {
           ...data,
           collectionIds: []
         })

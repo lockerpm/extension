@@ -61,4 +61,5 @@ export abstract class CryptoService {
     decryptFromBytes: (encBuf: ArrayBuffer, key: SymmetricCryptoKey) => Promise<ArrayBuffer>;
     randomNumber: (min: number, max: number) => Promise<number>;
     validateKey: (key: SymmetricCryptoKey) => Promise<boolean>;
+    decryptData: (otp: any, qr: any) => Promise<any>;
 }

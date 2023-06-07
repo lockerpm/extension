@@ -44,6 +44,9 @@
 <script>
 import Vue from 'vue'
 import InputText from '@/components/input/InputText'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+
 export default Vue.extend({
   components: {
     InputText
@@ -73,7 +76,7 @@ export default Vue.extend({
     async postUser (user) {
       try {
         this.loading = true
-        await this.axios.post(`cystack_platform/pm/teams/${this.currentUserPw.default_team_id}/family_members`, {
+        await cystackPlatformAPI.create_team_family_member(this.currentUserPw.default_team_id, {
           username: user.username
         })
         this.notify(this.$t('data.notifications.add_member_success'), 'success')
@@ -94,7 +97,7 @@ export default Vue.extend({
       }).then(async () => {
         try {
           this.loading = true
-          await this.axios.delete(`cystack_platform/pm/teams/${this.currentUserPw.default_team_id}/family_members/${user.id}`)
+          await cystackPlatformAPI.delete_team_family_member(this.currentUserPw.default_team_id, user.id)
           this.closeDialog()
           this.$emit('done')
           this.notify(this.$t('data.notifications.delete_member_success'), 'success')

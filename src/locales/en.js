@@ -90,7 +90,8 @@ module.exports = {
     download: 'Download Desktop App',
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
-    update_title: "Upgrade to Premium to get Unlimited Storage"
+    update_title: "Upgrade to Premium to get Unlimited Storage",
+    submit: "Submit"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -125,7 +126,7 @@ module.exports = {
     billing: 'Billing',
     family_members: 'Family Members',
     policies: 'Policies'
-    
+
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -275,7 +276,8 @@ module.exports = {
       min_password_length: 'Minimum password length is {length}',
       max_password_length: 'Maximum password length is {length}',
       password_composition: 'Password must contain at least 1 special character',
-      authentication_failed: 'Authentication failed'
+      authentication_failed: 'Authentication failed',
+      change_password_success: 'Change password success.'
     },
     profile_menu: {
       lock: 'Lock your account',
@@ -698,13 +700,28 @@ module.exports = {
       login_option_locker: 'Sign in to your Locker {option}',
       username_placeholder: 'Email or Username',
       password_placeholder: 'Password',
+      new_password_placeholder: 'New password',
+      confirm_new_password_placeholder: 'Confirm new password',
+      alert: {
+        th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
+        th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',
+        th3: 'Please log in to this account on Desktop app and try again.',
+        lock: "Please unlock your Vault on desktop app to continue to extension. Or log in to another Locker account.",
+      },
+      unlock: {
+        title: "Passwordless Unlock",
+        subtitle: "The admin has required you to unlock your vault using Passwordless method only.",
+        enter_otp: "Enter the OTP code below to your Desktop app to continue Login."
+      },
       options: {
         individual_vault: 'Individual',
         business_vault: 'Business',
-        enterprise_vault: 'Enterprise',
+        enterprise_vault: 'On-Premise',
       },
       message: {
         required: '{name} is required!',
+        invalid: '{name} is invalid',
+        otp_invalid: 'The OTP input on desktop app is invalid. Please try again.'
       }
     },
     set_master_pass: {
