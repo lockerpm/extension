@@ -35,7 +35,7 @@
         justify="center"
         class="mt-3"
       >
-        <a href="javascript:;">
+        <a href="javascript:;" @click="handleDownload">
           {{ $t(`common.download`) }}
         </a>
       </el-row>
@@ -69,6 +69,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { BrowserApi } from "@/browser/browserApi";
+
 export default Vue.extend({
   computed: {
     otpNumbers () {
@@ -115,6 +117,10 @@ export default Vue.extend({
       } else {
         this.$router.push({ name: 'login' })
       }
+    },
+    handleDownload() {
+      const url = 'https://locker.io/download';
+      BrowserApi.createNewTab(url, true, true);
     }
   }
 })

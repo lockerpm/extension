@@ -252,7 +252,7 @@ export default class RuntimeBackground {
         break;
       case "sso-authResult":
         if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
-          this.storageService.save('current_router', 'pwl-unlock')
+          this.storageService.save('current_router', JSON.stringify({ name: 'pwl-unlock' }))
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
             user_info: {
@@ -261,7 +261,7 @@ export default class RuntimeBackground {
           })
         } else {
           await this.updateStoreService('isLoggedIn', true);
-          this.storageService.save('current_router', 'lock')
+          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
             baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
