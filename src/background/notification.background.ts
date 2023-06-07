@@ -114,6 +114,7 @@ export default class NotificationBackground {
             const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
             let passwordFields = [];
             let usernameFields = [];
+            
             for (const form of forms) {
               for (const password of form.passwords) {
                 passwordFields.push(password)
