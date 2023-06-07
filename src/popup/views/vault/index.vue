@@ -354,9 +354,6 @@ export default Vue.extend({
         });
       }
     },
-    addEdit(item) {
-      this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`);
-    },
     async loadPageDetails() {
       this.pageDetails = [];
       this.tab = await BrowserApi.getTabFromCurrentWindow();

@@ -220,9 +220,6 @@ export default Vue.extend({
       this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers);
       this.loaded = true;
     },
-    addEdit(item) {
-      this.$router.push({ name: "add-item-create", params: { data: item } });
-    },
     async fillCipher(cipher) {
       if (
         cipher.reprompt !== CipherRepromptType.None &&

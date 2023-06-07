@@ -16,7 +16,8 @@
     "activeTab",
     "scripting",
     "webRequestBlocking",
-    "webNavigation"
+    "webNavigation",
+    "offscreen"
   ],
   "host_permissions": [
     "http://*/*",

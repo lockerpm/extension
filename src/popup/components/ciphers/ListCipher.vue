@@ -275,9 +275,6 @@ export default Vue.extend({
       this.orderField = orderField;
       this.orderDirection = orderDirection;
     },
-    addEdit(item) {
-      this.$router.push({ name: "add-item-create", params: { data: item } });
-    },
     handleAddButton() {
       this.$router.push({
         name: "add-item-create",

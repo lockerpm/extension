@@ -19,6 +19,11 @@ module.exports = {
       template: 'public/browser-extension.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
+    },
+    offscreen: {
+      template: 'public/offscreen.html',
+      entry: './src/offscreen.js',
+      title: 'Offscreen'
     }
   },
   pluginOptions: {

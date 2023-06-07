@@ -245,7 +245,6 @@ export default class RuntimeBackground {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-
           await this.setDefaultSettings();
         }
 

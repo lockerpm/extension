@@ -401,7 +401,6 @@ export default Vue.extend({
   },
   methods: {
     addEdit (item) {
-      // this.$platformUtilsService.launchUri(`/web.html#/vault/${item.id}`)
       this.$router.push({ name: 'add-item-create', params: { data: item } })
     },
     shareItem (cipher) {
