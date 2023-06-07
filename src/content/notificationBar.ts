@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', event => {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
-        if (autofillObj.enableAutofill === false) return;
+        if (autofillObj && autofillObj.enableAutofill === false) return;
         chrome.storage.local.get("neverDomains", (ndObj: any) => {
           const domains = ndObj.neverDomains;
           if (
@@ -317,41 +317,42 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false) {
-    let inputEl = document.getElementById(el.htmlID);
-    if (!inputEl) {
-      inputEl = document.getElementsByName(el.htmlName)[0]
+    const elements : any = document.getElementsByClassName(el.htmlClass)
+    let inputEl = null
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].id === el.htmlID && !elements[i].disabled) {
+        inputEl = elements[i]
+        break
+      }
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
+      removeFillLogo(inputEl)
       inputEl.addEventListener("click", () => {
         openInformMenu(inputEl, type);
       });
-      const elPosition = inputEl.getBoundingClientRect();
+      const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
         relativeContainer.style.position = 'relative'
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
-        const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
-        let logo = document.getElementById(logiId);
-        if (!logo) {
-          logo = document.createElement("span");
-          logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
-          logo.style.cssText = `
-            position: absolute;
-            height: 19px;
-            width: 19px;
-            background-position: center;
-            background-size: contain;
-            z-index: 1000 !important;
-            cursor: pointer;
-          `;
-          logo.addEventListener("click", () => {
-            openInformMenu(inputEl, type);
-          });
-          inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-        }
+        const logo = document.createElement("span");
+        logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
+        logo.style.cssText = `
+          position: absolute;
+          height: 19px;
+          width: 19px;
+          background-position: center;
+          background-size: contain;
+          z-index: 1000 !important;
+          cursor: pointer;
+        `;
+        logo.addEventListener("click", () => {
+          openInformMenu(inputEl, type);
+        });
+        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         if (elPosition.width <= 0) {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
@@ -380,6 +381,13 @@ document.addEventListener('DOMContentLoaded', event => {
     const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
+    }
+  }
+
+  function removeFillLogo(inputEl: any) {
+    const fillLogo = document.getElementById('cs-logo-' + (inputEl.htmlID || inputEl.htmlName));
+    if (fillLogo) {
+      fillLogo.parentElement.removeChild(fillLogo);
     }
   }
 
