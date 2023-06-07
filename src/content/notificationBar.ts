@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false) {
-    const elements = document.getElementsByClassName(el.htmlClass)
+    const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
     for (let i = 0; i < elements.length; i++) {
       if (elements[i].id === el.htmlID && !elements[i].disabled) {
