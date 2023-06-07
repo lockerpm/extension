@@ -331,7 +331,6 @@
       if (theTitle && theTitle.dataset[DISPLAY_TITLE_ATTRIBUE]) {
         pageDetails.displayTitle = theTitle.dataset.onepasswordTitle;
       }
-
       return pageDetails;
     }
 

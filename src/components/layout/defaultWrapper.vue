@@ -284,7 +284,6 @@ export default Vue.extend({
         this.getInvitations()
       } catch (e) {
         this.notify(this.$t(`data.notifications.${status}_member_failed`), 'warning')
-        console.log(e)
       } finally {
         this.loading = false
       }
