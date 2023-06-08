@@ -2,7 +2,7 @@ import { I18nService } from '../abstractions/i18n.service';
 import { IFrameComponent } from './iframe_component';
 
 export class CaptchaIFrame extends IFrameComponent {
-    constructor(win: Window, webVaultUrl: string,
+    constructor(win: any, webVaultUrl: string,
         private i18nService: I18nService, successCallback: (message: string) => any, errorCallback: (message: string) => any,
         infoCallback: (message: string) => any) {
         super(win, webVaultUrl, 'captcha-connector.html', 'hcaptcha_iframe', successCallback, errorCallback, (message: string) => {

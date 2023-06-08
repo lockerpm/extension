@@ -31,7 +31,7 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         private lockedCallback: () => Promise<void> = null, private loggedOutCallback: () => Promise<void> = null) {
     }
 
-    init(checkOnInterval: boolean) {
+    async init(checkOnInterval: boolean) {
         if (this.inited) {
             return;
         }

@@ -14,7 +14,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     private isIE: boolean;
     private isOldSafari: boolean;
 
-    constructor(private win: Window, private platformUtilsService: PlatformUtilsService) {
+    constructor(private win: any, private platformUtilsService: PlatformUtilsService) {
         this.crypto = win.crypto || null;
         this.subtle = (!!this.crypto && win.crypto) ? win.crypto.subtle : null;
         this.isIE = platformUtilsService.isIE();

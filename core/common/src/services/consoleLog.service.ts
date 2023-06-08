@@ -2,7 +2,7 @@ import { LogLevelType } from '../enums/logLevelType';
 
 import { LogService as LogServiceAbstraction } from '../abstractions/log.service';
 
-import hrtime from 'browser-hrtime';
+// import hrtime from 'browser-hrtime';
 
 export class ConsoleLogService implements LogServiceAbstraction {
   protected timersMap: Map<string, [number, number]> = new Map();
@@ -49,14 +49,15 @@ export class ConsoleLogService implements LogServiceAbstraction {
 
   time(label: string = 'default') {
     if (!this.timersMap.has(label)) {
-      this.timersMap.set(label, hrtime());
+      // this.timersMap.set(label, hrtime());
     }
   }
 
   timeEnd(label: string = 'default'): [number, number] {
-    const elapsed = hrtime(this.timersMap.get(label));
-    this.timersMap.delete(label);
-    this.write(LogLevelType.Info, `${label}: ${elapsed[0] * 1000 + elapsed[1] / 10e6}ms`);
-    return elapsed;
+    // const elapsed = hrtime(this.timersMap.get(label));
+    // this.timersMap.delete(label);
+    // this.write(LogLevelType.Info, `${label}: ${elapsed[0] * 1000 + elapsed[1] / 10e6}ms`);
+    // return elapsed;
+    return [0, 0]
   }
 }

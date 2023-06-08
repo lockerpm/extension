@@ -30,7 +30,7 @@ module.exports = {
     browserExtension: {
       componentOptions: {
         background: {
-          entry: 'src/background.ts'
+          entry: 'src/service-worker.ts'
         },
         contentScripts: {
           entries: {

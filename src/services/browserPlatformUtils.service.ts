@@ -18,11 +18,15 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   private showDialogResolves = new Map<number, { resolve: (value: boolean) => void, date: Date }>();
   private passwordDialogResolves = new Map<number, { tryResolve: (canceled: boolean, password: string) => Promise<boolean>, date: Date }>();
   private deviceCache: DeviceType = null;
-  private prefersColorSchemeDark = self.matchMedia('(prefers-color-scheme: dark)');
+  private prefersColorSchemeDark: any = self
+  // private prefersColorSchemeDark = self.matchMedia('(prefers-color-scheme: dark)');
 
-  constructor(private messagingService: MessagingService, private storageService: StorageService,
-              private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
-              private biometricCallback: () => Promise<boolean>) { }
+  constructor(
+    private messagingService: MessagingService,
+    private storageService: StorageService,
+    private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
+    private biometricCallback: () => Promise<boolean>
+  ) { }
 
   getDevice(): DeviceType {
     if (this.deviceCache) {
@@ -111,7 +115,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     BrowserApi.createNewTab(uri, options && options.extensionPage === true);
   }
 
-  saveFile(win: Window, blobData: any, blobOptions: any, fileName: string): void {
+  saveFile(win: any, blobData: any, blobOptions: any, fileName: string): void {
     BrowserApi.downloadFile(win, blobData, blobOptions, fileName);
   }
 
@@ -119,7 +123,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     return Promise.resolve(BrowserApi.getApplicationVersion());
   }
 
-  supportsWebAuthn(win: Window): boolean {
+  supportsWebAuthn(win: any): boolean {
     return (typeof(PublicKeyCredential) !== 'undefined');
   }
 

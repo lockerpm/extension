@@ -153,10 +153,11 @@ export default class MainBackground {
   private nativeMessagingBackground: NativeMessagingBackground;
 
   constructor() {
-    // Services
     this.messagingService = new BrowserMessagingService();
     this.storageService = new BrowserStorageService();
-    this.platformUtilsService = new BrowserPlatformUtilsService(this.messagingService, this.storageService,
+    this.platformUtilsService = new BrowserPlatformUtilsService(
+      this.messagingService,
+      this.storageService,
       (clipboardValue, clearMs) => {
         if (this.systemService) {
           this.systemService.clearClipboard(clipboardValue, clearMs);
@@ -165,7 +166,6 @@ export default class MainBackground {
       async () => {
         if (this.nativeMessagingBackground) {
           const promise = this.nativeMessagingBackground.getResponse();
-
           try {
             await this.nativeMessagingBackground.send({ command: 'biometricUnlock' });
           } catch (e) {
@@ -174,36 +174,101 @@ export default class MainBackground {
 
           return promise.then(result => result.response === 'unlocked');
         }
-      });
+      }
+    );
     this.secureStorageService = new BrowserStorageService();
     this.i18nService = new I18nService(BrowserApi.getUILanguage());
-    this.cryptoFunctionService = new WebCryptoFunctionService(self, this.platformUtilsService);
+    this.cryptoFunctionService = new WebCryptoFunctionService(
+      self,
+      this.platformUtilsService
+    );
     this.logService = new ConsoleLogService(false);
-    this.cryptoService = new BrowserCryptoService(this.storageService, this.secureStorageService,
-      this.cryptoFunctionService, this.platformUtilsService, this.logService);
+    this.cryptoService = new BrowserCryptoService(
+      this.storageService,
+      this.secureStorageService,
+      this.cryptoFunctionService,
+      this.platformUtilsService,
+      this.logService
+    );
     this.tokenService = new TokenService(this.storageService);
     this.appIdService = new AppIdService(this.storageService);
     this.environmentService = new EnvironmentService(this.storageService);
-    this.apiService = new ApiService(this.tokenService, this.platformUtilsService, this.environmentService,
-      (expired: boolean) => this.logout(expired));
-    this.userService = new UserService(this.tokenService, this.storageService);
-    this.settingsService = new SettingsService(this.userService, this.storageService);
-    this.fileUploadService = new FileUploadService(this.logService, this.apiService);
-    this.cipherService = new CipherService(this.cryptoService, this.userService, this.settingsService,
-      this.apiService, this.fileUploadService, this.storageService, this.i18nService, () => this.searchService, this.platformUtilsService,
-      this.logService);
-    this.folderService = new FolderService(this.cryptoService, this.userService, this.apiService,
-      this.storageService, this.i18nService, this.cipherService);
-    this.collectionService = new CollectionService(this.cryptoService, this.userService, this.storageService,
-      this.i18nService);
-    this.searchService = new SearchService(this.cipherService, this.logService, this.i18nService);
-    this.sendService = new SendService(this.cryptoService, this.userService, this.apiService, this.fileUploadService,
-      this.storageService, this.i18nService, this.cryptoFunctionService);
+    this.apiService = new ApiService(
+      this.tokenService,
+      this.platformUtilsService,
+      this.environmentService,
+      (expired: boolean) => this.logout(expired)
+    );
+    this.userService = new UserService(
+      this.tokenService,
+      this.storageService
+    );
+    this.settingsService = new SettingsService(
+      this.userService,
+      this.storageService
+    );
+    this.fileUploadService = new FileUploadService(
+      this.logService,
+      this.apiService
+    );
+    this.cipherService = new CipherService(
+      this.cryptoService,
+      this.userService,
+      this.settingsService,
+      this.apiService,
+      this.fileUploadService,
+      this.storageService,
+      this.i18nService,
+      () => this.searchService,
+      this.platformUtilsService,
+      this.logService
+    );
+    this.folderService = new FolderService(
+      this.cryptoService,
+      this.userService,
+      this.apiService,
+      this.storageService,
+      this.i18nService,
+      this.cipherService
+    );
+    this.collectionService = new CollectionService(
+      this.cryptoService,
+      this.userService,
+      this.storageService,
+      this.i18nService
+    );
+    this.searchService = new SearchService(
+      this.cipherService,
+      this.logService,
+      this.i18nService
+    );
+    this.sendService = new SendService(
+      this.cryptoService,
+      this.userService,
+      this.apiService,
+      this.fileUploadService,
+      this.storageService,
+      this.i18nService,
+      this.cryptoFunctionService
+    );
     this.stateService = new StateService();
-    this.policyService = new PolicyService(this.userService, this.storageService, this.apiService);
-    this.vaultTimeoutService = new VaultTimeoutService(this.cipherService, this.folderService,
-      this.collectionService, this.cryptoService, this.platformUtilsService, this.storageService,
-      this.messagingService, this.searchService, this.userService, this.tokenService, this.policyService,
+    this.policyService = new PolicyService(
+      this.userService,
+      this.storageService,
+      this.apiService
+    );
+    this.vaultTimeoutService = new VaultTimeoutService(
+      this.cipherService,
+      this.folderService,
+      this.collectionService,
+      this.cryptoService,
+      this.platformUtilsService,
+      this.storageService,
+      this.messagingService,
+      this.searchService,
+      this.userService,
+      this.tokenService,
+      this.policyService,
       async () => {
         if (this.notificationsService) {
           this.notificationsService.updateConnection(false);
@@ -214,74 +279,185 @@ export default class MainBackground {
           this.systemService.startProcessReload();
           await this.systemService.clearPendingClipboard();
         }
-      }, async () => await this.logout(false));
-    this.syncService = new SyncService(this.userService, this.apiService, this.settingsService,
-      this.folderService, this.cipherService, this.cryptoService, this.collectionService,
-      this.storageService, this.messagingService, this.policyService, this.sendService,
-      this.logService, async (expired: boolean) => await this.logout(expired));
-    this.eventService = new EventService(this.storageService, this.apiService, this.userService,
-      this.cipherService, this.logService);
+      },
+      async () => await this.logout(false)
+    );
+    this.syncService = new SyncService(
+      this.userService,
+      this.apiService,
+      this.settingsService,
+      this.folderService,
+      this.cipherService,
+      this.cryptoService,
+      this.collectionService,
+      this.storageService,
+      this.messagingService,
+      this.policyService,
+      this.sendService,
+      this.logService,
+      async (expired: boolean) => await this.logout(expired)
+    );
+    this.eventService = new EventService(
+      this.storageService,
+      this.apiService,
+      this.userService,
+      this.cipherService,
+      this.logService
+    );
     this.passService = new PassService(this.storageService);
-    this.passwordGenerationService = new PasswordGenerationService(this.cryptoService, this.storageService,
-      this.policyService);
-    this.totpService = new TotpService(this.storageService, this.cryptoFunctionService, this.logService);
-    this.autofillService = new AutofillService(this.cipherService, this.userService, this.totpService,
-      this.eventService);
+    this.passwordGenerationService = new PasswordGenerationService(
+      this.cryptoService,
+      this.storageService,
+      this.policyService
+    );
+    this.totpService = new TotpService(
+      this.storageService,
+      this.cryptoFunctionService,
+      this.logService
+    );
+    this.autofillService = new AutofillService(
+      this.cipherService,
+      this.userService,
+      this.totpService,
+      this.eventService
+    );
     this.containerService = new ContainerService(this.cryptoService);
-    this.auditService = new AuditService(this.cryptoFunctionService, this.apiService);
-    this.exportService = new ExportService(this.folderService, this.cipherService, this.apiService,
-      this.cryptoService);
-    this.importService = new ImportService(this.cipherService, this.folderService, this.apiService, this.i18nService, this.collectionService,
-      this.platformUtilsService, this.cryptoService);
-    this.notificationsService = new NotificationsService(this.userService, this.syncService, this.appIdService,
-      this.apiService, this.vaultTimeoutService, this.environmentService, () => this.logout(true), this.logService);
+    this.auditService = new AuditService(
+      this.cryptoFunctionService,
+      this.apiService
+    );
+    this.exportService = new ExportService(
+      this.folderService,
+      this.cipherService,
+      this.apiService,
+      this.cryptoService
+    );
+    this.importService = new ImportService(
+      this.cipherService,
+      this.folderService,
+      this.apiService,
+      this.i18nService,
+      this.collectionService,
+      this.platformUtilsService,
+      this.cryptoService
+    );
+    this.notificationsService = new NotificationsService(
+      this.userService,
+      this.syncService,
+      this.appIdService,
+      this.apiService,
+      this.vaultTimeoutService,
+      this.environmentService,
+      () => this.logout(true),
+      this.logService
+    );
     this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
-    this.systemService = new SystemService(this.storageService, this.vaultTimeoutService,
-      this.messagingService, this.platformUtilsService, () => {
-        const forceWindowReload = this.platformUtilsService.isSafari() ||
-          this.platformUtilsService.isFirefox() || this.platformUtilsService.isOpera();
-        BrowserApi.reloadExtension(forceWindowReload ? self : null);
-        return Promise.resolve();
-      });
 
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
-    this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ?
-      opr.sidebarAction : (self as any).chrome?.sidebarAction;
+    this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ? opr.sidebarAction : (self as any).chrome?.sidebarAction;
 
-    // Background
+    // // Background
     this.requestBackground = new RequestBackground(this);
-    this.runtimeBackground = new RuntimeBackground(this, this.autofillService,
-      this.platformUtilsService as BrowserPlatformUtilsService, this.storageService, this.i18nService,
-      this.notificationsService, this.systemService, this.environmentService, this.messagingService, this.cryptoService, this.cipherService, this.folderService, this.collectionService,
-      this.userService, this.settingsService, this.policyService, this.tokenService, this.passwordGenerationService, this.passService, this.requestBackground, this.vaultTimeoutService);
-    this.nativeMessagingBackground = new NativeMessagingBackground(this.storageService, this.cryptoService, this.cryptoFunctionService,
-      this.vaultTimeoutService, this.runtimeBackground, this.i18nService, this.userService, this.messagingService, this.appIdService,
-      this.platformUtilsService);
-    this.commandsBackground = new CommandsBackground(this, this.passwordGenerationService,
-      this.platformUtilsService, this.vaultTimeoutService);
-    this.notificationBackground = new NotificationBackground(this, this.autofillService, this.cipherService,
-      this.storageService, this.vaultTimeoutService, this.policyService, this.folderService, this.userService, this.totpService, this.requestBackground);
+    this.runtimeBackground = new RuntimeBackground(
+      this,
+      this.autofillService,
+      this.platformUtilsService as BrowserPlatformUtilsService,
+      this.storageService,
+      this.i18nService,
+      this.notificationsService,
+      this.systemService,
+      this.environmentService,
+      this.messagingService,
+      this.cryptoService,
+      this.cipherService,
+      this.folderService,
+      this.collectionService,
+      this.userService,
+      this.settingsService,
+      this.policyService,
+      this.tokenService,
+      this.passwordGenerationService,
+      this.passService,
+      this.requestBackground,
+      this.vaultTimeoutService
+    );
 
-    this.tabsBackground = new TabsBackground(this, this.notificationBackground);
-    this.contextMenusBackground = new ContextMenusBackground(this, this.cipherService, this.passwordGenerationService,
-      this.platformUtilsService, this.vaultTimeoutService, this.eventService, this.totpService);
-    this.idleBackground = new IdleBackground(this.vaultTimeoutService, this.storageService,
-      this.notificationsService);
-    this.webRequestBackground = new WebRequestBackground(this.platformUtilsService, this.cipherService,
-      this.vaultTimeoutService);
+    this.nativeMessagingBackground = new NativeMessagingBackground(
+      this.storageService,
+      this.cryptoService,
+      this.cryptoFunctionService,
+      this.vaultTimeoutService,
+      this.runtimeBackground,
+      this.i18nService,
+      this.userService,
+      this.messagingService,
+      this.appIdService,
+      this.platformUtilsService
+    );
+    this.commandsBackground = new CommandsBackground(
+      this,
+      this.passwordGenerationService,
+      this.platformUtilsService,
+      this.vaultTimeoutService
+    );
+    this.notificationBackground = new NotificationBackground(
+      this,
+      this.autofillService,
+      this.cipherService,
+      this.storageService,
+      this.vaultTimeoutService,
+      this.policyService,
+      this.folderService,
+      this.userService,
+      this.totpService,
+      this.requestBackground
+    );
+
+    this.tabsBackground = new TabsBackground(
+      this,
+      this.notificationBackground
+    );
+    this.contextMenusBackground = new ContextMenusBackground(
+      this,
+      this.cipherService,
+      this.passwordGenerationService,
+      this.platformUtilsService,
+      this.vaultTimeoutService,
+      this.eventService,
+      this.totpService
+    );
+    this.idleBackground = new IdleBackground(
+      this.vaultTimeoutService,
+      this.storageService,
+      this.notificationsService
+    );
+    this.webRequestBackground = new WebRequestBackground(
+      this.platformUtilsService,
+      this.cipherService,
+      this.vaultTimeoutService
+    );
     this.windowsBackground = new WindowsBackground(this);
 
     const that = this;
-    this.authService = new AuthService(this.cryptoService, this.apiService, this.userService,
-      this.tokenService, this.appIdService, this.i18nService, this.platformUtilsService,
+    this.authService = new AuthService(
+      this.cryptoService,
+      this.apiService,
+      this.userService,
+      this.tokenService,
+      this.appIdService,
+      this.i18nService,
+      this.platformUtilsService,
       new class extends MessagingServiceAbstraction {
         // AuthService should send the messages to the background not popup.
         send = (subscriber: string, arg: any = {}) => {
           const message = Object.assign({}, { command: subscriber }, arg);
           that.runtimeBackground.processMessage(message, that, null);
         }
-      }(), this.vaultTimeoutService, this.logService);
+      }(),
+      this.vaultTimeoutService,
+      this.logService
+    );
   }
 
   async bootstrap() {

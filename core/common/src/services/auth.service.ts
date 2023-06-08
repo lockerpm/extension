@@ -180,7 +180,7 @@ export class AuthService implements AuthServiceAbstraction {
         this.messagingService.send('loggedOut');
     }
 
-    getSupportedTwoFactorProviders(win: Window): any[] {
+    getSupportedTwoFactorProviders(win: any): any[] {
         const providers: any[] = [];
         if (this.twoFactorProvidersData == null) {
             return providers;

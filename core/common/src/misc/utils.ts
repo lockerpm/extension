@@ -336,7 +336,7 @@ export class Utils {
         return ipRegex.test(ipString);
     }
 
-    private static isMobile(win: Window) {
+    private static isMobile(win: any) {
         let mobile = false;
         (a => {
             // tslint:disable-next-line
@@ -347,7 +347,7 @@ export class Utils {
         return !!(mobile || win.navigator.userAgent.match(/iPad/i));
     }
 
-    private static isAppleMobile(win: Window) {
+    private static isAppleMobile(win: any) {
         return !!win.navigator.userAgent.match(/iPhone/i) || !!win.navigator.userAgent.match(/iPad/i);
     }
 
