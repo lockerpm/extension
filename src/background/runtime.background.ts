@@ -143,7 +143,7 @@ export default class RuntimeBackground {
             });
             this.autofillTimeout = setTimeout(
               async () => await this.autofillPage(),
-              300
+              500
             );
             break;
           default:
@@ -217,28 +217,29 @@ export default class RuntimeBackground {
   }
 
   private async autofillPage() {
-    const cipherId = this.main.loginToAutoFill.id
-    const cipherFavorite = this.main.loginToAutoFill.favorite
-    const totpCode = await this.autofillService.doAutoFill({
-      cipher: this.main.loginToAutoFill,
-      pageDetails: this.pageDetailsToAutoFill,
-      fillNewPassword: true,
-    });
-
-    if (totpCode != null) {
-      this.platformUtilsService.copyToClipboard(totpCode, { window: self });
+    if (this.main.loginToAutoFill?.id) {
+      const cipherId = this.main.loginToAutoFill.id
+      const cipherFavorite = this.main.loginToAutoFill.favorite
+      const totpCode = await this.autofillService.doAutoFill({
+        cipher: this.main.loginToAutoFill,
+        pageDetails: this.pageDetailsToAutoFill,
+        fillNewPassword: true,
+      });
+  
+      if (totpCode != null) {
+        this.platformUtilsService.copyToClipboard(totpCode, { window: self });
+      }
+      this.main.loginToAutoFill = null;
+      this.pageDetailsToAutoFill = [];
+      const res: any = await this.request.use_cipher(
+        cipherId,
+        { use: true, favorite: cipherFavorite },
+      )
+      const cipherResponse = new CipherResponse(res)
+      const userId = await this.userService.getUserId();
+      const cipherData = new CipherData(cipherResponse, userId);
+      this.cipherService.upsert(cipherData)
     }
-    this.main.loginToAutoFill = null;
-    this.pageDetailsToAutoFill = [];
-
-    const res: any = await this.request.use_cipher(
-      cipherId,
-      { use: true, favorite: cipherFavorite },
-    )
-    const cipherResponse = new CipherResponse(res)
-    const userId = await this.userService.getUserId();
-    const cipherData = new CipherData(cipherResponse, userId);
-    this.cipherService.upsert(cipherData)
   }
 
   private async checkOnInstalled() {

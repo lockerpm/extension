@@ -63,21 +63,18 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
       sendResponse();
-      return true;
     } else if (msg.command === 'closeNotificationBar') {
       if (inIframe) {
         return;
       }
       closeBar(true);
       sendResponse();
-      return true;
     } else if (msg.command === 'adjustNotificationBar') {
       if (inIframe) {
         return;
       }
       adjustBar(msg.data);
       sendResponse();
-      return true;
     } else if (msg.command === 'notificationBarPageDetails') {
       pageDetails = [];
       inputWithLogo = [];
@@ -147,12 +144,10 @@ document.addEventListener('DOMContentLoaded', event => {
         });
       })
       sendResponse();
-      return true;
     } else if (msg.command === 'informMenuPageDetails') {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       sendResponse();
-      return true;
     } else if (msg.command === 'informMenuPassword') {
       useGeneratedPassword(msg.data.password)
     } else if (msg.command === "resizeInformMenu") {
@@ -174,7 +169,6 @@ document.addEventListener('DOMContentLoaded', event => {
         closeInformMenu(logoField.inputEl);
       }
       sendResponse();
-      return true;
     }
   }
 

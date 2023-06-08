@@ -1364,19 +1364,15 @@
         sender: msg.sender
       });
       sendResponse();
-      return true;
     } else if (msg.command === 'fillForm') {
       fill(document, msg.fillScript);
       sendResponse();
-      return true;
     } else if (msg.command === 'scanQRCode') {
       scanQRCode(document, msg.tab);
       sendResponse();
-      return true;
     } else if (msg.command === 'capturedImage') {
       readAndAddQRCode(document, msg);
       sendResponse();
-      return true;
     } else if (msg.command === 'addedOTP') {
       isReading = false;
       const actions = document.querySelector('locker-select-wrapper');
@@ -1386,7 +1382,6 @@
         actions.style.visibility = 'inherit';
       }
       sendResponse();
-      return true;
     } else if (msg.command === 'alert') {
       switch (msg.type) {
         case 'username_password_updated':
@@ -1447,8 +1442,6 @@
         default:
           break;
       }
-
-      return true;
     }
   });
 })();

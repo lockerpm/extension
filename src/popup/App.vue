@@ -51,8 +51,7 @@ export default Vue.extend({
       default:
         break;
       }
-    }
-    );
+    });
   },
   watch: {
     '$route' (newValue) {

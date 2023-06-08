@@ -233,6 +233,7 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceIdentifier
           })
+
           await this.$runtimeBackground.handleUnlocked('loggedIn')
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)

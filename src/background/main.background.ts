@@ -353,6 +353,18 @@ export default class MainBackground {
     );
     this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
 
+    this.systemService = new SystemService(
+      this.storageService,
+      this.vaultTimeoutService,
+      this.messagingService,
+      this.platformUtilsService,
+      () => {
+        const forceWindowReload = this.platformUtilsService.isSafari() || this.platformUtilsService.isFirefox() || this.platformUtilsService.isOpera();
+        BrowserApi.reloadExtension(forceWindowReload ? self : null);
+        return Promise.resolve();
+      }
+    );
+
     // Other fields
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ? opr.sidebarAction : (self as any).chrome?.sidebarAction;
@@ -852,11 +864,11 @@ export default class MainBackground {
     if (!theAction || !theAction.setIcon) {
       return;
     }
-
+    const origin = self.location.origin
     const options = {
       path: {
-        19: 'icons/19' + '.png',
-        38: 'icons/38' + '.png',
+        19: `${origin}/icons/19.png`,
+        38: `${origin}/icons/38.png`,
       }
     };
 
@@ -888,8 +900,9 @@ export default class MainBackground {
 
   private async browserActionSetIcon(tabId: number, locked: boolean) {
     if (chrome.action && chrome.action.setIcon) {
+      const origin = self.location.origin
       await chrome.action.setIcon({
-        path: locked ? "icons/locked.png" : 'icons/19.png',
+        path: locked ? `${origin}/icons/locked.png` : `${origin}/icons/19.png`,
         tabId: tabId,
       });
     }
