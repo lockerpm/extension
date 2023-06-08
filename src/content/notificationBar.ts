@@ -321,7 +321,6 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
-      removeFillLogo(inputEl)
       inputEl.addEventListener("click", () => {
         openInformMenu(inputEl, type);
       });
@@ -332,6 +331,7 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
+        removeFillLogo(el)
         const logo = document.createElement("span");
         logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
         logo.style.cssText = `
@@ -395,15 +395,14 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function openInformMenu(inputEl: any, type: string = 'password') {
-    const elPosition = inputEl.getBoundingClientRect();
     if (!document.body) {
       return;
     }
+    closeAllInformMenu()
+
+    const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
-    if (document.getElementById(iframeId)) {
-      return;
-    }
     const barPageUrl: string = chrome.runtime.getURL(
       "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );

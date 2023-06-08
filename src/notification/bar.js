@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (msg.command === responseFoldersCommand && msg.data) {
                     fillSelectorWithFolders(msg.data.folders);
                 }
-                return true
             });
             sendPlatformMessage({
                 command: 'bgGetDataForTab',

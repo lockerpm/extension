@@ -13,7 +13,7 @@ module.exports = {
     menu: {
       template: './src/inform-menu/menu.html',
       entry: './src/inform-menu/menu.js',
-      title: 'Bar'
+      title: 'Menu'
     },
     popup: {
       template: 'public/browser-extension.html',
