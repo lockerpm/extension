@@ -62,19 +62,16 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
       closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
-      sendResponse();
     } else if (msg.command === 'closeNotificationBar') {
       if (inIframe) {
         return;
       }
       closeBar(true);
-      sendResponse();
     } else if (msg.command === 'adjustNotificationBar') {
       if (inIframe) {
         return;
       }
       adjustBar(msg.data);
-      sendResponse();
     } else if (msg.command === 'notificationBarPageDetails') {
       pageDetails = [];
       inputWithLogo = [];
@@ -143,11 +140,9 @@ document.addEventListener('DOMContentLoaded', event => {
           }
         });
       })
-      sendResponse();
     } else if (msg.command === 'informMenuPageDetails') {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
-      sendResponse();
     } else if (msg.command === 'informMenuPassword') {
       useGeneratedPassword(msg.data.password)
     } else if (msg.command === "resizeInformMenu") {
@@ -168,8 +163,9 @@ document.addEventListener('DOMContentLoaded', event => {
       for (const logoField of inputWithLogo) {
         closeInformMenu(logoField.inputEl);
       }
-      sendResponse();
     }
+    sendResponse();
+    return true;
   }
 
   function observeDom() {

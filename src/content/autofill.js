@@ -1363,16 +1363,13 @@
         details: pageDetailsObj,
         sender: msg.sender
       });
-      sendResponse();
     } else if (msg.command === 'fillForm') {
       fill(document, msg.fillScript);
-      sendResponse();
     } else if (msg.command === 'scanQRCode') {
       scanQRCode(document, msg.tab);
-      sendResponse();
     } else if (msg.command === 'capturedImage') {
       readAndAddQRCode(document, msg);
-      sendResponse();
+      
     } else if (msg.command === 'addedOTP') {
       isReading = false;
       const actions = document.querySelector('locker-select-wrapper');
@@ -1381,7 +1378,6 @@
       } else {
         actions.style.visibility = 'inherit';
       }
-      sendResponse();
     } else if (msg.command === 'alert') {
       switch (msg.type) {
         case 'username_password_updated':
@@ -1443,5 +1439,7 @@
           break;
       }
     }
+    sendResponse();
+    return true;
   });
 })();
