@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Home from '../popup/views/home/index.vue'
-import Layout from '@/popup/components/layout/default.vue'
+import Layout from '@/popup/components/layout/index.vue'
 import sentryConfig from './index'
 
 Vue.use(VueRouter)
@@ -14,21 +13,28 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         name: "home",
-        component: Home
-      }
-    ]
-  },
-  {
-    path: "/home/:id",
-    component: Layout,
-    children: [
+        component: () =>
+          import("../popup/views/home/index.vue")
+      },
       {
-        path: "",
+        path: "home/:id",
         name: "home-id",
         component: () =>
           import("../popup/views/home/_id.vue")
       }
     ]
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () =>
+      import("../popup/views/login.vue")
+  },
+  {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: () =>
+      import("../popup/views/forgot-password.vue")
   },
   {
     path: "/set-master-password",
@@ -51,18 +57,6 @@ const routes: Array<RouteConfig> = [
       import("../popup/views/pwl-unlock.vue")
   },
   {
-    path: "/login",
-    name: "login",
-    component: () =>
-      import("../popup/views/login.vue")
-  },
-  {
-    path: "/forgot-password",
-    name: "forgot-password",
-    component: () =>
-      import("../popup/views/forgot-password.vue")
-  },
-  {
     path: "/vault",
     component: Layout,
     children: [
@@ -73,15 +67,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/vault/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/vault/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "vault-id",
         component: () =>
           import("../popup/views/vault/_id.vue")
@@ -99,15 +87,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/passwords/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/passwords/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "passwords-id",
         component: () =>
           import(
@@ -127,15 +109,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/notes/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/notes/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "notes-id",
         component: () =>
           import("../popup/views/notes/_id.vue")
@@ -153,15 +129,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/cards/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/cards/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "cards-id",
         component: () =>
           import("../popup/views/cards/_id.vue")
@@ -179,15 +149,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/identities/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/identities/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "identities-id",
         component: () =>
           import(
@@ -207,15 +171,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/crypto-backups/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/crypto-backups/:id",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":id",
         name: "crypto-backups-id",
         component: () =>
           import(
@@ -235,15 +193,9 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/folders/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/folders/:folderId",
-    component: Layout,
-    children: [
+      },
       {
-        path: "",
+        path: ":folderId",
         name: "folders-folderId",
         component: () =>
           import(

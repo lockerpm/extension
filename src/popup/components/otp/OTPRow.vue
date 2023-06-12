@@ -29,7 +29,7 @@
         </div>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
-            v-clipboard:copy="item.name"
+            v-clipboard:copy="otp"
             v-clipboard:success="handleCopy"
           >
             {{ $t('data.otp.copy') }}

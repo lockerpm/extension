@@ -3,10 +3,9 @@
     class="relative mx-auto"
     style="background: #F6F6F6; min-height: 600px; max-width: 400px"
   >
-    <Header></Header>
-    <router-view v-if="wrapperType === 'component'" />
-    <slot v-if="wrapperType === 'wrapper'"></slot>
-    <Footer></Footer>
+    <Header />
+    <router-view />
+    <Footer />
   </div>
 </template>
 
@@ -19,12 +18,7 @@ import Footer from "@/popup/components/layout/parts/Footer";
 import ENDPOINT from '@/config/endpoint'
 
 export default Vue.extend({
-  props: {
-    wrapperType: {
-      type: String,
-      default: 'component'
-    }
-  },
+  name: 'Home',
   components: {
     Header,
     Footer
@@ -59,11 +53,10 @@ export default Vue.extend({
     'locked' (newValue) {
       if (newValue) {
         this.$router.push({ name: 'lock' })
-        // this.disconnectSocket()
+        this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')
-        this.getSyncData()
-        // this.reconnectSocket()
+        this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }
     }
@@ -78,9 +71,7 @@ export default Vue.extend({
     async reconnectSocket () {
       const cs_store = await this.$storageService.get('cs_store')
       const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
-      
       const token = await this.$storageService.get('cs_token')
-
       this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
         format: 'json',
         reconnection: true,

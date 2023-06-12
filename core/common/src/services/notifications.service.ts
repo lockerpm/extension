@@ -41,46 +41,44 @@ export class NotificationsService implements NotificationsServiceAbstraction {
   }
 
   async init(): Promise<void> {
-    this.inited = false;
-    this.url = this.environmentService.getNotificationsUrl();
+    // this.inited = false;
+    // this.url = this.environmentService.getNotificationsUrl();
 
-    // Set notifications server URL to `https://-` to effectively disable communication
-    // with the notifications server from the client app
-    if (this.url === 'https://-') {
-      return;
-    }
+    // if (this.url === 'https://-') {
+    //   return;
+    // }
 
-    if (this.signalrConnection != null) {
-      this.signalrConnection.off('ReceiveMessage');
-      this.signalrConnection.off('Heartbeat');
-      await this.signalrConnection.stop();
-      this.connected = false;
-      this.signalrConnection = null;
-    }
+    // if (this.signalrConnection != null) {
+    //   this.signalrConnection.off('ReceiveMessage');
+    //   this.signalrConnection.off('Heartbeat');
+    //   await this.signalrConnection.stop();
+    //   this.connected = false;
+    //   this.signalrConnection = null;
+    // }
 
-    this.signalrConnection = new signalR.HubConnectionBuilder()
-      .withUrl(this.url + '/ws/cystack_platform/pm/sync', {
-        accessTokenFactory: () => this.apiService.getActiveCsToken(),
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .withHubProtocol(new signalRMsgPack.MessagePackHubProtocol() as signalR.IHubProtocol)
-      // .configureLogging(signalR.LogLevel.Trace)
-      .build();
+    // this.signalrConnection = new signalR.HubConnectionBuilder()
+    //   .withUrl(this.url + '/cystack_platform/pm/sync', {
+    //     accessTokenFactory: () => this.apiService.getActiveCsToken(),
+    //     skipNegotiation: true,
+    //     transport: signalR.HttpTransportType.WebSockets,
+    //   })
+    //   .withHubProtocol(new signalRMsgPack.MessagePackHubProtocol() as signalR.IHubProtocol)
+    //   .configureLogging(signalR.LogLevel.Trace)
+    //   .build();
 
-    this.signalrConnection.on('ReceiveMessage',
-      (data: any) => this.processNotification(new NotificationResponse(data)));
-    this.signalrConnection.on('Heartbeat',
-      (data: any) => { });
-    this.signalrConnection.onclose(() => {
-      this.connected = false;
-      this.reconnect(true);
-    });
+    // this.signalrConnection.on('ReceiveMessage',
+    //   (data: any) => this.processNotification(new NotificationResponse(data)));
+    // this.signalrConnection.on('Heartbeat',
+    //   (data: any) => { });
+    // this.signalrConnection.onclose(() => {
+    //   this.connected = false;
+    //   this.reconnect(true);
+    // });
 
-    this.inited = true;
-    if (await this.isAuthedAndUnlocked()) {
-      await this.reconnect(false);
-    }
+    // this.inited = true;
+    // if (await this.isAuthedAndUnlocked()) {
+    //   await this.reconnect(false);
+    // }
   }
 
   async updateConnection(sync = false): Promise<void> {

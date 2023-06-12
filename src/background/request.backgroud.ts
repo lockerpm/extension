@@ -7,43 +7,6 @@ export default class RequestBackground {
   }
 
   async request(config: any) {
-    // const service = axios.create({
-    //   withCredentials: false,
-    //   timeout: 60000,
-    // });
-    
-    // service.interceptors.request.use(async (config) => {
-    //   const cs_store: any = await this.main.storageService.get('cs_store')
-    //   const accessToken = await this.main.storageService.get('cs_token')
-    //   const deviceId = await this.main.storageService.get('device_id')
-    
-    //   const baseUrl = cs_store?.baseApiUrl || process.env.VUE_APP_BASE_API_URL;
-    
-    //   config.baseURL = baseUrl
-    
-    //   config.headers["Content-Type"] = "application/json";
-    //   config.headers["Authorization"] = `Bearer ${accessToken}`;
-    //   config.headers['device-id'] = deviceId
-    //   return config;
-    // },
-    // (error) => {
-    //   return Promise.reject(error);
-    // });
-    
-    // service.interceptors.response.use(
-    //   (response) => {
-    //     if (response.headers['device-id']) {
-    //       this.main.storageService.save("device_id", response.headers["device-id"]);
-    //     }
-    //     return response && response.data
-    //   },
-    //   (error) => {
-    //     return Promise.reject(error)
-    //   }
-    // );
-
-    // return service(config)
-
     const cs_store: any = await this.main.storageService.get('cs_store')
     const accessToken = await this.main.storageService.get('cs_token')
     const deviceId: string = await this.main.storageService.get('device_id')
