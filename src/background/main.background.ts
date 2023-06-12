@@ -490,7 +490,7 @@ export default class MainBackground {
         await this.setIcon();
         setTimeout(() => this.notificationsService.init(), 2500);
         resolve();
-      }, 500);
+      }, 100);
     });
   }
 

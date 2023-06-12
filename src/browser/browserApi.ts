@@ -99,12 +99,7 @@ export class BrowserApi {
 
   static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
     chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-      chrome.tabs.create({active : false}, (tab)=>{
-        chrome.tabs.remove(tab.id);
-      });
-      setTimeout(function () {
-        callback(msg, sender, response);
-      }, 1);
+      callback(msg, sender, response);
     });
   }
 

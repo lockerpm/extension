@@ -48,20 +48,19 @@ export default class RequestBackground {
     const accessToken = await this.main.storageService.get('cs_token')
     const deviceId: string = await this.main.storageService.get('device_id')
     const baseUrl = cs_store?.baseApiUrl || process.env.VUE_APP_BASE_API_URL;
-    try {
-      const response = await fetch(baseUrl + config.url, {
-        method: config.method,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-          "device-id": deviceId
-        },
-        body: JSON.stringify(config.data),
-      });
-      return response
-    } catch (error) {
+    return await fetch(baseUrl + config.url, {
+      method: config.method,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+        "device-id": deviceId
+      },
+      body: JSON.stringify(config.data),
+    }).then(async (response) => {
+      return await response.json()
+    }).catch((error) => {
       return error
-    }
+    });
   }
 
   async use_cipher(id: any, data = {}) {
