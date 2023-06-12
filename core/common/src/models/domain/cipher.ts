@@ -116,6 +116,7 @@ export class Cipher extends Domain {
       name: null,
       notes: null,
     }, this.organizationId, encKey);
+
     switch (this.type) {
       case CipherType.Login:
         model.login = await this.login.decrypt(this.organizationId, encKey);
@@ -170,7 +171,6 @@ export class Cipher extends Domain {
       }, Promise.resolve());
       model.passwordHistory = passwordHistory;
     }
-
     return model;
   }
 

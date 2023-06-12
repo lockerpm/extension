@@ -94,11 +94,6 @@ export default class RuntimeBackground {
       case "logout":
         await this.main.logout(msg.expired);
         break;
-      case "syncCompleted":
-        if (msg.successfully) {
-          setTimeout(async () => await this.main.refreshBadgeAndMenu(), 2000);
-        }
-        break;
       case "promptForLogin":
         await BrowserApi.createNewTab(
           "popup.html?uilocation=popout",

@@ -173,11 +173,6 @@ export default Vue.extend({
       }
       this.hostname = Utils.getHostname(this.url);
       this.pageDetails = [];
-      BrowserApi.tabSendMessage(tab, {
-        command: "collectPageDetails",
-        tab: tab,
-        sender: BroadcasterSubscriptionId,
-      });
 
       const otherTypes = [];
       const dontShowCards = await new BrowserStorageService().get(

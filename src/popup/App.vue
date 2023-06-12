@@ -20,7 +20,7 @@ export default Vue.extend({
   },
   async created () {
     (self as any).bitwardenPopupMainMessageListener = async () => ({});
-    const locked = await this.vaultTimeoutService.isLocked();
+    const locked = await this.$vaultTimeoutService.isLocked();
     if (locked) {
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
         this.reconnectDesktopAppSocket(undefined, true);
@@ -28,7 +28,8 @@ export default Vue.extend({
     }
   },
   async beforeMount () {
-    const currentRouter = JSON.parse(await this.$storageService.get('current_router'))
+    const currentRouterString = await this.$storageService.get('current_router')
+    const currentRouter = JSON.parse(currentRouterString)
     this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'home'})
   },
   async mounted () {
@@ -54,9 +55,12 @@ export default Vue.extend({
     });
   },
   watch: {
-    '$route' (newValue) {
-      this.$storageService.save('current_router', JSON.stringify(newValue))
-    },
+    $route: {
+      async handler(newValue) {
+        await this.$storageService.save('current_router', JSON.stringify(newValue))
+      },
+      deep: true
+    }
   },
   methods: {}
 })

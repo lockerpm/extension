@@ -4,6 +4,8 @@ import 'nprogress/nprogress.css'
 import storePromise from "./store";
 import JSLib from '@/popup/services/services'
 const browserStorageService = JSLib.getBgService('storageService')()
+const vaultTimeoutService = JSLib.getBgService('vaultTimeoutService')()
+
 let isFirst = true
 
 let fistData = true;
@@ -13,13 +15,16 @@ NProgress.configure({ showSpinner: false })
 router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const store = await storePromise;
+  const isLocked = await vaultTimeoutService.isLocked()
   const accessToken = await browserStorageService.get('cs_token')
-
   if (!!store.state.isLoggedIn && accessToken) {
     if (fistData) {
       await store.dispatch("LoadCurrentUser");
       await store.dispatch("LoadCurrentUserPw");
       fistData = false
+    }
+    if (!isLocked && ['login', 'pwl-unlock', 'forgot-password', 'lock'].includes(to.name)) {
+      router.push({ name: "home" });
     }
     if (store.state.user.email && !!store.state.userPw) {
       const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')

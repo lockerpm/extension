@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', event => {
   if (self.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
-
+  let currentMessage: any = null
   let pageDetails: any[] = [];
   const formData: any[] = [];
   let barType: string = null;
@@ -53,6 +53,10 @@ document.addEventListener('DOMContentLoaded', event => {
   });
 
   chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+    if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+      return;
+    }
+    currentMessage = msg;
     processMessages(msg, sendResponse);
   });
 

@@ -122,7 +122,6 @@ export default Vue.extend({
         }
       }
     };
-    await this.loadPageDetails();
     chrome.runtime.onMessage.addListener(
       (msg, sender, response) => {
         switch (msg.command) {
@@ -353,18 +352,6 @@ export default Vue.extend({
           params: { teamId: item.organizationId, tfolderId: item.id },
         });
       }
-    },
-    async loadPageDetails() {
-      this.pageDetails = [];
-      this.tab = await BrowserApi.getTabFromCurrentWindow();
-      if (this.tab == null) {
-        return;
-      }
-      BrowserApi.tabSendMessage(this.tab, {
-        command: "collectPageDetails",
-        tab: this.tab,
-        sender: BroadcasterSubscriptionId,
-      });
     },
     async fillCipher(cipher) {
       if (

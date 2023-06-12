@@ -171,16 +171,16 @@ Vue.mixin({
       await this.setupFillPage();
     },
     async lock() {
-      await this.$passService.clearGeneratePassword()
+      const userId = await this.$userService.getUserId()
       await Promise.all([
-        this.$cryptoService.clearKey(),
-        this.$cryptoService.clearEncKey(true),
-        this.$cryptoService.clearOrgKeys(true),
-        this.$cryptoService.clearKeyPair(true),
+        this.$passService.clearGeneratePassword(),
+        this.$cryptoService.clearKeys(),
+        this.$folderService.clear(userId),
+        this.$collectionService.clear(userId),
+        this.$cipherService.clear(userId),
+        this.$settingsService.clear(userId),
+        this.$policyService.clear(userId),
       ])
-      await this.$folderService.clearCache()
-      await this.$cipherService.clearCache()
-      await this.$collectionService.clearCache()
       this.$router.push({ name: 'lock' });
       await this.setupFillPage();
     },
@@ -248,10 +248,6 @@ Vue.mixin({
           await this.$runtimeBackground.handleUnlocked('unlocked')
           this.$router.push({ name: 'home' });
           this.$store.commit('UPDATE_CALLING_API', false)
-
-          setTimeout(() => {
-            this.setupFillPage();
-          }, 1000);
         } else {
           const res = await cystackPlatformAPI.users_session({
             client_id: 'browser',
@@ -277,10 +273,6 @@ Vue.mixin({
             await this.$runtimeBackground.handleUnlocked('unlocked')
             this.$router.push({ name: 'home' });
             this.$store.commit('UPDATE_CALLING_API', false)
-
-            setTimeout(() => {
-              this.setupFillPage();
-            }, 1000);
           }, 1000);
         }
         const now = (new Date()).getTime()
@@ -318,7 +310,6 @@ Vue.mixin({
           await this.$syncService.syncSettings(userId, res.domains);
           await this.$syncService.syncPolicies(res.policies);
           await this.$syncService.setLastSync(new Date());
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           if (page * pageSize >= this.cipherCount) {
             break
           }
@@ -336,12 +327,13 @@ Vue.mixin({
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
+        this.setupFillPage();
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$store.commit('UPDATE_SYNCING', false)
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
-        this.$store.commit('UPDATE_SYNCED_CIPHERS')
-      } finally {
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false)
       }
     },

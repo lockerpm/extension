@@ -121,7 +121,6 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    await this.loadPageDetails();
     self.onscroll = () => {
       const bottomOfWindow =
         Math.max(
@@ -279,18 +278,6 @@ export default Vue.extend({
       this.$router.push({
         name: "add-item-create",
         params: { type: this.type },
-      });
-    },
-    async loadPageDetails() {
-      this.pageDetails = [];
-      this.tab = await BrowserApi.getTabFromCurrentWindow();
-      if (this.tab == null) {
-        return;
-      }
-      BrowserApi.tabSendMessage(this.tab, {
-        command: "collectPageDetails",
-        tab: this.tab,
-        sender: BroadcasterSubscriptionId,
       });
     },
     async fillCipher(cipher) {

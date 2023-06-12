@@ -136,6 +136,7 @@ export default class NotificationBackground {
                 this.autofillFirstPage(sender.tab);
               }
             })
+            this.main.refreshBadgeAndMenu()
             break;
           default:
             break;

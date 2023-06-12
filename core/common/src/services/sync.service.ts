@@ -262,7 +262,6 @@ export class SyncService implements SyncServiceAbstraction {
 
   private syncCompleted(successfully: boolean): boolean {
     this.syncInProgress = false;
-    this.messagingService.send('syncCompleted', { successfully: successfully });
     return successfully;
   }
 

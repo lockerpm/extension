@@ -695,7 +695,7 @@ export default class MainBackground {
     this.buildingContextMenu = false;
   }
 
-  private async contextMenuReady(tab: any, contextMenuEnabled: boolean) {
+  async contextMenuReady(tab: any, contextMenuEnabled: boolean) {
     await this.loadMenuAndUpdateBadge(tab.url, tab.id, contextMenuEnabled);
     this.onUpdatedRan = this.onReplacedRan = false;
   }
