@@ -58,24 +58,25 @@ export class NotificationsService implements NotificationsServiceAbstraction {
       this.signalrConnection = null;
     }
 
-    // this.signalrConnection = new signalR.HubConnectionBuilder()
-    //   .withUrl(this.url + '/ws/cystack_platform/pm/sync', {
-    //     accessTokenFactory: () => this.apiService.getActiveCsToken(),
-    //     skipNegotiation: true,
-    //     transport: signalR.HttpTransportType.WebSockets,
-    //   })
-    //   .withHubProtocol(new signalRMsgPack.MessagePackHubProtocol() as signalR.IHubProtocol)
-    //   // .configureLogging(signalR.LogLevel.Trace)
-    //   .build();
+    this.signalrConnection = new signalR.HubConnectionBuilder()
+      .withUrl(this.url + '/ws/cystack_platform/pm/sync', {
+        accessTokenFactory: () => this.apiService.getActiveCsToken(),
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+      })
+      .withHubProtocol(new signalRMsgPack.MessagePackHubProtocol() as signalR.IHubProtocol)
+      // .configureLogging(signalR.LogLevel.Trace)
+      .build();
 
-    // this.signalrConnection.on('ReceiveMessage',
-    //   (data: any) => this.processNotification(new NotificationResponse(data)));
-    // this.signalrConnection.on('Heartbeat',
-    //   (data: any) => { });
-    // this.signalrConnection.onclose(() => {
-    //   this.connected = false;
-    //   this.reconnect(true);
-    // });
+    this.signalrConnection.on('ReceiveMessage',
+      (data: any) => this.processNotification(new NotificationResponse(data)));
+    this.signalrConnection.on('Heartbeat',
+      (data: any) => { });
+    this.signalrConnection.onclose(() => {
+      this.connected = false;
+      this.reconnect(true);
+    });
+
     this.inited = true;
     if (await this.isAuthedAndUnlocked()) {
       await this.reconnect(false);

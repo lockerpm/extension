@@ -28,8 +28,8 @@ import { ProfileProviderOrganizationResponse } from '../models/response/profileP
 import { ProfileProviderResponse } from '../models/response/profileProviderResponse';
 
 export const Keys = {
-  key: 'key', // Master Key
-  memoryKey: 'memoryKey',
+  masterKey: 'masterKey',
+  key: 'key', // Key
   encOrgKeys: 'encOrgKeys',
   encProviderKeys: 'encProviderKeys',
   encPrivateKey: 'encPrivateKey',
@@ -54,8 +54,32 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   async setKey(key: SymmetricCryptoKey): Promise<any> {
     this.key = key;
-    await this.secureStorageService.save(Keys.memoryKey, JSON.stringify(key))
+    const masterKey = {
+      ...key,
+      encKey: this.arrayBufferToBase64(key.encKey),
+      key: this.arrayBufferToBase64(key.key),
+    }
+    await this.storageService.save(Keys.masterKey, masterKey)
     await this.storeKey(key);
+  }
+
+  arrayBufferToBase64( buffer: ArrayBuffer ) {
+    let binary = '';
+    const bytes = new Uint8Array( buffer );
+    const len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+      binary += String.fromCharCode( bytes[ i ] );
+    }
+    return btoa(binary);
+  }
+
+  base64ToArrayBuffer(base64: string) {
+    var binaryString = atob(base64);
+    var bytes = new Uint8Array(binaryString.length);
+    for (var i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 
   setKeyHash(keyHash: string): Promise<{}> {
@@ -108,9 +132,20 @@ export class CryptoService implements CryptoServiceAbstraction {
     return this.storageService.save(Keys.encProviderKeys, providerKeys);
   }
 
+
   async getKey(keySuffix?: KeySuffixOptions): Promise<SymmetricCryptoKey> {
     if (this.key) {
       return this.key;
+    }
+
+    const masterKey: any = await this.storageService.get(Keys.masterKey)
+    if (masterKey) {
+      this.key = {
+        ...masterKey,
+        encKey: this.base64ToArrayBuffer(masterKey.encKey),
+        key: this.base64ToArrayBuffer(masterKey.key),
+      }
+      return this.key
     }
 
     keySuffix = keySuffix || 'auto';
@@ -335,7 +370,8 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async hasKeyInMemory(): Promise<boolean> {
-    return !!(await this.secureStorageService.get(Keys.memoryKey));
+    const masterKey = await this.storageService.get(Keys.masterKey);
+    return !!masterKey
   }
 
   hasKeyStored(keySuffix: KeySuffixOptions): Promise<boolean> {
@@ -349,7 +385,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   async clearKey(clearSecretStorage: boolean = true): Promise<any> {
     this.key = this.legacyEtmKey = null;
-    await this.secureStorageService.remove(Keys.memoryKey)
+    await this.storageService.remove(Keys.masterKey)
     await this.secureStorageService.remove(Keys.key);
     if (clearSecretStorage) {
       this.clearStoredKey('auto');
@@ -757,7 +793,6 @@ export class CryptoService implements CryptoServiceAbstraction {
     key: SymmetricCryptoKey): Promise<string> {
     const keyForEnc = await this.getKeyForEncryption(key);
     const theKey = this.resolveLegacyKey(encType, keyForEnc);
-
     if (theKey.macKey && !mac) {
       this.logService.error('mac required.');
       return null;

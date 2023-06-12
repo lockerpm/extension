@@ -58,7 +58,7 @@ export default class Domain {
           return null;
         }).then((val: any) => {
           (viewModel as any)[theProp] = val;
-        }).catch(() => {
+        }).catch((error) => {
           (viewModel as any)[theProp] = null;
         });
         promises.push(p);

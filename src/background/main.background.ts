@@ -79,7 +79,6 @@ import NotificationBackground from './notification.background';
 import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
 import WebRequestBackground from './webRequest.background';
-import WindowsBackground from './windows.background';
 import RequestBackground from './request.backgroud';
 
 import { PopupUtilsService } from '../popup/services/popup-utils.service';
@@ -142,7 +141,6 @@ export default class MainBackground {
   private runtimeBackground: RuntimeBackground;
   private tabsBackground: TabsBackground;
   private webRequestBackground: WebRequestBackground;
-  private windowsBackground: WindowsBackground;
   private requestBackground: RequestBackground;
 
   private sidebarAction: any;
@@ -449,8 +447,6 @@ export default class MainBackground {
       this.cipherService,
       this.vaultTimeoutService
     );
-    this.windowsBackground = new WindowsBackground(this);
-
     const that = this;
     this.authService = new AuthService(
       this.cryptoService,
@@ -487,7 +483,6 @@ export default class MainBackground {
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();
-    await this.windowsBackground.init();
 
     return new Promise<void>(resolve => {
       setTimeout(async () => {

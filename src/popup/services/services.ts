@@ -41,10 +41,9 @@ function getBgService<T>(service: string) {
     if (page) {
       return page.bitwardenMain[service] as T
     }
-    const bitwardenMain = new MainBackground()
-    bitwardenMain.bootstrap();
-    (self as any).bitwardenMain = bitwardenMain;
-    return bitwardenMain[service] ;
+    const bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
+    bitwardenMain.bootstrap().then(() => {});
+    return bitwardenMain[service] as T;
   };
 }
 
