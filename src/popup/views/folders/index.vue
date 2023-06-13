@@ -57,8 +57,8 @@ export default Vue.extend({
   methods: {
     routerFolder (item) {
       this.$router.push({
-        name: "folders-folderId",
-        params: { folderId: item.id },
+        name: "folder-detail",
+        params: { id: item.id },
       });
     },
   }

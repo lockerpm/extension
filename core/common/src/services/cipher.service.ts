@@ -154,7 +154,7 @@ export class CipherService implements CipherServiceAbstraction {
     if (!key && cipher.organizationId) {
       key = await this.cryptoService.getOrgKey(cipher.organizationId);
       if (!key) {
-        throw new Error('Cannot encrypt cipher for organization. No key.');
+        return null
       }
     }
     await Promise.all([
@@ -299,7 +299,7 @@ export class CipherService implements CipherServiceAbstraction {
     const decCiphers: CipherView[] = [];
     const hasKey = await this.cryptoService.hasKey();
     if (!hasKey) {
-      throw new Error('No key.');
+      return []
     }
 
     const promises: any[] = [];

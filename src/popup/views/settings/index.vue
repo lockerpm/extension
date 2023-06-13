@@ -2,7 +2,6 @@
   <div
     class="settings-body"
   >
-    <Header></Header>
     <div class="p-4 text-[#A2A3A7]">
       <div
         v-for="(cate, index) in menu"
@@ -64,16 +63,15 @@
           </a>
         </div>
     </div>
-    <Footer></Footer>
-    <Fingerprint ref="fingerprintDialog" />
+    <Fingerprint
+      ref="fingerprintDialog"
+    />
   </div>
 </template>
 
 <script>
 import Vue from "vue";
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
-import Header from "@/popup/components/layout/parts/Header.vue";
-import Footer from "@/popup/components/layout/parts/Footer.vue";
 import i18n from '@/locales/i18n';
 import { VAULT_TIMEOUTS } from '@/config/constants'
 const enableAutofillKey = 'enableAutofill'
@@ -86,8 +84,6 @@ export default Vue.extend({
   name: "Settings",
   components: {
     Fingerprint,
-    Header,
-    Footer,
   },
   async mounted() {
     const res = await Promise.all([

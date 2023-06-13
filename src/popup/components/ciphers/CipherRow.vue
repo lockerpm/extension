@@ -151,7 +151,7 @@ export default Vue.extend(
     },
     methods: {
       addEdit (item) {
-        this.$router.push({name: 'add-item-create', params: {data: item}})
+        this.$router.push({name: 'add-edit-cipher', params: {data: item}})
       },
       fillCipher(){
         this.$emit('do-fill')

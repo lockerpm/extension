@@ -137,7 +137,7 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
-      this.$router.push({ name: 'add-item-create', params: { password: this.password } })
+      this.$router.push({ name: 'add-edit-cipher', params: { password: this.password } })
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {

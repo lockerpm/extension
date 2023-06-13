@@ -10,7 +10,7 @@
     />
     <div v-else>
       <div
-        v-if="!['folders-folderId'].includes(this.$route.name)"
+        v-if="!['folder-detail'].includes(this.$route.name)"
         class="mt-5 font-semibold mb-4 flex justify-between"
       >
         <div>{{ $tc(`type.${type}`, 2) }} ({{ ciphers ? ciphers.length : 0 }})</div>
@@ -281,7 +281,7 @@ export default Vue.extend({
     },
     handleAddButton() {
       this.$router.push({
-        name: "add-item-create",
+        name: "add-edit-cipher",
         params: { type: this.type },
       });
     },

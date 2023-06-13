@@ -1,101 +1,98 @@
 <template>
-  <BlankLayout>
-    <div class="flex flex-grow flex-col items-center px-5 py-5">
-      <div class="w-full max-w-[500px] text-center">
-        <div class="text-head-4 font-semibold mb-2.5">{{$t('data.set_master_pass.create')}}</div>
-        <div class="inline-block mb-8 select-none">
-          <div class="flex items-center">
-            <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
-              <img :src="currentUser.avatar" alt="" class="w-[28px] h-[28px] rounded-full mr-2">
-              <div class="mr-2">{{ currentUser.email }}</div>
-            </div>
-            <button
-              class="btn btn-sm btn-clean btn-primary !px-3 !font-normal"
-              @click="logout"
-            >
-              {{$t('data.set_master_pass.logout')}}
-            </button>
+  <div class="flex flex-grow flex-col items-center px-4 py-4">
+    <div class="w-full max-w-[500px] text-center">
+      <div class="text-head-4 font-semibold mb-2.5">{{$t('data.set_master_pass.create')}}</div>
+      <div class="inline-block mb-8 select-none">
+        <div class="flex items-center">
+          <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
+            <img :src="currentUser.avatar" alt="" class="w-[28px] h-[28px] rounded-full mr-2">
+            <div class="mr-2">{{ currentUser.email }}</div>
           </div>
-        </div>
-        <div class="text-left">
-          <div class="form-group !mb-4">
-            <label>{{$t('data.set_master_pass.enter_pass')}}</label>
-            <div class="input-group mb-1.5">
-              <input
-                v-model="masterPassword"
-                :type="showPassword ? 'text' : 'password'"
-                class="form-control"
-                :name="randomString()"
-                autocomplete="new-password"
-              >
-              <div class="input-group-append !bg-white">
-                <button class="btn btn-icon" @click="showPassword = !showPassword">
-                  <i
-                    class="far"
-                    :class="{'fa-eye': !showPassword, 'fa-eye-slash': showPassword}"
-                  />
-                </button>
-              </div>
-            </div>
-            <PasswordStrengthBar v-if="masterPassword" :score="passwordStrength.score" />
-          </div>
-          <div class="form-group !mb-4">
-            <label>{{$t('data.set_master_pass.confirm_pass')}}</label>
-            <div class="input-group" :class="[errors.masterRePassword ? 'is-invalid' :'']">
-              <input
-                v-model="masterRePassword"
-                :type="showRePassword ? 'text' : 'password'"
-                class="form-control"
-                name="repassword"
-                placeholder=""
-              >
-              <div class="input-group-append !bg-white">
-                <button class="btn btn-icon" @click="showRePassword = !showRePassword">
-                  <i
-                    class="far"
-                    :class="{'fa-eye': !showRePassword, 'fa-eye-slash': showRePassword}"
-                  />
-                </button>
-              </div>
-            </div>
-            <div class="invalid-feedback">{{ $t('errors.confirm_password') }}</div>
-          </div>
-          <div class="form-group !mb-8">
-            <label>{{$t('data.set_master_pass.hint_pass')}}</label>
-            <input
-              v-model="masterPasswordHint"
-              class="form-control"
-              placeholder=""
-              type="text"
-            />
-          </div>
-        </div>
-        <div class="form-group !mb-4">
           <button
-            class="btn btn-primary w-full"
-            :disabled="loading"
-            @click="setMasterPass"
+            class="btn btn-sm btn-clean btn-primary !px-3 !font-normal"
+            @click="logout"
           >
-            {{$t('data.set_master_pass.create_btn')}}
+            {{$t('data.set_master_pass.logout')}}
           </button>
         </div>
-        <div class="md:w-[320px] text-black-600 mx-auto">
-          {{$t('data.set_master_pass.note')}}
+      </div>
+      <div class="text-left">
+        <div class="form-group !mb-4">
+          <label>{{$t('data.set_master_pass.enter_pass')}}</label>
+          <div class="input-group mb-1.5">
+            <input
+              v-model="masterPassword"
+              :type="showPassword ? 'text' : 'password'"
+              class="form-control"
+              :name="randomString()"
+              autocomplete="new-password"
+            >
+            <div class="input-group-append !bg-white">
+              <button class="btn btn-icon" @click="showPassword = !showPassword">
+                <i
+                  class="far"
+                  :class="{'fa-eye': !showPassword, 'fa-eye-slash': showPassword}"
+                />
+              </button>
+            </div>
+          </div>
+          <PasswordStrengthBar v-if="masterPassword" :score="passwordStrength.score" />
+        </div>
+        <div class="form-group !mb-4">
+          <label>{{$t('data.set_master_pass.confirm_pass')}}</label>
+          <div class="input-group" :class="[errors.masterRePassword ? 'is-invalid' :'']">
+            <input
+              v-model="masterRePassword"
+              :type="showRePassword ? 'text' : 'password'"
+              class="form-control"
+              name="repassword"
+              placeholder=""
+            >
+            <div class="input-group-append !bg-white">
+              <button class="btn btn-icon" @click="showRePassword = !showRePassword">
+                <i
+                  class="far"
+                  :class="{'fa-eye': !showRePassword, 'fa-eye-slash': showRePassword}"
+                />
+              </button>
+            </div>
+          </div>
+          <div class="invalid-feedback">{{ $t('errors.confirm_password') }}</div>
+        </div>
+        <div class="form-group !mb-8">
+          <label>{{$t('data.set_master_pass.hint_pass')}}</label>
+          <input
+            v-model="masterPasswordHint"
+            class="form-control"
+            placeholder=""
+            type="text"
+          />
         </div>
       </div>
+      <div class="form-group !mb-4">
+        <button
+          class="btn btn-primary w-full"
+          :disabled="loading"
+          @click="setMasterPass"
+        >
+          {{$t('data.set_master_pass.create_btn')}}
+        </button>
+      </div>
+      <div class="md:w-[320px] text-black-600 mx-auto">
+        {{$t('data.set_master_pass.note')}}
+      </div>
     </div>
-  </BlankLayout>
+  </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
-import BlankLayout from '@/popup/components/layout/blank'
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default Vue.extend({
-  components: { BlankLayout, PasswordStrengthBar },
+  components: { PasswordStrengthBar },
   layout: 'blank',
   middleware: ['HaveAccountService'],
   data () {

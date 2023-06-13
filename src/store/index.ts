@@ -69,8 +69,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
         count: 0
       },
       userIntercom: {},
-      currentPath: '/',
-      previousPath: '',
       isDev: 'dev',
       environment: 'dev',
       loading: false,
@@ -96,8 +94,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
         state.isLoggedIn = payload.isLoggedIn || false
         state.user = payload.user || JSON.parse(JSON.stringify(defaultUser)),
         state.userPw = payload.userPw || {}
-        state.currentPath = payload.currentPath || '/'
-        state.previousPath = payload.previousPath || ''
       },
       SET_LANG (state, language) {
         state.user.language = language
@@ -124,12 +120,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_USER_INTERCOM (state, userIntercom) {
         state.userIntercom = userIntercom
-      },
-      UPDATE_PATH (state, {path} ) {
-        state.currentPath = path
-      },
-      UPDATE_PREVIOUS_PATH (state, path) {
-        state.previousPath = path || '/vault'
       },
       UPDATE_NOTIFICATION (state, payload) {
         state.notifications = payload

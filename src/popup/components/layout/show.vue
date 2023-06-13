@@ -3,21 +3,18 @@
     class="relative mx-auto"
     style="background: #F6F6F6; min-height: 600px; max-width: 400px"
   >
-    <Header />
+    <ShowHeader />
     <router-view />
-    <Footer />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
-import Header from "./components/Header.vue";
-import Footer from "./components/Footer.vue";
+import ShowHeader from "./components/ShowHeader.vue";
 
 export default Vue.extend({
   components: {
-    Header,
-    Footer
+    ShowHeader
   },
   data () {
     return {

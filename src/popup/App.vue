@@ -1,17 +1,28 @@
 <template>
-  <div class="">
+  <div class="w-full">
     <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import ENDPOINT from '@/config/endpoint'
 
 export default Vue.extend({
   name: 'App',
   data () {
     return {
+      locked: true,
+      ws1: null,
     }
+  },
+  asyncComputed: {
+    locked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
   },
   computed: {
     previousPath () {
@@ -36,10 +47,10 @@ export default Vue.extend({
     chrome.runtime.onMessage.addListener((msg) => {
       switch(msg.command){
       case 'locked':
-        this.$router.push({ name: 'lock' });
+        this.lock();
         break;
       case 'doneLoggingOut':
-        this.$router.push({ name: 'login' });
+        this.logout();
         break;
       case 'loggedIn':
         if (this.$route.name === 'login') {
@@ -55,6 +66,22 @@ export default Vue.extend({
     });
   },
   watch: {
+    '$store.state.userPw' (newValue) {
+      if (newValue.is_pwd_manager === false) {
+        this.$router.push({ name: 'set-master-password' })
+      }
+    },
+    'locked' (newValue) {
+      if (newValue) {
+        this.$router.push({ name: 'lock' })
+        this.disconnectSocket()
+      } else {
+        this.$store.dispatch('LoadTeams')
+        this.getSyncData()
+        this.reconnectSocket()
+        this.$store.dispatch('LoadCurrentPlan')
+      }
+    },
     $route: {
       async handler(newValue) {
         await this.$storageService.save('current_router', JSON.stringify({
@@ -66,7 +93,36 @@ export default Vue.extend({
       deep: true
     }
   },
-  methods: {}
+  methods: {
+    disconnectSocket () {
+      if (this.ws1) {
+        delete this.ws1.onmessage
+        this.ws1.close()
+      }
+    },
+    async reconnectSocket () {
+      const cs_store = await this.$storageService.get('cs_store')
+      const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
+      const token = await this.$storageService.get('cs_token')
+      this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
+        format: 'json',
+        reconnection: true,
+        reconnectionAttempts: 60,
+        reconnectionDelay: 3000
+      })
+      this.ws1 = this.$socket
+      this.ws1.onmessage = message => {
+        const data = JSON.parse(message.data)
+        switch (data.event) {
+        case 'sync':
+          this.getSyncData()
+          break
+        default:
+          break
+        }
+      }
+    },
+  }
 })
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 400px;">
+  <div class="w-full">
     <div class="mt-14 text-center">
       <img
         src="@/assets/images/logo/logo_black.svg"

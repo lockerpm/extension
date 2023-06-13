@@ -1,7 +1,6 @@
 <template>
   <div class="relative mx-auto"
     style="background: #E4F0E6; padding-bottom: 56px; padding-top: 140px; min-height: 600px; max-width: 400px">
-    <Header></Header>
     <div v-loading="loading">
       <template v-if="searchText.length > 1">
         <ul>
@@ -59,7 +58,6 @@
 
       </ul>
     </div>
-    <Footer></Footer>
   </div>
 </template>
 
@@ -70,15 +68,11 @@ import groupBy from "lodash/groupBy";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
 import CipherRow from "@/popup/components/ciphers/CipherRow.vue";
-import Header from "@/popup/components/layout/parts/Header.vue";
-import Footer from "@/popup/components/layout/parts/Footer.vue";
 const BroadcasterSubscriptionId = "ChildViewComponent";
 import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 export default Vue.extend({
   components: {
     CipherRow,
-    Header,
-    Footer,
   },
   data() {
     return {
@@ -336,8 +330,8 @@ export default Vue.extend({
     },
     routerFolder(item) {
       this.$router.push({
-        name: "vault-folders-folderId",
-        params: { folderId: item.id },
+        name: "folder-detail",
+        params: { id: item.id },
       });
     },
     routerCollection(item) {
