@@ -266,7 +266,12 @@ export default Vue.extend({
         });
         return folders;
       },
-      watch: ["searchText", "orderField", "orderDirection", "ciphers"],
+      watch: [
+        "searchText",
+        "orderField",
+        "orderDirection",
+        "ciphers"
+      ],
     },
   },
   methods: {

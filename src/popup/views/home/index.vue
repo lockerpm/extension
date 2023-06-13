@@ -259,14 +259,6 @@ export default Vue.extend({
     },
     async processMessage(msg, sender) {
       switch (msg.command) {
-      case "syncCompleted":
-        if (msg.successfully && msg.trigger) {
-          this.notify("Syncing complete", "success");
-        }
-        self.setTimeout(() => {
-          this.load();
-        }, 500);
-        break;
       case "collectPageDetailsResponse":
         if (msg.sender === BroadcasterSubscriptionId) {
           const pageDetailsObj = {

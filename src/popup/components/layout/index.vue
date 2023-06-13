@@ -18,7 +18,6 @@ import Footer from "@/popup/components/layout/parts/Footer";
 import ENDPOINT from '@/config/endpoint'
 
 export default Vue.extend({
-  name: 'Home',
   components: {
     Header,
     Footer
@@ -56,6 +55,7 @@ export default Vue.extend({
         this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')
+        this.getSyncData()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }

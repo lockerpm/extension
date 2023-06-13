@@ -88,9 +88,8 @@ export class SearchService implements SearchServiceAbstraction {
       query = null;
     }
 
-    if (!ciphers) {
-      ciphers = await this.cipherService.getAllDecrypted();
-    }
+    ciphers = await this.cipherService.getAllDecrypted();
+
     if (filter && Array.isArray(filter) && filter.length > 0) {
       ciphers = ciphers.filter(c => filter.every(f => !f || f(c)));
     } else if (filter) {

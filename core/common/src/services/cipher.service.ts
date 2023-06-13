@@ -296,13 +296,6 @@ export class CipherService implements CipherServiceAbstraction {
 
   @sequentialize(() => 'getAllDecrypted')
   async getAllDecrypted(): Promise<CipherView[]> {
-    if (!this.platformUtilsService.isFirefox() && this.decryptedCipherCache && this.decryptedCipherCache.length > 0) {
-      const userId = await this.userService.getUserId();
-      if (this.searchService && (this.searchService().indexedEntityId ?? userId) !== userId) {
-        await this.searchService().indexCiphers(userId, this.decryptedCipherCache);
-      }
-      return this.decryptedCipherCache || []
-    }
     const decCiphers: CipherView[] = [];
     const hasKey = await this.cryptoService.hasKey();
     if (!hasKey) {

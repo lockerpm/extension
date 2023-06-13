@@ -328,13 +328,14 @@ Vue.mixin({
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
-        this.setupFillPage();
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false)
+        this.$store.commit('UPDATE_SYNCING', false);
+        this.setupFillPage();
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false)
+        this.$store.commit('UPDATE_SYNCING', false);
+        this.setupFillPage();
       }
     },
     async getFolders() {

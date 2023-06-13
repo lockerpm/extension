@@ -57,7 +57,11 @@ export default Vue.extend({
   watch: {
     $route: {
       async handler(newValue) {
-        await this.$storageService.save('current_router', JSON.stringify(newValue))
+        await this.$storageService.save('current_router', JSON.stringify({
+          name: newValue.name,
+          params: newValue.params,
+          query: newValue.query
+        }))
       },
       deep: true
     }
