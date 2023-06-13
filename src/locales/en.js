@@ -742,7 +742,8 @@ module.exports = {
       settings: 'Settings',
       search: 'Search Vault',
       open_web_app: 'Open the web app',
-      sync_data: 'Sync your account'
+      sync_data: 'Sync your account',
+      folder: 'Folders'
     },
     otp: {
       scan_qr: 'Scan QR code',

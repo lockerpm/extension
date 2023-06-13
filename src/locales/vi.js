@@ -725,7 +725,8 @@ module.exports = {
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
-      sync_data: 'Đồng bộ tài khoản'
+      sync_data: 'Đồng bộ tài khoản',
+      folder: 'Thư mục'
     },
     otp: {
       scan_qr: 'Quét mã QR',
