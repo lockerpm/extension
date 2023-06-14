@@ -91,7 +91,8 @@ module.exports = {
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
     update_title: "Upgrade to Premium to get Unlimited Storage",
-    submit: "Submit"
+    submit: "Submit",
+    detail: "Detail"
   },
   sort: {
     name_asc: 'Name Ascending',

@@ -29,20 +29,20 @@
       </el-row>
       <div class="otp-item__right">
         <el-dropdown trigger="click">
-        <div class="icon flex items-center justify-center">
-          <i class="el-icon-more"></i>
-        </div>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            v-clipboard:copy="otp"
-            v-clipboard:success="handleCopy"
-          >
-            {{ $t('data.otp.copy') }}
-          </el-dropdown-item>
-          <el-dropdown-item @click.native="$emit('edit')">{{ $t('common.edit') }}</el-dropdown-item>
-          <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">{{ $t('common.delete') }}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+          <div class="icon flex items-center justify-center">
+            <i class="el-icon-more"></i>
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item
+              v-clipboard:copy="otp"
+              v-clipboard:success="handleCopy"
+            >
+              {{ $t('data.otp.copy') }}
+            </el-dropdown-item>
+            <el-dropdown-item @click.native="$emit('edit')">{{ $t('common.edit') }}</el-dropdown-item>
+            <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">{{ $t('common.delete') }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </el-row>
   </div>

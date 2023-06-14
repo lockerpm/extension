@@ -95,7 +95,7 @@ export default Vue.extend({
         this.$emit('created-folder', { id: res.id, name: folder.name })
         this.closeDialog()
         if (this.shouldRedirect) {
-          this.$router.push({ name: 'folder-detail', params: { id: res.id } })
+          this.$router.push({ name: 'folder-detail', params: { id: res.id, data: res } })
         }
       } catch (e) {
         this.errors = (e.response && e.response.data && e.response.data.details) || {}

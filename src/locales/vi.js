@@ -90,7 +90,8 @@ module.exports = {
     system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
     upgrade_now: 'Nâng cấp ngay',
     update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn",
-    submit: "Gửi"
+    submit: "Gửi",
+    detail: "Chi tiết"
   },
   sort: {
     name_asc: 'Tên tăng dần',
