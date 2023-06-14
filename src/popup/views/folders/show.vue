@@ -41,7 +41,7 @@
         <div
           v-if="!callingAPI"
           class="menu-icon mr-4 cursor-pointer"
-          @click="$emit('close')"
+          @click="$router.push({ name: 'folders' })"
         >
           {{$t('common.cancel')}}
         </div>

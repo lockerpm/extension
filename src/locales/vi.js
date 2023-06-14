@@ -318,23 +318,20 @@ module.exports = {
         btn: 'Thêm Thẻ thanh toán'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
+        title: 'Điền thông tin biểu mẫu nhanh chóng',
+        description: 'Thêm thẻ danh tính để Locker có thể tự động điền các biểu mẫu trực tuyến thay mặt bạn.',
         btn: 'Thêm Thẻ danh tính'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Thêm sao lưu ví crypto đầu tiên của bạn',
+        description: 'Lưu lại tài khoản/ví crypto của bạn',
+        btn: 'Thêm tài sản'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
+      OTP: {
+        title: 'Bảo vệ tài khoản của bạn',
+        description: 'Thêm một lớp bảo mật bổ sung cho tài khoản trực tuyến của bạn bằng cách thiết lập xác thực hai yếu tố với Locker',
+        btn: 'Thêm bảo mật 2 lớp'
       },
-      common: {
-        title: 'Các mục đã lưu của bạn sẽ xuất hiện ở đây. <br> Bắt đầu bằng cách thêm một tài khoản mà bạn đã sử dụng hàng ngày.',
-        btn: 'Thêm mục'
-      }
     },
     members: {
       role: {
@@ -726,7 +723,8 @@ module.exports = {
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
       sync_data: 'Đồng bộ tài khoản',
-      folder: 'Thư mục'
+      folder: 'Thư mục',
+      folder_items: 'Phần tử'
     },
     otp: {
       scan_qr: 'Quét mã QR',

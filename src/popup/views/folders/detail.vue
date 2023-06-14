@@ -11,7 +11,11 @@
         <i class="fas fa-arrow-left text-[20px]"></i>
       </div>
       <div class="text-center text-head-6 font-semibold">
-        <img src="@/assets/images/icons/icon_folder.svg" class="mx-auto" style="border-radius: 50%">
+        <img
+          src="@/assets/images/icons/icon_folder.svg"
+          class="mx-auto"
+          style="width: 32px; height: 32px;"
+        >
         {{folder.name}}
       </div>
     </div>

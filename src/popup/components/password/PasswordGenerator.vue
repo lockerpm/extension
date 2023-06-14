@@ -5,19 +5,24 @@
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
         </div>
-        <div class="ml-2">
-          <button
-            class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
+        <div>
+          <el-button
+            circle
+            plain
+            type="primary"
+            size="mini"
             @click="regenerate()"
           >
             <i class="fas fa-redo-alt" />
-          </button>
+          </el-button>
         </div>
       </div>
-      <PasswordStrength
-        v-if="password"
-        :score="passwordStrength.score"
-      />
+      <div class="flex justify-end">
+        <PasswordStrength
+          v-if="password"
+          :score="passwordStrength.score"
+        />
+      </div>
       <button
         v-clipboard:copy="password"
         v-clipboard:success="clipboardSuccessHandler"

@@ -34,7 +34,7 @@ export default Vue.extend({
   },
   data () {
     return {
-      cipherType: this.$route.params ? Number(this.$route.params.type || CipherType.Login) : CipherType.Login
+      cipherType: this.$route.query ? Number(this.$route.query.type || CipherType.Login) : CipherType.Login
     }
   },
   asyncComputed: {
@@ -45,7 +45,7 @@ export default Vue.extend({
     handleChangeCipherType(type) {
       this.cipherType = type
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      this.$router.replace({ name: this.$route.name, params: { type: type } }).catch(() => {})
+      this.$router.replace({ name: this.$route.name, query: { type: type } }).catch(() => {})
     },
   }
 }

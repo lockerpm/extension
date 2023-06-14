@@ -17,7 +17,7 @@
           <img
             src="@/assets/images/icons/icon_folder.svg"
             alt=""
-            style="border-radius: 50%"
+            style="width: 32px; height: 32px;"
           >
         </div>
         <div class="flex-grow flex justify-between mr-2">

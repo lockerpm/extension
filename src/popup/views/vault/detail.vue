@@ -1,7 +1,5 @@
 <template>
-  <DetailCipher
-    type="Card"
-  />
+  <DetailCipher />
 </template>
 
 <script>
@@ -13,9 +11,6 @@ export default Vue.extend ({
     DetailCipher
   },
   computed: {
-    type(){
-      return Number(this.$route.params.type)
-    },
   }
 })
 </script>

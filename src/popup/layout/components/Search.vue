@@ -27,16 +27,8 @@
       @input="handleSearch"
     >
     </el-input>
-    <el-button
-      v-if="!['otp'].includes($route.name)"
-      icon="el-icon-plus"
-      circle
-      type="primary"
-      size="small"
-      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } })"
-    />
     <el-dropdown
-      v-else
+      v-if="['otp'].includes($route.name)"
       @command="handleCreateOTP"
       trigger="click"
     >
@@ -51,6 +43,23 @@
           <el-dropdown-item command="setup-key">{{ $t('data.otp.setup_key') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+    <el-button
+      v-else-if="['vault'].includes($route.name)"
+      icon="el-icon-plus"
+      circle
+      type="primary"
+      size="small"
+      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } })"
+    />
+    <el-button
+      v-else
+      icon="el-icon-plus"
+      circle
+      type="primary"
+      size="small"
+      @click="$router.push({ name: 'add-edit-folder' })"
+    />
+    
   </div>
 </template>
 

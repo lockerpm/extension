@@ -292,51 +292,36 @@ module.exports = {
       change_team: 'Change Team'
     },
     no_data: {
-      Dashboard: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
-      Vault: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
       Login: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mật khẩu của bạn và truy cập chúng trên mọi thiết bị, bất cứ lúc nào',
-        btn: 'Thêm mật khẩu',
-        btn_import: 'Nhập mật khẩu'
+        title: 'Let\'s get started!',
+        description: 'Add your passwords and access them on any device, anytime',
+        btn: 'Add password',
+        btn_import: 'Import'
       },
       SecureNote: {
-        title: 'Giải phóng bộ nhớ của bạn',
-        description: 'Lưu lại mã Wi-Fi, mã báo động an ninh văn phòng hoặc ngày sinh của bạn bè bạn...',
-        btn: 'Thêm ghi chú'
+        title: 'Free up your memory',
+        description: 'Save Wi-Fi codes, office security alarm codes or your friends\' birthdays...',
+        btn: 'Add note'
       },
       Card: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ thanh toán'
+        title: 'Simplify online shopping',
+        description: 'Add payment card to autofill when shopping online',
+        btn: 'Add payment card'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ danh tính'
+        title: 'Fill online forms faster',
+        description: 'Add Identity card so that Locker can autofill online forms on behalf of you.',
+        btn: 'Add Identity card'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Add your first crypto backup',
+        description: 'Keep your crypto account/wallet in safe place',
+        btn: 'Add Asset'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
-      },
-      common: {
-        title: 'Your saved items will appear here.<br>Start by adding an account that you used every day.',
-        btn: 'Add first item'
+      OTP: {
+        title: 'Secure your account',
+        description: 'Add an additional layer of security for your online accounts by setting up two-factor authentication with Locker',
+        btn: 'Set up 2FA'
       }
     },
     members: {
@@ -742,7 +727,8 @@ module.exports = {
       search: 'Search Vault',
       open_web_app: 'Open the web app',
       sync_data: 'Sync your account',
-      folder: 'Folders'
+      folder: 'Folders',
+      folder_items: 'Folder items'
     },
     otp: {
       scan_qr: 'Scan QR code',

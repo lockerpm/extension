@@ -3,71 +3,18 @@
     class="relative mx-auto"
   >
     <NoCipher
-      v-if="shouldRenderNoCipher"
+      v-if="shouldRenderNoCipher && !$store.state.syncing"
+      :type="type"
       @add-cipher="handleAddButton"
     />
     <div v-else>
-      <div
-        v-if="!['folder-detail'].includes(this.$route.name)"
-        class="mb-2 font-semibold flex justify-between"
-      >
-        <div class="text-[#A2A3A7]">
-          {{ $tc(`type.${type}`, 2) }} ({{ ciphers ? ciphers.length : 0 }})
-        </div>
-        <div class="flex items-center">
-          <span v-if="orderString==='name_asc'">A-Z &nbsp;</span>
-          <span v-if="orderString==='name_desc'">Z-A &nbsp;</span>
-          <span v-if="orderString==='revisionDate_asc'">First Updated &nbsp;</span>
-          <span v-if="orderString==='revisionDate_desc'">Last Updated &nbsp;</span>
-          <el-dropdown trigger="click">
-            <span class="el-dropdown-link">
-              <img src="@/assets/images/icons/sort.svg">
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('name', 'asc')"
-              >
-                <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.ascending') }} &nbsp;</span>
-                <i
-                  v-if="orderString==='name_asc'"
-                  class="fa fa-check"
-                />
-              </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('name', 'desc')"
-              >
-                <span>{{ $t('data.ciphers.name') }} {{ $t('data.ciphers.descending') }} &nbsp;</span>
-                <i
-                  v-if="orderString==='name_desc'"
-                  class="fa fa-check"
-                />
-              </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('revisionDate', 'asc')"
-              >
-                <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.ascending') }} &nbsp;</span>
-                <i
-                  v-if="orderString==='revisionDate_asc'"
-                  class="fa fa-check"
-                />
-              </el-dropdown-item>
-              <el-dropdown-item
-                class="flex items-center justify-between"
-                @click.native="changeSort('revisionDate', 'desc')"
-              >
-                <span>{{ $t('data.ciphers.time') }} {{ $t('data.ciphers.descending') }} &nbsp;</span>
-                <i
-                  v-if="orderString==='revisionDate_desc'"
-                  class="fa fa-check"
-                />
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
-      </div>
+      <SortMenu
+        :ciphers="ciphers"
+        :label="folderId ? $t('data.parts.folder_items') : $tc(`type.${type}`, 2)"
+        :order-field="orderField"
+        :order-direction="orderDirection"
+        @sort="changeSort"
+      />
       <ul class="list-ciphers">
         <cipher-row
           v-for="item in dataRendered"
@@ -86,6 +33,8 @@ import Vue from "vue";
 import orderBy from "lodash/orderBy";
 import NoCipher from "@/popup/components/ciphers/NoCipher";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
+import SortMenu from "@/components/SortMenu.vue";
+
 import { CipherType } from "jslib-common/enums/cipherType";
 
 const BroadcasterSubscriptionId = "ChildViewComponent";
@@ -94,6 +43,7 @@ export default Vue.extend({
   components: {
     NoCipher,
     CipherRow,
+    SortMenu,
   },
   props: {
     deleted: {
@@ -235,9 +185,9 @@ export default Vue.extend({
     }
   },
   methods: {
-    changeSort(orderField, orderDirection) {
-      this.orderField = orderField;
-      this.orderDirection = orderDirection;
+    changeSort(sortValue) {
+      this.orderField = sortValue.orderField;
+      this.orderDirection = sortValue.orderDirection;
     },
     handleAddButton() {
       this.$router.push({

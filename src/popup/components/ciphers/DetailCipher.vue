@@ -311,10 +311,6 @@ export default Vue.extend({
     PasswordStrength
   },
   props: {
-    type: {
-      type: String,
-      default: ''
-    }
   },
   data () {
     return {

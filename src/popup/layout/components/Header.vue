@@ -10,13 +10,16 @@
         :to="{ name: item.routeName }"
         :key="item.routeName"
         class="text-center text-[14px] navigator-item"
-        :class="item.routeName === $route.name ? 'text-primary' : 'text-black'"
       >
         <img
           class="navigator-item__image"
+          :class="item.routeName === $route.name ? 'active' : ''"
           :src="require(`@/assets/images/icons/header/${item.icon}`)"
         >
-        <div class="navigator-item__title">
+        <div
+          class="navigator-item__title"
+          :class="item.routeName === $route.name ? 'text-primary font-semibold' : 'text-black'"
+        >
           {{ item.label }}
         </div>
       </router-link>
@@ -85,10 +88,11 @@ export default {
       &__image {
         margin-left: auto;
         margin-right: auto;
+        &.active {
+          filter: invert(36%) sepia(82%) saturate(415%) hue-rotate(78deg) brightness(95%) contrast(91%);
+        }
       }
       &.router-link-exact-active.router-link-active {
-        @apply text-primary;
-        font-weight: 600;
         .navigator-item__image {
           filter: invert(36%) sepia(82%) saturate(415%) hue-rotate(78deg) brightness(95%) contrast(91%);
         }
