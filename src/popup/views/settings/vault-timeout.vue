@@ -1,7 +1,6 @@
 <template>
   <div
-    class="relative h-screen"
-    style="background: #fff; padding-top: 82px"
+    lass="show-body"
   >
     <div
       class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"

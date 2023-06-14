@@ -63,7 +63,7 @@ export default Vue.extend({
       watch: []
     },
   },
-  mounted: {
+  computed: {
     filteredFolder() {
       return this.folders.filter((f) => f.name.toLowerCase().includes(this.searchText?.toLowerCase() || ''))
     }
@@ -72,7 +72,7 @@ export default Vue.extend({
     routerFolder (item) {
       this.$router.push({
         name: "folder-detail",
-        params: { id: item.id },
+        params: { id: item.id, data: item },
       });
     },
   }

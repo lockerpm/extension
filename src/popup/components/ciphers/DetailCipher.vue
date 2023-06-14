@@ -1,23 +1,5 @@
 <template>
-  <div class="w-full">
-    <div
-      class="flex items-center cursor-pointer h-[44px] leading-[44px] px-5 justify-between fixed top-0 bg-white"
-      style="z-index: 1; width: 400px"
-    >
-      <div
-        class="menu-icon mr-4"
-        @click="$router.back()"
-      >
-        <i class="fas fa-chevron-left text-[20px]"></i> {{$t('common.back')}}
-      </div>
-      <div>{{$t('common.details')}}</div>
-      <div
-        v-if="canManageItem(teams, cipher)"
-        @click="addEdit(cipher)"
-      >
-        {{$t('common.edit')}}
-      </div>
-    </div>
+  <div class="show-body">
     <div class="p-4">
       <div
         class="uppercase mb-2"

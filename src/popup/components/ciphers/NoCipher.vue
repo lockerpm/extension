@@ -81,6 +81,11 @@ export default Vue.extend({
           key: 'Folder',
           icon: 'folder.svg',
           value: 0
+        },
+        {
+          key: 'FolderItem',
+          icon: 'icon_default.svg',
+          value: 'folder_item'
         }
       ]
     },

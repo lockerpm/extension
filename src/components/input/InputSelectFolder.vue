@@ -1,11 +1,12 @@
 <template>
   <div
     class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': true,
-             'is-hover': hovering,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    :class="{
+      'is-focus': focusing,
+      'have-value': true,
+      'is-hover': hovering,
+      'is-error': errorText,
+      'is-disabled': disabled,
     }"
   >
     <label>{{ label }} <span v-if="required" class="text-danger">*</span></label>
@@ -101,18 +102,18 @@ export default Vue.extend({
       focusing: false,
       hovering: false,
       type: 'text',
-      value: ''
+      value: this.initialValue
     }
+  },
+  watch: {
+    initialValue () {
+      this.value = this.initialValue
+    },
   },
   computed: {
     shouldShowPlaceHolder () {
       return this.placeholder && this.focusing && !this.value
     }
-  },
-  mounted () {
-    this.$nextTick(() => {
-      this.value = this.initialValue
-    })
   },
   methods: {
     handleFocus () {

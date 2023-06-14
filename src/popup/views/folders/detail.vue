@@ -1,24 +1,5 @@
 <template>
-  <div>
-    <div
-      class="grid grid-cols-3 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
-    >
-      <div
-        class="menu-icon cursor-pointer"
-        @click="$router.back()"
-      >
-        <i class="fas fa-arrow-left text-[20px]"></i>
-      </div>
-      <div class="text-center text-head-6 font-semibold">
-        <img
-          src="@/assets/images/icons/icon_folder.svg"
-          class="mx-auto"
-          style="width: 32px; height: 32px;"
-        >
-        {{folder.name}}
-      </div>
-    </div>
+  <div class="show-body">
     <div class="p-4">
       <ListCipher
         :folder-id="$route.params.id"

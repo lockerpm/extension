@@ -1,43 +1,9 @@
 <template>
   <div
-    class="relative mx-auto"
-    style="padding-top: 95px;"
+    class="show-body"
   >
-    <div
-      class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
-    >
-      <div
-        class="menu-icon mr-4 cursor-pointer"
-        @click="$router.back()"
-      >
-        {{$t('common.cancel')}}
-      </div>
-      <div class="col-span-2 text-center text-head-6 font-semibold">
-        <div v-if="cipher.id">
-          <Vnodes :vnodes="getIconCipher(cipher, 34)" />
-        </div>
-        {{cipher.id? $t('common.edit') : $t('data.ciphers.add_cipher')}}
-      </div>
-      <button
-        v-if="cipher.id"
-        class="btn btn-primary"
-        style="border-radius: 100px !important; padding: 10px 24px !important"
-        @click="putCipher(cipher)"
-      >
-        {{$t('common.update')}}
-      </button>
-      <button
-        v-else
-        class="btn btn-primary"
-        style="border-radius: 100px !important; padding: 10px 24px !important"
-        @click="postCipher(cipher)"
-      >
-        {{ $t('common.save') }}
-      </button>
-    </div>
     <div class="p-4">
-      <div class="text-left bg-white p-4" style="border-radius: 16px">
+      <div class="text-left">
         <el-select
           v-if="!cipher.id"
           v-model="cipher.type"
@@ -539,14 +505,6 @@
           </div>
         </template>
       </div>
-      <div
-        v-if="cipher.id"
-        @click="deleteCiphers([cipher.id])"
-        class="text-red mt-4 bg-white cursor-pointer"
-        style="width: fit-content; padding: 8px 12px; color:#FF0000; border-radius: 31px;"
-      >
-        <i class="el-icon-delete">&nbsp; Delete</i>
-      </div>
     </div>
     <AddEditFolder
       ref="addEditFolder"
@@ -585,7 +543,6 @@ import InputSelectCryptoNetworks from '@/components/input/InputSelectCryptoNetwo
 import InputSeedPhrase from '@/components/input/InputSeedPhrase'
 import InputCustomFields from '@/components/input/InputCustomFields.vue'
 import { BrowserApi } from "@/browser/browserApi";
-import Vnodes from "@/popup/components/Vnodes";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 import { Utils } from 'jslib-common/misc/utils';
@@ -605,7 +562,6 @@ export default Vue.extend({
     InputSelectFolder,
     InputSelectOrg,
     AddEditFolder,
-    Vnodes,
     InputSelectCryptoWallet,
     InputSelectCryptoNetworks,
     InputSeedPhrase,
@@ -616,10 +572,6 @@ export default Vue.extend({
     type: {
       type: String,
       default: null
-    },
-    routeName: {
-      type: String,
-      default: ''
     },
     data: {
       type: CipherView,
@@ -707,7 +659,7 @@ export default Vue.extend({
       }
       const url = (await BrowserApi.getTabFromCurrentWindow()).url
       this.cipher.name = Utils.getDomain(url);
-      this.cipher.login.uris[0].uri = url
+      this.cipher.login.uris[0].uri = url;
     }
   },
   watch: {
@@ -929,7 +881,7 @@ export default Vue.extend({
       this.cipher.secureNote.type = SecureNoteType.Generic
       this.cipher.fields = []
       this.cipher.folderId = this.$route.params.folderId || null
-      this.cipher.collectionIds = this.$route.params.tfolderId ? [this.$route.params.tfolderId] : []
+      this.cipher.collectionIds = this.$route.params.folderId ? [this.$route.params.folderId] : []
       if (this.cipher.organizationId) {
         this.handleChangeOrg(this.cipher.organizationId)
       }

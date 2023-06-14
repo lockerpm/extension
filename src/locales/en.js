@@ -328,6 +328,11 @@ module.exports = {
         title: 'Add your first folder',
         description: 'Add an folder to manage ciphers',
         btn: 'Add Folder'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {

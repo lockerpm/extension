@@ -141,6 +141,13 @@ export default Vue.extend({
   width: 100% !important;
   overflow: auto !important;
 }
+.show-body {
+  position: absolute !important;
+  top: 60px !important;
+  bottom: 0px !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
 .el-message-box {
   width: 260px !important;
 }

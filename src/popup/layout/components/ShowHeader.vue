@@ -96,7 +96,7 @@ export default {
         result.Icon = this.getIconCipher(this.$route.params?.data, width);
         break;
       case 'folder-detail':
-        result.title = this.$route.params.name
+        result.title = this.$route.params?.data?.name
         result.back = () => this.$router.push({ name: 'folders' })
         result.menus = [
           {
@@ -244,7 +244,7 @@ export default {
 <style lang="scss">
 #show-header {
   z-index: 2000;
-  height: 52px;
+  height: 60px;
   background-color: white;
 }
 </style>

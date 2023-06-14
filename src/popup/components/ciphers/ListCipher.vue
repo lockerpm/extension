@@ -4,7 +4,7 @@
   >
     <NoCipher
       v-if="shouldRenderNoCipher && !$store.state.syncing"
-      :type="type"
+      :type="folderId ? 'folder_item' : type"
       @add-cipher="handleAddButton"
     />
     <div v-else>
@@ -192,7 +192,7 @@ export default Vue.extend({
     handleAddButton() {
       this.$router.push({
         name: "add-edit-cipher",
-        params: { type: this.type },
+        params: { type: this.type || CipherType.Login, folderId: this.folderId },
       });
     }
   },

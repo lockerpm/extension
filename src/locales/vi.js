@@ -337,6 +337,11 @@ module.exports = {
         title: 'Thêm thư mục đầu tiên của bạn',
         description: 'Thêm thư mục để quản lý Ciphers',
         btn: 'Thêm thư mục'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {

@@ -1,59 +1,61 @@
 <template>
-  <div class="create-otp p-4" v-loading="callingAPI">
-    <div class="text-left bg-white p-4" style="border-radius: 16px">
-      <h1 class="create-otp__title text-black-700 text-head-6 font-semibold">
-        {{ item ? $t('data.otp.edit.form_title') : $t('data.otp.create.form_title')}}
-      </h1>
-      <el-form
-        class="create-otp__form"
-        ref="form"
-        :model="form"
-        :rules="rules"
-      >
-        <el-form-item :label="$t('data.otp.create.title')" prop="name">
-          <el-input v-model="form.name" :disabled="callingAPI"></el-input>
-        </el-form-item>
-        <el-form-item v-if="!item" :label="$t('data.otp.create.secret_key')" prop="secretKey">
-          <el-input
-            class="secret-key"
-            v-model="form.secretKey"
-            :type="secretKeyInputType"
-            :disabled="callingAPI"
+  <div class="show-body">
+    <div class="create-otp p-4" v-loading="callingAPI">
+      <div class="text-left bg-white p-4" style="border-radius: 16px">
+        <h1 class="create-otp__title text-black-700 text-head-6 font-semibold">
+          {{ item ? $t('data.otp.edit.form_title') : $t('data.otp.create.form_title')}}
+        </h1>
+        <el-form
+          class="create-otp__form"
+          ref="form"
+          :model="form"
+          :rules="rules"
+        >
+          <el-form-item :label="$t('data.otp.create.title')" prop="name">
+            <el-input v-model="form.name" :disabled="callingAPI"></el-input>
+          </el-form-item>
+          <el-form-item v-if="!item" :label="$t('data.otp.create.secret_key')" prop="secretKey">
+            <el-input
+              class="secret-key"
+              v-model="form.secretKey"
+              :type="secretKeyInputType"
+              :disabled="callingAPI"
+            >
+              <i
+                v-if="form.secretKey && secretKeyInputType === 'password'"
+                class="fas fa-eye"
+                slot="suffix"
+                @click="secretKeyInputType = ''"
+              ></i>
+              <i
+                v-else-if="form.secretKey"
+                class="fas fa-eye-slash"
+                slot="suffix"
+                @click="secretKeyInputType = 'password'"
+              ></i>
+            </el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div class="create-otp__btn mt-4">
+        <el-row type="flex" justify="space-between">
+          <div
+            v-if="!callingAPI"
+            class="menu-icon mr-4 cursor-pointer"
+            @click="$emit('close')"
           >
-            <i
-              v-if="form.secretKey && secretKeyInputType === 'password'"
-              class="fas fa-eye"
-              slot="suffix"
-              @click="secretKeyInputType = ''"
-            ></i>
-            <i
-              v-else-if="form.secretKey"
-              class="fas fa-eye-slash"
-              slot="suffix"
-              @click="secretKeyInputType = 'password'"
-            ></i>
-          </el-input>
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="create-otp__btn mt-4">
-      <el-row type="flex" justify="space-between">
-        <div
-          v-if="!callingAPI"
-          class="menu-icon mr-4 cursor-pointer"
-          @click="$emit('close')"
-        >
-          {{$t('common.cancel')}}
-        </div>
-        <button
-          class="btn btn-primary"
-          style="border-radius: 100px !important; padding: 10px 24px !important"
-          :disabled="callingAPI"
-          @click="handleAddEdit"
-        >
-          {{ $t('common.save') }}
-        </button>
-      </el-row>
+            {{$t('common.cancel')}}
+          </div>
+          <button
+            class="btn btn-primary"
+            style="border-radius: 100px !important; padding: 10px 24px !important"
+            :disabled="callingAPI"
+            @click="handleAddEdit"
+          >
+            {{ $t('common.save') }}
+          </button>
+        </el-row>
+      </div>
     </div>
   </div>
 </template>
