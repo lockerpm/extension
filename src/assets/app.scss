@@ -397,7 +397,7 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .cipher-item {
-    @apply flex items-center cursor-pointer h-[60px] px-5 border-black-400;
+    @apply flex items-center cursor-pointer h-[50px] px-4 border-black-400;
   }
 }
 .list-ciphers li:hover {
@@ -409,7 +409,7 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .folder-item {
-    @apply flex items-center cursor-pointer h-[56px] px-5 border-black-400;
+    @apply flex items-center cursor-pointer h-[56px] px-4 border-black-400;
   }
 }
 .list-folders li:hover {

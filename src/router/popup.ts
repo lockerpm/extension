@@ -98,6 +98,14 @@ const routes: Array<RouteConfig> = [
           )
       },
       {
+        path: "folders/:id",
+        name: "folder-detail",
+        component: () =>
+          import(
+            "../popup/views/folders/detail.vue"
+          )
+      },
+      {
         path: "add-edit-cipher",
         name: "add-edit-cipher",
         component: () =>
@@ -106,11 +114,11 @@ const routes: Array<RouteConfig> = [
           )
       },
       {
-        path: "folders/:id",
-        name: "folder-detail",
+        path: "add-edit-otp",
+        name: "add-edit-otp",
         component: () =>
           import(
-            "../popup/views/folders/_id.vue"
+            "../popup/views/add-edit-otp.vue"
           )
       },
       {

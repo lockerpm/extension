@@ -2,6 +2,7 @@
   <div class="otp-body">
     <div
       class="p-4"
+      v-loading="$store.state.syncing"
     >
       <ListOTP
         v-if="!addEditOTP"

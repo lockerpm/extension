@@ -12,7 +12,7 @@
       >
         <div class="flex">
           <div
-            class="text-[34px] mr-3 flex-shrink-0 "
+            class="text-[32px] mr-3 flex-shrink-0 "
           >
             <Vnodes
               :vnodes="getCurrentSiteIcon()"
@@ -20,10 +20,16 @@
           </div>
           
           <div class="text-left">
-            <div class="text-head-6 text-black font-semibold">
+            <div
+              class="text-black font-semibold"
+              style="line-height: 18px;"
+            >
               {{$t('data.home.add_password')}}
             </div>
-            <div class="text-[14px] text-black-500">
+            <div
+              class="truncate text-[#A2A3A7]"
+              style="line-height: 16px;"
+            >
               {{$t('data.home.no_for_current')}}
             </div>
           </div>
@@ -157,8 +163,8 @@ export default Vue.extend({
             Avatar,
             {
               props: {
-                src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${34}`,
-                size: 34,
+                src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${32}`,
+                size: 32,
                 alt: domain,
                 shape: "square"
               }
@@ -175,7 +181,7 @@ export default Vue.extend({
         return this.$createElement('img', {
           attrs: {
             src: require(`@/assets/images/icons/icon_default.svg`),
-            style: `height: 34px`,
+            style: `height: 32px`,
             class: 'rounded mx-auto'
           }
         })
@@ -183,7 +189,7 @@ export default Vue.extend({
         return this.$createElement('img', {
           attrs: {
             src: require(`@/assets/images/icons/icon_default.svg`),
-            style: `height: 34px`,
+            style: `height: 32px`,
             class: 'rounded mx-auto'
           }
         })

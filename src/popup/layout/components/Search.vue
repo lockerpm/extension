@@ -20,10 +20,10 @@
     </el-select>
     <el-input
       v-model="inputText"
-      :placeholder="$t('data.parts.search')"
       suffix-icon="el-icon-search"
-      :class="!['otp'].includes($route.name) ? 'mr-2' : ''"
+      class="mr-2"
       size="small"
+      :placeholder="$t('data.parts.search')"
       @input="handleSearch"
     >
     </el-input>
@@ -35,12 +35,28 @@
       size="small"
       @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } })"
     />
+    <el-dropdown
+      v-else
+      @command="handleCreateOTP"
+      trigger="click"
+    >
+      <el-button
+        icon="el-icon-plus"
+        circle
+        type="primary"
+        size="small"
+      />
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="scan-qr">{{ $t('data.otp.scan_qr') }}</el-dropdown-item>
+          <el-dropdown-item command="setup-key">{{ $t('data.otp.setup_key') }}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
   </div>
 </template>
 
 <script>
-import debounce from 'lodash/debounce'
 import { CipherType } from "jslib-common/enums/cipherType";
+import { BrowserApi } from "@/browser/browserApi";
 
 export default {
   props: {
@@ -54,20 +70,6 @@ export default {
     return {
       inputText: ''
     }
-  },
-  asyncComputed: {
-    locked: {
-      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      async get () {
-        return await this.$vaultTimeoutService.isLocked()
-      },
-      watch: []
-    },
-  },
-  methods: {
-    handleSearch: debounce(function () {
-      this.$store.commit('UPDATE_SEARCH', this.inputText)
-    }, 100),
   },
   computed: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -95,6 +97,40 @@ export default {
         },
       ]
     },
+  },
+  asyncComputed: {
+    locked: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    },
+  },
+  methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    handleSearch () {
+      this.$store.commit('UPDATE_SEARCH', this.inputText)
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    handleCreateOTP (command) {
+      if (command === 'setup-key') {
+        this.$emit('add-edit');
+      } else {
+        this.scanQRCode();
+      }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async scanQRCode () {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "scanQRCode",
+          tab: tab,
+          sender: 'scanQRCode',
+        });  
+      }
+    }
   }
 }
 </script>

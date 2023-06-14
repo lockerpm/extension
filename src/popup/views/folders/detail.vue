@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top: 110px; padding-bottom: 56px;">
+  <div>
     <div
       class="grid grid-cols-3 bg-white px-4 pb-4 fixed top-0"
       style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
@@ -17,8 +17,7 @@
     </div>
     <div class="p-4">
       <ListCipher
-        :filter="c => c.folderId === $route.params.folderId"
-        route-name="vault"
+        :folder-id="$route.params.id"
       />
     </div>
   </div>

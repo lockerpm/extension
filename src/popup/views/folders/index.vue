@@ -1,6 +1,7 @@
 <template>
   <div
     class="vault-body px-4 pb-4"
+    v-loading="$store.state.syncing"
   >
     <div v-if="folders" class="font-semibold mb-2 text-[#A2A3A7]">
       {{ $t('type.folder') }} ({{folders.length}})

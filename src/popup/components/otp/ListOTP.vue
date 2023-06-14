@@ -33,26 +33,14 @@
         />
       </div>
     </div>
-    <div class="list-otp__add">
-      <el-dropdown @command="handleCreateOTP" trigger="click">
-        <div class="icon flex items-center justify-center">
-          <i class="el-icon-plus"></i>
-        </div>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="scan-qr">{{ $t('data.otp.scan_qr') }}</el-dropdown-item>
-          <el-dropdown-item command="setup-key">{{ $t('data.otp.setup_key') }}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-    </div>
   </div>
 </template>
 
 <script>
 import orderBy from "lodash/orderBy";
-import { CipherType } from "jslib-common/enums/cipherType";
-import { BrowserApi } from "@/browser/browserApi";
 import OTPRow from './OTPRow.vue';
 
+import { CipherType } from "jslib-common/enums/cipherType";
 import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
@@ -121,14 +109,6 @@ export default {
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    handleCreateOTP (command) {
-      if (command === 'setup-key') {
-        this.$emit('add-edit');
-      } else {
-        this.scanQRCode();
-      }
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     changeSort (sortValue) {
       if (sortValue === 'custom') {
         return;
@@ -154,17 +134,6 @@ export default {
           this.callingAPI = false
         }
       })
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async scanQRCode () {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "scanQRCode",
-          tab: tab,
-          sender: 'scanQRCode',
-        });  
-      }
     }
   }
 }
@@ -184,24 +153,6 @@ export default {
         font-size: 20px;
         color: #6F6F6F;
       }
-    }
-  }
-  &__add {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 3;
-    .icon {
-      width: 40px;
-      height: 40px;
-      background-color: #268334;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    
-    i {
-      font-size: 28px;
-      color: #fff;
     }
   }
 }

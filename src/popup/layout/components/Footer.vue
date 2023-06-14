@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="['home', 'folders'].includes(this.$route.name)"
     id="popup-navigator"
     class="h-10 bg-white fixed bottom-0 flex items-center justify-between w-full px-4"
   >

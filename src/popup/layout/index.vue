@@ -12,7 +12,9 @@
     <router-view
       :cipher-type="cipherType"
     />
-    <Footer />
+    <Footer
+      v-if="['home', 'folders', 'otp'].includes(this.$route.name)"
+    />
   </div>
 </template>
 

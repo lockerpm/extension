@@ -1,6 +1,5 @@
 <template>
   <div
-    v-loading="loading"
     class="relative mx-auto"
   >
     <NoCipher
@@ -85,12 +84,12 @@
 <script>
 import Vue from "vue";
 import orderBy from "lodash/orderBy";
-import { CipherType } from "jslib-common/enums/cipherType";
-import { BrowserApi } from "@/browser/browserApi";
-const BroadcasterSubscriptionId = "ChildViewComponent";
-import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 import NoCipher from "@/popup/components/ciphers/NoCipher";
 import CipherRow from "@/popup/components/ciphers/CipherRow";
+import { CipherType } from "jslib-common/enums/cipherType";
+
+const BroadcasterSubscriptionId = "ChildViewComponent";
+
 export default Vue.extend({
   components: {
     NoCipher,
@@ -104,12 +103,15 @@ export default Vue.extend({
     type: {
       type: Number,
       default: 1,
+    },
+    folderId: {
+      type: String,
+      default: ''
     }
   },
   data() {
     return {
       CipherType,
-      loading: true,
       dataRendered: [],
       renderIndex: 0,
       pageDetails: [],
@@ -158,13 +160,6 @@ export default Vue.extend({
       }
     );
   },
-  watch: {
-    ciphers() {
-      if (this.ciphers) {
-        this.loading = false;
-      }
-    },
-  },
   computed: {
     orderString() {
       return `${this.orderField}_${this.orderDirection}`;
@@ -174,6 +169,9 @@ export default Vue.extend({
       return !filteredCiphers.length;
     },
     cipherFilter() {
+      if (this.folderId) {
+        return (c) => c.folderId === this.folderId
+      }
       if (this.type == CipherType.CryptoBackup) {
         return (c) => c.type ===  CipherType.CryptoAccount || c.type === CipherType.CryptoWallet
       }
@@ -234,26 +232,7 @@ export default Vue.extend({
         "orderField",
         "orderDirection",
       ],
-    },
-    folders: {
-      async get() {
-        let folders = (await this.$folderService.getAllDecrypted()) || [];
-        folders = folders.filter((f) => f.id);
-        folders.forEach((f) => {
-          const ciphers =
-            this.ciphers &&
-            (this.ciphers.filter((c) => c.folderId === f.id) || []);
-          f.ciphersCount = ciphers && ciphers.length;
-        });
-        return folders;
-      },
-      watch: [
-        "searchText",
-        "orderField",
-        "orderDirection",
-        "ciphers"
-      ],
-    },
+    }
   },
   methods: {
     changeSort(orderField, orderDirection) {
@@ -265,51 +244,7 @@ export default Vue.extend({
         name: "add-edit-cipher",
         params: { type: this.type },
       });
-    },
-    async fillCipher(cipher) {
-      if (
-        cipher.reprompt !== CipherRepromptType.None &&
-        !(await this.$passwordRepromptService.showPasswordPrompt())
-      ) {
-        return;
-      }
-
-      this.totpCode = null;
-      if (this.totpTimeout != null) {
-        self.clearTimeout(this.totpTimeout);
-      }
-
-      if (this.pageDetails == null || this.pageDetails.length === 0) {
-        this.notify(this.$t("errors.autofill"), "error");
-        return;
-      }
-
-      try {
-        this.totpCode = await this.$autofillService.doAutoFill({
-          cipher: cipher,
-          pageDetails: this.pageDetails,
-          fillNewPassword: true,
-        });
-        if (this.totpCode != null) {
-          this.$platformUtilsService.copyToClipboard(this.totpCode, {
-            window: self,
-          });
-        }
-        if (this.$popupUtilsService.inPopup(self)) {
-          if (
-            this.$platformUtilsService.isFirefox() ||
-            this.$platformUtilsService.isSafari()
-          ) {
-            BrowserApi.closePopup(self);
-          } else {
-            // Slight delay to fix bug in Chromium browsers where popup closes without copying totp to clipboard
-            setTimeout(() => BrowserApi.closePopup(self), 50);
-          }
-        }
-      } catch (e) {
-        this.notify(this.$t("errors.autofill"), "error");
-      }
-    },
+    }
   },
 });
 </script>

@@ -2,6 +2,7 @@
   <div class="vault-body">
     <div
       class="px-4 pb-4"
+      v-loading="$store.state.syncing"
     >
       <template>
         <!-- Login Ciphers -->

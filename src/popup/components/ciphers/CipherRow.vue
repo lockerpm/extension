@@ -5,15 +5,16 @@
       class="cipher-item"
     >
       <div
-        class="text-[34px] mr-3 flex-shrink-0"
+        class="text-[32px] mr-3 flex-shrink-0"
         :class="{'filter grayscale': item.isDeleted}"
         @click="fillCipher()"
       >
-        <Vnodes :vnodes="getIconCipher(item, 34)" />
+        <Vnodes :vnodes="getIconCipher(item, 32)" />
       </div>
       <div class="flex-grow overflow-hidden">
         <div
-          class="text-black font-semibold truncate"
+          class="text-black font-semibold truncate hover:text-primary"
+          style="line-height: 18px;"
           @click.self="$router.push({ name: 'cipher-detail', params: { id: item.id } })"
         >
           {{ item.name }}
@@ -25,7 +26,10 @@
             class="inline-block ml-2"
           >
         </div>
-        <div class="truncate text-[#A2A3A7] ">
+        <div
+          class="truncate text-[#A2A3A7]"
+          style="line-height: 16px;"
+        >
           <small>
             {{ item.type === CipherType.CryptoWallet && item.cryptoWallet ? item.cryptoWallet.username : item.subTitle }}
           </small>

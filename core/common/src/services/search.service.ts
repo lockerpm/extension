@@ -16,7 +16,7 @@ export class SearchService implements SearchServiceAbstraction {
   indexedEntityId?: string = null;
   private indexing = false;
   private index: lunr.Index = null;
-  private searchableMinLength = 2;
+  private searchableMinLength = 1;
 
   constructor(private cipherService: CipherService, private logService: LogService,
     private i18nService: I18nService) {
