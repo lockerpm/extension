@@ -332,6 +332,11 @@ module.exports = {
         description: 'Thêm một lớp bảo mật bổ sung cho tài khoản trực tuyến của bạn bằng cách thiết lập xác thực hai yếu tố với Locker',
         btn: 'Thêm bảo mật 2 lớp'
       },
+      Folder: {
+        title: 'Thêm thư mục đầu tiên của bạn',
+        description: 'Thêm thư mục để quản lý Ciphers',
+        btn: 'Thêm thư mục'
+      }
     },
     members: {
       role: {

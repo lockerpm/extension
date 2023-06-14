@@ -76,6 +76,11 @@ export default Vue.extend({
           key: 'CryptoBackup',
           icon: 'icon_CryptoWallet.svg',
           value: CipherType.CryptoBackup
+        },
+        {
+          key: 'Folder',
+          icon: 'folder.svg',
+          value: 0
         }
       ]
     },

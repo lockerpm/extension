@@ -322,6 +322,11 @@ module.exports = {
         title: 'Secure your account',
         description: 'Add an additional layer of security for your online accounts by setting up two-factor authentication with Locker',
         btn: 'Set up 2FA'
+      },
+      Folder: {
+        title: 'Add your first folder',
+        description: 'Add an folder to manage ciphers',
+        btn: 'Add Folder'
       }
     },
     members: {
