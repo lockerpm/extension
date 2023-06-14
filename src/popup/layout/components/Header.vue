@@ -40,7 +40,7 @@ export default {
       return [
         {
           label: this.$t('data.parts.vault'),
-          routeName: 'home',
+          routeName: 'vault',
           icon: 'vault.svg'
         },
         {

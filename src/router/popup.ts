@@ -15,32 +15,32 @@ const routes: Array<RouteConfig> = [
         path: "login",
         name: "login",
         component: () =>
-          import("../popup/views/login.vue")
+          import("../popup/views/auth/login.vue")
       },
       {
         path: "lock",
         name: "lock",
         component: () =>
-          import("../popup/views/lock.vue")
+          import("../popup/views/auth/lock.vue")
       },
       {
         path: "pwl-unlock",
         name: "pwl-unlock",
         component: () =>
-          import("../popup/views/pwl-unlock.vue")
+          import("../popup/views/auth/pwl-unlock.vue")
       },
       {
         path: "forgot-password",
         name: "forgot-password",
         component: () =>
-          import("../popup/views/forgot-password.vue")
+          import("../popup/views/auth/forgot-password.vue")
       },
       {
         path: "set-master-password",
         name: "set-master-password",
         component: () =>
           import(
-            "../popup/views/set-master-password.vue"
+            "../popup/views/auth/set-master-password.vue"
           )
       },
     ]
@@ -50,10 +50,10 @@ const routes: Array<RouteConfig> = [
     component: Layout,
     children: [
       {
-        path: "home",
-        name: "home",
+        path: "vault",
+        name: "vault",
         component: () =>
-          import("../popup/views/home.vue")
+          import("../popup/views/vault/index.vue")
       },
       {
         path: "folders",
@@ -67,13 +67,13 @@ const routes: Array<RouteConfig> = [
         path: "generator",
         name: "generator",
         component: () =>
-          import("../popup/views/generator.vue")
+          import("../popup/views/generator/index.vue")
       },
       {
         path: "otp",
         name: "otp",
         component: () =>
-          import("../popup/views/otp.vue")
+          import("../popup/views/otp/index.vue")
       },
       {
         path: "settings",
@@ -90,11 +90,11 @@ const routes: Array<RouteConfig> = [
     component: ShowLayout,
     children: [
       {
-        path: "home/:id",
-        name: "cipher-detail",
+        path: "vault/:id",
+        name: "vault-detail",
         component: () =>
           import(
-            "../popup/views/cipher-detail.vue"
+            "../popup/views/vault/detail.vue"
           )
       },
       {
@@ -106,19 +106,19 @@ const routes: Array<RouteConfig> = [
           )
       },
       {
-        path: "add-edit-cipher",
+        path: "vault/add-edit",
         name: "add-edit-cipher",
         component: () =>
           import(
-            "../popup/views/add-edit-cipher.vue"
+            "../popup/views/vault/show.vue"
           )
       },
       {
-        path: "add-edit-otp",
+        path: "otp/add-edit",
         name: "add-edit-otp",
         component: () =>
           import(
-            "../popup/views/add-edit-otp.vue"
+            "../popup/views/otp/show.vue"
           )
       },
       {

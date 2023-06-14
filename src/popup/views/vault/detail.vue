@@ -1,7 +1,6 @@
 <template>
   <DetailCipher
     type="Card"
-    route-name="home"
   />
 </template>
 

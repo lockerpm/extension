@@ -41,7 +41,7 @@ export default Vue.extend({
   async beforeMount () {
     const currentRouterString = await this.$storageService.get('current_router')
     const currentRouter = JSON.parse(currentRouterString)
-    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'home'})
+    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'vault'})
   },
   async mounted () {
     chrome.runtime.onMessage.addListener((msg) => {

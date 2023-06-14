@@ -55,10 +55,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import LogInWith from '../components/auth/LogInWith.vue'
-import Form from '../components/auth/Form.vue'
-import Identity from '../components/auth/Identity.vue'
-import VerifyOTP from '../components/auth/VerifyOTP.vue'
+import LogInWith from '@/popup/components/auth/LogInWith.vue'
+import Form from '@/popup/components/auth/Form.vue'
+import Identity from '@/popup/components/auth/Identity.vue'
+import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import authAPI from '@/api/auth'
 import meAPI from '@/api/me'

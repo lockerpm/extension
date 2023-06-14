@@ -5,7 +5,7 @@
   >
     <Header />
     <Search
-      v-if="['home', 'folders', 'otp'].includes($route.name)"
+      v-if="['vault', 'folders', 'otp'].includes($route.name)"
       :cipher-type="cipherType"
       @change="handleChangeCipherType"
     />
@@ -13,7 +13,7 @@
       :cipher-type="cipherType"
     />
     <Footer
-      v-if="['home', 'folders', 'otp'].includes(this.$route.name)"
+      v-if="['vault', 'folders', 'otp'].includes(this.$route.name)"
     />
   </div>
 </template>

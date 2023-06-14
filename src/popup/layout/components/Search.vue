@@ -4,7 +4,7 @@
     style="height: 64px"
   >
     <el-select
-      v-if="['home'].includes($route.name)"
+      v-if="['vault'].includes($route.name)"
       v-model="cipherType"
       class="mr-2"
       style="width: 270px;"

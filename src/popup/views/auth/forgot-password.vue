@@ -57,10 +57,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import ForgotForm from '../components/auth/ForgotForm.vue'
-import Identity from '../components/auth/Identity.vue'
-import VerifyOTP from '../components/auth/VerifyOTP.vue'
-import SetNewPassword from '../components/auth/SetNewPassword.vue'
+import ForgotForm from '@/popup/components/auth/ForgotForm.vue'
+import Identity from '@/popup/components/auth/Identity.vue'
+import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
+import SetNewPassword from '@/popup/components/auth/SetNewPassword.vue'
 
 export default Vue.extend({
   name: 'ForgotPassword',

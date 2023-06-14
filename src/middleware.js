@@ -24,7 +24,7 @@ router.beforeEach(async (to, from, next) => {
       fistData = false
     }
     if (!isLocked && ['login', 'pwl-unlock', 'forgot-password', 'lock'].includes(to.name)) {
-      router.push({ name: "home" });
+      router.push({ name: "vault" });
     }
     if (store.state.user.email && !!store.state.userPw) {
       const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
@@ -37,7 +37,7 @@ router.beforeEach(async (to, from, next) => {
         }
       } else {
         if (['login', 'forgot-password'].includes(to.name)) {
-          router.push({ name: "home" });
+          router.push({ name: "vault" });
         } else {
           next();
         }

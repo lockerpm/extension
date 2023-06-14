@@ -246,7 +246,7 @@ Vue.mixin({
             this.$vaultTimeoutService.biometricLocked = false
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.$router.push({ name: 'home' });
+          this.$router.push({ name: 'vault' });
           this.$store.commit('UPDATE_CALLING_API', false)
         } else {
           const res = await cystackPlatformAPI.users_session({
@@ -271,7 +271,7 @@ Vue.mixin({
               this.$vaultTimeoutService.biometricLocked = false
             }
             await this.$runtimeBackground.handleUnlocked('unlocked')
-            this.$router.push({ name: 'home' });
+            this.$router.push({ name: 'vault' });
             this.$store.commit('UPDATE_CALLING_API', false)
           }, 1000);
         }

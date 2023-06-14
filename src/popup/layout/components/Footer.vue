@@ -1,6 +1,6 @@
 <template>
   <div
-    id="popup-navigator"
+    id="layout-footer"
     class="h-10 bg-white fixed bottom-0 flex items-center justify-between w-full px-4"
   >
     <a
@@ -44,43 +44,9 @@ export default Vue.extend({
     }
   },
   computed: {
-    menu () {
-      return [
-        {
-          label: this.$t('data.parts.current'),
-          routeName: 'home',
-          icon: 'globe'
-        },
-        {
-          label: this.$t('data.parts.vault'),
-          routeName: 'vault',
-          icon: 'folder'
-        },
-        {
-          label: this.$t('data.parts.generate'),
-          routeName: 'generator',
-          icon: 'sync-alt'
-        },
-        {
-          label: this.$t('data.parts.settings'),
-          routeName: 'settings',
-          icon: 'cog'
-        }
-      ]
-    }
   }
 })
 </script>
 
 <style>
-#popup-navigator .router-link-exact-active.router-link-active {
-  color: #268334;
-}
-
-.menu-item {
-  @apply hover:bg-[#F1F1F1] text-black-500;
-}
-a.menu-item {
-  @apply hover:no-underline;
-}
 </style>
