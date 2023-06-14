@@ -45,10 +45,12 @@ export default Vue.extend({
         } catch (error) {
           results = []
         }
-        results = results.filter((f) => f.id);
+        results = results.filter((f) => f.id && f.name.toLowerCase().includes(this.searchText?.toLowerCase() || ''));
         return results;
       },
-      watch: []
+      watch: [
+        'searchText'
+      ]
     },
   },
   methods: {

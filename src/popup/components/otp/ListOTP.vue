@@ -10,7 +10,7 @@
       v-loading="callingAPI"
     >
       <SortMenu
-        :ciphers="ciphers"
+        :ciphers="dataRendered"
         :label="$t('data.parts.otp')"
         :order-field="orderField"
         :order-direction="orderDirection"
@@ -18,7 +18,7 @@
       />
       <div class="list-ciphers">
         <OTPRow
-          v-for="item in ciphers"
+          v-for="item in dataRendered"
           :key="item.id"
           :item="item"
           @edit="$emit('add-edit', item)"
@@ -52,15 +52,42 @@ export default {
       orderField: "revisionDate",
       orderDirection: 'desc',
       callingAPI: false,
+      renderIndex: 0,
+      dataRendered: []
     }
+  },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  mounted() {
+    self.onscroll = () => {
+      const bottomOfWindow =
+        Math.max(
+          self.pageYOffset,
+          document.documentElement.scrollTop,
+          document.body.scrollTop
+        ) +
+          self.innerHeight +
+          500 >=
+        document.documentElement.scrollHeight;
+
+      if (bottomOfWindow) {
+        this.renderIndex += 50;
+        if ( this.ciphers && this.renderIndex <= this.ciphers.length) {
+          this.dataRendered = this.dataRendered.concat(
+            this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
+          );
+        }
+      }
+    };
   },
   asyncComputed: {
     ciphers: {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       async get() {
-        let result = await this.$cipherService.getAllDecrypted();
-        result = result.filter((c) => !c.deleted && c.type === CipherType.OTP)
-        result = result.filter((c) => c.name.toLowerCase().includes(this.textSearch ? this.textSearch.toLowerCase() : ''))
+        let result = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => !c.deleted && c.type == CipherType.OTP],
+          null
+        )) || [];
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
@@ -70,7 +97,7 @@ export default {
         "$store.state.syncedCiphersToggle",
         "orderField",
         "orderDirection",
-        "textSearch",
+        "searchText",
       ],
     },
   },
