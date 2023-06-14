@@ -1,6 +1,10 @@
 <template>
   <div>
-    <AddEditCipher :type="type" :password="password" :data="data"></AddEditCipher>
+    <AddEditCipher
+      :type="type"
+      :password="password"
+      :data="data"
+    />
   </div>
 </template>
 
@@ -13,7 +17,7 @@ export default Vue.extend({
   },
   computed: {
     type(){
-      return this.$route.params.type
+      return Number(this.$route.params.type)
     },
     password(){
       return this.$route.params.password

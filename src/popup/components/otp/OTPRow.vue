@@ -1,7 +1,12 @@
 <template>
-  <div class="otp-item p-4">
+  <div class="otp-item px-4 py-2">
     <el-row type="flex" justify="space-between">
-      <el-row type="flex" justify="space-between" class="w-full" align="middle">
+      <el-row
+        type="flex"
+        justify="space-between"
+        class="w-full"
+        align="middle"
+      >
         <div
           class="otp-item__left"
           v-clipboard:copy="otp"
@@ -106,9 +111,9 @@ export default {
 </script>
 <style lang="scss">
 .otp-item {
-  border-bottom: 1px solid #e5e7eb;
-  &:hover {
-    background-color: #f3f4f6;
+  border-bottom: 1px solid #eaeaf5;
+  &:last-child {
+    border-bottom: none;
   }
   &:last-child {
     border: none;

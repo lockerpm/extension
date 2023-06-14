@@ -2,8 +2,8 @@ import Vue from 'vue'
 import sentryConfig from './index'
 import VueRouter, { RouteConfig } from 'vue-router'
 
-import Layout from '@/popup/components/layout/index.vue'
-import ShowLayout from '@/popup/components/layout/show.vue'
+import Layout from '@/popup/layout/index.vue'
+import ShowLayout from '@/popup/layout/show.vue'
 
 Vue.use(VueRouter)
 
@@ -53,7 +53,7 @@ const routes: Array<RouteConfig> = [
         path: "home",
         name: "home",
         component: () =>
-          import("../popup/views/home/index.vue")
+          import("../popup/views/home.vue")
       },
       {
         path: "folders",
@@ -73,7 +73,7 @@ const routes: Array<RouteConfig> = [
         path: "otp",
         name: "otp",
         component: () =>
-          import("../popup/views/otp/index.vue")
+          import("../popup/views/otp.vue")
       },
       {
         path: "settings",
@@ -89,6 +89,14 @@ const routes: Array<RouteConfig> = [
     path: "/",
     component: ShowLayout,
     children: [
+      {
+        path: "home/:id",
+        name: "cipher-detail",
+        component: () =>
+          import(
+            "../popup/views/cipher-detail.vue"
+          )
+      },
       {
         path: "add-edit-cipher",
         name: "add-edit-cipher",

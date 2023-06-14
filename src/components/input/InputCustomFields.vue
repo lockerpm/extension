@@ -5,13 +5,17 @@
     <div v-for="(field, index) in value" :key="index">
       <div class="flex">
         <div class="self-center mr-3">
-          <i class="el-icon-remove-outline cursor-pointer text-head-5" style="color: #dc2626" @click="deleteField(index)" />
+          <i
+            class="el-icon-remove-outline cursor-pointer text-head-5"
+            style="color: #dc2626"
+            @click="deleteField(index)"
+          />
         </div>
         <InputField
           v-model="field.value"
           :label="field.name"
           class="w-full"
-          :is-date="field.type === 7"
+          :is-date="field.type === CipherType.CryptoWallet"
           :placeholder="field.type === 8 ? 'mm/yyyy' : $t('data.ciphers.value')"
           :is-password="field.type === FieldType.Hidden"
           @input-label="(l) => updateField(index, {name: l, value: field.value})"
@@ -44,6 +48,8 @@
 <script>
 import { FieldView } from 'jslib-common/models/view/fieldView'
 import { FieldType } from 'jslib-common/enums/fieldType'
+import { CipherType } from "jslib-common/enums/cipherType";
+
 import InputField from './InputField.vue'
 import Vue from 'vue'
 export default Vue.extend ({
@@ -62,6 +68,7 @@ export default Vue.extend ({
   },
   data () {
     return {
+      CipherType,
       fieldTypeOptions: [
         {
           label: this.$t('data.ciphers.text'),
@@ -71,10 +78,6 @@ export default Vue.extend ({
           label: this.$t('data.ciphers.hidden'),
           value: FieldType.Hidden
         },
-        // {
-        //   label: 'Boolean',
-        //   value: FieldType.Boolean
-        // }
         {
           label: 'URL',
           value: 4

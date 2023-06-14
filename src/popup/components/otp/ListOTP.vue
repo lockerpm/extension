@@ -1,15 +1,11 @@
 <template>
   <div class="list-otp">
-    <el-input
-      v-model="textSearch"
-      class="list-otp__search"
-      prefix-icon="el-icon-search"
-      :placeholder="$t('data.parts.search')"
+    <div
+      class="list-otp__container"
+      v-loading="callingAPI || loading"
     >
-    </el-input>
-    <div class="list-otp__container" v-loading="callingAPI || loading">
       <el-row
-        class="list-otp__container--sort p-4"
+        class="list-otp__container--sort mb-2"
         type="flex"
         justify="space-between"
       >
@@ -27,13 +23,15 @@
           </el-dropdown>
         </div>
       </el-row>
-      <OTPRow
-        v-for="item in ciphers"
-        :key="item.id"
-        :item="item"
-        @edit="$emit('add-edit', item)"
-        @delete="deleteOTPs"
-      />
+      <div class="list-ciphers">
+        <OTPRow
+          v-for="item in ciphers"
+          :key="item.id"
+          :item="item"
+          @edit="$emit('add-edit', item)"
+          @delete="deleteOTPs"
+        />
+      </div>
     </div>
     <div class="list-otp__add">
       <el-dropdown @command="handleCreateOTP" trigger="click">
@@ -173,30 +171,8 @@ export default {
 </script>
 <style lang="scss">
 .list-otp {
-  position: relative;
-  &__search {
-    position: fixed;
-    top: 98px !important;
-    left: 0;
-    width: 100%;
-    z-index: 1;
-    .el-input {
-      &__inner {
-        border-left: none;
-        border-right: none;
-        border-radius: 0 !important;
-        &:focus {
-          border-color: #E6E6E8 !important;
-        }
-      }
-    }
-  }
+  z-index: 1;
   &__container {
-    position: absolute;
-    top: 40px;
-    left: 0;
-    width: 100%;
-    z-index: 0;
     padding-bottom: 64px;
     .right-icon {
       width: 40px;

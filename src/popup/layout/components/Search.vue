@@ -1,36 +1,40 @@
 <template>
   <div
-    class="flex items-center h-[52px] leading-[44px] px-4 py-2"
+    class="fixed flex items-center px-4 layout-filter"
+    style="height: 64px"
   >
-    <!-- <img
-      src="@/assets/images/logo/logo.png"
-      alt="Locker"
-      class="h-[25px] mr-3"
-      @click="$router.push('/')"
-    > -->
     <el-select
+      v-if="['home'].includes($route.name)"
       v-model="cipherType"
+      class="mr-2"
+      style="width: 270px;"
+      size="small"
+      @change="(v) => $emit('change', v)"
     >
       <el-option
         v-for="item in cipherTypes"
         :key="item.value"
         :label="$t(`sidebar.${item.name}`)"
-        :value="item.value">
-      </el-option>
+        :value="item.value"
+      />
     </el-select>
     <el-input
       v-model="inputText"
       :placeholder="$t('data.parts.search')"
       suffix-icon="el-icon-search"
+      :class="!['otp'].includes($route.name) ? 'mr-2' : ''"
+      size="small"
       @input="handleSearch"
     >
     </el-input>
-    <div
-      style="margin-left: 12px; display: flex;"
-      @click="$router.push({ name: 'add-edit-cipher', params: { type } })"
-    >
-      <i class="el-icon-plus text-primary text-head-5 font-semibold"></i>
-    </div>
+    <el-button
+      v-if="!['otp'].includes($route.name)"
+      icon="el-icon-plus"
+      circle
+      type="primary"
+      size="small"
+      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } })"
+    />
   </div>
 </template>
 
@@ -39,11 +43,16 @@ import debounce from 'lodash/debounce'
 import { CipherType } from "jslib-common/enums/cipherType";
 
 export default {
+  props: {
+    cipherType: {
+      type: Number,
+      default: CipherType.Login
+    }
+  },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
-      inputText: '',
-      cipherType: CipherType.Login
+      inputText: ''
     }
   },
   asyncComputed: {
@@ -82,7 +91,7 @@ export default {
         },
         {
           value: CipherType.CryptoBackup,
-          name: 'crypto-backups'
+          name: 'cryptoBackups'
         },
       ]
     },
@@ -91,5 +100,17 @@ export default {
 </script>
 
 <style lang="scss">
+.layout-filter {
+  z-index: 2000;
+  top: 73px;
+  left: 0;
+  right: 0;
+  .el-input {
+    &__inner {
+      border-radius: 12px !important;
+      border: none !important;
+    }
+  }
+}
 </style>
 

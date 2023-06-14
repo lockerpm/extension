@@ -43,7 +43,7 @@
           v-model="cipher.type"
           placeholder=""
           class="w-full mb-3"
-          :change="handleChangeType"
+          :change="newCipher"
         >
           <el-option
             v-for="(item, index) in typeOptions"
@@ -296,7 +296,7 @@
             />
           </div>
         </template>
-        <template v-if="cipher.type === 6">
+        <template v-if="cipher.type === CipherType.CryptoAccount">
           <InputText
             v-model="cryptoAccount.username"
             label="Email / Username"
@@ -358,7 +358,7 @@
             :disabled="isDeleted"
           />
         </template>
-        <template v-if="cipher.type === 7">
+        <template v-if="cipher.type === CipherType.CryptoWallet">
           <InputSelectCryptoWallet
             ref="inputSelectCryptoWallet"
             :label="$t('data.ciphers.wallet_app')"
@@ -454,7 +454,7 @@
           {{ $t('data.ciphers.others') }}
         </div>
         <InputText
-          v-if="cipher.type === 6"
+          v-if="cipher.type === CipherType.CryptoAccount"
           v-model="cryptoAccount.notes"
           :label="$t('data.ciphers.notes')"
           class="w-full"
@@ -462,7 +462,7 @@
           is-textarea
         />
         <InputText
-          v-else-if="cipher.type === 7"
+          v-else-if="cipher.type === CipherType.CryptoWallet"
           v-model="cryptoWallet.notes"
           :label="$t('data.ciphers.notes')"
           class="w-full"
@@ -501,6 +501,7 @@
           @change="(v) => cipher.folderId = v"
           @addFolder="addFolder(false)"
         />
+
         <template v-if="ownershipOptions.length">
           <InputSelectOrg
             :label="$t('common.ownership')"
@@ -674,10 +675,10 @@ export default Vue.extend({
   async mounted () {
     this.folders = await this.getFolders()
     if (this.data.id) {
-      if (this.data.type === 6) {
+      if (this.data.type === CipherType.CryptoAccount) {
         this.cryptoAccount = this.data.cryptoAccount
       }
-      if (this.data.type === 7) {
+      if (this.data.type === CipherType.CryptoWallet) {
         this.cryptoWallet = this.data.cryptoWallet
       }
       if (this.data.type === CipherType.Login && this.data.login && this.data.login.uris == null) {
@@ -692,15 +693,15 @@ export default Vue.extend({
       }
       this.cipher = new Cipher({ ...this.data }, true)
       this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
-    } else if (CipherType[this.type]) {
+    } else if (this.type) {
       this.newCipher(this.type, this.data)
-      if(this.type === 'Login'){
+      if(this.type === CipherType.Login){
         const url = (await BrowserApi.getTabFromCurrentWindow()).url
         this.cipher.name = Utils.getDomain(url);
         this.cipher.login.uris[0].uri = url
       }
     } else {
-      this.newCipher('Login', this.data)
+      this.newCipher(CipherType.Login, this.data)
       if (this.password) {
         this.cipher.login.password = this.password
       }
@@ -721,7 +722,7 @@ export default Vue.extend({
         { label: this.$tc('type.Card', 1), value: CipherType.Card },
         { label: this.$tc('type.Identity', 1), value: CipherType.Identity },
         { label: this.$tc('type.SecureNote', 1), value: CipherType.SecureNote },
-        { label: this.$tc('type.CryptoBackup', 1), value: 7 }
+        { label: this.$tc('type.CryptoBackup', 1), value: CipherType.CryptoBackup }
       ]
     },
     cardBrandOptions () {
@@ -771,10 +772,10 @@ export default Vue.extend({
       if (this.cipher.type === CipherType.Login && this.cipher.login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
       }
-      if (this.cipher.type === 6 && this.cipher.cryptoAccount) {
+      if (this.cipher.type === CipherType.CryptoAccount && this.cipher.cryptoAccount) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
       }
-      if (this.cipher.type === 7 && this.cryptoWallet) {
+      if (this.cipher.type === CipherType.CryptoWallet && this.cryptoWallet) {
         return this.$passwordGenerationService.passwordStrength(this.cryptoWallet.password, ['cystack']) || {}
       }
       return {}
@@ -827,8 +828,8 @@ export default Vue.extend({
     async putCipher (cipher) {
       try {
         const type_ = this.cipher.type
-        if (this.cipher.type === 6 || this.cipher.type === 7) {
-          this.cipher.notes = JSON.stringify(this.cipher.type === 6 ? this.cryptoAccount : this.cryptoWallet)
+        if (this.cipher.type === CipherType.CryptoAccount || this.cipher.type === CipherType.CryptoWallet) {
+          this.cipher.notes = JSON.stringify(this.cipher.type === CipherType.CryptoAccount ? this.cryptoAccount : this.cryptoWallet)
           this.cipher.type = CipherType.SecureNote
           this.cipher.secureNote = new SecureNote(this.cipher.secureNote, true)
           this.cipher.secureNote.type = 0
@@ -916,10 +917,10 @@ export default Vue.extend({
       this.folders.push(folder)
       this.cipher.folderId = folder.id
     },
-    newCipher (type, data) {
+    newCipher (type, data = {}) {
       this.cipher = new CipherView()
       this.cipher.organizationId = data.organizationId ? data.organizationId : null
-      this.cipher.type = CipherType[type]
+      this.cipher.type = type
       this.cipher.login = new LoginView()
       this.cipher.login.uris = [new LoginUriView()]
       this.cipher.card = new CardView()
@@ -932,9 +933,6 @@ export default Vue.extend({
       if (this.cipher.organizationId) {
         this.handleChangeOrg(this.cipher.organizationId)
       }
-    },
-    handleChangeType (type) {
-      this.newCipher(type)
     },
     async handleChangeOrg (orgId) {
       this.cipher.folderId = null
@@ -962,10 +960,10 @@ export default Vue.extend({
       if (this.cipher.type === CipherType.Login) {
         this.cipher.login.password = p
       }
-      if (this.cipher.type === 6) {
+      if (this.cipher.type === CipherType.CryptoAccount) {
         this.cryptoAccount.password = p
       }
-      if (this.cipher.type === 7) {
+      if (this.cipher.type === CipherType.CryptoWallet) {
         this.cryptoWallet.password = p
       }
     },

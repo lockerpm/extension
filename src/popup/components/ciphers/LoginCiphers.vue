@@ -1,23 +1,25 @@
 <template>
-  <div class="mb-1">
-    <div class="mb-4 font-semibold">{{$t('data.home.for_current')}}</div>
+  <div class="mb-4">
+    <div class="mb-2 font-semibold text-[#A2A3A7]">
+      {{$t('data.home.for_current')}} ({{ loginCiphers.length }})
+    </div>
     <ul class="list-ciphers">
       <div
         v-if="!loginCiphers.length"
-        class="bg-white py-2 px-5 cursor-pointer"
+        class="bg-white py-2 px-5 cursor-pointer hover:bg-black-300"
         style="border-radius: 12px"
         @click="goToAddItem"
       >
         <div class="flex">
           <div
-            class="text-[34px] mr-3 flex-shrink-0"
+            class="text-[34px] mr-3 flex-shrink-0 "
           >
             <Vnodes
               :vnodes="getCurrentSiteIcon()"
             />
           </div>
           
-          <div class="ml-4 text-left">
+          <div class="text-left">
             <div class="text-head-6 text-black font-semibold">
               {{$t('data.home.add_password')}}
             </div>
@@ -31,7 +33,7 @@
         v-for="item in loginCiphers"
         :key="item.id"
         :item="item"
-        @do-fill="fillCipher(item)"
+        @do-fill="$emit('do-fill', item)"
       />
     </ul>
   </div>
@@ -48,7 +50,6 @@ import { Avatar } from "element-ui";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { ConstantsService } from "jslib-common/services/constants.service";
-import { CipherRepromptType } from "jslib-common/enums/cipherRepromptType";
 
 const BroadcasterSubscriptionId = "CurrentTabComponent";
 
@@ -142,48 +143,6 @@ export default Vue.extend({
 
       this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers);
       this.loaded = true;
-    },
-    async fillCipher(cipher) {
-      if (
-        cipher.reprompt !== CipherRepromptType.None &&
-        !(await this.$passwordRepromptService.showPasswordPrompt())
-      ) {
-        return;
-      }
-
-      this.totpCode = null;
-      if (this.totpTimeout != null) {
-        self.clearTimeout(this.totpTimeout);
-      }
-
-      if (this.pageDetails == null || this.pageDetails.length === 0) {
-        this.notify(this.$t("errors.autofill"), "error");
-        return;
-      }
-      try {
-        this.totpCode = await this.$autofillService.doAutoFill({
-          cipher: cipher,
-          pageDetails: this.pageDetails,
-          fillNewPassword: true,
-        });
-        if (this.totpCode != null) {
-          this.$platformUtilsService.copyToClipboard(this.totpCode, {
-            window: self,
-          });
-        }
-        if (this.$popupUtilsService.inPopup(self)) {
-          if (
-            this.$platformUtilsService.isFirefox() ||
-            this.$platformUtilsService.isSafari()
-          ) {
-            BrowserApi.closePopup(self);
-          } else {
-            setTimeout(() => BrowserApi.closePopup(self), 50);
-          }
-        }
-      } catch (e) {
-        this.notify(this.$t("errors.autofill"), "error");
-      }
     },
     goToAddItem () {
       this.$router.push({ name: "add-edit-cipher"});

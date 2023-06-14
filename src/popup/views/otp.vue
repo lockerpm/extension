@@ -1,16 +1,18 @@
 <template>
-  <div
-    class="relative mx-auto settings-body bg-white"
-  >
-    <ListOTP
-      v-if="!addEditOTP"
-      @add-edit="handleAddEditOTP"
-    />
-    <AddEditOTP
-      v-else
-      :item="selectedOTP"
-      @close="addEditOTP = false"
-    />
+  <div class="otp-body">
+    <div
+      class="p-4"
+    >
+      <ListOTP
+        v-if="!addEditOTP"
+        @add-edit="handleAddEditOTP"
+      />
+      <AddEditOTP
+        v-else
+        :item="selectedOTP"
+        @close="addEditOTP = false"
+      />
+    </div>
   </div>
 </template>
 
@@ -36,6 +38,12 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss">
+.otp-body {
+  position: absolute !important;
+  top: 125px !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
 </style>

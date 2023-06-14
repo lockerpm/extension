@@ -3,7 +3,7 @@
     class="fixed top-0 w-full"
   >
     <div
-      class="h-auto grid grid-cols-5 navigator py-2"
+      class="h-auto grid grid-cols-5 navigator"
     >
       <router-link
         v-for="item in menu"
@@ -74,6 +74,7 @@ export default {
   z-index: 2000;
   .navigator {
     background-color: white !important;
+    padding: 12px 0;
     .navigator-item {
       @apply no-underline;
       &:hover {

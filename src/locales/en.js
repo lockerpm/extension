@@ -126,7 +126,6 @@ module.exports = {
     billing: 'Billing',
     family_members: 'Family Members',
     policies: 'Policies'
-
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',

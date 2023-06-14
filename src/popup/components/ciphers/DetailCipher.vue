@@ -170,7 +170,7 @@
           :text="cipher.identity.country"
         />
       </template>
-      <template v-if="cipher.type === 6 && cipher.cryptoAccount">
+      <template v-if="cipher.type === CipherType.CryptoAccount && cipher.cryptoAccount">
         <TextHaveCopy
           label="Email / Username"
           :text="cipher.cryptoAccount.username"
@@ -219,7 +219,7 @@
           :text-area="true"
         />
       </template>
-      <template v-if="cipher.type === 7 && cipher.cryptoWallet">
+      <template v-if="cipher.type === CipherType.CryptoWallet && cipher.cryptoWallet">
         <TextHaveCopy
           label="Email"
           :text="cipher.cryptoWallet.email"
@@ -316,15 +316,10 @@ export default Vue.extend({
     type: {
       type: String,
       default: ''
-    },
-    routeName: {
-      type: String,
-      default: 'passwords'
     }
   },
   data () {
     return {
-      // cipher: {},
       showPassword: false,
       CipherType,
       editMode: false
