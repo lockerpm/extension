@@ -584,7 +584,9 @@ module.exports = {
       hidden: 'Mật khẩu',
       date: 'Ngày',
       monthYear: 'Tháng/Năm',
-      markFavorite: 'Đánh dấu yêu thích'
+      markFavorite: 'Đánh dấu yêu thích',
+      select_networks: 'Chọn Mạng Blockchain',
+      select_wallet: 'Chọn ví Blockchain'
     },
     settings: {
       account: 'Tài khoản',

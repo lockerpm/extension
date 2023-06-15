@@ -114,14 +114,6 @@ const routes: Array<RouteConfig> = [
           )
       },
       {
-        path: "folders/add-edit",
-        name: "add-edit-folder",
-        component: () =>
-          import(
-            "../popup/views/folders/show.vue"
-          )
-      },
-      {
         path: "otp/add-edit",
         name: "add-edit-otp",
         component: () =>

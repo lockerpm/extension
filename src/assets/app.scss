@@ -55,6 +55,7 @@ body {
 .el-input__inner {
   height: 40px;
   line-height: 40px;
+  border: 0px solid white;
 }
 
 [type="text"]:focus,
@@ -76,18 +77,21 @@ select:focus {
 }
 
 .el-dialog.locker-dialog {
-  .el-dialog__header,
-  .el-dialog__footer {
-    @apply px-8;
-  }
+  border-radius: 8px;
   .el-dialog__header {
-    @apply pt-8;
+    @apply px-4 pt-4 py-2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .el-dialog__headerbtn {
+      position: initial
+    }
   }
   .el-dialog__footer {
-    @apply pb-8;
+    @apply px-4 pt-2 pb-4;
   }
   .el-dialog__body {
-    @apply px-8 py-5;
+    @apply px-4 py-2;
   }
 }
 .hover-table-row:hover {
@@ -409,7 +413,7 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .folder-item {
-    @apply flex items-center cursor-pointer h-[50px] px-4 border-black-400;
+    @apply flex items-center h-[50px] px-4 border-black-400;
   }
 }
 .list-folders li:hover {
@@ -462,4 +466,12 @@ input:-webkit-autofill:active {
 .info-section {
   @apply text-black text-head-6 p-4;
   border-bottom: 1px solid #A2A3A7;
+}
+
+.el-switch__core::after {
+  background-color: #e8e8e9 !important;
+}
+
+.text-gray {
+  color: #A2A3A7 !important;
 }

@@ -2,7 +2,7 @@
   <div
     class="settings-body"
   >
-    <div class="p-4 text-[#A2A3A7]">
+    <div class="p-4 text-gray">
       <div
         v-for="(cate, index) in menu"
         :key="index"
@@ -35,7 +35,12 @@
             </template>
             <template v-if="item.switch">
               <div>
-                <el-switch @change="changeStorage(item.key)" v-model="storage[`${item.key}`]"></el-switch>
+                <el-switch
+                  v-model="storage[`${item.key}`]"
+                  inactive-color="white"
+                  active-color="#13ce66"
+                  @change="changeStorage(item.key)"
+                ></el-switch>
               </div>
             </template>
             <template v-if="item.externalUrl">

@@ -4,7 +4,7 @@
     type="flex"
     justify="space-between items-center font-semibold"
   >
-    <div class="text-[#A2A3A7]">
+    <div class="text-gray">
       {{ label }} ({{ ciphers ? ciphers.length : 0 }})
     </div>
     <div class="flex items-center">

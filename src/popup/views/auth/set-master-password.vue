@@ -87,7 +87,7 @@
 
 <script>
 import Vue from 'vue'
-import PasswordStrengthBar from '@/components/password/PasswordStrengthBar'
+import PasswordStrengthBar from '@/popup/components/password/PasswordStrengthBar'
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 

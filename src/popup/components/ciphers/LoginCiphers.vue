@@ -1,12 +1,12 @@
 <template>
   <div class="mb-4">
-    <div class="mb-2 font-semibold text-[#A2A3A7]">
-      {{$t('data.home.for_current')}} ({{ loginCiphers.length }})
+    <div class="mb-2 font-semibold text-gray">
+      {{$t('data.home.for_current')}} ({{ loginCiphers ? loginCiphers.length : 0 }})
     </div>
     <ul class="list-ciphers">
-      <div
-        v-if="!loginCiphers.length"
-        class="bg-white py-2 px-5 cursor-pointer hover:bg-black-300"
+      <li
+        v-if="!loginCiphers || !loginCiphers.length"
+        class="bg-white py-2 px-5 cursor-pointer"
         style="border-radius: 12px"
         @click="goToAddItem"
       >
@@ -27,14 +27,14 @@
               {{$t('data.home.add_password')}}
             </div>
             <div
-              class="truncate text-[#A2A3A7]"
+              class="truncate text-gray"
               style="line-height: 16px;"
             >
               {{$t('data.home.no_for_current')}}
             </div>
           </div>
         </div>
-      </div>
+      </li>
       <CipherRow
         v-for="item in loginCiphers"
         :key="item.id"
@@ -147,7 +147,7 @@ export default Vue.extend({
         }
       });
 
-      this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers);
+      this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers) || [];
       this.loaded = true;
     },
     goToAddItem () {

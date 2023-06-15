@@ -571,6 +571,38 @@ Vue.mixin({
         })
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async deleteCiphers (ids, callback = () => {}) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
+          this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
+        }
+      })
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async deleteFolder (id, callback = () => {}) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', 1), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.delete_folder(id)
+          this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.folder')  }), 'warning')
+        }
+      })
+    },
   }
 })
 

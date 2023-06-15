@@ -21,8 +21,6 @@
           v-for="item in dataRendered"
           :key="item.id"
           :item="item"
-          @edit="$emit('add-edit', item)"
-          @delete="deleteOTPs"
         />
       </div>
     </div>
@@ -34,7 +32,6 @@ import orderBy from "lodash/orderBy";
 import OTPRow from './OTPRow.vue';
 
 import { CipherType } from "jslib-common/enums/cipherType";
-import cystackPlatformAPI from '@/api/cystack_platform';
 import NoCipher from "@/popup/components/ciphers/NoCipher";
 import SortMenu from "@/components/SortMenu.vue";
 
@@ -48,6 +45,7 @@ export default {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
+      CipherType,
       otps: [],
       orderField: "revisionDate",
       orderDirection: 'desc',
@@ -91,7 +89,7 @@ export default {
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
-        return result
+        return result || []
       },
       watch: [
         "$store.state.syncedCiphersToggle",
@@ -112,25 +110,6 @@ export default {
     changeSort (sortValue) {
       this.orderField = sortValue.orderField;
       this.orderDirection = sortValue.orderDirection;
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async deleteOTPs (ids) {
-      this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
-        confirmButtonText: this.$t('common.delete'),
-        cancelButtonText: this.$t('common.cancel'),
-        type: 'warning'
-      }).then(async () => {
-        try {
-          this.callingAPI = true
-          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
-          this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$t('type.5', ids.length) }), 'success')
-          this.callingAPI = false
-        } catch (e) {
-          this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.5', ids.length) }), 'warning')
-        } finally {
-          this.callingAPI = false
-        }
-      })
     }
   }
 }

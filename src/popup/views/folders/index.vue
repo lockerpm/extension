@@ -4,76 +4,79 @@
     v-loading="$store.state.syncing"
   >
     <NoCipher
-      v-if="!folders.length && !$store.state.syncing"
+      v-if="folders && !folders.length && !$store.state.syncing"
       :type="0"
-      @add-cipher="() => $router.push({ name: 'add-edit-folder' })"
+      @add-cipher="() => addFolder()"
     />
     <div v-else>
-      <div class="font-semibold mb-2 text-[#A2A3A7]">
-        {{ $t('type.folder') }} ({{filteredFolder.length}})
+      <div class="font-semibold mb-2 text-gray">
+        {{ $t('type.folder') }} ({{ filteredFolder ? filteredFolder.length || 0 : 0}})
       </div>
       <ul class="list-folders">
         <li
-          v-for="item in filteredFolder"
-          :key="item.id"
-          class="folder-item"
-          @click="routerFolder(item)"
+          v-for="folder in filteredFolder"
+          :key="folder.id"
         >
-          <div class="menu-icon mr-4">
-            <img
-              src="@/assets/images/icons/icon_folder.svg"
-              alt=""
-              style="width: 32px; height: 32px;"
-            >
-          </div>
-          <div class="flex-grow flex justify-between mr-2">
-            <div class="w-[200px] truncate text-black font-semibold">
-              {{ item.name }}
-            </div>
-          </div>
-          <div>
-            <i class="fas fa-chevron-right"></i>
-          </div>
+          <FolderRow
+            :folder="folder"
+            @edit-folder="() => editFolder(folder)"
+          />
         </li>
       </ul>
     </div>
+    <AddEditFolder
+      key="folders"
+      ref="addEditFolder"
+      @done="() => $router.push({ name: 'folders' })"
+    />
   </div>
 </template>
 
 <script>
 import Vue from "vue";
 import NoCipher from "@/popup/components/ciphers/NoCipher";
+import FolderRow from "@/popup/components/folder/FolderRow.vue";
+import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 
 export default Vue.extend({
   components: {
-    NoCipher
+    NoCipher,
+    FolderRow,
+    AddEditFolder
   },
   asyncComputed: {
     folders: {
       async get () {
         let results = []
+        const allCiphers = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => !c.isDeleted],
+          null
+        )) || [];
         try {
           results = await this.$folderService.getAllDecrypted() || [];
         } catch (error) {
           results = []
         }
-        results = results.filter((f) => f.id);
-        return results || [];
+        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => c.folderId === f.id)}));
+        return results;
       },
-      watch: []
+      watch: [
+        "$store.state.syncedCiphersToggle"
+      ]
     },
   },
   computed: {
     filteredFolder() {
-      return this.folders.filter((f) => f.name.toLowerCase().includes(this.searchText?.toLowerCase() || ''))
+      return (this.folders || []).filter((f) => this.searchText ? f.name.toLowerCase().includes(this.searchText.toLowerCase() || '') : true)
     }
   },
   methods: {
-    routerFolder (item) {
-      this.$router.push({
-        name: "folder-detail",
-        params: { id: item.id, data: item },
-      });
+    addFolder () {
+      this.$refs.addEditFolder?.openDialog({}, true)
+    },
+    editFolder (folder) {
+      this.$refs.addEditFolder?.openDialog(folder, true)
     },
   }
 })

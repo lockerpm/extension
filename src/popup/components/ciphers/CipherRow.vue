@@ -27,7 +27,7 @@
           >
         </div>
         <div
-          class="truncate text-[#A2A3A7]"
+          class="truncate text-gray"
           style="line-height: 16px;"
         >
           <small>

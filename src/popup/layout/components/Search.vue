@@ -57,17 +57,23 @@
       circle
       type="primary"
       size="small"
-      @click="$router.push({ name: 'add-edit-folder' })"
+      @click="() => addFolder()"
     />
-    
+    <AddEditFolder
+      key="search-folders"
+      ref="addSearchEditFolder"
+      @done="() => {}"
+    />
   </div>
 </template>
 
 <script>
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
+import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 
 export default {
+  components: { AddEditFolder },
   props: {
     cipherType: {
       type: Number,
@@ -116,10 +122,24 @@ export default {
       watch: []
     },
   },
+  watch: {
+    $route: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+      handler() {
+        this.inputText = '';
+        this.handleSearch()
+      },
+      deep: true
+    }
+  },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleSearch () {
       this.$store.commit('UPDATE_SEARCH', this.inputText)
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    addFolder () {
+      this.$refs.addSearchEditFolder?.openDialog({}, true)
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleCreateOTP (command) {

@@ -37,8 +37,6 @@ export default Vue.extend({
       cipherType: this.$route.query ? Number(this.$route.query.type || CipherType.Login) : CipherType.Login
     }
   },
-  asyncComputed: {
-  },
   computed: {
   },
   methods: {

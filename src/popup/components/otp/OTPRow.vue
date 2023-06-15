@@ -39,8 +39,17 @@
             >
               {{ $t('data.otp.copy') }}
             </el-dropdown-item>
-            <el-dropdown-item @click.native="$emit('edit')">{{ $t('common.edit') }}</el-dropdown-item>
-            <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">{{ $t('common.delete') }}</el-dropdown-item>
+            <el-dropdown-item
+              @click.native="$router.push({ name: 'add-edit-otp', params: { data: item } })"
+            >
+              {{ $t('common.edit') }}
+            </el-dropdown-item>
+            <el-dropdown-item
+              class="text-danger"
+              @click.native="deleteCiphers([item.id])"
+            >
+              {{ $t('common.delete') }}
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -49,6 +58,7 @@
 </template>
 
 <script>
+
 export default {
   components: { },
   props: {

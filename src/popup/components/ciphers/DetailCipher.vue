@@ -284,7 +284,7 @@
 import Vue from 'vue';
 import debounce from 'lodash/debounce'
 import find from 'lodash/find'
-import PasswordStrength from '@/components/password/PasswordStrength'
+import PasswordStrength from '@/popup/components/password/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
 import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy'
 export default Vue.extend({
@@ -378,9 +378,6 @@ export default Vue.extend({
     },
     moveFolders (ids) {
       this.$refs.moveFolder.openDialog(ids)
-    },
-    deleteCiphers (ids) {
-      this.$refs.addEditCipherDialog.deleteCiphers(ids)
     },
     checkPassword: debounce(function (password) {
       return this.$passwordGenerationService.passwordStrength(String(password), ['cystack']) || {}

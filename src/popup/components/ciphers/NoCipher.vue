@@ -14,7 +14,7 @@
       >
       </div>
       <div
-        class="text-[#A2A3A7] mb-4"
+        class="text-gray mb-4"
         v-html="$t(`data.no_data.${currentIcon.key}.description`)"
       >
       </div>

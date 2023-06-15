@@ -71,10 +71,6 @@ export class FolderService implements FolderServiceAbstraction {
     }
 
     async getAllDecrypted(): Promise<FolderView[]> {
-        if (this.decryptedFolderCache != null) {
-            return this.decryptedFolderCache;
-        }
-
         const hasKey = await this.cryptoService.hasKey();
         if (!hasKey) {
           this.decryptedFolderCache = []

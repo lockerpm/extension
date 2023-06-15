@@ -23,19 +23,26 @@
           :score="passwordStrength.score"
         />
       </div>
-      <button
-        v-clipboard:copy="password"
-        v-clipboard:success="clipboardSuccessHandler"
-        class="btn btn-primary w-full mt-4"
-      >
-        {{ $t('data.tools.copy_password') }}
-      </button>
-      <button
-        class="btn btn-primary-reserve w-full mt-2"
-        @click="savePassword"
-      >
-        {{ $t('data.tools.save_with_locker') }}
-      </button>
+      <div class="mt-2">
+        <el-button
+          v-clipboard:copy="password"
+          v-clipboard:success="clipboardSuccessHandler"
+          type="primary"
+          size="small"
+          class="w-full"
+        >
+          {{ $t('data.tools.copy_password') }}
+        </el-button>
+      </div>
+      <div class="mt-2">
+        <el-button
+          class="w-full"
+          size="small"
+          @click="savePassword"
+        >
+          {{ $t('data.tools.save_with_locker') }}
+        </el-button>
+      </div>
     </div>
     <div class="password-generator-options">
       <div class="generator-option">

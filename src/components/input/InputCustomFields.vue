@@ -1,7 +1,5 @@
 <template>
   <div>
-    <div class="mb-4">
-    </div>
     <div v-for="(field, index) in value" :key="index">
       <div class="flex">
         <div class="self-center mr-3">

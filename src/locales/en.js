@@ -576,7 +576,9 @@ module.exports = {
       hidden: 'Hidden',
       date: 'Date',
       monthYear: 'Month/Year',
-      markFavorite: 'Mark favorite'
+      markFavorite: 'Mark favorite',
+      select_networks: 'Select networks',
+      select_wallet: 'Select wallets'
     },
     settings: {
       account: 'Account',

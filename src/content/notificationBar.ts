@@ -344,7 +344,12 @@ document.addEventListener('DOMContentLoaded', event => {
           cursor: pointer;
         `;
         logo.addEventListener("click", () => {
-          openInformMenu(inputEl, type);
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+          if (menuEl) {
+            menuEl.parentElement.removeChild(menuEl);
+          } else {
+            openInformMenu(inputEl, type);
+          }
         });
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         if (elPosition.width <= 0) {
