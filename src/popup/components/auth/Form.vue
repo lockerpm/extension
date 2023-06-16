@@ -30,8 +30,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: 'quyetnv@cystack.net',
-        password: 'tienquyet1997@'
+        username: '',
+        password: ''
       },
     }
   },
