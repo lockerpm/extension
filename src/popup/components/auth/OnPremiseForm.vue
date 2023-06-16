@@ -106,7 +106,7 @@ export default Vue.extend({
           user_info: payload
         })
         if (JSON.stringify(response) == '{}' || response.login_method === 'passwordless' || response.require_passwordless) {
-          this.$router.push({ name: 'pwl-unlock' })
+          this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
         }
         this.callingAPI = false
       }).catch((error) => {

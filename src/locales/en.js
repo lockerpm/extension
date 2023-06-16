@@ -615,7 +615,7 @@ module.exports = {
       go_to_web_vault: 'Go to Web Vault',
       import_export: 'Import & Export',
       vault_timeout: 'Vault Timeout',
-      vault_timeout_desc: 'Lock your vault automatically.',
+      vault_timeout_desc: 'Lock your vault automatically',
       vault_timeout_action: 'Vault Timeout Action',
       vault_timeout_details: 'Choose when to lock your vault. You will be asked to enter your Master Password to unlock it when it’s locked.',
       fingerprint_phase: 'Fingerprint Phrase',

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      :visible.sync="dialogVisible"
+      :visible.sync="visible"
       width="435px"
       destroy-on-close
       top="15vh"
@@ -25,22 +25,24 @@
           />
         </form>
       </div>
-      <div slot="footer" class="dialog-footer flex items-center text-left">
-        <div class="flex-grow" />
+      <div slot="footer" class="dialog-footer flex items-center justify-end">
         <div>
-          <button
-            class="btn btn-default"
-            @click="dialogVisible = false"
+          <el-button
+            size="small"
+            :disabled="callingAPI"
+            @click="visible = false"
           >
             {{ $t('common.cancel') }}
-          </button>
-          <button
-            class="btn btn-primary"
-            :disabled="loading || !password"
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            :disabled="!password"
+            :loading="callingAPI"
             @click="confirmPassword"
           >
             {{ $t('common.confirm') }}
-          </button>
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -53,30 +55,32 @@ export default {
   components: {
     InputText
   },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
       password: '',
       showPassword: false,
-      dialogVisible: false,
-      loading: false,
+      visible: false,
+      callingAPI: false,
       count: 0,
       errors: {}
     }
   },
   computed: {
   },
-  mounted () {
-  },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async openDialog () {
-      this.dialogVisible = true
+      this.visible = true
       this.password = ''
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     closeDialog () {
-      this.dialogVisible = false
+      this.visible = false
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async confirmPassword () {
-      this.loading = true
+      this.callingAPI = true
       this.errors = { }
       const keyHash = await this.$cryptoService.hashPassword(this.password, null)
       const storedKeyHash = await this.$cryptoService.getKeyHash()
@@ -91,7 +95,7 @@ export default {
           this.lock()
         }
       }
-      this.loading = false
+      this.callingAPI = false
     }
   }
 }

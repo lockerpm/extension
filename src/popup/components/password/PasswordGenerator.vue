@@ -37,6 +37,8 @@
       <div class="mt-2">
         <el-button
           class="w-full"
+          type="primary"
+          plain
           size="small"
           @click="savePassword"
         >
@@ -149,7 +151,7 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
-      this.$router.push({ name: 'add-edit-cipher', params: { password: this.password } })
+      this.$router.push({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {

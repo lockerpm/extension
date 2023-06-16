@@ -27,7 +27,7 @@
     <AddEditFolder
       key="folders"
       ref="addEditFolder"
-      @done="() => $router.push({ name: 'folders' })"
+      @done="() => {}"
     />
   </div>
 </template>

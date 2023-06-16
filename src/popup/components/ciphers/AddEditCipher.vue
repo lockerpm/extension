@@ -41,7 +41,6 @@
           <el-switch
             v-model="cipher.favorite"
             active-color="#13ce66"
-            inactive-color="white"
           >
           </el-switch>
         </div>
@@ -516,6 +515,18 @@
             </el-checkbox-group>
           </div>
         </template>
+
+        <div class="mt-4">
+          <el-button
+            class="w-full"
+            type="primary"
+            plain
+            :loading="callingAPI"
+            @click="handleSave"
+          >
+            {{ $t('common.save') }}
+          </el-button>
+        </div>
       </div>
     </div>
     <AddEditFolder
@@ -600,8 +611,7 @@ export default Vue.extend({
       folders: [],
       showPassword: false,
       showCardCode: false,
-      dialogVisible: false,
-      loading: false,
+      callingAPI: false,
       CipherType,
       errors: {},
       writeableCollections: [],
@@ -753,10 +763,17 @@ export default Vue.extend({
     }
   },
   methods: {
+    async handleSave () {
+      if (this.cipher.id) {
+        await this.putCipher(this.cipher)
+      } else {
+        await this.postCipher(this.cipher)
+      }
+    },
     async postCipher (cipher) {
       if (!cipher.name) { return }
       try {
-        this.loading = true
+        this.callingAPI = true
         this.errors = {}
         const type_ = this.cipher.type
         if (this.cipher.type === CipherType.CryptoAccount || this.cipher.type === CipherType.CryptoWallet) {
@@ -786,7 +803,7 @@ export default Vue.extend({
           this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning')
         }
       } finally {
-        this.loading = false
+        this.callingAPI = false
       }
     },
     async putCipher (cipher) {
@@ -816,45 +833,8 @@ export default Vue.extend({
           this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning') 
         }
       } finally {
-        this.loading = false
+        this.callingAPI = false
       }
-    },
-    async moveTrashCiphers (ids) {
-      this.$confirm(this.$tc('data.notifications.trash_selected_desc', ids.length, { count: ids.length }), this.$t('common.warning'), {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(async () => {
-        try {
-          this.loading = true
-          await cystackPlatformAPI.ciphers_delete({ ids })
-          this.notify(this.$tc('data.notifications.trash_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
-          this.$emit('trashed-cipher')
-        } catch (e) {
-          this.notify(this.$tc('data.notifications.trash_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-          this.$emit('reset-selection')
-        } finally {
-          this.loading = false
-        }
-      })
-    },
-    async restoreCiphers (ids) {
-      this.$confirm(this.$tc('data.notifications.restore_selected_desc', ids.length), this.$t('common.warning'), {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(async () => {
-        try {
-          this.loading = true
-          await cystackPlatformAPI.ciphers_restore({ ids })
-          this.notify(this.$tc('data.notifications.restore_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
-          this.$emit('reset-selection')
-        } catch (e) {
-          this.notify(this.$tc('data.notifications.restore_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
-        } finally {
-          this.loading = false
-        }
-      })
     },
     addFolder (shouldRedirect = false) {
       this.$refs.addEditFolder.openDialog({}, shouldRedirect)

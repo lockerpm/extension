@@ -64,7 +64,7 @@ export default Vue.extend({
         user_info: null,
         auth_info: null,
       })
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' }).catch(() => ({}))
     },
 
     handleRestore() {

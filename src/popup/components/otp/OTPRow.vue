@@ -1,5 +1,7 @@
 <template>
-  <div class="otp-item px-4 py-2">
+  <div
+    class="otp-item px-4 py-2"
+  >
     <el-row type="flex" justify="space-between">
       <el-row
         type="flex"
@@ -27,12 +29,18 @@
           :stroke-width="3"
         ></el-progress>
       </el-row>
-      <div class="otp-item__right">
-        <el-dropdown trigger="click">
+      <div
+        class="otp-item__right"
+      >
+        <el-dropdown
+          trigger="hover"
+        >
           <div class="icon flex items-center justify-center">
             <i class="el-icon-more"></i>
           </div>
-          <el-dropdown-menu slot="dropdown">
+          <el-dropdown-menu
+            slot="dropdown"
+          >
             <el-dropdown-item
               v-clipboard:copy="otp"
               v-clipboard:success="handleCopy"
@@ -40,7 +48,7 @@
               {{ $t('data.otp.copy') }}
             </el-dropdown-item>
             <el-dropdown-item
-              @click.native="$router.push({ name: 'add-edit-otp', params: { data: item } })"
+              @click.native="$emit('edit-otp')"
             >
               {{ $t('common.edit') }}
             </el-dropdown-item>
@@ -70,7 +78,7 @@ export default {
       otp: '',
       period: 30,
       now: new Date().getTime() / 1000,
-      isCopied: false,
+      isCopied: false
     }
   },
   computed: {

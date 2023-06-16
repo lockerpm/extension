@@ -6,6 +6,7 @@
       @add-cipher="() => {}"
     />
     <div
+      v-else
       class="list-otp__container"
       v-loading="callingAPI"
     >
@@ -21,6 +22,7 @@
           v-for="item in dataRendered"
           :key="item.id"
           :item="item"
+          @edit-otp="() => $emit('edit-otp', item)"
         />
       </div>
     </div>

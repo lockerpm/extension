@@ -113,9 +113,9 @@ export default Vue.extend({
     },
     handleBack() {
       if (this.isLoggedIn) {
-        this.$router.push({ name: 'lock' })
+        this.$router.push({ name: 'lock' }).catch(() => ({}))
       } else {
-        this.$router.push({ name: 'login' })
+        this.$router.push({ name: 'login' }).catch(() => ({}))
       }
     },
     handleDownload() {

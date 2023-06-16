@@ -134,7 +134,7 @@ export default Vue.extend({
       const ciphers = await this.$cipherService.getAllDecryptedForUrl(
         this.url,
         otherTypes.length > 0 ? otherTypes : null
-      );
+      ) || [];
       this.loginCiphers = [];
 
       ciphers.forEach((c) => {
@@ -151,7 +151,7 @@ export default Vue.extend({
       this.loaded = true;
     },
     goToAddItem () {
-      this.$router.push({ name: "add-edit-cipher"});
+      this.$router.push({ name: "add-edit-cipher"}).catch(() => ({}));
     },
     getCurrentSiteIcon() {
       try {

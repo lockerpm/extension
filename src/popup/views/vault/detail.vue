@@ -11,6 +11,6 @@ export default Vue.extend ({
     DetailCipher
   },
   computed: {
-  }
+  },
 })
 </script>

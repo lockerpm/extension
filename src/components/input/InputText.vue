@@ -8,8 +8,8 @@
       'is-password': isPassword,
       'is-error': errorText,
       'is-disabled': disabled,
-      'bottom-border': bottomBorder,
-      'no-border': noBorder
+      'no-border': noBorder,
+      'bottom-border': bottomBorder
     }"
   >
     <label for="">{{ label }} <span v-if="required" class="text-danger">*</span></label>
@@ -260,6 +260,9 @@ export default Vue.extend({
     line-height: 19px;
     user-select: none;
   }
+  &.no-border {
+    border: none;
+  }
   &.bottom-border {
     border: none;
     border-bottom: solid 1px #e6e8f4;
@@ -281,9 +284,6 @@ export default Vue.extend({
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
-  }
-  &.no-border {
-    border: none !important;
   }
 }
 </style>

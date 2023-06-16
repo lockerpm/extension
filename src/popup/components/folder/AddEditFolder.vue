@@ -1,8 +1,8 @@
 <template>
   <el-dialog
-    :visible.sync="dialogVisible"
+    :visible.sync="visible"
     :title="folder.id ? $t('data.folders.edit_folder') : $t('data.folders.add_folder')"
-    width="80%"
+    width="85%"
     destroy-on-close
     append-to-body
     custom-class="locker-dialog"
@@ -16,6 +16,7 @@
         <InputText
           v-model="folder.name"
           class="w-full"
+          required
           :disabled="callingAPI"
           :bottom-border="true"
           :label="$t('common.folder_name')"
@@ -28,7 +29,7 @@
         <el-button
           size="small"
           :disabled="callingAPI"
-          @click="dialogVisible = false"
+          @click="visible = false"
         >
           {{ $t('common.cancel') }}
         </el-button>
@@ -62,9 +63,10 @@ export default Vue.extend({
   },
   data () {
     return {
+      item: {},
       folder: {},
       callingAPI: false,
-      dialogVisible: false,
+      visible: false,
       errors: {},
       redirect: false,
       shouldRedirect: false
@@ -72,8 +74,9 @@ export default Vue.extend({
   },
   methods: {
     openDialog (folder = {}, shouldRedirect = false) {
-      this.dialogVisible = true
+      this.visible = true
       this.shouldRedirect = shouldRedirect
+      this.item = folder || {}
       this.folder = { ...folder }
     },
     async handleSave() {
@@ -84,7 +87,6 @@ export default Vue.extend({
       }
     },
     async postFolder() {
-      console.log(11111);
       try {
         this.callingAPI = true
         const folderEnc = await this.$folderService.encrypt(this.folder)
@@ -93,7 +95,7 @@ export default Vue.extend({
         this.$emit('done')
         this.$emit('created-folder', { id: res.id, name: this.folder.name })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.folder') }), 'success')
-        this.dialogVisible = false
+        this.visible = false
       } catch (e) {
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t('common.folder') }), 'warning')
@@ -102,6 +104,11 @@ export default Vue.extend({
       }
     },
     async putFolder() {
+      if (this.folder.name == this.item.name) {
+        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.folder') }), 'success')
+        this.visible = false
+        return
+      }
       try {
         this.callingAPI = true
         const folderEnc = await this.$folderService.encrypt(this.folder)
@@ -109,7 +116,7 @@ export default Vue.extend({
         await cystackPlatformAPI.update_folder(this.folder.id, data)
         this.$emit('done')
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.folder') }), 'success')
-        this.dialogVisible = false
+        this.visible = false
       } catch (e) {
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
         this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$t('common.folder') }), 'warning')

@@ -303,7 +303,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     const promises: any[] = [];
-    const ciphers = await this.getAll();
+    const ciphers = await this.getAll() || [];
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)));
     });
@@ -355,7 +355,7 @@ export class CipherService implements CipherServiceAbstraction {
         return matches;
       });
 
-    const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted()]);
+    const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted() || []]);
     const matchingDomains = result[0];
     const ciphers = result[1] || [];
 
@@ -707,7 +707,7 @@ export class CipherService implements CipherServiceAbstraction {
       const c = cipher as CipherData;
       ciphers[c.id] = c;
     } else {
-      (cipher as CipherData[]).forEach(c => {
+      (cipher as CipherData[] || []).forEach(c => {
         ciphers[c.id] = c;
       });
     }
@@ -736,7 +736,7 @@ export class CipherService implements CipherServiceAbstraction {
       ciphers = {};
     }
 
-    ids.forEach(id => {
+    (ids || []).forEach(id => {
       if (ciphers.hasOwnProperty(id)) {
         ciphers[id].folderId = folderId;
       }
@@ -1114,10 +1114,6 @@ export class CipherService implements CipherServiceAbstraction {
     const cacheKey = autofillOnPageLoad ? 'autofillOnPageLoad-' + url : url;
     if (!this.sortedCiphersCache.isCached(cacheKey)) {
       let ciphers = await this.getAllDecryptedForUrl(url) || [];
-      if (!ciphers) {
-        return null;
-      }
-
       if (autofillOnPageLoad) {
         const autofillOnPageLoadDefault = await this.storageService.get(ConstantsService.autoFillOnPageLoadDefaultKey);
         ciphers = ciphers.filter(cipher => cipher.login.autofillOnPageLoad ||

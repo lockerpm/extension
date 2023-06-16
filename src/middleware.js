@@ -22,9 +22,11 @@ router.beforeEach(async (to, from, next) => {
       await store.dispatch("LoadCurrentUser");
       await store.dispatch("LoadCurrentUserPw");
       fistData = false
-    }
-    if (!isLocked && ['login', 'pwl-unlock', 'forgot-password', 'lock'].includes(to.name)) {
-      router.push({ name: "vault" });
+      if (!isLocked && ['login', 'pwl-unlock', 'forgot-password', 'lock', 'set-master-password'].includes(to.name)) {
+        router.push({ name: "vault" });
+      } else if (isLocked && !['pwl-unlock', 'lock', 'set-master-password'].includes(to.name)) {
+        router.push({ name: "lock" });
+      }
     }
     if (store.state.user.email && !!store.state.userPw) {
       const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')

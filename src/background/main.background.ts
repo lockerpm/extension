@@ -713,7 +713,7 @@ export default class MainBackground {
     if (!locked) {
       try {
         setTimeout(async () => {
-          const ciphers = await this.cipherService.getAllDecryptedForUrl(url);
+          const ciphers = await this.cipherService.getAllDecryptedForUrl(url) || [];
           ciphers.sort((a, b) => this.cipherService.sortCiphersByLastUsedThenName(a, b));
           if (contextMenuEnabled) {
             ciphers.forEach(cipher => {

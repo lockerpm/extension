@@ -118,13 +118,13 @@ export default Vue.extend({
               }
             })
             if (response.login_method === 'passwordless' || response.require_passwordless) {
-              this.$router.push({ name: 'pwl-unlock' })
+              this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
             } else {
               await this.$store.dispatch("LoadCurrentUser");
               await this.$store.dispatch("LoadCurrentUserPw");
               await this.$runtimeBackground.updateStoreService('isLoggedIn', true)
               this.$store.commit('UPDATE_IS_LOGGEDIN', true)
-              this.$router.push({ name: 'lock' })
+              this.$router.push({ name: 'lock' }).catch(() => ({}))
             }
             callback()
           }).catch ((error) => {

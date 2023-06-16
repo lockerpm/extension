@@ -15,7 +15,7 @@
         <div
           class="text-black font-semibold truncate hover:text-primary"
           style="line-height: 18px;"
-          @click.self="$router.push({ name: 'vault-detail', params: { id: item.id, data: item } })"
+          @click.self="$router.push({ name: 'vault-detail', params: { id: item.id, data: item } }).catch(() => ({}))"
         >
           {{ item.name }}
           <img
@@ -164,7 +164,7 @@ export default Vue.extend(
     },
     methods: {
       addEdit (item) {
-        this.$router.push({name: 'add-edit-cipher', params: {data: item}})
+        this.$router.push({name: 'add-edit-cipher', params: {data: item}}).catch(() => ({}))
       },
       fillCipher(){
         this.$emit('do-fill')

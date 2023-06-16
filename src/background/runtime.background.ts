@@ -301,7 +301,9 @@ export default class RuntimeBackground {
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
       let url = ''
-      if (provider === 'sso') {
+      if (type === 'id-info') {
+        BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);
+      } else if (provider === 'sso') {
         this.currentLocation = tab.url
         BrowserApi.createNewTab(`${process.env.VUE_APP_ID_URL}/login/sso?client=extension`, true, true);
       } else {

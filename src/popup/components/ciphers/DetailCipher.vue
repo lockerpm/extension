@@ -250,7 +250,7 @@
         >
           <div class="">{{ $t('data.ciphers.folder') }}</div>
           <div class="col-span-4">
-            <template v-if="cipher.collectionIds && cipher.collectionIds.length">
+            <template v-if="cipher && cipher.collectionIds && cipher.collectionIds.length">
               <div
                 v-for="item in cipher.collectionIds"
                 :key="item"
@@ -264,7 +264,7 @@
               </div>
             </template>
             <div
-              v-if="cipher.folderId"
+              v-if="cipher && cipher.folderId"
               class="font-semibold flex items-center mt-2"
             >
               <img
@@ -282,7 +282,6 @@
 
 <script>
 import Vue from 'vue';
-import debounce from 'lodash/debounce'
 import find from 'lodash/find'
 import PasswordStrength from '@/popup/components/password/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
@@ -298,30 +297,6 @@ export default Vue.extend({
     return {
       showPassword: false,
       CipherType
-    }
-  },
-  computed: {
-    folder () {
-      return find(this.folders, e => e.id === this.cipher.folderId) || {}
-    },
-    collection () {
-      if (this.collections) {
-        return find(this.collections, e => e.id === this.$route.params.tfolderId) || { name: 'Unassigned Folder', id: 'unassigned' }
-      }
-      return {}
-    },
-    cipher () {
-      return find(this.ciphers, e => e.id === this.$route.params.id) || { collectionIds: [] }
-    },
-    passwordStrength () {
-      if (this.cipher.login) {
-        return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
-      } else if (this.cipher.cryptoAccount) {
-        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
-      } else if (this.cipher.cryptoWallet) {
-        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
-      }
-      return {}
     }
   },
   asyncComputed: {
@@ -367,26 +342,32 @@ export default Vue.extend({
         return collections
       },
       watch: ['$store.state.syncedCiphersToggle', 'ciphers']
+    },
+  },
+  computed: {
+    cipher () {
+      if (this.ciphers) {
+        return find(this.ciphers, e => e.id === this.$route.params.id) || { collectionIds: [] }
+      }
+      return this.$route.params.data || {}
+    },
+    passwordStrength () {
+      if (this.cipher && this.cipher.login) {
+        return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
+      } else if (this.cipher.cryptoAccount) {
+        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
+      } else if (this.cipher.cryptoWallet) {
+        return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
+      }
+      return {}
     }
   },
   methods: {
-    addEdit (item) {
-      this.$router.push({ name: 'add-edit-cipher', params: { data: item } })
-    },
-    shareItem (cipher) {
-      this.$refs.shareCipher.openDialog(cipher)
-    },
-    moveFolders (ids) {
-      this.$refs.moveFolder.openDialog(ids)
-    },
-    checkPassword: debounce(function (password) {
-      return this.$passwordGenerationService.passwordStrength(String(password), ['cystack']) || {}
-    }, 600),
-    findCollection (collections, id) {
-      return find(collections, e => e.id === id) || { name: 'Unassigned Folder', id: 'unassigned' }
-    },
     findFolder (folders, id) {
-      return find(folders, e => e.id === id) || { name: this.$t('data.folders.no_folder'), id: 'unassigned' }
+      if (folders) {
+        return find(folders, e => e.id === id) || { name: this.$t('data.folders.no_folder'), id: 'unassigned' }
+      }
+      return { name: this.$t('data.folders.no_folder'), id: 'unassigned' }
     }
   }
 })

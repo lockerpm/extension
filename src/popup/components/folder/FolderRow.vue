@@ -1,6 +1,8 @@
 <template>
   <div
     class="folder-item"
+    @mouseover="() => isHover = true"
+    @mouseleave="() => isHover = false"
   >
     <div class="menu-icon mr-4">
       <img
@@ -26,10 +28,17 @@
         </small>
       </div>
     </div>
-    <div class="folder-item__right">
-      <el-dropdown trigger="click">
+    <div
+      v-show="isHover"
+      class="folder-item__right"
+    >
+      <el-dropdown
+        trigger="hover"
+      >
         <i class="el-icon-more"></i>
-        <el-dropdown-menu slot="dropdown">
+        <el-dropdown-menu
+          slot="dropdown"
+        >
           <el-dropdown-item
             @click.native="() => $emit('edit-folder')"
           >
@@ -57,12 +66,17 @@ export default Vue.extend({
       type: Object
     }
   },
+  data() {
+    return {
+      isHover: false
+    }
+  },
   methods: {
     routerFolder (folder) {
       this.$router.push({
         name: "folder-detail",
         params: { id: folder.id, data: folder },
-      });
+      }).catch(() => ({}));
     },
   }
 })

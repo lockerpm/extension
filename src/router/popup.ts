@@ -2,6 +2,7 @@ import Vue from 'vue'
 import sentryConfig from './index'
 import VueRouter, { RouteConfig } from 'vue-router'
 
+import AuthLayout from '@/popup/layout/auth.vue'
 import Layout from '@/popup/layout/index.vue'
 import ShowLayout from '@/popup/layout/show.vue'
 
@@ -10,6 +11,7 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
   {
     path: "/auth",
+    component: AuthLayout,
     children: [
       {
         path: "login",
@@ -111,14 +113,6 @@ const routes: Array<RouteConfig> = [
         component: () =>
           import(
             "../popup/views/vault/show.vue"
-          )
-      },
-      {
-        path: "otp/add-edit",
-        name: "add-edit-otp",
-        component: () =>
-          import(
-            "../popup/views/otp/show.vue"
           )
       },
       {

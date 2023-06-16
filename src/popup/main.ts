@@ -166,7 +166,7 @@ Vue.mixin({
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
 
-      this.$router.push({ name: 'login' });
+      this.$router.push({ name: 'login' }).catch(() => ({}));
       await this.$runtimeBackground.updateStoreService('isLoggedIn', false)
       await this.setupFillPage();
     },
@@ -181,7 +181,7 @@ Vue.mixin({
         this.$settingsService.clear(userId),
         this.$policyService.clear(userId),
       ])
-      this.$router.push({ name: 'lock' });
+      this.$router.push({ name: 'lock' }).catch(() => ({}));
       await this.setupFillPage();
     },
     randomString() {
@@ -246,7 +246,7 @@ Vue.mixin({
             this.$vaultTimeoutService.biometricLocked = false
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.$router.push({ name: 'vault' });
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
         } else {
           const res = await cystackPlatformAPI.users_session({
@@ -271,7 +271,7 @@ Vue.mixin({
               this.$vaultTimeoutService.biometricLocked = false
             }
             await this.$runtimeBackground.handleUnlocked('unlocked')
-            this.$router.push({ name: 'vault' });
+            this.$router.push({ name: 'vault' }).catch(() => ({}));
             this.$store.commit('UPDATE_CALLING_API', false)
           }, 1000);
         }
@@ -516,7 +516,7 @@ Vue.mixin({
         if (data.msgType === 3) {
           // Connect success and show OTP
           if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' })
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
           }
         } else if (data.msgType === 4) {
           // Unlock success
@@ -536,7 +536,7 @@ Vue.mixin({
         } else if (data.msgType === 6) {
           // Not Install Desktop App or Not Unlock
           if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' })
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
           }
         } else if (data.msgType === 7) {
           // Desktop Lock

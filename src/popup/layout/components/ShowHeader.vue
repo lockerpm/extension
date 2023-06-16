@@ -20,16 +20,6 @@
         </div>
       </div>
       <div class="s-header-right flex items-center">
-        <el-button
-          v-if="showMenuData.isSave"
-          icon="el-icon-check"
-          type="primary"
-          size="small"
-          round
-          @click="$emit('save')"
-        >
-          {{ $t('common.save') }}
-        </el-button>
         <el-dropdown
           v-if="showMenuData && showMenuData.menus && showMenuData.menus.length > 0"
           trigger="click"
@@ -43,6 +33,7 @@
             <el-dropdown-item
               v-for="(menu, index) in showMenuData.menus"
               :key="index"
+              :class="menu.class || ''"
               @click.native="() => menu.click()"
             >
               {{ menu.label }}
@@ -72,16 +63,13 @@ export default {
       const result = {
         Icon: null,
         title: '',
-        isSave: false,
         menus: [],
         back: () => this.$router.back()
       }
       switch (this.$route.name) {
       case 'vault-detail':
         result.title = this.$route.params?.data?.name
-        if (window.history.length === 2) {
-          result.back = () => this.$router.push({ name: 'vault', query: { type: this.$route.params?.data?.type } })
-        }
+        result.back = () => this.$router.push({ name: 'vault', query: { type: this.$route.params?.data?.type } }).catch(() => ({}))
         result.menus = [
           {
             label: this.$t('common.edit'),
@@ -89,11 +77,12 @@ export default {
               this.$router.push({
                 name: 'add-edit-cipher',
                 params: this.$route.params
-              })
+              }).catch(() => ({}))
             }
           },
           {
             label: this.$t('common.delete'),
+            class: 'text-danger',
             click: () => this.deleteCiphers([this.$route.params?.id], result.back)
           }
         ]
@@ -102,14 +91,12 @@ export default {
       case 'folder-detail':
         result.title = this.$route.params?.data?.name
         if (window.history.length == 2) {
-          result.back = () => this.$router.push({ name: 'folders' })
+          result.back = () => this.$router.push({ name: 'folders' }).catch(() => ({}))
         }
         result.menus = [
           {
             label: this.$t('common.delete'),
-            click: () => {
-              //
-            }
+            click: () => this.deleteFolder(this.$route.params?.data?.id, result.back)
           }
         ]
         result.Icon = this.$createElement("img", {
@@ -121,24 +108,23 @@ export default {
         })
         break;
       case 'add-edit-cipher':
-        result.isSave = true
-        if (window.history.length == 2) {
-          result.back = () => this.$router.push({ name: 'vault' })
-        }
+        result.back = () => this.$router.push({ name: 'vault' }).catch(() => ({}))
         if (this.$route.params?.data) {
           result.title = this.$t('common.edit') + ' ' + this.$tc(`type.${this.$route.params?.data?.type}`, 1)
           result.menus = [
             {
               label: this.$t('common.detail'),
               click: () => {
-                this.$router.push({ name: 'vault-detail', params: { id: this.$route.params?.data?.id, data: this.$route.params?.data } })
+                this.$router.push({
+                  name: 'vault-detail',
+                  params: { id: this.$route.params?.data?.id, data: this.$route.params?.data }
+                }).catch(() => ({}))
               }
             },
             {
               label: this.$t('common.delete'),
-              click: () => {
-                //
-              }
+              class: 'text-danger',
+              click: () => this.deleteCiphers([this.$route.params?.data?.id], result.back)
             }
           ]
           result.Icon = this.getIconCipher(this.$route.params?.data, width);
@@ -147,44 +133,19 @@ export default {
           result.Icon = null
         }
         break;
-      case 'add-edit-otp':
-        result.isSave = true
-        if (window.history.length == 2) {
-          result.back = () => this.$router.push({ name: 'otp' })
-        }
-        result.Icon = this.$createElement("img", {
-          attrs: {
-            src: require("@/assets/images/icons/icon_OTP.svg"),
-            width: `${width}px`,
-            height: `${width}px`,
-          }
-        })
-        if (this.$router.params?.data) {
-          result.title = this.$t('common.edit') + ' ' + this.$t('data.parts.otp')
-          result.menus = [
-            {
-              label: this.$t('common.delete'),
-              click: () => this.deleteCiphers([this.$router.params?.data?.id], result.back)
-            }
-          ]
-        } else {
-          result.title = this.$t('common.add') + ' ' + this.$t('data.parts.otp')
-          result.menus = []
-        }
-        break;
       case 'settings-excluded-domains':
         result.Icon = null
-        result.back = () => this.$router.push({ name: 'settings' })
+        result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.excluded_domains')
         break;
       case 'settings-vault-timeout':
         result.Icon = null
-        result.back = () => this.$router.push({ name: 'settings' })
+        result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.vault_timeout')
         break;
       case 'settings-info':
         result.Icon = null
-        result.back = () => this.$router.push({ name: 'settings' })
+        result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.about')
         break;
       default:

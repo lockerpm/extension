@@ -41,39 +41,12 @@ export default Vue.extend({
   async beforeMount () {
     const currentRouterString = await this.$storageService.get('current_router')
     const currentRouter = JSON.parse(currentRouterString)
-    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'vault'})
+    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'vault'}).catch(() => ({}))
   },
-  async mounted () {
-    chrome.runtime.onMessage.addListener((msg) => {
-      switch(msg.command){
-      case 'locked':
-        this.lock();
-        break;
-      case 'doneLoggingOut':
-        this.logout();
-        break;
-      case 'loggedIn':
-        if (this.$route.name === 'login') {
-          (async () => {
-            await this.$store.dispatch('LoadCurrentUser')
-            this.$router.push({ name: 'lock' });
-          })()
-        }
-        break;
-      default:
-        break;
-      }
-    });
-  },
+
   watch: {
-    '$store.state.userPw' (newValue) {
-      if (newValue.is_pwd_manager === false) {
-        this.$router.push({ name: 'set-master-password' })
-      }
-    },
     'locked' (newValue) {
       if (newValue) {
-        this.$router.push({ name: 'lock' })
         this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')

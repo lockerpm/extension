@@ -49,7 +49,7 @@
       circle
       type="primary"
       size="small"
-      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } })"
+      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } }).catch(() => ({}))"
     />
     <el-button
       v-else
@@ -61,8 +61,12 @@
     />
     <AddEditFolder
       key="search-folders"
-      ref="addSearchEditFolder"
+      ref="addEditFolder"
       @done="() => {}"
+    />
+    <AddEditOTP
+      key="search-otp"
+      ref="addEditOTP"
     />
   </div>
 </template>
@@ -71,9 +75,10 @@
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
+import AddEditOTP from '@/popup/components/otp/AddEditOTP.vue'
 
 export default {
-  components: { AddEditFolder },
+  components: { AddEditFolder, AddEditOTP },
   props: {
     cipherType: {
       type: Number,
@@ -139,27 +144,24 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     addFolder () {
-      this.$refs.addSearchEditFolder?.openDialog({}, true)
+      this.$refs.addEditFolder?.openDialog({}, true)
     },
+    
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    handleCreateOTP (command) {
+    async handleCreateOTP (command) {
       if (command === 'setup-key') {
-        this.$emit('add-edit');
+        this.$refs.addEditOTP?.openDialog(null)
       } else {
-        this.scanQRCode();
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        if (tab) {
+          BrowserApi.tabSendMessage(tab, {
+            command: "scanQRCode",
+            tab: tab,
+            sender: 'scanQRCode',
+          });  
+        }
       }
     },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async scanQRCode () {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "scanQRCode",
-          tab: tab,
-          sender: 'scanQRCode',
-        });  
-      }
-    }
   }
 }
 </script>

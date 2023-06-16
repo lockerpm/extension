@@ -55,7 +55,6 @@ body {
 .el-input__inner {
   height: 40px;
   line-height: 40px;
-  border: 0px solid white;
 }
 
 [type="text"]:focus,
@@ -431,14 +430,16 @@ input:-webkit-autofill:active {
 }
 .popup-setting-wrapper {
   @apply bg-white;
-  border-radius: 16px;
+  border-radius: 12px;
   .popup-setting-section {
-    @apply flex items-center cursor-pointer p-4;
+    @apply flex items-center cursor-pointer px-4 py-2;
     .setting-title {
-      @apply text-black text-head-6;
+      @apply text-black;
+      font-size: 14px !important;
     }
     .setting-desc {
-      @apply text-black-500
+      @apply text-black-500;
+      font-size: 11px !important;
     }
 
   }
@@ -458,18 +459,13 @@ input:-webkit-autofill:active {
   visibility: visible !important;
 }
 .timeout-option{
-  @apply flex items-center justify-between px-4 py-2;
+  @apply flex items-center justify-between p-4 py-2;
 }
 .timeout-option:hover {
   background-color: #E8E8E9;
 }
 .info-section {
-  @apply text-black text-head-6 p-4;
-  border-bottom: 1px solid #A2A3A7;
-}
-
-.el-switch__core::after {
-  background-color: #e8e8e9 !important;
+  @apply text-black text-head-6 py-2;
 }
 
 .text-gray {

@@ -265,7 +265,7 @@ export default class NotificationBackground {
   private async autofillFirstPage(tab: chrome.tabs.Tab) {
     try {
       if (this.cipherService && tab.url) {
-        const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url);
+        const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
         const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
         if (loginCiphers.length > 0) {
           await this.startAutofillPage(loginCiphers[0])
@@ -379,7 +379,7 @@ export default class NotificationBackground {
       return;
     }
 
-    const ciphers = await this.cipherService.getAllDecryptedForUrl(loginInfo.url);
+    const ciphers = await this.cipherService.getAllDecryptedForUrl(loginInfo.url) || [];
     const usernameMatches = ciphers.filter(c =>
       c.login.username != null && c.login.username.toLowerCase() === normalizedUsername);
     if (usernameMatches.length === 0) {
@@ -433,7 +433,7 @@ export default class NotificationBackground {
     }
 
     let id: string = null;
-    const ciphers = await this.cipherService.getAllDecryptedForUrl(changeData.url);
+    const ciphers = await this.cipherService.getAllDecryptedForUrl(changeData.url) || [];
     if (changeData.currentPassword != null) {
       const passwordMatches = ciphers.filter(c => c.login.password === changeData.currentPassword);
       if (passwordMatches.length === 1) {
@@ -495,7 +495,7 @@ export default class NotificationBackground {
       // If the vault was locked, check if a cipher needs updating instead of creating a new one
       if (queueMessage.type === NotificationQueueMessageType.addLogin && queueMessage.wasVaultLocked === true) {
         const message = (queueMessage as AddLoginQueueMessage);
-        const ciphers = await this.cipherService.getAllDecryptedForUrl(message.uri);
+        const ciphers = await this.cipherService.getAllDecryptedForUrl(message.uri) || [];
         const usernameMatches = ciphers.filter(c => c.login.username != null &&
           c.login.username.toLowerCase() === message.username);
 
@@ -642,7 +642,7 @@ export default class NotificationBackground {
         responseData.ciphers = []
       } else {
         try {
-          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url)
+          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || []
         } catch (error) {
           responseData.ciphers = []
         }
@@ -666,7 +666,7 @@ export default class NotificationBackground {
             responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(
               tab.url,
               otherTypes
-            );
+            ) || [];
             responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
           }
         } catch (error) {

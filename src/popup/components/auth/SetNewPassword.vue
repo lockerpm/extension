@@ -107,7 +107,7 @@ export default Vue.extend({
               forgot_step: 1
             })
             this.notify(this.$t('data.notifications.change_password_success'), 'success')
-            this.$router.push({ name: 'login' });
+            this.$router.push({ name: 'login' }).catch(() => ({}));
             this.callingAPI = false
           }).catch((error) => {
             this.callingAPI = false
