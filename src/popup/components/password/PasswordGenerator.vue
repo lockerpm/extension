@@ -28,7 +28,6 @@
           v-clipboard:copy="password"
           v-clipboard:success="clipboardSuccessHandler"
           type="primary"
-          size="small"
           class="w-full"
         >
           {{ $t('data.tools.copy_password') }}
@@ -39,7 +38,6 @@
           class="w-full"
           type="primary"
           plain
-          size="small"
           @click="savePassword"
         >
           {{ $t('data.tools.save_with_locker') }}

@@ -150,7 +150,7 @@ export default {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async handleCreateOTP (command) {
       if (command === 'setup-key') {
-        this.$refs.addEditOTP?.openDialog(null)
+        this.$refs.addEditOTP?.openDialog({})
       } else {
         const tab = await BrowserApi.getTabFromCurrentWindow();
         if (tab) {

@@ -181,8 +181,8 @@ Vue.mixin({
         this.$settingsService.clear(userId),
         this.$policyService.clear(userId),
       ])
-      this.$router.push({ name: 'lock' }).catch(() => ({}));
       await this.setupFillPage();
+      this.$router.push({ name: 'lock' }).catch(() => ({}));
     },
     randomString() {
       return nanoid()
@@ -246,6 +246,7 @@ Vue.mixin({
             this.$vaultTimeoutService.biometricLocked = false
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
+          this.getSyncData()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
         } else {
@@ -271,6 +272,7 @@ Vue.mixin({
               this.$vaultTimeoutService.biometricLocked = false
             }
             await this.$runtimeBackground.handleUnlocked('unlocked')
+            this.getSyncData()
             this.$router.push({ name: 'vault' }).catch(() => ({}));
             this.$store.commit('UPDATE_CALLING_API', false)
           }, 1000);

@@ -355,7 +355,7 @@ export class CipherService implements CipherServiceAbstraction {
         return matches;
       });
 
-    const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted() || []]);
+    const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted()]);
     const matchingDomains = result[0];
     const ciphers = result[1] || [];
 
@@ -707,7 +707,7 @@ export class CipherService implements CipherServiceAbstraction {
       const c = cipher as CipherData;
       ciphers[c.id] = c;
     } else {
-      (cipher as CipherData[] || []).forEach(c => {
+      (cipher as CipherData[]).forEach(c => {
         ciphers[c.id] = c;
       });
     }
