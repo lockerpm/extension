@@ -1,26 +1,14 @@
 <template>
   <div
-    class="relative h-screen"
-    style="background: #fff; padding-top: 82px"
+    class="show-body bg-white"
   >
-    <div
-      class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
-    >
-      <div
-        class="menu-icon cursor-pointer"
-        @click="$router.back()"
-      >
-        <i class="fas fa-arrow-left text-[20px]"></i>
-      </div>
-      <div class="col-span-2 text-center text-head-6 font-semibold">
-        {{$t('data.settings.excluded_domains')}}
-      </div>
-    </div>
     <div class="p-4">
-      <div class="text-black-500">
-        {{$t('data.settings.excluded_domains_details')}}
+      <div class="font-semibold">
+        {{$t('data.settings.excluded_domains_desc')}}
       </div>
+      <span class="text-black-500">
+        {{$t('data.settings.excluded_domains_details')}}
+      </span>
       <div class="mt-3">
         <template v-for="(domain, index) in excludedDomains">
           <div
@@ -97,7 +85,6 @@ export default Vue.extend({
         ConstantsService.neverDomainsKey,
         savedDomains
       );
-      // this.$router.push({ name: "settings" });
     },
   },
 });

@@ -91,7 +91,8 @@ module.exports = {
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
     update_title: "Upgrade to Premium to get Unlimited Storage",
-    submit: "Submit"
+    submit: "Submit",
+    detail: "Detail"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -126,7 +127,6 @@ module.exports = {
     billing: 'Billing',
     family_members: 'Family Members',
     policies: 'Policies'
-
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -293,51 +293,46 @@ module.exports = {
       change_team: 'Change Team'
     },
     no_data: {
-      Dashboard: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
-      Vault: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
       Login: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mật khẩu của bạn và truy cập chúng trên mọi thiết bị, bất cứ lúc nào',
-        btn: 'Thêm mật khẩu',
-        btn_import: 'Nhập mật khẩu'
+        title: 'Let\'s get started!',
+        description: 'Add your passwords and access them on any device, anytime',
+        btn: 'Add password',
+        btn_import: 'Import'
       },
       SecureNote: {
-        title: 'Giải phóng bộ nhớ của bạn',
-        description: 'Lưu lại mã Wi-Fi, mã báo động an ninh văn phòng hoặc ngày sinh của bạn bè bạn...',
-        btn: 'Thêm ghi chú'
+        title: 'Free up your memory',
+        description: 'Save Wi-Fi codes, office security alarm codes or your friends\' birthdays...',
+        btn: 'Add note'
       },
       Card: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ thanh toán'
+        title: 'Simplify online shopping',
+        description: 'Add payment card to autofill when shopping online',
+        btn: 'Add payment card'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ danh tính'
+        title: 'Fill online forms faster',
+        description: 'Add Identity card so that Locker can autofill online forms on behalf of you.',
+        btn: 'Add Identity card'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Add your first crypto backup',
+        description: 'Keep your crypto account/wallet in safe place',
+        btn: 'Add Asset'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
+      OTP: {
+        title: 'Secure your account',
+        description: 'Add an additional layer of security for your online accounts by setting up two-factor authentication with Locker',
+        btn: 'Set up 2FA'
       },
-      common: {
-        title: 'Your saved items will appear here.<br>Start by adding an account that you used every day.',
-        btn: 'Add first item'
+      Folder: {
+        title: 'Add your first folder',
+        description: 'Add an folder to manage ciphers',
+        btn: 'Add Folder'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {
@@ -581,7 +576,9 @@ module.exports = {
       hidden: 'Hidden',
       date: 'Date',
       monthYear: 'Month/Year',
-      markFavorite: 'Mark favorite'
+      markFavorite: 'Mark favorite',
+      select_networks: 'Select networks',
+      select_wallet: 'Select wallets'
     },
     settings: {
       account: 'Account',
@@ -618,7 +615,7 @@ module.exports = {
       go_to_web_vault: 'Go to Web Vault',
       import_export: 'Import & Export',
       vault_timeout: 'Vault Timeout',
-      vault_timeout_desc: 'Lock your vault automatically.',
+      vault_timeout_desc: 'Lock your vault automatically',
       vault_timeout_action: 'Vault Timeout Action',
       vault_timeout_details: 'Choose when to lock your vault. You will be asked to enter your Master Password to unlock it when it’s locked.',
       fingerprint_phase: 'Fingerprint Phrase',
@@ -742,7 +739,9 @@ module.exports = {
       settings: 'Settings',
       search: 'Search Vault',
       open_web_app: 'Open the web app',
-      sync_data: 'Sync your account'
+      sync_data: 'Sync your account',
+      folder: 'Folders',
+      folder_items: 'Folder items'
     },
     otp: {
       scan_qr: 'Scan QR code',

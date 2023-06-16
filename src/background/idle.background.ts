@@ -54,7 +54,7 @@ export default class IdleBackground {
 
     private pollIdle(handler: (newState: string) => void) {
         if (this.idleTimer != null) {
-            window.clearTimeout(this.idleTimer);
+            self.clearTimeout(this.idleTimer);
             this.idleTimer = null;
         }
         this.idle.queryState(IdleInterval, (state: string) => {
@@ -62,7 +62,7 @@ export default class IdleBackground {
                 this.idleState = state;
                 handler(state);
             }
-            this.idleTimer = window.setTimeout(() => this.pollIdle(handler), 5000);
+            this.idleTimer = self.setTimeout(() => this.pollIdle(handler), 5000);
         });
     }
 }

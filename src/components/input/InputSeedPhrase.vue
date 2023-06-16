@@ -1,29 +1,34 @@
 <template>
   <div class="grid grid-cols-3 gap-2">
     <div 
-      class="cs-field"
       v-for="(w, index) in words.filter((w, index) => !!w.trim() || index < wordCount)" 
+      class="cs-field bg-white"
+      style="border-radius: 4px;"
       :key="index"
     >
       <div style="align-self:center">
         {{`${index + 1}.`}}
       </div>
       <input
-      class="cs-input"
-      :ref="index"
-      :value="w"
-      type="text"
-      @input="handleChange($event.target.value, index)"
-      @keyup.enter="handleEnter($event, index)"
-    />
+        class="cs-input"
+        :ref="index"
+        :value="w"
+        type="text"
+        @input="handleChange($event.target.value, index)"
+        @keyup.enter="handleEnter($event, index)"
+      />
     </div>
     
     <div v-if="wordCount<24">
-      <button class="btn btn-default h-10 w-full" @click="handlePress">
-        <div>
-          <i class="el-icon-circle-plus-outline" /> {{ $t('common.add') }}
-        </div>
-      </button>
+      <el-button
+        class="h-10 w-full"
+        type="primary"
+        plain
+        icon="el-icon-plus"
+        @click="handlePress"
+      >
+        {{ $t('common.add') }}
+      </el-button>
     </div>
   </div>
 </template>

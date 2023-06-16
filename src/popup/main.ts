@@ -15,7 +15,6 @@ import router from '@/router/popup'
 import storePromise from '@/store'
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
-import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
@@ -141,14 +140,10 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
-        chrome.runtime.sendMessage({
-          command: 'updateStoreService',
-          sender: { key: 'language', value: value },
-        });
+        this.$runtimeBackground.updateStoreService('language', value)
       })
     },
     async logout() {
-      console.log('###### LOG OUT')
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       await this.$passService.clearGeneratePassword()
       const userId = await this.$userService.getUserId()
@@ -171,28 +166,23 @@ Vue.mixin({
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
 
-      this.$router.push({ name: 'login' });
-
-      chrome.runtime.sendMessage({
-        command: 'updateStoreService',
-        sender: { key: 'isLoggedIn', value: false },
-      });
+      this.$router.push({ name: 'login' }).catch(() => ({}));
+      await this.$runtimeBackground.updateStoreService('isLoggedIn', false)
       await this.setupFillPage();
     },
     async lock() {
-      await this.$passService.clearGeneratePassword()
+      const userId = await this.$userService.getUserId()
       await Promise.all([
-        this.$cryptoService.clearKey(),
-        this.$cryptoService.clearOrgKeys(true),
-        this.$cryptoService.clearKeyPair(true),
-        this.$cryptoService.clearEncKey(true)
+        this.$passService.clearGeneratePassword(),
+        this.$cryptoService.clearKeys(),
+        this.$folderService.clear(userId),
+        this.$collectionService.clear(userId),
+        this.$cipherService.clear(userId),
+        this.$settingsService.clear(userId),
+        this.$policyService.clear(userId),
       ])
-
-      this.$folderService.clearCache()
-      this.$cipherService.clearCache()
-      this.$collectionService.clearCache()
-      this.$router.push({ name: 'lock' });
       await this.setupFillPage();
+      this.$router.push({ name: 'lock' }).catch(() => ({}));
     },
     randomString() {
       return nanoid()
@@ -218,22 +208,21 @@ Vue.mixin({
     async login(isPwl = false, decryptData: any) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
-      const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
-        browserStorageService.get("device_id"),
-        browserStorageService.get("hideIcons"),
-        browserStorageService.get("showFolders"),
-        browserStorageService.get("enableAutofill"),
+        this.$storageService.get("device_id"),
+        this.$storageService.get("hideIcons"),
+        this.$storageService.get("showFolders"),
+        this.$storageService.get("enableAutofill"),
       ]);
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       const deviceIdentifier = deviceId || this.randomString();
       if (!deviceId) {
-        browserStorageService.save("device_id", deviceIdentifier);
+        this.$storageService.save("device_id", deviceIdentifier);
       }
       try {
-        await this.clearKeys()
+        await this.$cryptoService.clearKeys();
         if (!isPwl) {
           const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
           const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
@@ -244,7 +233,8 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceIdentifier
           })
-          chrome.runtime.sendMessage({ command: 'loggedIn' })
+
+          await this.$runtimeBackground.handleUnlocked('loggedIn')
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
           await this.$cryptoService.setKey(key)
@@ -255,13 +245,10 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          chrome.runtime.sendMessage({ command: "unlocked" });
-          this.$router.push({ name: 'home' });
+          await this.$runtimeBackground.handleUnlocked('unlocked')
+          this.getSyncData()
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
-
-          setTimeout(() => {
-            this.setupFillPage();
-          }, 1000);
         } else {
           const res = await cystackPlatformAPI.users_session({
             client_id: 'browser',
@@ -284,13 +271,10 @@ Vue.mixin({
             if (this.$vaultTimeoutService != null) {
               this.$vaultTimeoutService.biometricLocked = false
             }
-            chrome.runtime.sendMessage({ command: "unlocked" });
-            this.$router.push({ name: 'home' });
+            await this.$runtimeBackground.handleUnlocked('unlocked')
+            this.getSyncData()
+            this.$router.push({ name: 'vault' }).catch(() => ({}));
             this.$store.commit('UPDATE_CALLING_API', false)
-
-            setTimeout(() => {
-              this.setupFillPage();
-            }, 1000);
           }, 1000);
         }
         const now = (new Date()).getTime()
@@ -299,9 +283,6 @@ Vue.mixin({
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
-    },
-    async clearKeys() {
-      await this.$cryptoService.clearKeys()
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
@@ -331,7 +312,6 @@ Vue.mixin({
           await this.$syncService.syncSettings(userId, res.domains);
           await this.$syncService.syncPolicies(res.policies);
           await this.$syncService.setLastSync(new Date());
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           if (page * pageSize >= this.cipherCount) {
             break
           }
@@ -348,15 +328,16 @@ Vue.mixin({
           }
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
-
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$store.commit('UPDATE_SYNCING', false);
+        this.setupFillPage();
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
-        this.$store.commit('UPDATE_SYNCED_CIPHERS')
-      } finally {
-        this.$store.commit('UPDATE_SYNCING', false)
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$store.commit('UPDATE_SYNCING', false);
+        this.setupFillPage();
       }
     },
     async getFolders() {
@@ -461,61 +442,6 @@ Vue.mixin({
         }
       })
     },
-    routerCipher(cipher, callbackDeleted) {
-      if (cipher.isDeleted) {
-        callbackDeleted(cipher)
-        return
-      }
-      if (this.$route.name === 'vault') {
-        this.$router.push({
-          name: 'vault-id',
-          params: { id: cipher.id }
-        })
-        return
-      }
-      if (this.$route.name === "home") {
-        this.$router.push({
-          name: "home-id",
-          params: { id: cipher.id }
-        });
-        return;
-      }
-      if (this.$route.name === 'vault-folders-folderId') {
-        this.$router.push({
-          name: 'vault-folders-folderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      if (this.$route.name === 'vault-teams-teamId-tfolders-tfolderId') {
-        this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      let name = ''
-      switch (cipher.type) {
-      case CipherType.Login:
-        name = 'passwords'
-        break
-      case CipherType.SecureNote:
-        name = 'notes'
-        break
-      case CipherType.Card:
-        name = 'cards'
-        break
-      case CipherType.Identity:
-        name = 'identities'
-        break
-      }
-      this.$router.push({
-        name: name + '-id',
-        params: { id: cipher.id }
-      })
-    },
     getTeam(teams, orgId) {
       return find(teams, e => e.id === orgId) || {}
     },
@@ -537,11 +463,11 @@ Vue.mixin({
       if (!link.match(/^https?:\/\//i)) {
         link = "http://" + link;
       }
-      window.open(link, '_blank')
+      self.open(link, '_blank')
     },
     sanitizeUrl(connectionUrl) {
       if (connectionUrl.startsWith('//')) {
-        const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
+        const scheme = self.location.protocol === 'https:' ? 'wss' : 'ws'
         connectionUrl = `${scheme}:${connectionUrl}`
       }
 
@@ -592,7 +518,7 @@ Vue.mixin({
         if (data.msgType === 3) {
           // Connect success and show OTP
           if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' })
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
           }
         } else if (data.msgType === 4) {
           // Unlock success
@@ -612,7 +538,7 @@ Vue.mixin({
         } else if (data.msgType === 6) {
           // Not Install Desktop App or Not Unlock
           if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' })
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
           }
         } else if (data.msgType === 7) {
           // Desktop Lock
@@ -646,6 +572,38 @@ Vue.mixin({
           sending: false
         })
       }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async deleteCiphers (ids, callback = () => {}) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
+          this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
+        }
+      })
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async deleteFolder (id, callback = () => {}) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', 1), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.delete_folder(id)
+          this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.folder')  }), 'warning')
+        }
+      })
     },
   }
 })

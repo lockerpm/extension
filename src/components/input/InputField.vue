@@ -1,12 +1,14 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': value,
-             'is-hover': hovering,
-             'is-password': isPassword,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': value,
+      'is-hover': hovering,
+      'is-password': isPassword,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder
     }"
   >
     <input
@@ -138,6 +140,10 @@ export default Vue.extend ({
     required: {
       type: Boolean,
       default: false
+    },
+    noBorder: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -237,7 +243,6 @@ export default Vue.extend ({
   border-radius: 2px;
   border: solid 1px #e6e8f4;
   padding-top: 20px;
-  background-color: #F3F3F3;
   &.is-hover, &.is-focus {
     @apply border-primary bg-white;
     label {
@@ -299,14 +304,6 @@ export default Vue.extend ({
     top: 5px;
     left: 11px;
     background-color: inherit;
-
-    // font-size: 14px;
-    // color: #90A0C1;
-    // pointer-events: none;
-    // transition: .4s cubic-bezier(.25,.8,.25,1);
-    // transition-duration: .3s;
-    // line-height: 19px;
-    // user-select: none;
   }
   .cs-textarea {
     min-height: 100px;
@@ -333,6 +330,9 @@ export default Vue.extend ({
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none !important;
   }
 }
 </style>

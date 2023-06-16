@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
+    var query = self.location.search.substring(1);
     var vars = query.split('&');
 
     for (var i = 0; i < vars.length; i++) {
@@ -141,9 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'none'
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         });
         btnDropdown.style.display = 'none'
         return
@@ -159,9 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'initial'
         lockBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         })
         btnDropdown.style.display = 'none'
         return

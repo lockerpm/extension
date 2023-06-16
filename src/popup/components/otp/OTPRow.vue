@@ -1,7 +1,14 @@
 <template>
-  <div class="otp-item p-4">
+  <div
+    class="otp-item px-4 py-2"
+  >
     <el-row type="flex" justify="space-between">
-      <el-row type="flex" justify="space-between" class="w-full" align="middle">
+      <el-row
+        type="flex"
+        justify="space-between"
+        class="w-full"
+        align="middle"
+      >
         <div
           class="otp-item__left"
           v-clipboard:copy="otp"
@@ -22,28 +29,44 @@
           :stroke-width="3"
         ></el-progress>
       </el-row>
-      <div class="otp-item__right">
-        <el-dropdown trigger="click">
-        <div class="icon flex items-center justify-center">
-          <i class="el-icon-more"></i>
-        </div>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            v-clipboard:copy="item.name"
-            v-clipboard:success="handleCopy"
+      <div
+        class="otp-item__right"
+      >
+        <el-dropdown
+          trigger="hover"
+        >
+          <div class="icon flex items-center justify-center">
+            <i class="el-icon-more"></i>
+          </div>
+          <el-dropdown-menu
+            slot="dropdown"
           >
-            {{ $t('data.otp.copy') }}
-          </el-dropdown-item>
-          <el-dropdown-item @click.native="$emit('edit')">{{ $t('common.edit') }}</el-dropdown-item>
-          <el-dropdown-item class="text-danger" @click.native="$emit('delete', [item.id])">{{ $t('common.delete') }}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+            <el-dropdown-item
+              v-clipboard:copy="otp"
+              v-clipboard:success="handleCopy"
+            >
+              {{ $t('data.otp.copy') }}
+            </el-dropdown-item>
+            <el-dropdown-item
+              @click.native="$emit('edit-otp')"
+            >
+              {{ $t('common.edit') }}
+            </el-dropdown-item>
+            <el-dropdown-item
+              class="text-danger"
+              @click.native="deleteCiphers([item.id])"
+            >
+              {{ $t('common.delete') }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </el-row>
   </div>
 </template>
 
 <script>
+
 export default {
   components: { },
   props: {
@@ -55,7 +78,7 @@ export default {
       otp: '',
       period: 30,
       now: new Date().getTime() / 1000,
-      isCopied: false,
+      isCopied: false
     }
   },
   computed: {
@@ -106,9 +129,9 @@ export default {
 </script>
 <style lang="scss">
 .otp-item {
-  border-bottom: 1px solid #e5e7eb;
-  &:hover {
-    background-color: #f3f4f6;
+  border-bottom: 1px solid #eaeaf5;
+  &:last-child {
+    border-bottom: none;
   }
   &:last-child {
     border: none;

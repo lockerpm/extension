@@ -1888,7 +1888,7 @@ select {
 
 .text-danger {
   --tw-text-opacity: 1;
-  color: rgba(245, 79, 100, var(--tw-text-opacity));
+  color: rgba(245, 79, 100, var(--tw-text-opacity)) !important;
 }
 
 .\!text-black {

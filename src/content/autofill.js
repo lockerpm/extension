@@ -167,7 +167,7 @@
       }
 
       // end helpers
-      var theView = theDoc.defaultView ? theDoc.defaultView : window,
+      var theView = theDoc.defaultView ? theDoc.defaultView : self,
         passwordRegEx = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|(\\\\b|_|-)passe(\\\\b|_|-)|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
 
       // get all the docs
@@ -180,7 +180,7 @@
         addProp(op, 'htmlName', getElementAttrValue(formEl, 'name'));
         addProp(op, 'htmlID', getElementAttrValue(formEl, 'id'));
         formOpId = getElementAttrValue(formEl, 'action');
-        formOpId = new URL(formOpId, window.location.href);
+        formOpId = new URL(formOpId, self.location.href);
         addProp(op, 'htmlAction', formOpId ? formOpId.href : null);
         addProp(op, 'htmlMethod', getElementAttrValue(formEl, 'method'));
 
@@ -331,7 +331,6 @@
       if (theTitle && theTitle.dataset[DISPLAY_TITLE_ATTRIBUE]) {
         pageDetails.displayTitle = theTitle.dataset.onepasswordTitle;
       }
-
       return pageDetails;
     }
 
@@ -455,7 +454,7 @@
       }
 
       // walk the tree
-      for (var pointEl = el.ownerDocument.elementFromPoint(leftOffset + (rect.right > window.innerWidth ? (window.innerWidth - leftOffset) / 2 : rect.width / 2), topOffset + (rect.bottom > window.innerHeight ? (window.innerHeight - topOffset) / 2 : rect.height / 2)); pointEl && pointEl !== el && pointEl !== document;) {
+      for (var pointEl = el.ownerDocument.elementFromPoint(leftOffset + (rect.right > self.innerWidth ? (self.innerWidth - leftOffset) / 2 : rect.width / 2), topOffset + (rect.bottom > self.innerHeight ? (self.innerHeight - topOffset) / 2 : rect.height / 2)); pointEl && pointEl !== el && pointEl !== document;) {
         if (pointEl.tagName && 'string' === typeof pointEl.tagName && 'label' === pointEl.tagName.toLowerCase()
           && el.labels && 0 < el.labels.length) {
           return 0 <= Array.prototype.slice.call(el.labels).indexOf(pointEl);
@@ -630,7 +629,7 @@
         if (fillScript.hasOwnProperty('autosubmit') && 'function' == typeof autosubmit) {
           fillScript.itemType && 'fillLogin' !== fillScript.itemType || (0 < operationsToDo.length ? setTimeout(function () {
             autosubmit(fillScript.autosubmit, fillScriptProperties.allow_clicky_autosubmit, operationsToDo);
-          }, AUTOSUBMIT_DELAY) : DEBUG_AUTOSUBMIT && console.log('[AUTOSUBMIT] Not attempting to submit since no fields were filled: ', operationsToDo))
+          }, AUTOSUBMIT_DELAY) : DEBUG_AUTOSUBMIT)
         }
 
         // handle protectedGlobalPage
@@ -787,8 +786,8 @@
     // normalize the event based on API support
     function normalizeEvent(el, eventName) {
       var ev;
-      if ('KeyboardEvent' in window) {
-        ev = new window.KeyboardEvent(eventName, {
+      if ('KeyboardEvent' in self) {
+        ev = new self.KeyboardEvent(eventName, {
           bubbles: true,
           cancelable: false,
         });
@@ -945,8 +944,8 @@
   }
 
   function scanQRCode(document, tab) {
-    const docHeight = window.innerHeight;
-    const docWidth = window.innerWidth;
+    const docHeight = self.innerHeight;
+    const docWidth = self.innerWidth;
     let isMove = false;
     let isSetUp = false;
     let isResize = false;
@@ -1336,9 +1335,9 @@
     const center = document.getElementById('locker_screenshot_wrapper--center');
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const imageData = ctx.createImageData(window.innerWidth, window.innerHeight);
+    canvas.width = self.innerWidth;
+    canvas.height = self.innerHeight;
+    const imageData = ctx.createImageData(self.innerWidth, self.innerHeight);
     ctx.putImageData(imageData, 0, 0);
     const image = new Image();
     image.src = msg.sender;
@@ -1355,11 +1354,7 @@
     }
   }
 
-  /*
-  End 1Password Extension
-  */
-
-  chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
+  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {
       const pageDetailsObj = JSON.parse(collect(document));
       chrome.runtime.sendMessage({
@@ -1368,20 +1363,13 @@
         details: pageDetailsObj,
         sender: msg.sender
       });
-      sendResponse();
-      return true;
     } else if (msg.command === 'fillForm') {
       fill(document, msg.fillScript);
-      sendResponse();
-      return true;
     } else if (msg.command === 'scanQRCode') {
       scanQRCode(document, msg.tab);
-      sendResponse();
-      return true;
     } else if (msg.command === 'capturedImage') {
       readAndAddQRCode(document, msg);
-      sendResponse();
-      return true;
+      
     } else if (msg.command === 'addedOTP') {
       isReading = false;
       const actions = document.querySelector('locker-select-wrapper');
@@ -1390,61 +1378,59 @@
       } else {
         actions.style.visibility = 'inherit';
       }
-      sendResponse();
-      return true;
     } else if (msg.command === 'alert') {
       switch (msg.type) {
         case 'username_password_updated':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Cập nhật thành công."
               : "Username and Password are updated!"
           );
           break;
         case 'otp_limited':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Đã đạt đến số lượng tối đa cho mã OTP. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
               : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
           );
           break;
         case 'otp_added':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Thêm mới thành công."
               : "QR code OTP added!"
           );
           break;
         case 'password_limited':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
               : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
           );
         case 'password_added':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Thêm mới thành công."
               : "Username and Password are added!"
           );
           break;
         case 'qr_invalid':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa."
               : "QR code is invalid! Please try again."
           );
           break;
         case 'qr_existed':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Mã QR đã tồn tại! Vui lòng quét mã QR khác."
               : "QR code is existed! Please try scan QR code other."
           );
           break;
         case 'capture_not_active':
-          window.alert(
-            window.navigator.language === "vi"
+          self.alert(
+            self.navigator.language === "vi"
               ? "Sự kiện chụp ảnh của trình duyệt không hoạt đông!. Không thể đọc mã QR"
               : "Capture visible tab is not active! Cannot read QR code."
           );
@@ -1452,8 +1438,8 @@
         default:
           break;
       }
-
-      return true;
     }
+    sendResponse();
+    return true;
   });
 })();

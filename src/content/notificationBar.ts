@@ -10,20 +10,10 @@ import {
 } from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
-  if (window.location.hostname.indexOf('id.locker.io') > -1) {
+  if (self.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
-  const test = window.document.createElement('div');
-  test.style.position = 'fixed';
-  test.style.top = '0px';
-  test.style.right = '0px';
-  test.style.height = '100vh';
-  test.style.width = '100%'
-  test.style.backgroundColor = 'red'
-  test.style.opacity = '0.2'
-  test.style.zIndex = '1000000000'
-  // window.document.body.appendChild(test)
-
+  let currentMessage: any = null
   let pageDetails: any[] = [];
   const formData: any[] = [];
   let barType: string = null;
@@ -36,7 +26,7 @@ document.addEventListener('DOMContentLoaded', event => {
   let disabledChangedPasswordNotification = false;
   let inputWithLogo: any[] = []
   let isSignUp = false
-  const inIframe = !window || window.self !== window.top;
+  const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
   const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
   const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -46,7 +36,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
   chrome.storage.local.get('neverDomains', (ndObj: any) => {
     const domains = ndObj.neverDomains;
-    if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
+    if (domains != null && domains.hasOwnProperty(self.location.hostname)) {
       return;
     }
 
@@ -63,6 +53,10 @@ document.addEventListener('DOMContentLoaded', event => {
   });
 
   chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+    if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+      return;
+    }
+    currentMessage = msg;
     processMessages(msg, sendResponse);
   });
 
@@ -72,34 +66,28 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
       }
       closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
-      sendResponse();
-      return true;
     } else if (msg.command === 'closeNotificationBar') {
       if (inIframe) {
         return;
       }
       closeBar(true);
-      sendResponse();
-      return true;
     } else if (msg.command === 'adjustNotificationBar') {
       if (inIframe) {
         return;
       }
       adjustBar(msg.data);
-      sendResponse();
-      return true;
     } else if (msg.command === 'notificationBarPageDetails') {
       pageDetails = [];
       inputWithLogo = [];
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
-        if (autofillObj.enableAutofill === false) return;
+        if (autofillObj && autofillObj.enableAutofill === false) return;
         chrome.storage.local.get("neverDomains", (ndObj: any) => {
           const domains = ndObj.neverDomains;
           if (
             domains == null ||
-            !domains.hasOwnProperty(window.location.hostname)
+            !domains.hasOwnProperty(self.location.hostname)
           ) {
             for (let i = 0; i < msg.data.passwordFields.length; i++) {
               try {
@@ -156,13 +144,9 @@ document.addEventListener('DOMContentLoaded', event => {
           }
         });
       })
-      sendResponse();
-      return true;
     } else if (msg.command === 'informMenuPageDetails') {
       pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
-      sendResponse();
-      return true;
     } else if (msg.command === 'informMenuPassword') {
       useGeneratedPassword(msg.data.password)
     } else if (msg.command === "resizeInformMenu") {
@@ -183,25 +167,16 @@ document.addEventListener('DOMContentLoaded', event => {
       for (const logoField of inputWithLogo) {
         closeInformMenu(logoField.inputEl);
       }
-      sendResponse();
-      return true;
-    } else if (msg.command === "openPopupIframe") {
-      openPopupIframe();
-    } else if (msg.command === 'closePopupIframe') {
-      const frameDiv = document.getElementById('locker_popup-iframe-container');
-      if (frameDiv) {
-        frameDiv.remove();
-      }
-      sendResponse();
-      return true;
     }
+    sendResponse();
+    return true;
   }
 
   function observeDom() {
     const bodies = document.querySelectorAll('body');
     if (bodies && bodies.length > 0) {
       observer = new MutationObserver(mutations => {
-        if (mutations == null || mutations.length === 0 || pageHref !== window.location.href) {
+        if (mutations == null || mutations.length === 0 || pageHref !== self.location.href) {
           return;
         }
 
@@ -244,10 +219,10 @@ document.addEventListener('DOMContentLoaded', event => {
 
         if (doCollect) {
           if (domObservationCollectTimeout != null) {
-            window.clearTimeout(domObservationCollectTimeout);
+            self.clearTimeout(domObservationCollectTimeout);
           }
 
-          domObservationCollectTimeout = window.setTimeout(() => {
+          domObservationCollectTimeout = self.setTimeout(() => {
             sendPlatformMessage({
               command: 'bgCollectPageDetails',
               sender: 'notificationBar',
@@ -262,14 +237,14 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function collectIfNeededWithTimeout() {
     if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
+      self.clearTimeout(collectIfNeededTimeout);
     }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
+    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function collectIfNeeded() {
-    if (pageHref !== window.location.href) {
-      pageHref = window.location.href;
+    if (pageHref !== self.location.href) {
+      pageHref = self.location.href;
       if (observer) {
         observer.disconnect();
         observer = null;
@@ -281,15 +256,15 @@ document.addEventListener('DOMContentLoaded', event => {
       });
 
       if (observeDomTimeout != null) {
-        window.clearTimeout(observeDomTimeout);
+        self.clearTimeout(observeDomTimeout);
       }
-      observeDomTimeout = window.setTimeout(observeDom, 1000);
+      observeDomTimeout = self.setTimeout(observeDom, 1000);
     }
 
     if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
+      self.clearTimeout(collectIfNeededTimeout);
     }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
+    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function watchForms(forms: any[]) {
@@ -336,41 +311,47 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false) {
-    let inputEl = document.getElementById(el.htmlID);
-    if (!inputEl) {
-      inputEl = document.getElementsByName(el.htmlName)[0]
+    const elements : any = document.getElementsByClassName(el.htmlClass)
+    let inputEl = null
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].id === el.htmlID && !elements[i].disabled) {
+        inputEl = elements[i]
+        break
+      }
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
       inputEl.addEventListener("click", () => {
         openInformMenu(inputEl, type);
       });
-      const elPosition = inputEl.getBoundingClientRect();
+      const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
         relativeContainer.style.position = 'relative'
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
-        const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
-        let logo = document.getElementById(logiId);
-        if (!logo) {
-          logo = document.createElement("span");
-          logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
-          logo.style.cssText = `
-            position: absolute;
-            height: 19px;
-            width: 19px;
-            background-position: center;
-            background-size: contain;
-            z-index: 1000 !important;
-            cursor: pointer;
-          `;
-          logo.addEventListener("click", () => {
+        removeFillLogo(el)
+        const logo = document.createElement("span");
+        logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
+        logo.style.cssText = `
+          position: absolute;
+          height: 19px;
+          width: 19px;
+          background-position: center;
+          background-size: contain;
+          z-index: 1000 !important;
+          cursor: pointer;
+        `;
+        logo.addEventListener("click", () => {
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+          if (menuEl) {
+            menuEl.parentElement.removeChild(menuEl);
+          } else {
             openInformMenu(inputEl, type);
-          });
-          inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-        }
+          }
+        });
+        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         if (elPosition.width <= 0) {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
@@ -402,6 +383,13 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
+  function removeFillLogo(inputEl: any) {
+    const fillLogo = document.getElementById('cs-logo-' + (inputEl.htmlID || inputEl.htmlName));
+    if (fillLogo) {
+      fillLogo.parentElement.removeChild(fillLogo);
+    }
+  }
+
   function closeAllInformMenu() {
     const menuEls = document.getElementsByClassName('cs-inform-menu-iframe');
     if (menuEls && menuEls.length > 0) {
@@ -412,16 +400,15 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function openInformMenu(inputEl: any, type: string = 'password') {
-    const elPosition = inputEl.getBoundingClientRect();
     if (!document.body) {
       return;
     }
+    closeAllInformMenu()
+
+    const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
-    if (document.getElementById(iframeId)) {
-      return;
-    }
-    const barPageUrl: string = chrome.extension.getURL(
+    const barPageUrl: string = chrome.runtime.getURL(
       "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
@@ -683,7 +670,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function processedForm(form: HTMLFormElement) {
     form.dataset.bitwardenProcessed = '1';
-    window.setTimeout(() => {
+    self.setTimeout(() => {
       form.dataset.bitwardenProcessed = '0';
     }, 500);
   }
@@ -717,7 +704,7 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
 
-    const barPageUrl: string = chrome.extension.getURL(barPage);
+    const barPageUrl: string = chrome.runtime.getURL(barPage);
 
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
@@ -819,50 +806,5 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } while ((elem = elem.offsetParent));
     return offsetLeft;
-  }
-
-  function openPopupIframe() {
-    if (document.body == null) {
-      return;
-    }
-    let frameDiv = document.getElementById('locker_popup-iframe-container');
-    if (frameDiv) {
-      frameDiv.remove();
-      return
-    }
-
-    let barPageUrl: string = chrome.extension.getURL('popup.html');
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = `
-      height: 602px;
-      width: 402px;
-      border: 1px solid rgb(189 190 190);
-      background-color: white
-    `;
-    iframe.id = 'popup-iframe';
-    iframe.src = barPageUrl;
-    frameDiv = document.createElement('div');
-    frameDiv.id = 'locker_popup-iframe-container';
-    frameDiv.style.cssText = `
-      height: 600px;
-      width: 402px;
-      top: 0px;
-      right: 0px;
-      position: fixed;
-      z-index: 2147483647;
-      visibility: visible;
-    `;
-    frameDiv.appendChild(iframe);
-    window.addEventListener('click', function (e: any) {
-      if (frameDiv.contains(e.target)) {
-      } else {
-        sendPlatformMessage({
-          command: 'closePopupIframe',
-        });
-      }
-    });
-    document.body.appendChild(frameDiv);
-
-    (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

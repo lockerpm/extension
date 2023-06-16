@@ -1,7 +1,7 @@
 require('./bar.scss');
 document.addEventListener('DOMContentLoaded', () => {
     var i18n = {};
-    var lang = window.navigator.language;
+    var lang = self.navigator.language;
     
     i18n.appName = chrome.i18n.getMessage('appName');
     i18n.close = chrome.i18n.getMessage('close');
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getQueryVariable(variable) {
-        var query = window.location.search.substring(1);
+        var query = self.location.search.substring(1);
         var vars = query.split('&');
         for (var i = 0; i < vars.length; i++) { 
           var pair = vars[i].split('=');

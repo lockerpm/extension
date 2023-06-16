@@ -6,7 +6,7 @@
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "author": "CyStack JSC.",
-  "homepage_url": "http://localhost:8080/",
+  "homepage_url": "http://locker.io/",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",

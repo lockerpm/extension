@@ -90,7 +90,8 @@ module.exports = {
     system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
     upgrade_now: 'Nâng cấp ngay',
     update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn",
-    submit: "Gửi"
+    submit: "Gửi",
+    detail: "Chi tiết"
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -318,22 +319,29 @@ module.exports = {
         btn: 'Thêm Thẻ thanh toán'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
+        title: 'Điền thông tin biểu mẫu nhanh chóng',
+        description: 'Thêm thẻ danh tính để Locker có thể tự động điền các biểu mẫu trực tuyến thay mặt bạn.',
         btn: 'Thêm Thẻ danh tính'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Thêm sao lưu ví crypto đầu tiên của bạn',
+        description: 'Lưu lại tài khoản/ví crypto của bạn',
+        btn: 'Thêm tài sản'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
+      OTP: {
+        title: 'Bảo vệ tài khoản của bạn',
+        description: 'Thêm một lớp bảo mật bổ sung cho tài khoản trực tuyến của bạn bằng cách thiết lập xác thực hai yếu tố với Locker',
+        btn: 'Thêm bảo mật 2 lớp'
       },
-      common: {
-        title: 'Các mục đã lưu của bạn sẽ xuất hiện ở đây. <br> Bắt đầu bằng cách thêm một tài khoản mà bạn đã sử dụng hàng ngày.',
-        btn: 'Thêm mục'
+      Folder: {
+        title: 'Thêm thư mục đầu tiên của bạn',
+        description: 'Thêm thư mục để quản lý Ciphers',
+        btn: 'Thêm thư mục'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {
@@ -576,7 +584,9 @@ module.exports = {
       hidden: 'Mật khẩu',
       date: 'Ngày',
       monthYear: 'Tháng/Năm',
-      markFavorite: 'Đánh dấu yêu thích'
+      markFavorite: 'Đánh dấu yêu thích',
+      select_networks: 'Chọn Mạng Blockchain',
+      select_wallet: 'Chọn ví Blockchain'
     },
     settings: {
       account: 'Tài khoản',
@@ -610,7 +620,8 @@ module.exports = {
       vault_timeout: 'Hẹn giờ khóa',
       vault_timeout_desc: 'Tự động khóa kho dữ liệu của bạn',
       vault_timeout_action: 'Hành động khi hết giờ',
-      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
+      vault_timeout_title: 'Chọn thời điểm khóa kho tiền của bạn',
+      vault_timeout_details: 'Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
       fingerprint_phase: 'Định danh',
       lock_now: 'Khóa ngay',
       upgrade_to_premium: 'Nâng cấp Premium',
@@ -725,7 +736,9 @@ module.exports = {
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
-      sync_data: 'Đồng bộ tài khoản'
+      sync_data: 'Đồng bộ tài khoản',
+      folder: 'Thư mục',
+      folder_items: 'Phần tử'
     },
     otp: {
       scan_qr: 'Quét mã QR',

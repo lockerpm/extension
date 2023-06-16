@@ -13,19 +13,24 @@ module.exports = {
     menu: {
       template: './src/inform-menu/menu.html',
       entry: './src/inform-menu/menu.js',
-      title: 'Bar'
+      title: 'Menu'
     },
     popup: {
       template: 'public/browser-extension.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
+    },
+    offscreen: {
+      template: 'public/offscreen.html',
+      entry: './src/offscreen.js',
+      title: 'Offscreen'
     }
   },
   pluginOptions: {
     browserExtension: {
       componentOptions: {
         background: {
-          entry: 'src/background.ts'
+          entry: 'src/service-worker.ts'
         },
         contentScripts: {
           entries: {
@@ -40,14 +45,14 @@ module.exports = {
       },
       manifestTransformer: (manifest) => {
         if (process.env.NODE_ENV === 'development') {
-          manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
-          manifest.content_security_policy = manifest.content_security_policy.replace('script-src-elem', 'script-src-elem http://localhost:8098');
+          manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace('script-src', "script-src http://localhost:8098 'wasm-unsafe-eval'");
         }
         return manifest;
       }
     }
   },
   configureWebpack: {
+    devtool: 'source-map',
     resolve: {
       alias: {
         'jslib-common': path.resolve(__dirname, 'core/common/src'),

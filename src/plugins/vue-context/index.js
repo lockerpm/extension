@@ -65,7 +65,7 @@ export default Vue.extend({
 
   methods: {
     addScrollEventListener () {
-      eventOn(window, 'scroll', this.close)
+      eventOn(self, 'scroll', this.close)
     },
 
     close () {
@@ -169,8 +169,8 @@ export default Vue.extend({
     },
 
     positionMenu (top, left) {
-      const largestHeight = window.innerHeight - this.$el.offsetHeight - 25
-      const largestWidth = window.innerWidth - this.$el.offsetWidth - 25
+      const largestHeight = self.innerHeight - this.$el.offsetHeight - 25
+      const largestWidth = self.innerWidth - this.$el.offsetWidth - 25
 
       if (top > largestHeight) {
         top = largestHeight
@@ -185,7 +185,7 @@ export default Vue.extend({
     },
 
     removeScrollEventListener () {
-      eventOff(window, 'scroll', this.close)
+      eventOff(self, 'scroll', this.close)
     },
 
     resetData () {

@@ -18,11 +18,15 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   private showDialogResolves = new Map<number, { resolve: (value: boolean) => void, date: Date }>();
   private passwordDialogResolves = new Map<number, { tryResolve: (canceled: boolean, password: string) => Promise<boolean>, date: Date }>();
   private deviceCache: DeviceType = null;
-  private prefersColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)');
+  private prefersColorSchemeDark: any = self
+  // private prefersColorSchemeDark = self.matchMedia('(prefers-color-scheme: dark)');
 
-  constructor(private messagingService: MessagingService, private storageService: StorageService,
-              private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
-              private biometricCallback: () => Promise<boolean>) { }
+  constructor(
+    private messagingService: MessagingService,
+    private storageService: StorageService,
+    private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
+    private biometricCallback: () => Promise<boolean>
+  ) { }
 
   getDevice(): DeviceType {
     if (this.deviceCache) {
@@ -31,14 +35,14 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
 
     if (navigator.userAgent.indexOf(' Firefox/') !== -1 || navigator.userAgent.indexOf(' Gecko/') !== -1) {
       this.deviceCache = DeviceType.FirefoxExtension;
-    } else if ((!!(window as any).opr && !!opr.addons) || !!(window as any).opera ||
+    } else if ((!!(self as any).opr && !!opr.addons) || !!(self as any).opera ||
       navigator.userAgent.indexOf(' OPR/') >= 0) {
       this.deviceCache = DeviceType.OperaExtension;
     } else if (navigator.userAgent.indexOf(' Edg/') !== -1) {
       this.deviceCache = DeviceType.EdgeExtension;
     } else if (navigator.userAgent.indexOf(' Vivaldi/') !== -1) {
       this.deviceCache = DeviceType.VivaldiExtension;
-    } else if ((window as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
+    } else if ((self as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
       this.deviceCache = DeviceType.ChromeExtension;
     } else if (navigator.userAgent.indexOf(' Safari/') !== -1) {
       this.deviceCache = DeviceType.SafariExtension;
@@ -111,7 +115,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     BrowserApi.createNewTab(uri, options && options.extensionPage === true);
   }
 
-  saveFile(win: Window, blobData: any, blobOptions: any, fileName: string): void {
+  saveFile(win: any, blobData: any, blobOptions: any, fileName: string): void {
     BrowserApi.downloadFile(win, blobData, blobOptions, fileName);
   }
 
@@ -119,7 +123,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     return Promise.resolve(BrowserApi.getApplicationVersion());
   }
 
-  supportsWebAuthn(win: Window): boolean {
+  supportsWebAuthn(win: any): boolean {
     return (typeof(PublicKeyCredential) !== 'undefined');
   }
 
@@ -163,10 +167,10 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   }
 
   copyToClipboard(text: string, options?: any): void {
-    let win = window;
-    let doc = window.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
+    let win = self;
+    let doc = self.document;
+    if (options && (options.window || options.win || self)) {
+      win = options.window || options.win || self;
       doc = win.document;
     } else if (options && options.doc) {
       doc = options.doc;
@@ -219,10 +223,10 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   }
 
   async readFromClipboard(options?: any): Promise<string> {
-    let win = window;
-    let doc = window.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
+    let win = self;
+    let doc = self.document;
+    if (options && (options.window || options.win || self)) {
+      win = options.window || options.win || self;
       doc = win.document;
     } else if (options && options.doc) {
       doc = options.doc;
@@ -308,7 +312,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   }
 
   sidebarViewName(): string {
-    if ((window as any).chrome.sidebarAction && this.isFirefox()) {
+    if ((self as any).chrome.sidebarAction && this.isFirefox()) {
       return 'sidebar';
     } else if (this.isOpera() && (typeof opr !== 'undefined') && opr.sidebarAction) {
       return 'sidebar_panel';

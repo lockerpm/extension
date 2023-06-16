@@ -30,8 +30,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: null,
-        password: null
+        username: 'quyetnv@cystack.net',
+        password: 'tienquyet1997@'
       },
     }
   },
@@ -135,7 +135,7 @@ export default Vue.extend({
         user_info: this.form,
         forgot_step: 1,
       })
-      this.$router.push({ name: 'forgot-password' })
+      this.$router.push({ name: 'forgot-password' }).catch(() => ({}))
     }
   }
 })

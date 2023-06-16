@@ -5,32 +5,44 @@
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
         </div>
-        <div class="ml-2">
-          <button
-            class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
+        <div>
+          <el-button
+            circle
+            plain
+            type="primary"
+            size="mini"
             @click="regenerate()"
           >
             <i class="fas fa-redo-alt" />
-          </button>
+          </el-button>
         </div>
       </div>
-      <PasswordStrength
-        v-if="password"
-        :score="passwordStrength.score"
-      />
-      <button
-        v-clipboard:copy="password"
-        v-clipboard:success="clipboardSuccessHandler"
-        class="btn btn-primary w-full mt-4"
-      >
-        {{ $t('data.tools.copy_password') }}
-      </button>
-      <button
-        class="btn btn-primary-reserve w-full mt-2"
-        @click="savePassword"
-      >
-        {{ $t('data.tools.save_with_locker') }}
-      </button>
+      <div class="flex justify-end">
+        <PasswordStrength
+          v-if="password"
+          :score="passwordStrength.score"
+        />
+      </div>
+      <div class="mt-2">
+        <el-button
+          v-clipboard:copy="password"
+          v-clipboard:success="clipboardSuccessHandler"
+          type="primary"
+          class="w-full"
+        >
+          {{ $t('data.tools.copy_password') }}
+        </el-button>
+      </div>
+      <div class="mt-2">
+        <el-button
+          class="w-full"
+          type="primary"
+          plain
+          @click="savePassword"
+        >
+          {{ $t('data.tools.save_with_locker') }}
+        </el-button>
+      </div>
     </div>
     <div class="password-generator-options">
       <div class="generator-option">
@@ -137,7 +149,7 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
-      this.$router.push({ name: 'add-item-create', params: { password: this.password } })
+      this.$router.push({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {

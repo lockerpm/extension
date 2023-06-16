@@ -1,0 +1,53 @@
+<template>
+  <div
+    class="relative mx-auto"
+    style="background: #F6F6F6; min-height: 600px; max-width: 400px"
+  >
+    <Header />
+    <Search
+      v-if="['vault', 'folders', 'otp'].includes($route.name)"
+      :cipher-type="cipherType"
+      @change="handleChangeCipherType"
+    />
+    <router-view
+      :cipher-type="cipherType"
+    />
+    <Footer
+      v-if="['vault', 'folders', 'otp'].includes(this.$route.name)"
+    />
+  </div>
+</template>
+
+<script>
+import Vue from 'vue'
+import Header from "./components/Header.vue";
+import Search from "./components/Search.vue";
+import Footer from "./components/Footer.vue";
+
+import { CipherType } from "jslib-common/enums/cipherType";
+
+export default Vue.extend({
+  components: {
+    Header,
+    Search,
+    Footer
+  },
+  data () {
+    return {
+      cipherType: this.$route.query ? Number(this.$route.query.type || CipherType.Login) : CipherType.Login
+    }
+  },
+  computed: {
+  },
+  methods: {
+    handleChangeCipherType(type) {
+      this.cipherType = type
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      this.$router.replace({ name: this.$route.name, query: { type: type } }).catch(() => {})
+    },
+  }
+}
+)
+</script>
+<style>
+</style>

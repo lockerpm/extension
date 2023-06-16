@@ -52,7 +52,7 @@ export default class CommandsBackground {
   private async generatePasswordToClipboard() {
     const options = (await this.passwordGenerationService.getOptions())[0];
     const password = await this.passwordGenerationService.generatePassword(options);
-    this.platformUtilsService.copyToClipboard(password, { window: window });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerationService.addHistory(password);
   }
 

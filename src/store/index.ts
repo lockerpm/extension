@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
+import RuntimeBackground from '../background/runtime.background';
 import {StorageService} from "jslib-common/abstractions/storage.service";
+
 import { v4 as uuidv4 } from 'uuid';
 
 import meAPI from '@/api/me';
@@ -10,7 +12,9 @@ import notificationAPI from '@/api/notification';
 
 Vue.use(Vuex)
 
-const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+const storageService = JSLib.getBgService<StorageService>('storageService')()
+const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+
 const STORAGE_KEY = 'cs_store'
 
 const defaultUser = {
@@ -39,7 +43,7 @@ const defaultLoginInfo = {
   forgot_token: null
 }
 
-export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
+export default storageService.get(STORAGE_KEY).then(async oldStore => {
   let oldStoreParsed = {
     language: 'en',
     ...JSON.parse(JSON.stringify(defaultLoginInfo)),
@@ -47,7 +51,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
   if (typeof oldStore === 'object') {
     oldStoreParsed = {
       ...oldStoreParsed,
-      ...oldStore
+      ...oldStore,
     }
   }
 
@@ -65,8 +69,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         count: 0
       },
       userIntercom: {},
-      currentPath: '/',
-      previousPath: '',
       isDev: 'dev',
       environment: 'dev',
       loading: false,
@@ -92,18 +94,13 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         state.isLoggedIn = payload.isLoggedIn || false
         state.user = payload.user || JSON.parse(JSON.stringify(defaultUser)),
         state.userPw = payload.userPw || {}
-        state.currentPath = payload.currentPath || '/'
-        state.previousPath = payload.previousPath || ''
       },
       SET_LANG (state, language) {
         state.user.language = language
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
-        chrome.runtime.sendMessage({
-          command: 'updateStoreService',
-          sender: { key: 'isLoggedIn', value: isLoggedIn },
-        });
+        runtimeBackground.updateStoreService('isLoggedIn', true)
       },
       CLEAR_ALL_DATA (state) {
         state.use = JSON.parse(JSON.stringify(defaultUser)),
@@ -123,12 +120,6 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       UPDATE_USER_INTERCOM (state, userIntercom) {
         state.userIntercom = userIntercom
-      },
-      UPDATE_PATH (state, {path} ) {
-        state.currentPath = path
-      },
-      UPDATE_PREVIOUS_PATH (state, path) {
-        state.previousPath = path || '/vault'
       },
       UPDATE_NOTIFICATION (state, payload) {
         state.notifications = payload
@@ -186,25 +177,22 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
         keys.forEach((key) => {
           state[key] = defaultData[key]
         });
-        chrome.runtime.sendMessage({
-          command: 'updateStoreServiceInfo',
-          sender: {
-            login_step: state.login_step,
-            identity: state.identity,
-            auth_info: state.auth_info,
-            user_info: state.user_info,
-            ws2: state.ws2,
-            clientId: state.clientId,
-            desktopAppInstalled: state.desktopAppInstalled,
-            desktopAppData: state.desktopAppData,
-            preloginData: state.preloginData,
-            baseApiUrl: state.baseApiUrl,
-            baseWsUrl: state.baseWsUrl,
-            sending: state.sending,
-            forgot_step: state.forgot_step,
-            forgot_token: state.forgot_token
-          },
-        });
+        runtimeBackground.updateStoreServiceInfo({
+          login_step: state.login_step,
+          identity: state.identity,
+          auth_info: state.auth_info,
+          user_info: state.user_info,
+          ws2: state.ws2,
+          clientId: state.clientId,
+          desktopAppInstalled: state.desktopAppInstalled,
+          desktopAppData: state.desktopAppData,
+          preloginData: state.preloginData,
+          baseApiUrl: state.baseApiUrl,
+          baseWsUrl: state.baseWsUrl,
+          sending: state.sending,
+          forgot_step: state.forgot_step,
+          forgot_token: state.forgot_token
+        })
       },
     },
     actions: {
@@ -241,7 +229,7 @@ export default browserStorageService.get(STORAGE_KEY).then(oldStore => {
       },
       async LoadCurrentIntercom ({ commit }) {
         const res: any = await meAPI.me_intercom();
-        window.intercomSettings = res
+        self.intercomSettings = res
         commit('UPDATE_USER_INTERCOM', res)
         Intercom('update')
       },
