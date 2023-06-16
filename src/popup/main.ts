@@ -145,43 +145,16 @@ Vue.mixin({
     },
     async logout() {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
-      await this.$passService.clearGeneratePassword()
-      const userId = await this.$userService.getUserId()
-      try {
-        await userAPI.logout();
-      } catch (error) {
-        //
-      }
-      await Promise.all([
-        this.$cryptoService.clearKeys(),
-        this.$userService.clear(),
-        this.$folderService.clear(userId),
-        this.$collectionService.clear(userId),
-        this.$cipherService.clear(userId),
-        this.$settingsService.clear(userId),
-        this.$policyService.clear(userId),
-        this.$tokenService.clearToken(),
-        this.$storageService.remove("cs_token"),
-      ]);
+      await self.bitwardenMain.onLogout(false)
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
-
+      // await this.setupFillPage();
       this.$router.push({ name: 'login' }).catch(() => ({}));
-      await this.$runtimeBackground.updateStoreService('isLoggedIn', false)
-      await this.setupFillPage();
     },
+
     async lock() {
-      const userId = await this.$userService.getUserId()
-      await Promise.all([
-        this.$passService.clearGeneratePassword(),
-        this.$cryptoService.clearKeys(),
-        this.$folderService.clear(userId),
-        this.$collectionService.clear(userId),
-        this.$cipherService.clear(userId),
-        this.$settingsService.clear(userId),
-        this.$policyService.clear(userId),
-      ])
-      await this.setupFillPage();
+      await self.bitwardenMain.onLock()
+      // await this.setupFillPage();
       this.$router.push({ name: 'lock' }).catch(() => ({}));
     },
     randomString() {

@@ -133,6 +133,8 @@ export default class MainBackground {
   onUpdatedRan: boolean;
   onReplacedRan: boolean;
   loginToAutoFill: CipherView = null;
+  onLock: Function;
+  onLogout: Function;
 
   private commandsBackground: CommandsBackground;
   private contextMenusBackground: ContextMenusBackground;
@@ -146,7 +148,6 @@ export default class MainBackground {
   private sidebarAction: any;
   private buildingContextMenu: boolean;
   private menuOptionsLoaded: any[] = [];
-  private syncTimeout: any;
   private isSafari: boolean;
   private nativeMessagingBackground: NativeMessagingBackground;
 
@@ -484,6 +485,9 @@ export default class MainBackground {
     await this.idleBackground.init();
     await this.webRequestBackground.init();
 
+    this.onLogout = (expired: boolean) => this.logout(expired)
+    this.onLock = () => this.lock()
+
     return new Promise<void>(resolve => {
       setTimeout(async () => {
         await this.environmentService.setUrlsFromStorage();
@@ -536,7 +540,25 @@ export default class MainBackground {
     }
   }
 
-  async logout(expired: boolean) {
+  async lock() {
+    const userId = await this.userService.getUserId()
+    await Promise.all([
+      this.passService.clearGeneratePassword(),
+      this.cryptoService.clearKeys(),
+      this.folderService.clear(userId),
+      this.collectionService.clear(userId),
+      this.cipherService.clear(userId),
+      this.settingsService.clear(userId),
+      this.policyService.clear(userId),
+    ])
+
+    this.searchService.clearIndex();
+    await this.setIcon();
+    await this.refreshBadgeAndMenu();
+    await this.reseedStorage();
+  }
+
+  async logout(expired: boolean = false) {
     await this.eventService.uploadEvents();
     const userId = await this.userService.getUserId();
 

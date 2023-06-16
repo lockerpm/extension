@@ -19,7 +19,7 @@
       <div class="text-left">
         <div class="form-group !mb-4">
           <label>{{$t('data.set_master_pass.enter_pass')}}</label>
-          <div class="input-group mb-1.5">
+          <div class="input-group-ext mb-1.5">
             <input
               v-model="masterPassword"
               :type="showPassword ? 'text' : 'password'"
@@ -27,7 +27,7 @@
               :name="randomString()"
               autocomplete="new-password"
             >
-            <div class="input-group-append !bg-white">
+            <div class="input-group-ext-append !bg-white">
               <button class="btn btn-icon" @click="showPassword = !showPassword">
                 <i
                   class="far"
@@ -40,7 +40,7 @@
         </div>
         <div class="form-group !mb-4">
           <label>{{$t('data.set_master_pass.confirm_pass')}}</label>
-          <div class="input-group" :class="[errors.masterRePassword ? 'is-invalid' :'']">
+          <div class="input-group-ext" :class="[errors.masterRePassword ? 'is-invalid' :'']">
             <input
               v-model="masterRePassword"
               :type="showRePassword ? 'text' : 'password'"
@@ -48,7 +48,7 @@
               name="repassword"
               placeholder=""
             >
-            <div class="input-group-append !bg-white">
+            <div class="input-group-ext-append !bg-white">
               <button class="btn btn-icon" @click="showRePassword = !showRePassword">
                 <i
                   class="far"
