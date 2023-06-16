@@ -2,7 +2,6 @@
 import router from '@/router/popup'
 import JSLib from '@/popup/services/services'
 const storageService = JSLib.getBgService('storageService')();
-const runtimeBackground = JSLib.getBgService('runtimeBackground')();
 
 import storePromise from '@/store'
 
@@ -13,15 +12,15 @@ export function handleResponseErrorMessage(error) {
     }
     if (error.response.status === 401) {
       storageService.remove('cs_token')
-      storePromise.then((store) => {
+      storePromise.then(async (store) => {
         store.commit('UPDATE_LOGIN_PAGE_INFO', null)
+        await self.bitwardenMain.onLogout(false)
         store.commit('UPDATE_IS_LOGGEDIN', false)
         store.commit('CLEAR_ALL_DATA')
 
         setTimeout(async () => {
-          await runtimeBackground.updateStoreService('isLoggedIn', false)
           if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
+            router.push({ name: "login" }).catch(() => ({}));
           }
         }, 1000);
       })

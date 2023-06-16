@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full">
-    <div class="mt-14 text-center">
+  <div class="w-full" style="padding-top: 3.5rem;">
+    <div class="text-center">
       <img
         src="@/assets/images/logo/logo_black.svg"
         alt=""

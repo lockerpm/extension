@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import request from "@/config/request";
 import ENDPOINT from "@/config/endpoint";
+import userAPI from "./user";
+import store from "../store";
 
 async function sso_auth(data) {
   return await request({
@@ -90,5 +92,5 @@ export default {
   sso_reset_password,
   sso_reset_password_token,
   sso_reset_password_verify_token,
-  sso_new_password
+  sso_new_password,
 };

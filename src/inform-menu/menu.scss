@@ -111,7 +111,7 @@ button.neutral {
     margin: 0px !important;
     padding: 0px !important;
 }
-.cs-inform-container {
+.cs-inform-container-ext {
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -158,7 +158,7 @@ button.neutral {
     margin-right: 10px;
   }
 }
-.cs-inform-header {
+.cs-inform-header-ext {
   display: flex;
   padding-left: 16px;
   background-color: #F6F6F6;
@@ -259,7 +259,7 @@ button.neutral {
 input.generated-password{
   border: 0px;
 }
-.input-group {
+.input-group-ext {
   display: flex;
   justify-content: space-between;
   padding: 16px;

@@ -1,6 +1,10 @@
 <template>
-  <div class="w-full px-10 auth-form" v-loading="loginInfo.sending || $store.state.callingAPI" style="width: 400px;">
-    <div class="mt-14 text-center">
+  <div
+    v-loading="loginInfo.sending || $store.state.callingAPI"
+    class="w-full px-10 auth-form"
+    style="padding-top: 3.5rem;"
+  >
+    <div class="text-center">
       <img
         src="@/assets/images/logo/logo_black.svg"
         alt=""

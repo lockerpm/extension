@@ -37,7 +37,7 @@
       color: #C0C4CC;
       cursor: not-allowed;
     }
-    &~.input-group-append {
+    &~.input-group-ext-append {
       background-color: #F5F7FA;
     }
   }
@@ -50,7 +50,7 @@
   .is-invalid~.invalid-feedback, .is-invalid~.invalid-tooltip, .was-validated :invalid~.invalid-feedback, .was-validated :invalid~.invalid-tooltip {
     display: block;
   }
-  .input-group {
+  .input-group-ext {
     @apply relative flex flex-wrap items-stretch w-full border border-black-200 rounded focus:ring-0 focus-within:border-primary focus:outline-none;
     .form-control {
       width: 1%;
@@ -60,21 +60,21 @@
     }
     .form-control:not(:last-child) {
     }
-    .input-group-append, .input-group-prepend {
+    .input-group-ext-append, .input-group-ext-prepend {
       display: flex;
       border-radius: 5px;
     }
-    .input-group-append, .input-group-prepend {
+    .input-group-ext-append, .input-group-ext-prepend {
       margin-left: -1px;
       @apply px-3;
       .btn {
         @apply px-0 py-0;
       }
-      .input-group-text {
+      .input-group-ext-text {
         @apply flex items-center text-center whitespace-nowrap text-xs;
       }
     }
-    .input-group-separator {
+    .input-group-ext-separator {
       align-self: stretch;
       margin-bottom: 8px;
       margin-top: 8px;
