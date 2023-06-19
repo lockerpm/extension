@@ -46,7 +46,7 @@
             <label class="text-left">
               {{ $t('master_password.enter_password') }}
             </label>
-            <div class="input-group-ext mb-1.5">
+            <div class="input-group mb-1.5">
               <input
                 ref="master-pass"
                 v-model="masterPassword"
@@ -56,7 +56,7 @@
                 :name="randomString()"
                 autocomplete="new-password"
               >
-              <div class="input-group-ext-append !bg-white">
+              <div class="input-group-append !bg-white">
                 <button
                   class="btn btn-icon"
                   type="button"

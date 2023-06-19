@@ -69,7 +69,7 @@ export default Vue.extend({
     language: {
       handler() {
         setTimeout(() => {
-          this.$refs.form.clearValidate();
+          this.$refs.form?.clearValidate();
         }, 10);
       },
       deep: true
