@@ -148,51 +148,25 @@ Vue.mixin({
       })
     },
     async logout() {
-      console.log('###### LOG OUT')
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
-      await this.$passService.clearGeneratePassword()
-      const userId = await this.$userService.getUserId()
       try {
         await userAPI.logout();
       } catch (error) {
         //
       }
-      await Promise.all([
-        this.$cryptoService.clearKeys(),
-        this.$userService.clear(),
-        this.$folderService.clear(userId),
-        this.$collectionService.clear(userId),
-        this.$cipherService.clear(userId),
-        this.$settingsService.clear(userId),
-        this.$policyService.clear(userId),
-        this.$tokenService.clearToken(),
-        this.$storageService.remove("cs_token"),
-      ]);
+      const page = BrowserApi.getBackgroundPage();
+      await page.bitwardenMain.onLogout(false)
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
-
-      this.$router.push({ name: 'login' });
-
-      chrome.runtime.sendMessage({
-        command: 'updateStoreService',
-        sender: { key: 'isLoggedIn', value: false },
-      });
       await this.setupFillPage();
+      this.$router.push({ name: 'login' }).catch(() => ({}));
     },
     async lock() {
-      await this.$passService.clearGeneratePassword()
-      await Promise.all([
-        this.$cryptoService.clearKey(),
-        this.$cryptoService.clearOrgKeys(true),
-        this.$cryptoService.clearKeyPair(true),
-        this.$cryptoService.clearEncKey(true)
-      ])
-
-      this.$folderService.clearCache()
-      this.$cipherService.clearCache()
-      this.$collectionService.clearCache()
-      this.$router.push({ name: 'lock' });
+      const page = BrowserApi.getBackgroundPage();
+      await page.bitwardenMain.onLock()
       await this.setupFillPage();
+      this.$router.push({ name: 'lock' }).catch(() => ({}));
+
     },
     randomString() {
       return nanoid()
@@ -258,10 +232,6 @@ Vue.mixin({
           chrome.runtime.sendMessage({ command: "unlocked" });
           this.$router.push({ name: 'home' });
           this.$store.commit('UPDATE_CALLING_API', false)
-
-          setTimeout(() => {
-            this.setupFillPage();
-          }, 1000);
         } else {
           const res = await cystackPlatformAPI.users_session({
             client_id: 'browser',
@@ -287,10 +257,6 @@ Vue.mixin({
             chrome.runtime.sendMessage({ command: "unlocked" });
             this.$router.push({ name: 'home' });
             this.$store.commit('UPDATE_CALLING_API', false)
-
-            setTimeout(() => {
-              this.setupFillPage();
-            }, 1000);
           }, 1000);
         }
         const now = (new Date()).getTime()
@@ -357,6 +323,7 @@ Vue.mixin({
         this.$store.commit('UPDATE_SYNCED_CIPHERS')
       } finally {
         this.$store.commit('UPDATE_SYNCING', false)
+        this.setupFillPage();
       }
     },
     async getFolders() {

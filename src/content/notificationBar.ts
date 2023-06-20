@@ -346,10 +346,10 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
-      removeFillLogo(inputEl)
       inputEl.addEventListener("click", () => {
         openInformMenu(inputEl, type);
       });
+
       const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
@@ -357,6 +357,7 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
+        removeFillLogo(el)
         const logo = document.createElement("span");
         logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
         logo.style.cssText = `
@@ -369,7 +370,12 @@ document.addEventListener('DOMContentLoaded', event => {
           cursor: pointer;
         `;
         logo.addEventListener("click", () => {
-          openInformMenu(inputEl, type);
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+          if (menuEl) {
+            menuEl.parentElement.removeChild(menuEl);
+          } else {
+            openInformMenu(inputEl, type);
+          }
         });
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         if (elPosition.width <= 0) {
