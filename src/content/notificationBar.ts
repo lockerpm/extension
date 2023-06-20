@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', event => {
               }
             }
             inputWithLogo = inputWithLogo.filter(e => e != null)
+            
             document.onclick = check;
             function check(e) {
               const target = e && e.target;
@@ -372,6 +373,7 @@ document.addEventListener('DOMContentLoaded', event => {
           type
         };
       }
+      return null
     }
     return null
   }

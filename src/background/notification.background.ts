@@ -166,9 +166,9 @@ export default class NotificationBackground {
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
         break;
       case 'informMenuUsePassword':
-        const crrentTab = await BrowserApi.getTabFromCurrentWindow();
-        if (crrentTab) {
-          await BrowserApi.tabSendMessageData(crrentTab, 'informMenuPassword', {
+        const cTab = await BrowserApi.getTabFromCurrentWindow();
+        if (cTab) {
+          await BrowserApi.tabSendMessageData(cTab, 'informMenuPassword', {
             password: msg.password
           });
         }
@@ -182,9 +182,10 @@ export default class NotificationBackground {
           await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
             width: '400px', height: '180px'
           });
-        }
-        else {
-          await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", { width: '320px', height: '407px' });
+        } else {
+          await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
+            width: '320px', height: '416px'
+          });
         }
         break;
       case 'informMenuTurnOff':
@@ -195,7 +196,9 @@ export default class NotificationBackground {
         if (tab__ == null) {
           return;
         }
-        await BrowserApi.tabSendMessageData(tab__, "resizeInformMenu", { width: msg.data?.width, height: msg.data?.height });
+        await BrowserApi.tabSendMessageData(tab__, "resizeInformMenu", {
+          width: msg.data?.width, height: msg.data?.height
+        });
         break;
       case 'barFormChange':
         const currentTab = await BrowserApi.getTabFromCurrentWindow();

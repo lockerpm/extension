@@ -148,13 +148,13 @@ Vue.mixin({
       await self.bitwardenMain.onLogout(false)
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
-      // await this.setupFillPage();
+      await this.setupFillPage();
       this.$router.push({ name: 'login' }).catch(() => ({}));
     },
 
     async lock() {
       await self.bitwardenMain.onLock()
-      // await this.setupFillPage();
+      await this.setupFillPage();
       this.$router.push({ name: 'lock' }).catch(() => ({}));
     },
     randomString() {

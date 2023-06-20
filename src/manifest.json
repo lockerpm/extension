@@ -14,9 +14,7 @@
     "idle",
     "identity",
     "activeTab",
-    "scripting",
     "webRequestBlocking",
-    "webNavigation",
     "offscreen"
   ],
   "host_permissions": [
