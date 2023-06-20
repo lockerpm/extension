@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnDropdown.onclick = function () {
       changeMenuContent()
     }
+    goToStartPage()
     document.getElementById('inform-logo').onclick = function () {
       goToStartPage()
     }
@@ -74,38 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (msg.command === generatePasswordOptions && msg.data) {
         setGeneratePasswordOptions(msg.data.options)
       }
-    });
-    if (getQueryVariable('generate')) {
-      document.getElementById('header-title').innerHTML = i18n.informMenuPasswordGenerator
-      setContent(document.getElementById('template-generated-password'));
-      var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
-      var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
-      var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
-      usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
-      showPasswordButton.addEventListener('click', () => {
-        var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
-        inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
-      });
-      showOptionsButton.addEventListener('click', getPasswordGeneration);
-      sendPlatformMessage({
-        command: 'bgGeneratePassword',
-        responseCommand: responseGeneratePasswordNoOptions
-      });
-    } else {
-      document.getElementById('header-title').innerHTML = i18n.informMenuSavedLogin
-      setContent(document.getElementById('template-list-ciphers'));
-      sendPlatformMessage({
-        command: 'bgGetDataForTab',
-        responseCommand: responseCiphersCommand
-      });
-    }
+    })
   }
   function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    var vars = query.split('&');
-
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i].split('=');
+    const query = self.location.search.substring(1);
+    const vars = query.split('&');
+    for (let i = 0; i < vars.length; i++) {
+      const pair = vars[i].split('=');
       if (pair[0] === variable) {
         return pair[1];
       }
@@ -141,9 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'none'
         document.getElementById('btn-inform-login').addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         });
         btnDropdown.style.display = 'none'
         return
@@ -159,9 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBtn.style.display = 'initial'
         lockBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          sendPlatformMessage({
-            command: 'openPopupIframe'
-          });
         })
         btnDropdown.style.display = 'none'
         return
@@ -273,46 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     else {
-      if (getQueryVariable('generate')) {
-        document.getElementById('header-title').innerHTML = chrome.i18n.getMessage("informMenuPasswordGenerator")
-        setContent(document.getElementById('template-generated-password'));
-        var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
-        var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
-        var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
-        usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
-        showPasswordButton.addEventListener('click', () => {
-          var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
-          inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
-        });
-        showOptionsButton.addEventListener('click', getPasswordGeneration);
-        sendPlatformMessage({
-          command: 'bgGeneratePassword',
-          responseCommand: responseGeneratePasswordNoOptions
-        });
-      }
-      else {
-        document.getElementById('header-title').innerHTML = i18n.informMenuSavedLogin
-        setContent(document.getElementById('template-list-ciphers'));
-        sendPlatformMessage({
-          command: 'bgGetDataForTab',
-          responseCommand: responseCiphersCommand
-        });
-      }
+      goToStartPage()
     }
   }
   function goToStartPage() {
     if (getQueryVariable('generate')) {
-      document.getElementById('header-title').innerHTML = chrome.i18n.getMessage("informMenuPasswordGenerator")
+      document.getElementById('header-title').innerHTML = i18n.informMenuPasswordGenerator
       setContent(document.getElementById('template-generated-password'));
-      var usePasswordButton = document.querySelector('#template-generated-password-clone .use-password')
-      var showPasswordButton = document.querySelector('#template-generated-password-clone .btn-show-password')
-      var showOptionsButton = document.querySelector('#template-generated-password-clone .btn-show-options')
-      usePasswordButton.addEventListener('click', function () { useGeneratedPassword('input') });
-      showPasswordButton.addEventListener('click', () => {
-        var inputEl = document.querySelector('#template-generated-password-clone .generated-password')
-        inputEl.type = inputEl.type === 'password' ? 'text' : 'password'
-      });
-      showOptionsButton.addEventListener('click', getPasswordGeneration);
       sendPlatformMessage({
         command: 'bgGeneratePassword',
         responseCommand: responseGeneratePasswordNoOptions
@@ -375,7 +312,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   function showGeneratedPasswordNoOptions(passwordData) {
-    document.querySelector('#template-generated-password-clone .generated-password').value = passwordData.password
+    const generatedPasswordInput = document.querySelector('#template-generated-password-clone .generated-password')
+    generatedPasswordInput.value = passwordData.password
+
+    const btnShowPassword = document.querySelector('#template-generated-password-clone .btn-show-password');
+    btnShowPassword.style.marginRight  = passwordData.isLocked ? '0px' : '12px';
+    btnShowPassword.addEventListener('click', () => {
+      generatedPasswordInput.type = generatedPasswordInput.type == 'text' ? 'password' : 'text';
+    })
+
+    const btnShowOptions = document.querySelector('#template-generated-password-clone .btn-show-options')
+    btnShowOptions.addEventListener('click', () => {
+      getPasswordGeneration()
+    });
+
+    const btnDropdown = document.getElementById('dropdownOptions')
+    if (passwordData.isLocked) {
+      btnDropdown.style.display = 'none'
+    } else {
+      btnDropdown.style.display = 'initial'
+    }
+
+    const buttonUsePassword = document.getElementById('button_use_password')
+    buttonUsePassword?.addEventListener('click', () => {
+      useGeneratedPassword('input')
+    })
   }
   function showGeneratedPassword(passwordData) {
     let color = '#000000'

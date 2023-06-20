@@ -134,6 +134,8 @@ export default class MainBackground {
   onUpdatedRan: boolean;
   onReplacedRan: boolean;
   loginToAutoFill: CipherView = null;
+  onLock: Function;
+  onLogout: Function;
 
   private commandsBackground: CommandsBackground;
   private contextMenusBackground: ContextMenusBackground;
@@ -301,6 +303,9 @@ export default class MainBackground {
     await this.webRequestBackground.init();
     await this.windowsBackground.init();
 
+    this.onLogout = (expired: boolean) => this.logout(expired)
+    this.onLock = () => this.lock()
+
     return new Promise<void>(resolve => {
       setTimeout(async () => {
         await this.environmentService.setUrlsFromStorage();
@@ -352,6 +357,24 @@ export default class MainBackground {
     if (tab) {
       await this.contextMenuReady(tab, !menuDisabled);
     }
+  }
+
+  async lock() {
+    const userId = await this.userService.getUserId()
+    await Promise.all([
+      this.passService.clearGeneratePassword(),
+      this.cryptoService.clearKeys(),
+      this.folderService.clear(userId),
+      this.collectionService.clear(userId),
+      this.cipherService.clear(userId),
+      this.settingsService.clear(userId),
+      this.policyService.clear(userId),
+    ])
+
+    this.searchService.clearIndex();
+    await this.setIcon();
+    await this.refreshBadgeAndMenu();
+    await this.reseedStorage();
   }
 
   async logout(expired: boolean) {

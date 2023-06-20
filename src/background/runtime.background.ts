@@ -407,6 +407,7 @@ export default class RuntimeBackground {
     const responseData: any = {};
     responseData.password = password
     responseData.passwordStrength = passwordStrength
+    responseData.isLocked = await this.vaultTimeoutService.isLocked();
     await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
     this.platformUtilsService.copyToClipboard(password, { window: window });
     this.passwordGenerator.addHistory(password);
