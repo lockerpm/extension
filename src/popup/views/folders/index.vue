@@ -1,6 +1,5 @@
 <template>
   <div
-    class="vault-body px-4 pb-4"
     v-loading="$store.state.syncing"
   >
     <NoCipher

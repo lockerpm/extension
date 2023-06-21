@@ -69,7 +69,10 @@ export default {
       switch (this.$route.name) {
       case 'vault-detail':
         result.title = this.$route.params?.data?.name
-        result.back = () => this.$router.push({ name: 'vault', query: { type: this.$route.params?.data?.type } }).catch(() => ({}))
+        result.back = () => this.$router.push({
+          name: 'vault',
+          query: { type: this.$route.params?.data?.type }
+        }).catch(() => ({}))
         result.menus = [
           {
             label: this.$t('common.edit'),
@@ -90,9 +93,7 @@ export default {
         break;
       case 'folder-detail':
         result.title = this.$route.params?.data?.name
-        if (window.history.length == 2) {
-          result.back = () => this.$router.push({ name: 'folders' }).catch(() => ({}))
-        }
+        result.back = () => this.$router.push({ name: 'folders' }).catch(() => ({}))
         result.menus = [
           {
             label: this.$t('common.delete'),
@@ -108,7 +109,18 @@ export default {
         })
         break;
       case 'add-edit-cipher':
-        result.back = () => this.$router.push({ name: 'vault' }).catch(() => ({}))
+        if (this.$route.params?.folder) {
+          result.back = () => this.$router.push({
+            name: 'folder-detail',
+            params: { data: this.$route.params?.folder },
+            query: { type: this.$route.params?.data?.type }
+          }).catch(() => ({}))
+        } else {
+          result.back = () => this.$router.push({
+            name: 'vault',
+            query: { type: this.$route.params?.data?.type }
+          }).catch(() => ({}))
+        }
         if (this.$route.params?.data) {
           result.title = this.$t('common.edit') + ' ' + this.$tc(`type.${this.$route.params?.data?.type}`, 1)
           result.menus = [

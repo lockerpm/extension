@@ -15,7 +15,6 @@ import { FolderView } from 'jslib-common/models/view/folderView';
 import { LoginView } from 'jslib-common/models/view/loginView';
 import { SecureNoteView } from 'jslib-common/models/view/secureNoteView';
 
-import { CipherRepromptType } from 'jslib-common/enums/cipherRepromptType';
 import { CipherType } from 'jslib-common/enums/cipherType';
 import { FieldType } from 'jslib-common/enums/fieldType';
 import { SecureNoteType } from 'jslib-common/enums/secureNoteType';

@@ -5,15 +5,20 @@
   >
     <Header />
     <Search
-      v-if="['vault', 'folders', 'otp'].includes($route.name)"
-      :cipher-type="cipherType"
-      @change="handleChangeCipherType"
+      v-if="isSearch"
     />
-    <router-view
-      :cipher-type="cipherType"
-    />
+    <div
+      class="main-body p-4"
+      :class="{
+        'is-search pt-0': isSearch,
+        'is-footer': isFooter,
+        'p-0': noPadding
+      }"
+    >
+      <router-view />
+    </div>
     <Footer
-      v-if="['vault', 'folders', 'otp'].includes(this.$route.name)"
+      v-if="isFooter"
     />
   </div>
 </template>
@@ -24,30 +29,40 @@ import Header from "./components/Header.vue";
 import Search from "./components/Search.vue";
 import Footer from "./components/Footer.vue";
 
-import { CipherType } from "jslib-common/enums/cipherType";
-
 export default Vue.extend({
   components: {
     Header,
     Search,
     Footer
   },
-  data () {
-    return {
-      cipherType: this.$route.query ? Number(this.$route.query.type || CipherType.Login) : CipherType.Login
+  computed: {
+    isSearch() {
+      return ['vault', 'folders', 'otp'].includes(this.$route.name)
+    },
+    isFooter() {
+      return ['vault', 'folders', 'otp'].includes(this.$route.name)
+    },
+    noPadding() {
+      return ['generator'].includes(this.$route.name)
     }
   },
-  computed: {
-  },
   methods: {
-    handleChangeCipherType(type) {
-      this.cipherType = type
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      this.$router.replace({ name: this.$route.name, query: { type: type } }).catch(() => {})
-    },
   }
 }
 )
 </script>
-<style>
+<style lang="scss">
+.main-body {
+  position: absolute;
+  top: 73px;
+  bottom: 0px;
+  width: 100%;
+  overflow: auto;
+  &.is-search {
+    top: 137px !important;
+  }
+  &.is-footer {
+    bottom: 40px !important;
+  }
+}
 </style>

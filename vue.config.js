@@ -16,7 +16,7 @@ module.exports = {
       title: 'Menu'
     },
     popup: {
-      template: 'public/browser-extension.html',
+      template: 'public/index.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
     },

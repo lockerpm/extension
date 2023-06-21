@@ -1,6 +1,6 @@
 <template>
-  <div id="password-generator">
-    <div class="p-4">
+  <div id="password-generator" class="p-4">
+    <div class="pb-4">
       <div class="flex items-center justify-between mb-1 generated-password-container">
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
@@ -44,7 +44,7 @@
         </el-button>
       </div>
     </div>
-    <div class="password-generator-options">
+    <div>
       <div class="generator-option">
         <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
         <el-slider

@@ -75,7 +75,7 @@ export default Vue.extend({
     routerFolder (folder) {
       this.$router.push({
         name: "folder-detail",
-        params: { id: folder.id, data: folder },
+        params: { data: folder },
       }).catch(() => ({}));
     },
   }

@@ -1,15 +1,16 @@
 <template>
   <div
     class="fixed flex items-center px-4 layout-filter"
+    :class="{ 'is-detail': isDetail }"
     style="height: 64px"
   >
     <el-select
-      v-if="['vault'].includes($route.name)"
-      v-model="cipherType"
+      v-if="['vault', 'folder-detail'].includes($route.name)"
+      :value="cipherType"
       class="mr-2"
       style="width: 270px;"
       size="small"
-      @change="(v) => $emit('change', v)"
+      @change="(v) => changeCipherType(v)"
     >
       <el-option
         v-for="item in cipherTypes"
@@ -44,12 +45,12 @@
         </el-dropdown-menu>
       </el-dropdown>
     <el-button
-      v-else-if="['vault'].includes($route.name)"
+      v-else-if="['vault', 'folder-detail'].includes($route.name)"
       icon="el-icon-plus"
       circle
       type="primary"
       size="small"
-      @click="$router.push({ name: 'add-edit-cipher', params: { type: cipherType } }).catch(() => ({}))"
+      @click="addCipher"
     />
     <el-button
       v-else
@@ -80,9 +81,9 @@ import AddEditOTP from '@/popup/components/otp/AddEditOTP.vue'
 export default {
   components: { AddEditFolder, AddEditOTP },
   props: {
-    cipherType: {
-      type: Number,
-      default: CipherType.Login
+    isDetail: {
+      type: Boolean,
+      default: false
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -92,6 +93,10 @@ export default {
     }
   },
   computed: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    cipherType() {
+      return this.$route.query ? Number(this.$route.query?.type || CipherType.Login) : CipherType.Login
+    },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     cipherTypes() {
       return [
@@ -118,15 +123,6 @@ export default {
       ]
     },
   },
-  asyncComputed: {
-    locked: {
-      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      async get () {
-        return await this.$vaultTimeoutService.isLocked()
-      },
-      watch: []
-    },
-  },
   watch: {
     $route: {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -139,8 +135,20 @@ export default {
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    changeCipherType(type) {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      this.$router.replace({ name: this.$route.name, query: { type: type }, params: this.$route.params }).catch(() => {})
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleSearch () {
       this.$store.commit('UPDATE_SEARCH', this.inputText)
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    addCipher () {
+      this.$router.push({
+        name: 'add-edit-cipher',
+        params: { type: this.cipherType, folder: this.$route.params?.data || null }
+      }).catch(() => ({}))
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     addFolder () {
@@ -177,6 +185,9 @@ export default {
       border-radius: 12px !important;
       border: none !important;
     }
+  }
+  &.is-detail {
+    top: 60px !important;
   }
 }
 </style>

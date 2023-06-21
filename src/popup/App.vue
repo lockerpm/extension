@@ -41,7 +41,12 @@ export default Vue.extend({
   async beforeMount () {
     const currentRouterString = await this.$storageService.get('current_router')
     const currentRouter = JSON.parse(currentRouterString)
-    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'vault'}).catch(() => ({}))
+    const allRouters = this.$router.options.routes.map((o: any) => o.children).flat();
+    if (allRouters.find((r: any) => currentRouter && r.name === currentRouter.name)) {
+      this.$router.push(currentRouter).catch(() => ({}))
+    } else {
+      this.$router.push({ name: 'vault'}).catch(() => ({}))
+    }
   },
 
   watch: {
@@ -100,27 +105,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.vault-body {
-  position: absolute !important;
-  top: 137px !important;
-  bottom: 40px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
-.settings-body {
-  position: absolute !important;
-  top: 73px !important;
-  bottom: 0px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
-.show-body {
-  position: absolute !important;
-  top: 60px !important;
-  bottom: 0px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
 .el-message-box {
   width: 260px !important;
 }

@@ -1,14 +1,9 @@
 <template>
-  <div class="otp-body">
-    <div
-      class="p-4"
-      v-loading="$store.state.syncing"
-    >
-      <ListOTP
-        v-if="!addEditOTP"
-        @edit-otp="editOTP"
-      />
-    </div>
+  <div v-loading="$store.state.syncing">
+    <ListOTP
+      v-if="!addEditOTP"
+      @edit-otp="editOTP"
+    />
     <AddEditOTP
       key="otp"
       ref="addEditOTP"
@@ -40,11 +35,4 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.otp-body {
-  position: absolute !important;
-  top: 125px !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
 </style>

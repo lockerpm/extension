@@ -1,8 +1,6 @@
 <template>
-  <div
-    class="show-body"
-  >
-    <div class="p-4">
+  <div>
+    <div>
       <div class="text-left">
         <el-select
           v-if="!cipher.id"
@@ -793,7 +791,11 @@ export default Vue.extend({
           collectionIds: cipher.collectionIds,
         })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
-        this.$router.back()
+        if (this.$route.params?.folder?.id) {
+          this.$router.push({ name: 'folder-detail', params: { data: this.$route.params?.folder } })
+        } else {
+          this.$router.push({ name: 'vault', query: { type: this.cipher.type } })
+        }
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           this.notify(this.$t('errors.5002', { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'error')
@@ -825,7 +827,11 @@ export default Vue.extend({
           collectionIds: cipher.collectionIds,
         })
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
-        this.$router.back()
+        if (this.$route.params?.folder?.id) {
+          this.$router.push({ name: 'folder-detail', params: { data: this.$route.params?.folder } })
+        } else {
+          this.$router.push({ name: 'vault', query: { type: this.cipher.type } })
+        }
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '3003') {
           this.notify(this.$t('errors.3003'), 'error')
@@ -844,6 +850,7 @@ export default Vue.extend({
       this.cipher.folderId = folder.id
     },
     newCipher (type, data = {}) {
+      const folderId = this.$route.params.folder?.id || null
       this.cipher = new CipherView()
       this.cipher.organizationId = data.organizationId ? data.organizationId : null
       this.cipher.type = type
@@ -854,8 +861,8 @@ export default Vue.extend({
       this.cipher.secureNote = new SecureNoteView()
       this.cipher.secureNote.type = SecureNoteType.Generic
       this.cipher.fields = []
-      this.cipher.folderId = this.$route.params.folderId || null
-      this.cipher.collectionIds = this.$route.params.folderId ? [this.$route.params.folderId] : []
+      this.cipher.folderId = folderId
+      this.cipher.collectionIds = folderId ? [folderId] : []
       if (this.cipher.organizationId) {
         this.handleChangeOrg(this.cipher.organizationId)
       }

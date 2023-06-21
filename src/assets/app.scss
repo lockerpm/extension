@@ -425,9 +425,6 @@ input:-webkit-autofill:active {
   background-color: #E4F0E6;
   border-radius: 4px;
 }
-#password-generator .password-generator-options {
-  padding: 0px 20px 16px 20px;
-}
 .popup-setting-wrapper {
   @apply bg-white;
   border-radius: 12px;
@@ -459,10 +456,7 @@ input:-webkit-autofill:active {
   visibility: visible !important;
 }
 .timeout-option{
-  @apply flex items-center justify-between p-4 py-2;
-}
-.timeout-option:hover {
-  background-color: #E8E8E9;
+  @apply flex items-center justify-between py-2;
 }
 .info-section {
   @apply text-black text-head-6 py-2;
