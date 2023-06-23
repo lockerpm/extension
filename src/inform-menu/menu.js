@@ -323,6 +323,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnShowOptions = document.querySelector('#template-generated-password-clone .btn-show-options')
     btnShowOptions.addEventListener('click', () => {
+      sendPlatformMessage({
+        command: 'bgResizeInformMenu',
+        data: { width: '320px', height: '416px' }
+      });
       getPasswordGeneration()
     });
 
@@ -376,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
       options: generateOptions
     });
   }
-
   function setGeneratePasswordOptions(options) {
     const lengthEl = document.getElementById('password_length_slider')
     const uppercaseEl = document.getElementById('checkbox_use_upper')
@@ -391,7 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
     specialEl.checked = options.special;
     ambiguousEl.checked = options.ambiguous;
   }
-
   function getGeneratePasswordOptions() {
     const lengthEl = document.getElementById('password_length_slider')
     const uppercaseEl = document.getElementById('checkbox_use_upper')

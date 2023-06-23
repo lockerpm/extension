@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full">
+  <div
+    class="w-full h-full"
+  >
     <router-view></router-view>
   </div>
 </template>
@@ -38,16 +40,6 @@ export default Vue.extend({
       }
     }
   },
-  async beforeMount () {
-    const currentRouterString = await this.$storageService.get('current_router')
-    const currentRouter = JSON.parse(currentRouterString)
-    const allRouters = this.$router.options.routes.map((o: any) => o.children).flat();
-    if (allRouters.find((r: any) => currentRouter && r.name === currentRouter.name)) {
-      this.$router.push(currentRouter).catch(() => ({}))
-    } else {
-      this.$router.push({ name: 'vault'}).catch(() => ({}))
-    }
-  },
 
   watch: {
     'locked' (newValue) {
@@ -62,6 +54,9 @@ export default Vue.extend({
     },
     $route: {
       async handler(newValue) {
+        if (newValue.meta?.isOver) {
+          return
+        }
         await this.$storageService.save('current_router', JSON.stringify({
           name: newValue.name,
           params: newValue.params,

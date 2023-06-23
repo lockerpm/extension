@@ -60,7 +60,7 @@ export default Vue.extend({
   },
   methods: {
     async getUser() {
-      const user = await this.$store.dispatch("LoadCurrentUserPw");
+      const user = await cystackPlatformAPI.users_me();
       this.user = { ...user };
     },
     async putUser(timeoutValue) {

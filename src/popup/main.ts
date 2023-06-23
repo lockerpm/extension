@@ -293,6 +293,9 @@ Vue.mixin({
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
+      setTimeout(() => {
+        this.setupFillPage();
+      }, 1000);
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
@@ -342,12 +345,10 @@ Vue.mixin({
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-        this.setupFillPage();
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-        this.setupFillPage();
       }
     },
     async getFolders() {

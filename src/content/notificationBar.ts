@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', event => {
         const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
         if (menuEl) {
           if (msg.data) {
-            menuEl.style.height = msg.data.height
+            menuEl.style.height = `${msg.data.height} !important`
             menuEl.style.width = elPosition.width
           }
         }
@@ -410,8 +410,11 @@ document.addEventListener('DOMContentLoaded', event => {
     const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
+    // const barPageUrl: string = chrome.runtime.getURL(
+    //   "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+    // );
     const barPageUrl: string = chrome.runtime.getURL(
-      "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+      "popup.html" + `#/menu`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
