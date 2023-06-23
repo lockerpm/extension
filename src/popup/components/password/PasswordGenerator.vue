@@ -23,25 +23,38 @@
           :score="passwordStrength.score"
         />
       </div>
-      <div class="mt-2">
-        <el-button
-          v-clipboard:copy="password"
-          v-clipboard:success="clipboardSuccessHandler"
-          type="primary"
-          class="w-full"
-        >
-          {{ $t('data.tools.copy_password') }}
-        </el-button>
+      <div v-if="isOver">
+        <div class="mt-2">
+          <el-button
+            type="primary"
+            class="w-full"
+            @click="handleUsePassword"
+          >
+            {{ $t('menu.use_this_password') }}
+          </el-button>
+        </div>
       </div>
-      <div class="mt-2">
-        <el-button
-          class="w-full"
-          type="primary"
-          plain
-          @click="savePassword"
-        >
-          {{ $t('data.tools.save_with_locker') }}
-        </el-button>
+      <div v-else>
+        <div class="mt-2">
+          <el-button
+            v-clipboard:copy="password"
+            v-clipboard:success="clipboardSuccessHandler"
+            type="primary"
+            class="w-full"
+          >
+            {{ $t('data.tools.copy_password') }}
+          </el-button>
+        </div>
+        <div class="mt-2">
+          <el-button
+            class="w-full"
+            type="primary"
+            plain
+            @click="savePassword"
+          >
+            {{ $t('data.tools.save_with_locker') }}
+          </el-button>
+        </div>
       </div>
     </div>
     <div>
@@ -103,6 +116,12 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
+  props: {
+    isOver: {
+      type: Boolean,
+      default: false
+    }
+  },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
@@ -176,6 +195,16 @@ export default {
         this.errors = (e.response && e.response.data && e.response.data.details) || {}
       } finally {
         this.loading = false
+      }
+    },
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async handleUsePassword () {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
+          password: this.password
+        });
       }
     }
   }

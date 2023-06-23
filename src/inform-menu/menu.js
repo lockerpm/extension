@@ -229,10 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const optionsContainer = document.getElementById('template-dropdown-options-clone');
     if (!optionsContainer) {
       setContent(document.getElementById('template-dropdown-options'))
-      sendPlatformMessage({
-        command: 'bgResizeInformMenu',
-        data: { width: '320px', height: '244px' }
-      });
       document.getElementById('OPTION_GENPASS').onclick = getPasswordGeneration
       document.getElementById('OPTION_FILLELSE').onclick = getSomethingElseToFill
       document.getElementById('OPTION_TURNOFF').addEventListener('click', (e) => {

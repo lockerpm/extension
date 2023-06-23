@@ -44,7 +44,6 @@ export default class NotificationBackground {
   ) {}
 
   async init() {
-    // this.main.storageService.remove('neverDomains');
     if (chrome.runtime == null) {
       return;
     }
@@ -68,7 +67,6 @@ export default class NotificationBackground {
         if (msg.responseCommand === 'informMenuGetCiphersForCurrentTab') {
           await Promise.all([
             this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
-            BrowserApi.tabSendMessageData(sender.tab, "resizeInformMenu", { width: '320px', height: '244px' })
           ])
         } else {
           await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);

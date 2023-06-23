@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #F6F6F6; min-height: 600px; max-width: 400px"
+    style="background: #F6F6F6; height: 600px; width: 400px"
   >
     <ShowHeader />
     <Search

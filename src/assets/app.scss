@@ -27,7 +27,7 @@ body {
   -ms-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-width: 400px;
+  width: 100%;
   height: 100%;
   &.body-full {
     @apply w-full h-full;

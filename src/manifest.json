@@ -67,7 +67,7 @@
     {
       "all_frames": true,
       "js": [
-        "js/content/message_handler.js"
+        "js/content/messageHandler.js"
       ],
       "matches": [
         "http://*/*",

@@ -410,11 +410,8 @@ document.addEventListener('DOMContentLoaded', event => {
     const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
-    // const barPageUrl: string = chrome.runtime.getURL(
-    //   "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
-    // );
     const barPageUrl: string = chrome.runtime.getURL(
-      "popup.html" + `#/menu`
+      "popup.html" + `#/menu` + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -423,7 +420,7 @@ document.addEventListener('DOMContentLoaded', event => {
       top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
       left: ${getOffsetLeft(inputEl)}px;
       position: absolute;
-      height: 244px;
+      height: 300px;
       width: ${elPosition.width}px !important;
       border: 0;
       min-height: initial;
@@ -443,7 +440,7 @@ document.addEventListener('DOMContentLoaded', event => {
       border-style: initial;
       border-color: initial;
       border-image: initial;
-      border-radius: 8px;
+      border-radius: 4px;
       margin: 0px !important;
       padding: 0px !important;
     `;

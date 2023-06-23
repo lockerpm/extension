@@ -154,7 +154,7 @@ const routes: Array<RouteConfig> = [
         },
         component: () =>
           import(
-            "../popup/menu/index.vue"
+            "../menu/index.vue"
           )
       },
     ]
