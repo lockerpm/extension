@@ -1,31 +1,29 @@
 <template>
   <div
-    class="show-body bg-white"
+    class="bg-white"
   >
-    <div class="p-4">
-      <div class="font-semibold">
-        {{$t('data.settings.excluded_domains_desc')}}
-      </div>
-      <span class="text-black-500">
-        {{$t('data.settings.excluded_domains_details')}}
-      </span>
-      <div class="mt-3">
-        <template v-for="(domain, index) in excludedDomains">
-          <div
-            :key="index"
-            class="flex justify-between"
-            style="padding: 16px 0px"
-          >
-            <div class="text-head-6">
-              {{domain.uri}}
-            </div>
-            <div
-              class="cursor-pointer text-danger font-semibold"
-              @click="removeUri(index)"
-            >{{$t('common.remove')}}</div>
+    <div class="font-semibold">
+      {{$t('data.settings.excluded_domains_desc')}}
+    </div>
+    <span class="text-black-500">
+      {{$t('data.settings.excluded_domains_details')}}
+    </span>
+    <div class="mt-3">
+      <template v-for="(domain, index) in excludedDomains">
+        <div
+          :key="index"
+          class="flex justify-between"
+          style="padding: 16px 0px"
+        >
+          <div class="text-head-6">
+            {{domain.uri}}
           </div>
-        </template>
-      </div>
+          <div
+            class="cursor-pointer text-danger font-semibold"
+            @click="removeUri(index)"
+          >{{$t('common.remove')}}</div>
+        </div>
+      </template>
     </div>
   </div>
 </template>

@@ -1,20 +1,34 @@
 <template>
   <div
     class="relative mx-auto"
-    style="background: #F6F6F6; min-height: 600px; max-width: 400px"
+    style="background: #F6F6F6; height: 600px; width: 400px"
   >
     <ShowHeader />
-    <router-view />
+    <Search
+      v-if="isSearch"
+      is-detail
+    />
+    <div
+      class="show-body px-4 py-4"
+      :class="{
+        'is-search pt-0': isSearch,
+        'is-setting': isSetting
+      }"
+    >
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import ShowHeader from "./components/ShowHeader.vue";
+import Search from "./components/Search.vue";
 
 export default Vue.extend({
   components: {
-    ShowHeader
+    ShowHeader,
+    Search
   },
   data () {
     return {
@@ -23,11 +37,30 @@ export default Vue.extend({
   asyncComputed: {
   },
   computed: {
+    isSearch() {
+      return ['folder-detail'].includes(this.$route.name)
+    },
+    isSetting() {
+      return this.$route.name.includes('settings')
+    }
   },
   methods: {
   }
 }
 )
 </script>
-<style>
+<style lang="scss">
+.show-body {
+  position: absolute !important;
+  top: 60px;
+  bottom: 0px !important;
+  width: 100% !important;
+  overflow: auto !important;
+  &.is-search {
+    top: 124px !important;
+  }
+  &.is-setting {
+    background: white !important;
+  }
+}
 </style>

@@ -57,8 +57,6 @@ import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { ConstantsService } from "jslib-common/services/constants.service";
 
-const BroadcasterSubscriptionId = "CurrentTabComponent";
-
 export default Vue.extend({
   name: "LoginCiphers",
   components: {
@@ -70,41 +68,11 @@ export default Vue.extend({
       CipherType,
       loginCiphers: [],
       url: "",
-      pageDetails: [],
       loaded: false,
-
-      totpCode: "",
-      totpTimeout: null,
-      loadedTimeout: null,
     };
   },
   watch: {
     "$store.state.syncedCiphersToggle": 'load'
-  },
-  async mounted() {
-    chrome.runtime.onMessage.addListener(
-      (msg, sender, response) => {
-        switch (msg.command) {
-        case "collectPageDetailsResponse":
-          if (msg.sender === BroadcasterSubscriptionId) {
-            const pageDetailsObj = {
-              frameId: sender.frameId,
-              tab: msg.tab,
-              details: msg.details,
-            };
-            this.pageDetails.push(pageDetailsObj);
-          }
-          break;
-        default:
-          break;
-        }
-        response();
-      }
-    );
-    await this.load();
-  },
-  destroyed() {
-    self.clearTimeout(this.loadedTimeout);
   },
   methods: {
     async load() {
@@ -115,8 +83,6 @@ export default Vue.extend({
         this.loginCiphers = [];
         return;
       }
-      this.pageDetails = [];
-
       const otherTypes = [];
       const dontShowCards = await new BrowserStorageService().get(
         ConstantsService.dontShowCardsCurrentTab

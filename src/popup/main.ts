@@ -17,6 +17,7 @@ import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
+import { CipherRepromptType } from 'jslib-common/enums/cipherRepromptType';
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 
@@ -49,6 +50,12 @@ import '../middleware';
 Vue.mixin({
   data() {
     return {
+      totpCode: "",
+      totpTimeout: null,
+      loadedTimeout: null,
+      pageDetails: [],
+      selectedCipher: null,
+
       folders: [],
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
@@ -98,6 +105,32 @@ Vue.mixin({
       return this.$store.state.enableAutofill
     }
   },
+  mounted() {
+    chrome.runtime.onMessage.addListener(
+      (msg, sender, response) => {
+        switch (msg.command) {
+        case "collectPageDetailsResponse":
+          if (msg.sender === 'autofillItem') {
+            const pageDetailsObj = {
+              frameId: sender.frameId,
+              tab: msg.tab,
+              details: msg.details,
+            };
+            if (this.selectedCipher) {
+              this.autoFillCipher([pageDetailsObj])
+            }
+          }
+          break;
+        default:
+          break;
+        }
+        response();
+      }
+    );
+  },
+  destroyed() {
+    self.clearTimeout(this.loadedTimeout);
+  },
   methods: {
     changeLang(value) {
       if (value === 'vi') {
@@ -145,13 +178,17 @@ Vue.mixin({
     },
     async logout() {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
+      try {
+        await userAPI.logout();
+      } catch (error) {
+        //
+      }
       await self.bitwardenMain.onLogout(false)
       this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
       await this.setupFillPage();
       this.$router.push({ name: 'login' }).catch(() => ({}));
     },
-
     async lock() {
       await self.bitwardenMain.onLock()
       await this.setupFillPage();
@@ -256,6 +293,9 @@ Vue.mixin({
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
+      setTimeout(() => {
+        this.setupFillPage();
+      }, 1000);
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
@@ -305,12 +345,10 @@ Vue.mixin({
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-        this.setupFillPage();
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-        this.setupFillPage();
       }
     },
     async getFolders() {
@@ -578,6 +616,63 @@ Vue.mixin({
         }
       })
     },
+    async fillCipher(cipher) {
+      this.selectedCipher = cipher;
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillItem',
+      });
+    },
+    async autoFillCipher(pageDetails) {
+      if (
+        this.selectedCipher.reprompt !== CipherRepromptType.None && this.$passwordRepromptService &&
+        !(await this.$passwordRepromptService.showPasswordPrompt())
+      ) {
+        return;
+      }
+
+      this.totpCode = null;
+      if (this.totpTimeout != null) {
+        self.clearTimeout(this.totpTimeout);
+      }
+
+      if (pageDetails == null || pageDetails.length === 0) {
+        this.notify(this.$t("errors.autofill"), "warning");
+        return;
+      }
+      try {
+        this.totpCode = await this.$autofillService.doAutoFill({
+          cipher: this.selectedCipher,
+          pageDetails: pageDetails,
+          fillNewPassword: true,
+        });
+        if (this.totpCode != null) {
+          this.$platformUtilsService.copyToClipboard(this.totpCode, {
+            window: self,
+          });
+        }
+        if (this.$popupUtilsService.inPopup(self)) {
+          if (
+            this.$platformUtilsService.isFirefox() ||
+            this.$platformUtilsService.isSafari()
+          ) {
+            BrowserApi.closePopup(self);
+          } else {
+            setTimeout(() => BrowserApi.closePopup(self), 50);
+          }
+        }
+        if (this.selectedCipher?.id) {
+          await cystackPlatformAPI.use_cipher(
+            this.selectedCipher.id,
+            { use: true, favorite: this.selectedCipher.favorite },
+          )
+        }
+      } catch (e) {
+        this.notify(this.$t("errors.autofill"), "error");
+      }
+    }
   }
 })
 

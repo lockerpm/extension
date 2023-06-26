@@ -1,6 +1,6 @@
 <template>
-  <div id="password-generator">
-    <div class="p-4">
+  <div id="password-generator" class="p-4">
+    <div class="pb-4">
       <div class="flex items-center justify-between mb-1 generated-password-container">
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
@@ -23,28 +23,41 @@
           :score="passwordStrength.score"
         />
       </div>
-      <div class="mt-2">
-        <el-button
-          v-clipboard:copy="password"
-          v-clipboard:success="clipboardSuccessHandler"
-          type="primary"
-          class="w-full"
-        >
-          {{ $t('data.tools.copy_password') }}
-        </el-button>
+      <div v-if="isOver">
+        <div class="mt-2">
+          <el-button
+            type="primary"
+            class="w-full"
+            @click="handleUsePassword"
+          >
+            {{ $t('menu.use_this_password') }}
+          </el-button>
+        </div>
       </div>
-      <div class="mt-2">
-        <el-button
-          class="w-full"
-          type="primary"
-          plain
-          @click="savePassword"
-        >
-          {{ $t('data.tools.save_with_locker') }}
-        </el-button>
+      <div v-else>
+        <div class="mt-2">
+          <el-button
+            v-clipboard:copy="password"
+            v-clipboard:success="clipboardSuccessHandler"
+            type="primary"
+            class="w-full"
+          >
+            {{ $t('data.tools.copy_password') }}
+          </el-button>
+        </div>
+        <div class="mt-2">
+          <el-button
+            class="w-full"
+            type="primary"
+            plain
+            @click="savePassword"
+          >
+            {{ $t('data.tools.save_with_locker') }}
+          </el-button>
+        </div>
       </div>
     </div>
-    <div class="password-generator-options">
+    <div>
       <div class="generator-option">
         <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
         <el-slider
@@ -98,11 +111,19 @@
 import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { CipherType } from "jslib-common/enums/cipherType";
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
+  props: {
+    isOver: {
+      type: Boolean,
+      default: false
+    }
+  },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
@@ -177,6 +198,11 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async handleUsePassword () {
+      this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
     }
   }
 }

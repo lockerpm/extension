@@ -36,7 +36,7 @@ import { CipherType } from "jslib-common/enums/cipherType";
 export default Vue.extend({
   props: {
     type: {
-      type: Number,
+      type: [Number, String],
       default: CipherType.Login
     }
   },

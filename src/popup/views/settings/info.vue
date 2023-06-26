@@ -1,21 +1,17 @@
 <template>
-  <div
-    class="show-body bg-white"
-  >
-    <div class="p-4">
-      <div class="text-black text-head-6 font-semibold pb-4">
-        {{$t('data.settings.version')}} {{version}}
-      </div>
-      <div class="info-section">
-        <a target="_blank" href="https://locker.io/terms">
-          {{$t('data.settings.term')}}
-        </a>
-      </div>
-      <div class="info-section">
-        <a target="_blank" href="https://locker.io/privacy">
-          {{$t('data.settings.privacy')}}
-        </a>
-      </div>
+  <div>
+    <div class="text-black text-head-6 font-semibold pb-4">
+      {{$t('data.settings.version')}} {{version}}
+    </div>
+    <div class="info-section">
+      <a target="_blank" href="https://locker.io/terms">
+        {{$t('data.settings.term')}}
+      </a>
+    </div>
+    <div class="info-section">
+      <a target="_blank" href="https://locker.io/privacy">
+        {{$t('data.settings.privacy')}}
+      </a>
     </div>
   </div>
 </template>

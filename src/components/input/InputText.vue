@@ -1,6 +1,6 @@
 <template>
   <div
-    class="cs-field"
+    class="cs-field bg-white"
     :class="{
       'is-focus': focusing,
       'have-value': value,

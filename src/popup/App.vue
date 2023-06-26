@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full">
+  <div
+    class="w-full h-full"
+  >
     <router-view></router-view>
   </div>
 </template>
@@ -38,11 +40,6 @@ export default Vue.extend({
       }
     }
   },
-  async beforeMount () {
-    const currentRouterString = await this.$storageService.get('current_router')
-    const currentRouter = JSON.parse(currentRouterString)
-    this.$router.push(currentRouter && currentRouter.name ? currentRouter : { name: 'vault'}).catch(() => ({}))
-  },
 
   watch: {
     'locked' (newValue) {
@@ -57,6 +54,9 @@ export default Vue.extend({
     },
     $route: {
       async handler(newValue) {
+        if (newValue.meta?.isOver) {
+          return
+        }
         await this.$storageService.save('current_router', JSON.stringify({
           name: newValue.name,
           params: newValue.params,
@@ -100,27 +100,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.vault-body {
-  position: absolute !important;
-  top: 137px !important;
-  bottom: 40px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
-.settings-body {
-  position: absolute !important;
-  top: 73px !important;
-  bottom: 0px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
-.show-body {
-  position: absolute !important;
-  top: 60px !important;
-  bottom: 0px !important;
-  width: 100% !important;
-  overflow: auto !important;
-}
 .el-message-box {
   width: 260px !important;
 }

@@ -1,8 +1,6 @@
 <template>
-  <div
-    class="settings-body"
-  >
-    <div class="p-4">
+  <div>
+    <div>
       <div
         v-for="(cate, index) in menu"
         :key="index"

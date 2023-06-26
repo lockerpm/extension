@@ -1591,8 +1591,13 @@ select {
 }
 
 .p-0 {
-  padding: 0px;
+  padding: 0px !important;
 }
+
+.pt-0 {
+  padding-top: 0px !important;
+}
+
 
 .p-4 {
   padding: 1rem;

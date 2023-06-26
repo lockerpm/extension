@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="relative mx-auto settings-body"
-  >
+  <div>
     <PasswordGenerator />
   </div>
 </template>

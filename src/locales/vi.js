@@ -585,6 +585,7 @@ module.exports = {
       date: 'Ngày',
       monthYear: 'Tháng/Năm',
       markFavorite: 'Đánh dấu yêu thích',
+      markNotFavorite: 'Bỏ yêu thích',
       select_networks: 'Chọn Mạng Blockchain',
       select_wallet: 'Chọn ví Blockchain'
     },

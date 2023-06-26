@@ -16,6 +16,8 @@ const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
 
 const STORAGE_KEY = 'cs_store'
+const USER_KEY = 'cs_user'
+const USER_PW_KEY = 'cs_user_pw'
 
 const defaultUser = {
   email: null,
@@ -55,12 +57,15 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
     }
   }
 
+  const user = await storageService.get(USER_KEY)
+  const userPw = await storageService.get(USER_PW_KEY) || { is_pwd_manager: false }
+
   return new Vuex.Store({
     state: {
       init: false,
       isLoggedIn: false,
       user: {
-        ...JSON.parse(JSON.stringify(defaultUser)),
+        ...JSON.parse(JSON.stringify(user || defaultUser)),
         language: oldStoreParsed.language,
       },
       notifications: {
@@ -72,9 +77,7 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       isDev: 'dev',
       environment: 'dev',
       loading: false,
-      userPw: {
-        is_pwd_manager: false
-      },
+      userPw: JSON.parse(JSON.stringify(userPw)),
       isLoggedInPw: false,
       syncedCiphersToggle: false,
       syncing: false,
@@ -100,10 +103,11 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
-        runtimeBackground.updateStoreService('isLoggedIn', true)
+        runtimeBackground.updateStoreService('isLoggedIn', isLoggedIn)
       },
       CLEAR_ALL_DATA (state) {
         state.use = JSON.parse(JSON.stringify(defaultUser)),
+        state.userPw = {}
         state.isLoggedIn = false
         state.notifications = {
           results: [],
@@ -211,21 +215,25 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
         })
       },
       async LoadCurrentUser ({ commit }) {
-        return await meAPI.me().then((response) => {
+        await meAPI.me().then(async (response) => {
           commit('UPDATE_IS_LOGGEDIN', true)
           commit('UPDATE_USER', response)
-          return response
-        }).catch(() => {
+          await storageService.save(USER_KEY, response)
+        }).catch(async () => {
           commit('UPDATE_IS_LOGGEDIN', false)
           commit('UPDATE_USER', null)
-          return JSON.parse(JSON.stringify(defaultUser))
+          await storageService.save(USER_KEY, null)
         });
         
       },
       async LoadCurrentUserPw ({ commit }) {
-        const res = await cystackPlatformAPI.users_me();
-        commit('UPDATE_USER_PW', res)
-        return res
+        await cystackPlatformAPI.users_me().then(async res => {
+          commit('UPDATE_USER_PW', res)
+          await storageService.save(USER_PW_KEY, res)
+        }).catch(async () => {
+          commit('UPDATE_USER_PW', {})
+          await storageService.save(USER_PW_KEY, {})
+        });
       },
       async LoadCurrentIntercom ({ commit }) {
         const res: any = await meAPI.me_intercom();

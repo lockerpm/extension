@@ -1,16 +1,16 @@
 <template>
-  <div class="show-body">
-    <div class="p-4">
-      <ListCipher
-        :folder-id="$route.params.id"
-      />
-    </div>
+  <div>
+    <ListCipher
+      :type="cipherType"
+      :folder="$route.params.data"
+    />
   </div>
 </template>
 
 <script>
-import find from 'lodash/find'
 import ListCipher from "@/popup/components/ciphers/ListCipher";
+import { CipherType } from "jslib-common/enums/cipherType";
+
 export default {
   scrollToTop: true,
   components: {
@@ -19,28 +19,15 @@ export default {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
-      folders: []
     }
   },
   asyncComputed: {
-    folders: {
-      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      async get () {
-        let folders = (await this.$folderService.getAllDecrypted()) || [];
-        folders = folders.filter((f) => f.id);
-        return folders;
-      },
-      watch: ["ciphers"],
-    },
   },
   computed: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    folder () {
-      if (this.folders) {
-        return find(this.folders, e => e.id === this.$route.params.folderId) || {}
-      }
-      return {}
-    }
+    cipherType() {
+      return this.$route.query ? Number(this.$route.query.type || CipherType.Login) : CipherType.Login
+    },
   }
 }
 </script>

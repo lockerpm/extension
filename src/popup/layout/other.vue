@@ -1,9 +1,8 @@
 <template>
   <div
-    class="relative mx-auto bg-white"
-    style="height: 600px; width: 400px"
+    class="bg-white w-full h-full"
   >
-    <router-view style="height: 600px;"/>
+    <router-view />
   </div>
 </template>
 

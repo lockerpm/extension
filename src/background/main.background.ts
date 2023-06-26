@@ -578,6 +578,8 @@ export default class MainBackground {
       this.passwordGenerationService.clear(),
       this.vaultTimeoutService.clear(),
       this.storageService.remove("cs_token"),
+      this.storageService.remove("cs_user"),
+      this.storageService.remove("cs_user_pw"),
     ]);
 
     this.searchService.clearIndex();

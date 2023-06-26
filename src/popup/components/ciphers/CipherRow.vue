@@ -3,19 +3,22 @@
     <li
       v-if="item.id"
       class="cipher-item"
+      @click.self="() => fillCipher(item)"
     >
       <div
         class="text-[32px] mr-3 flex-shrink-0"
         :class="{'filter grayscale': item.isDeleted}"
-        @click="fillCipher()"
+        @click="() => fillCipher(item)"
       >
         <Vnodes :vnodes="getIconCipher(item, 32)" />
       </div>
-      <div class="flex-grow overflow-hidden">
+      <div
+        class="flex-grow overflow-hidden"
+        @click="() => fillCipher(item)"
+      >
         <div
-          class="text-black font-semibold truncate hover:text-primary"
+          class="text-black font-semibold truncate"
           style="line-height: 18px;"
-          @click.self="$router.push({ name: 'vault-detail', params: { id: item.id, data: item } }).catch(() => ({}))"
         >
           {{ item.name }}
           <img
@@ -46,7 +49,7 @@
               <i class="fas fa-external-link-square-alt" />
           </button>
           <el-dropdown
-            v-if="!item.isDeleted && [CipherType.Login, CipherType.SecureNote, 6, 7].includes(item.type)"
+            v-if="!item.isDeleted && [CipherType.Login, CipherType.SecureNote, CipherType.CryptoAccount, CipherType.CryptoWallet].includes(item.type)"
             trigger="click"
             :hide-on-click="false"
           >
@@ -118,14 +121,35 @@
               </template>
             </el-dropdown-menu>
           </el-dropdown>
-          <template v-if="!item.isDeleted && canManageItem(organizations, item)">
+          <el-dropdown
+            v-if="!item.isDeleted && canManageItem(organizations, item)"
+            trigger="click"
+            :hide-on-click="false"
+          >
             <button
               class="btn btn-icon btn-xs hover:text-primary"
-              @click="addEdit(item)"
             >
-              <i class="fas fa-pen" />
+              <i class="el-icon-more"></i>
             </button>
-          </template>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                @click.native="() => showDetail(item)"
+              >
+                {{ $t('common.detail') }}
+              </el-dropdown-item>
+              <el-dropdown-item
+                @click.native="() => addEdit(item)"
+              >
+                {{ $t('common.edit') }}
+              </el-dropdown-item>
+              <el-dropdown-item
+                class="text-danger"
+                @click.native="deleteCiphers([item.id])"
+              >
+                {{ $t('common.delete') }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </div>
     </li>
@@ -146,6 +170,10 @@ export default Vue.extend(
       item:{
         type: [CipherView, Object],
         default: () => new CipherView()
+      },
+      folder: {
+        type: Object,
+        default: null
       }
     },
     data(){
@@ -164,10 +192,16 @@ export default Vue.extend(
     },
     methods: {
       addEdit (item) {
-        this.$router.push({name: 'add-edit-cipher', params: {data: item}}).catch(() => ({}))
+        this.$router.push({
+          name: 'add-edit-cipher',
+          params: {data: item, folder: this.folder}
+        }).catch(() => ({}))
       },
-      fillCipher(){
-        this.$emit('do-fill')
+      showDetail (item) {
+        this.$router.push({
+          name: 'vault-detail',
+          params: { id: item.id, data: item }
+        }).catch(() => ({}))
       }
     }
   }

@@ -16,7 +16,7 @@ module.exports = {
       title: 'Menu'
     },
     popup: {
-      template: 'public/browser-extension.html',
+      template: 'public/index.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
     },
@@ -39,7 +39,7 @@ module.exports = {
             'content/notificationBar': 'src/content/notificationBar.ts',
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',
             'content/shortcuts': 'src/content/shortcuts.ts',
-            'content/message_handler': 'src/content/message_handler.ts',
+            'content/messageHandler': 'src/content/messageHandler.ts',
           },
         },
       },

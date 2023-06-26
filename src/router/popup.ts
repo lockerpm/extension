@@ -2,9 +2,10 @@ import Vue from 'vue'
 import sentryConfig from './index'
 import VueRouter, { RouteConfig } from 'vue-router'
 
-import AuthLayout from '@/popup/layout/auth.vue'
 import Layout from '@/popup/layout/index.vue'
+import AuthLayout from '@/popup/layout/auth.vue'
 import ShowLayout from '@/popup/layout/show.vue'
+import OtherLayout from '@/popup/layout/other.vue'
 
 Vue.use(VueRouter)
 
@@ -52,7 +53,7 @@ const routes: Array<RouteConfig> = [
     component: Layout,
     children: [
       {
-        path: "vault",
+        path: "",
         name: "vault",
         component: () =>
           import("../popup/views/vault/index.vue")
@@ -139,6 +140,23 @@ const routes: Array<RouteConfig> = [
             "../popup/views/settings/info.vue"
           )
       }
+    ]
+  },
+  {
+    path: "/menu",
+    component: OtherLayout,
+    children: [
+      {
+        path: "",
+        name: "menu",
+        meta: {
+          isOver: true
+        },
+        component: () =>
+          import(
+            "../menu/index.vue"
+          )
+      },
     ]
   },
 ];
