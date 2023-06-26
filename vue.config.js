@@ -5,11 +5,6 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const os = require('os');
 module.exports = {
   pages: {
-    bar: {
-      template: './src/notification/bar.html',
-      entry: './src/notification/bar.js',
-      title: 'Bar'
-    },
     popup: {
       template: 'public/index.html',
       entry: './src/popup/main.ts',

@@ -78,7 +78,7 @@ export default Vue.extend({
       model.name = model.name.replace(/^www\./, '');
       model.type = CipherType.Login;
       model.login = loginModel;
-      model.folderId = data.folderId
+      model.folderId = this.data.folderId
 
       const cipher = await this.$cipherService.encrypt(model);
       const data = new CipherRequest(cipher)
@@ -119,7 +119,9 @@ export default Vue.extend({
         
     },
     async excludeDomain() {
-      //
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      await this.addExcludeDomain(tab.url);
+      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
     },
     async notificationAlert(type) {
       const tab = await BrowserApi.getTabFromCurrentWindow();

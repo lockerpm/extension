@@ -7,7 +7,7 @@
       <img src="@/assets/images/icons/icon_menu_logo.svg">
       <p class="ml-2">{{ title }}</p>
     </div>
-    <div>
+    <div v-if="!excluded">
       <el-dropdown
         trigger="hover"
       >
@@ -57,6 +57,10 @@ export default Vue.extend({
     fillType: {
       type: Object,
       default: () => ({})
+    },
+    excluded: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

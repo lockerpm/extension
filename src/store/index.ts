@@ -80,6 +80,7 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       userPw: JSON.parse(JSON.stringify(userPw)),
       isLoggedInPw: false,
       syncedCiphersToggle: false,
+      syncedExcludeDomains: false,
       syncing: false,
       searchText: '',
       teams: [],
@@ -139,6 +140,9 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_SYNCED_CIPHERS (state) {
         state.syncedCiphersToggle = !state.syncedCiphersToggle
+      },
+      UPDATE_EXCLUDE_DOMAINS (state) {
+        state.syncedExcludeDomains = !state.syncedExcludeDomains
       },
       UPDATE_SYNCING (state, syncing) {
         state.syncing = syncing

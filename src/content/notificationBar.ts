@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let currentMessage: any = null
   let pageDetails: any[] = [];
   const formData: any[] = [];
-  let barType: string = null;
   let pageHref: string = null;
   let observer: MutationObserver = null;
   let domObservationCollectTimeout: number = null;
@@ -38,21 +37,14 @@ document.addEventListener('DOMContentLoaded', event => {
     chrome.runtime.sendMessage(msg);
   }
 
-  chrome.storage.local.get('neverDomains', (ndObj: any) => {
-    const domains = ndObj.neverDomains;
-    if (domains != null && domains.hasOwnProperty(self.location.hostname)) {
-      return;
-    }
-
-    chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-      disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-      chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-        disabledChangedPasswordNotification = disChangedObj != null &&
-          disChangedObj.disableChangedPasswordNotification === true;
-        if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-          collectIfNeededWithTimeout();
-        }
-      });
+  chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+    disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+    chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+      disabledChangedPasswordNotification = disChangedObj != null &&
+        disChangedObj.disableChangedPasswordNotification === true;
+      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+        collectIfNeededWithTimeout();
+      }
     });
   });
 
@@ -69,17 +61,12 @@ document.addEventListener('DOMContentLoaded', event => {
       if (inIframe) {
         return;
       }
-      closeExistingAndOpenBar(msg.data.type, msg.data.queueMessage || msg.data.loginInfo);
+      closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
       if (inIframe) {
         return;
       }
       closeBar(true);
-    } else if (msg.command === 'adjustNotificationBar') {
-      if (inIframe) {
-        return;
-      }
-      adjustBar(msg.data);
     } else if (msg.command === 'notificationBarPageDetails') {
       pageDetails = [];
       inputWithLogo = [];
@@ -87,67 +74,59 @@ document.addEventListener('DOMContentLoaded', event => {
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
         if (autofillObj && autofillObj.enableAutofill === false) return;
-        chrome.storage.local.get("neverDomains", (ndObj: any) => {
-          const domains = ndObj.neverDomains;
-          if (
-            domains == null ||
-            !domains.hasOwnProperty(self.location.hostname)
-          ) {
-            for (let i = 0; i < msg.data.passwordFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            for (let i = 0; i < msg.data.usernameFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            inputWithLogo = inputWithLogo.filter(e => e != null)
-            
-            document.onclick = check;
-            function check(e) {
-              const target = e && e.target;
-              let check = false;
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (
-                  checkParent(target, inputWithLogo[i].inputEl) ||
-                  checkParent(target, inputWithLogo[i].logo)
-                ) {
-                  check = true;
-                  closeOtherMenu(i);
-                }
-              }
-              if (!check) {
-                for (let i = 0; i < inputWithLogo.length; i++) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function closeOtherMenu(indexClick) {
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (i !== indexClick) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function checkParent(t, elm) {
-              while (t.parentNode) {
-                if (t === elm) {
-                  return true;
-                }
-                t = t.parentNode;
-              }
-              return false;
+        for (let i = 0; i < msg.data.passwordFields.length; i++) {
+          try {
+            inputWithLogo.push(
+              setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+            );
+          } catch (error) {
+          }
+        }
+        for (let i = 0; i < msg.data.usernameFields.length; i++) {
+          try {
+            inputWithLogo.push(
+              setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+            );
+          } catch (error) {
+          }
+        }
+        inputWithLogo = inputWithLogo.filter(e => e != null)
+        
+        document.onclick = check;
+        function check(e) {
+          const target = e && e.target;
+          let check = false;
+          for (let i = 0; i < inputWithLogo.length; i++) {
+            if (
+              checkParent(target, inputWithLogo[i].inputEl) ||
+              checkParent(target, inputWithLogo[i].logo)
+            ) {
+              check = true;
+              closeOtherMenu(i);
             }
           }
-        });
+          if (!check) {
+            for (let i = 0; i < inputWithLogo.length; i++) {
+              closeInformMenu(inputWithLogo[i].inputEl);
+            }
+          }
+        }
+        function closeOtherMenu(indexClick) {
+          for (let i = 0; i < inputWithLogo.length; i++) {
+            if (i !== indexClick) {
+              closeInformMenu(inputWithLogo[i].inputEl);
+            }
+          }
+        }
+        function checkParent(t, elm) {
+          while (t.parentNode) {
+            if (t === elm) {
+              return true;
+            }
+            t = t.parentNode;
+          }
+          return false;
+        }
       })
     } else if (msg.command === "closeInformMenu") {
       if (inIframe) {
@@ -672,13 +651,11 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
 
-    closeBar(false);
+    closeBar();
     openBar(type, barPage);
   }
 
   function openBar(type: string, barPage: string) {
-    barType = type;
-
     if (document.body == null) {
       return;
     }
@@ -716,7 +693,7 @@ document.addEventListener('DOMContentLoaded', event => {
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 
-  function closeBar(explicitClose: boolean) {
+  function closeBar(explicitClose: boolean = false) {
     const barEl = document.getElementById('bit-notification-bar');
     if (barEl != null) {
       barEl.parentElement.removeChild(barEl);
@@ -726,40 +703,10 @@ document.addEventListener('DOMContentLoaded', event => {
     if (spacerEl) {
       spacerEl.parentElement.removeChild(spacerEl);
     }
-
-    if (!explicitClose) {
-      return;
-    }
-
-    switch (barType) {
-      case 'add':
-        sendPlatformMessage({
-          command: 'bgAddClose',
-        });
-        break;
-      case 'change':
-        sendPlatformMessage({
-          command: 'bgChangeClose',
-        });
-        break;
-      default:
-        break;
-    }
-  }
-
-  function adjustBar(data: any) {
-    if (data != null && data.height !== 42) {
-      const newHeight = data.height + 'px';
-      doHeightAdjustment('bit-notification-bar-iframe', newHeight);
-      doHeightAdjustment('bit-notification-bar', newHeight);
-      doHeightAdjustment('bit-notification-bar-spacer', newHeight);
-    }
-  }
-
-  function doHeightAdjustment(elId: string, heightStyle: string) {
-    const el = document.getElementById(elId);
-    if (el != null) {
-      el.style.height = heightStyle;
+    if (explicitClose) {
+      sendPlatformMessage({
+        command: 'bgCloseNotificationBar',
+      })
     }
   }
 

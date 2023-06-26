@@ -4,27 +4,34 @@
       :tab="currentTab"
       :fill-type="currentFillType"
       :tabs="tabs"
+      :excluded="excluded"
     />
-    <MenuSearch
-      v-if="tab === 2 && !isLocked"
-      :fill-types="fillTypes"
-      :fill-type="currentFillType"
-      @change="(v) => fillType = v"
-    />
-    <div class="menu-info" :class="{ 'is-search': tab === 2 }">
-      <PasswordGenerator
-        v-if="tab === 1"
-        is-over
-      />
-      <MenuCiphers
-        v-else-if="tab === 2 && !isLocked"
+    <div v-if="!excluded">
+      <MenuSearch
+        v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes"
         :fill-type="currentFillType"
+        @change="(v) => fillType = v"
       />
-      <MenuLocked
-        v-else-if="tab === 2 && isLocked"
-      />
+      <div class="menu-info" :class="{ 'is-search': tab === 2 }">
+        <PasswordGenerator
+          v-if="tab === 1"
+          is-over
+        />
+        <MenuCiphers
+          v-else-if="tab === 2 && !isLocked"
+          :fill-types="fillTypes"
+          :fill-type="currentFillType"
+        />
+        <MenuLocked
+          v-else-if="tab === 2 && isLocked"
+        />
+      </div>
     </div>
+    <MenuExcluded
+      v-else
+      @remove="() => removeDomain(excluded)"
+    />
   </div>
 </template>
 
@@ -34,6 +41,8 @@ import MenuHeader from './components/Header.vue';
 import MenuSearch from './components/Search.vue';
 import MenuCiphers from './components/Ciphers.vue';
 import MenuLocked from './components/Locked.vue';
+import MenuExcluded from './components/Excluded.vue';
+
 import PasswordGenerator from '@/popup/components/password/PasswordGenerator.vue'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
@@ -45,6 +54,7 @@ export default Vue.extend({
     MenuSearch,
     MenuCiphers,
     MenuLocked,
+    MenuExcluded,
     PasswordGenerator
   },
   data () {
@@ -56,17 +66,20 @@ export default Vue.extend({
   asyncComputed: {
     savedDomains: {
       async get () {
-        const domains = await this.$storageService.get('neverDomains') || {}
-        return Object.keys(domains) || []
+        return await this.$storageService.get('neverDomains') || {}
       },
-      watch: []
+      watch: [
+        '$store.state.syncedExcludeDomains'
+      ]
     },
-    excludeDomain: {
+    excluded: {
       async get () {
         const currentUrlTab = await BrowserApi.getTabFromCurrentWindow();
-        return !!(this.savedDomains || []).find((d) => currentUrlTab.url.includes(d))
+        return await this.$cipherService.getIncludedDomainByUrl(currentUrlTab.url)
       },
-      watch: []
+      watch: [
+        '$store.state.syncedExcludeDomains'
+      ]
     },
     isLocked: {
       async get () {

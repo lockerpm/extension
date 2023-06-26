@@ -45,6 +45,7 @@ export default Vue.extend({
     const locked = await this.$vaultTimeoutService.isLocked()
     if (!locked) {
       this.getSyncData()
+      this.getExcludeDomains()
     }
   },
 
@@ -55,6 +56,7 @@ export default Vue.extend({
       } else {
         this.$store.dispatch('LoadTeams')
         this.getSyncData()
+        this.getExcludeDomains()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }

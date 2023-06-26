@@ -1,8 +1,6 @@
 import { CipherType } from 'jslib-common/enums/cipherType';
 import { SecureNoteView } from 'jslib-common/models/view/secureNoteView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
-import { LoginUriView } from 'jslib-common/models/view/loginUriView';
-import { LoginView } from 'jslib-common/models/view/loginView';
 
 import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
@@ -23,26 +21,28 @@ import { Utils } from 'jslib-common/misc/utils';
 
 import { PolicyType } from 'jslib-common/enums/policyType';
 
-import AddChangePasswordQueueMessage from './models/addChangePasswordQueueMessage';
-import AddLoginQueueMessage from './models/addLoginQueueMessage';
 import AddLoginRuntimeMessage from './models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from './models/changePasswordRuntimeMessage';
-import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
 import { NotificationQueueMessageType } from './models/notificationQueueMessageType';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherData } from 'jslib-common/models/data/cipherData';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+
+let currentLoginInfo = null
+
 export default class NotificationBackground {
-
-  private notificationQueue: (AddLoginQueueMessage | AddChangePasswordQueueMessage | any)[] = [];
-
-  constructor(private main: MainBackground, private autofillService: AutofillService,
-    private cipherService: CipherService, private storageService: StorageService,
-    private vaultTimeoutService: VaultTimeoutService, private policyService: PolicyService,
-    private folderService: FolderService, private userService: UserService,
-    private totpService: TotpService, private request: Requestground
+  constructor(
+    private main: MainBackground,
+    private autofillService: AutofillService,
+    private cipherService: CipherService,
+    private storageService: StorageService,
+    private vaultTimeoutService: VaultTimeoutService,
+    private policyService: PolicyService,
+    private folderService: FolderService,
+    private userService: UserService,
+    private totpService: TotpService,
+    private request: Requestground
   ) {}
-
   async init() {
     if (chrome.runtime == null) {
       return;
@@ -51,8 +51,6 @@ export default class NotificationBackground {
     BrowserApi.messageListener('notification.background', async (msg: any, sender: chrome.runtime.MessageSender) => {
       await this.processMessage(msg, sender);
     });
-
-    this.cleanupNotificationQueue();
   }
 
   async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
@@ -64,39 +62,13 @@ export default class NotificationBackground {
         await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
         break;
       case 'bgCloseNotificationBar':
-        await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
-        break;
-      case 'bgAdjustNotificationBar':
-        await BrowserApi.tabSendMessageData(sender.tab, 'adjustNotificationBar', msg.data);
+        currentLoginInfo = null;
         break;
       case 'bgAddLogin':
         await this.addLogin(msg.login, sender.tab);
         break;
       case 'bgChangedPassword':
         await this.changedPassword(msg.data, sender.tab);
-        break;
-      case 'bgAddClose':
-      case 'bgChangeClose':
-        this.removeTabFromNotificationQueue(sender.tab);
-        break;
-      case 'bgAddSave':
-      case 'bgChangeSave':
-        if (await this.vaultTimeoutService.isLocked()) {
-          const retryMessage: LockedVaultPendingNotificationsItem = {
-            commandToRetry: {
-              msg: msg,
-              sender: sender,
-            },
-            target: 'notification.background',
-          };
-          await BrowserApi.tabSendMessageData(sender.tab, 'addToLockedVaultPendingNotifications', retryMessage);
-          await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
-          return;
-        }
-        await this.saveOrUpdateCredentials(sender.tab, msg.folder);
-        break;
-      case 'bgNeverSave':
-        await this.saveNever(sender.tab);
         break;
       case 'collectPageDetailsResponse':
         switch (msg.sender) {
@@ -118,8 +90,13 @@ export default class NotificationBackground {
               usernameFields: usernameFields,
               isLocked: await this.vaultTimeoutService.isLocked()
             });
-            chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
+            chrome.storage.local.get('enableAutofill', async (autofillObj: any) => {
               if (autofillObj.enableAutofill === false) return;
+              const tab = await BrowserApi.getTabFromCurrentWindow();
+              const excludeDomain: any = await this.cipherService.getIncludedDomainByUrl(tab.url)
+              if (!!excludeDomain) {
+                return;
+              }
               // check is login page
               if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
                 this.autofillFirstPage(sender.tab);
@@ -129,23 +106,6 @@ export default class NotificationBackground {
             break;
           default:
             break;
-        }
-        break;
-      case 'informMenuTurnOff':
-        await this.turnOffAutofill(sender.tab)
-        break;
-      case 'barFormChange':
-        const currentTab = await BrowserApi.getTabFromCurrentWindow();
-        const notificationQueueIndex = this.notificationQueue.findIndex((n) => currentTab && n.tabId === currentTab.id);
-        if (notificationQueueIndex > -1) {
-          this.notificationQueue[notificationQueueIndex]
-          if (msg.username) {
-            this.notificationQueue[notificationQueueIndex].username = msg.username;
-          } else if (msg.password) {
-            this.notificationQueue[notificationQueueIndex].password = msg.password
-          } else if (msg.newPassword) {
-            this.notificationQueue[notificationQueueIndex].newPassword = msg.newPassword
-          }
         }
         break;
       case 'scanQRCode':
@@ -220,31 +180,21 @@ export default class NotificationBackground {
   }
 
   async checkNotificationQueue(tab: chrome.tabs.Tab = null, loginInfo: object = null): Promise<void> {
-    if (this.notificationQueue.length === 0) {
-      return;
+    if (loginInfo) {
+      currentLoginInfo = loginInfo
     }
-
     if (tab != null) {
-      this.doNotificationQueueCheck(tab, loginInfo);
+      this.doNotificationQueueCheck(tab, currentLoginInfo);
       return;
     }
 
     const currentTab = await BrowserApi.getTabFromCurrentWindow();
     if (currentTab != null) {
-      this.doNotificationQueueCheck(currentTab, loginInfo);
+      this.doNotificationQueueCheck(currentTab, currentLoginInfo);
     }
   }
 
-  private cleanupNotificationQueue() {
-    for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
-      if (this.notificationQueue[i].expires < new Date()) {
-        this.notificationQueue.splice(i, 1);
-      }
-    }
-    setTimeout(() => this.cleanupNotificationQueue(), 2 * 60 * 1000); // check every 2 minutes
-  }
-
-  private doNotificationQueueCheck(tab: chrome.tabs.Tab, loginInfo: object): void {
+  private doNotificationQueueCheck(tab: chrome.tabs.Tab, loginInfo: any): void {
     if (tab == null) {
       return;
     }
@@ -257,32 +207,16 @@ export default class NotificationBackground {
       ...loginInfo,
       uri: tabDomain
     }
-    for (let i = 0; i < this.notificationQueue.length; i++) {
-      if (this.notificationQueue[i].tabId !== tab.id || this.notificationQueue[i].domain !== tabDomain) {
-        continue;
-      }
-      if (this.notificationQueue[i].type === NotificationQueueMessageType.addLogin) {
-        BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
-          type: 'add',
-          loginInfo,
-          queueMessage: this.notificationQueue[0]
-        });
-      } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
-        BrowserApi.tabSendMessageData(tab, "openNotificationBar", {
-          type: "change",
-          loginInfo,
-          queueMessage: this.notificationQueue[0]
-        });
-      }
-      break;
-    }
-  }
-
-  private removeTabFromNotificationQueue(tab: chrome.tabs.Tab) {
-    for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
-      if (this.notificationQueue[i].tabId === tab.id) {
-        this.notificationQueue.splice(i, 1);
-      }
+    if (loginInfo.type === NotificationQueueMessageType.addLogin) {
+      BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
+        type: 'add',
+        loginInfo,
+      });
+    } else if (loginInfo.type === NotificationQueueMessageType.changePassword) {
+      BrowserApi.tabSendMessageData(tab, "openNotificationBar", {
+        type: "change",
+        loginInfo,
+      });
     }
   }
 
@@ -330,9 +264,7 @@ export default class NotificationBackground {
   }
 
   private async pushAddLoginToQueue(loginDomain: string, loginInfo: AddLoginRuntimeMessage, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
-    // remove any old messages for this tab
-    this.removeTabFromNotificationQueue(tab);
-    const message: AddLoginQueueMessage = {
+    await this.checkNotificationQueue(tab, {
       type: NotificationQueueMessageType.addLogin,
       username: loginInfo.username,
       password: loginInfo.password,
@@ -341,9 +273,7 @@ export default class NotificationBackground {
       tabId: tab.id,
       expires: new Date((new Date()).getTime() + 5 * 60000), // 5 minutes
       wasVaultLocked: isVaultLocked,
-    };
-    this.notificationQueue.push(message);
-    await this.checkNotificationQueue(tab, { username: loginInfo.username, password: loginInfo.password, uri: loginInfo.url });
+    });
   }
 
   private async changedPassword(changeData: ChangePasswordRuntimeMessage, tab: chrome.tabs.Tab) {
@@ -372,9 +302,7 @@ export default class NotificationBackground {
   }
 
   private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
-    // remove any old messages for this tab
-    this.removeTabFromNotificationQueue(tab);
-    const message: AddChangePasswordQueueMessage = {
+    await this.checkNotificationQueue(tab, {
       type: NotificationQueueMessageType.changePassword,
       cipherId: cipherId,
       username,
@@ -383,92 +311,7 @@ export default class NotificationBackground {
       tabId: tab.id,
       expires: new Date((new Date()).getTime() + 5 * 60000), // 5 minutes
       wasVaultLocked: isVaultLocked,
-    };
-    this.notificationQueue.push(message);
-    await this.checkNotificationQueue(tab, { password: newPassword, username, uri: loginDomain });
-  }
-
-  private async saveOrUpdateCredentials(tab: chrome.tabs.Tab, folderId?: string) {
-    for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
-      const queueMessage = this.notificationQueue[i];
-      if (queueMessage.tabId !== tab.id ||
-        (queueMessage.type !== NotificationQueueMessageType.addLogin && queueMessage.type !== NotificationQueueMessageType.changePassword)) {
-        continue;
-      }
-
-      const tabDomain = Utils.getDomain(tab.url);
-      if (tabDomain != null && tabDomain !== queueMessage.domain) {
-        continue;
-      }
-      this.notificationQueue.splice(i, 1);
-      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar');
-      if (queueMessage.type === NotificationQueueMessageType.changePassword) {
-        const message = (queueMessage as AddChangePasswordQueueMessage);
-        const cipher = await this.getDecryptedCipherById(message.cipherId);
-        if (cipher == null) {
-          return;
-        }
-        await this.updateCipher(cipher, message.newPassword, message.username);
-        return;
-      }
-
-      if (!queueMessage.wasVaultLocked) {
-        await this.createNewCipher(queueMessage as AddLoginQueueMessage, folderId);
-      }
-
-      // If the vault was locked, check if a cipher needs updating instead of creating a new one
-      if (queueMessage.type === NotificationQueueMessageType.addLogin && queueMessage.wasVaultLocked === true) {
-        const message = (queueMessage as AddLoginQueueMessage);
-        const ciphers = await this.cipherService.getAllDecryptedForUrl(message.uri) || [];
-        const usernameMatches = ciphers.filter(c => c.login.username != null &&
-          c.login.username.toLowerCase() === message.username);
-
-        if (usernameMatches.length >= 1) {
-          await this.updateCipher(usernameMatches[0], message.password);
-          return;
-        }
-
-        await this.createNewCipher(message, folderId);
-      }
-
-    }
-  }
-
-  private async createNewCipher(queueMessage: AddLoginQueueMessage, folderId: string) {
-    const loginModel = new LoginView();
-    const loginUri = new LoginUriView();
-    loginUri.uri = queueMessage.uri;
-    loginModel.uris = [loginUri];
-    loginModel.username = queueMessage.username;
-    loginModel.password = queueMessage.password;
-    const model = new CipherView();
-    model.name = Utils.getHostname(queueMessage.uri) || queueMessage.domain;
-    model.name = model.name.replace(/^www\./, '');
-    model.type = CipherType.Login;
-    model.login = loginModel;
-
-    if (!Utils.isNullOrWhitespace(folderId)) {
-      const folders = await this.folderService.getAllDecrypted();
-      if (folders.some(x => x.id === folderId)) {
-        model.folderId = folderId;
-      }
-    }
-
-    const cipher = await this.cipherService.encrypt(model);
-    const data = new CipherRequest(cipher)
-    try {
-      const res: any = await this.request.create_ciphers_vault(data);
-
-      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-      const userId = await this.userService.getUserId();
-      const cipherData = new CipherData(cipherResponse, userId)
-      this.cipherService.upsert(cipherData)
-      this.notificationAlert('password_added')
-    } catch (e) {
-      if (e.response && e.response.data && e.response.data.code === '5002') {
-        this.notificationAlert('password_limited')
-      }
-    }
+    });
   }
 
   private async createNewOTP(otpData: any) {
@@ -496,62 +339,8 @@ export default class NotificationBackground {
     }
   }
 
-  private async getDecryptedCipherById(cipherId: string) {
-    const cipher = await this.cipherService.get(cipherId);
-    if (cipher != null && cipher.type === CipherType.Login) {
-      return await cipher.decrypt();
-    }
-    return null;
-  }
-
-  private async updateCipher(cipher: CipherView, newPassword: string, username: string = '') {
-    if (cipher != null && cipher.type === CipherType.Login) {
-      cipher.login.password = newPassword;
-      if (username) {
-        cipher.login.username = username;
-      }
-      const newCipher = await this.cipherService.encrypt(cipher);
-      const data = new CipherRequest(newCipher)
-      try {
-        const res: any = await this.request.update_cipher(cipher.id, data)
-        const cipherResponse = new CipherResponse(res)
-        const userId = await this.userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId);
-        await this.cipherService.upsert(cipherData);
-        this.notificationAlert('username_password_updated')
-      } catch (e) {
-      }
-    }
-  }
-
-  private async saveNever(tab: chrome.tabs.Tab) {
-    for (let i = this.notificationQueue.length - 1; i >= 0; i--) {
-      const queueMessage = this.notificationQueue[i];
-      if (queueMessage.tabId !== tab.id || queueMessage.type !== NotificationQueueMessageType.addLogin) {
-        continue;
-      }
-
-      const tabDomain = Utils.getDomain(tab.url);
-      if (tabDomain != null && tabDomain !== queueMessage.domain) {
-        continue;
-      }
-
-      this.notificationQueue.splice(i, 1);
-      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar');
-
-      const hostname = Utils.getHostname(tab.url);
-      await this.cipherService.saveNeverDomain(hostname);
-    }
-  }
-
   private async allowPersonalOwnership(): Promise<boolean> {
     return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
-  }
-
-  private async turnOffAutofill(tab: chrome.tabs.Tab) {
-    BrowserApi.tabSendMessageData(tab, "closeInformMenu");
-    const hostname = Utils.getHostname(tab.url);
-    await this.cipherService.saveNeverDomain(hostname);
   }
 
   private async notificationAlert(type: string) {
