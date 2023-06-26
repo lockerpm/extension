@@ -247,7 +247,7 @@ export default Vue.extend({
         key,
         this.storage[key]
       )
-      if (key === enableAutofillKey && this.storage[enableAutofillKey]) {
+      if (key === enableAutofillKey) {
         await this.setupFillPage()
       }
     }
