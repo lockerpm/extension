@@ -63,7 +63,10 @@ module.exports = {
     submit: "Submit",
     detail: "Detail",
     payment_card: "Payment Card",
-    personal_information: "Personal Information"
+    personal_information: "Personal Information",
+    never: 'Never',
+    add_url: "Add Domain or URL",
+    item: "Item"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -728,6 +731,12 @@ module.exports = {
     log_in_to_autofill: "Log in to autofill",
     unlock_your_vault: "Unlock your vault",
     login_now: "Login now",
-    unlock_now: "Unlock now"
+    unlock_now: "Unlock now",
+    domain_excluded_note: 'You turned off autofill for this website. Remove website from this list will re-enable autofill for it.',
+    remove_now: 'Remove Now',
+  },
+  bar: {
+    create_title: "Should Locker remember this password for you?",
+    update_title: "Do you want to update this password in Locker?"
   }
 }

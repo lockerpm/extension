@@ -152,7 +152,6 @@ export default Vue.extend({
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         this.dataRendered = result.slice(0, 50);
         this.renderIndex = 0;
-        console.log(result);
         return result
       },
       watch: [

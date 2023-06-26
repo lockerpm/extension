@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let currentMessage: any = null
   let pageDetails: any[] = [];
   const formData: any[] = [];
-  let barType: string = null;
   let pageHref: string = null;
   let observer: MutationObserver = null;
   let domObservationCollectTimeout: number = null;
@@ -34,21 +33,18 @@ document.addEventListener('DOMContentLoaded', event => {
   const changePasswordButtonNames = new Set(CHANGE_PASSWORD_BUTTON_NAMES);
   const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES);
 
-  chrome.storage.local.get('neverDomains', (ndObj: any) => {
-    const domains = ndObj.neverDomains;
-    if (domains != null && domains.hasOwnProperty(self.location.hostname)) {
-      return;
-    }
+  function sendPlatformMessage(msg: any) {
+    chrome.runtime.sendMessage(msg);
+  }
 
-    chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-      disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-      chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-        disabledChangedPasswordNotification = disChangedObj != null &&
-          disChangedObj.disableChangedPasswordNotification === true;
-        if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-          collectIfNeededWithTimeout();
-        }
-      });
+  chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+    disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+    chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+      disabledChangedPasswordNotification = disChangedObj != null &&
+        disChangedObj.disableChangedPasswordNotification === true;
+      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+        collectIfNeededWithTimeout();
+      }
     });
   });
 
@@ -65,17 +61,12 @@ document.addEventListener('DOMContentLoaded', event => {
       if (inIframe) {
         return;
       }
-      closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
+      closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
       if (inIframe) {
         return;
       }
       closeBar(true);
-    } else if (msg.command === 'adjustNotificationBar') {
-      if (inIframe) {
-        return;
-      }
-      adjustBar(msg.data);
     } else if (msg.command === 'notificationBarPageDetails') {
       pageDetails = [];
       inputWithLogo = [];
@@ -83,84 +74,60 @@ document.addEventListener('DOMContentLoaded', event => {
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
         if (autofillObj && autofillObj.enableAutofill === false) return;
-        chrome.storage.local.get("neverDomains", (ndObj: any) => {
-          const domains = ndObj.neverDomains;
-          if (
-            domains == null ||
-            !domains.hasOwnProperty(self.location.hostname)
-          ) {
-            for (let i = 0; i < msg.data.passwordFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            for (let i = 0; i < msg.data.usernameFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            inputWithLogo = inputWithLogo.filter(e => e != null)
-            
-            document.onclick = check;
-            function check(e) {
-              const target = e && e.target;
-              let check = false;
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (
-                  checkParent(target, inputWithLogo[i].inputEl) ||
-                  checkParent(target, inputWithLogo[i].logo)
-                ) {
-                  check = true;
-                  closeOtherMenu(i);
-                }
-              }
-              if (!check) {
-                for (let i = 0; i < inputWithLogo.length; i++) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function closeOtherMenu(indexClick) {
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (i !== indexClick) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function checkParent(t, elm) {
-              while (t.parentNode) {
-                if (t === elm) {
-                  return true;
-                }
-                t = t.parentNode;
-              }
-              return false;
-            }
-          }
-        });
-      })
-    } else if (msg.command === 'informMenuPageDetails') {
-      pageDetails.push(msg.data.details);
-      watchForms(msg.data.forms);
-    } else if (msg.command === 'informMenuPassword') {
-      useGeneratedPassword(msg.data.password)
-    } else if (msg.command === "resizeInformMenu") {
-      for (const logoField of inputWithLogo) {
-        const elPosition = logoField.inputEl.getBoundingClientRect();
-        const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
-        if (menuEl) {
-          if (msg.data) {
-            menuEl.style.height = `${msg.data.height} !important`
-            menuEl.style.width = elPosition.width
+        for (let i = 0; i < msg.data.passwordFields.length; i++) {
+          try {
+            inputWithLogo.push(
+              setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+            );
+          } catch (error) {
           }
         }
-      }
+        for (let i = 0; i < msg.data.usernameFields.length; i++) {
+          try {
+            inputWithLogo.push(
+              setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+            );
+          } catch (error) {
+          }
+        }
+        inputWithLogo = inputWithLogo.filter(e => e != null)
+        
+        document.onclick = check;
+        function check(e) {
+          const target = e && e.target;
+          let check = false;
+          for (let i = 0; i < inputWithLogo.length; i++) {
+            if (
+              checkParent(target, inputWithLogo[i].inputEl) ||
+              checkParent(target, inputWithLogo[i].logo)
+            ) {
+              check = true;
+              closeOtherMenu(i);
+            }
+          }
+          if (!check) {
+            for (let i = 0; i < inputWithLogo.length; i++) {
+              closeInformMenu(inputWithLogo[i].inputEl);
+            }
+          }
+        }
+        function closeOtherMenu(indexClick) {
+          for (let i = 0; i < inputWithLogo.length; i++) {
+            if (i !== indexClick) {
+              closeInformMenu(inputWithLogo[i].inputEl);
+            }
+          }
+        }
+        function checkParent(t, elm) {
+          while (t.parentNode) {
+            if (t === elm) {
+              return true;
+            }
+            t = t.parentNode;
+          }
+          return false;
+        }
+      })
     } else if (msg.command === "closeInformMenu") {
       if (inIframe) {
         return;
@@ -300,17 +267,6 @@ document.addEventListener('DOMContentLoaded', event => {
     });
   }
 
-  function useGeneratedPassword(password) {
-    for (const logoField of inputWithLogo) {
-      if (logoField.type === 'password') {
-        logoField.inputEl.value = password;
-      }
-    }
-    for (const logoField of inputWithLogo) {
-      closeInformMenu(logoField.inputEl);
-    }
-  }
-
   function setFillLogo(el, type = 'password', isLocked = false) {
     const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
@@ -411,7 +367,7 @@ document.addEventListener('DOMContentLoaded', event => {
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
     const barPageUrl: string = chrome.runtime.getURL(
-      "popup.html" + `#/menu` + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+      "popup.html#/menu" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -677,14 +633,14 @@ document.addEventListener('DOMContentLoaded', event => {
     }, 500);
   }
 
-  function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
-    let barPage = 'bar.html';
+  function closeExistingAndOpenBar(type: string, loginInfo: any) {
+    let barPage = 'popup.html#/bar';
     switch (type) {
       case 'add':
-        barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
+        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
         break;
       case 'change':
-        barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
+        barPage = barPage + '?id=' + encodeURIComponent(loginInfo.cipherId) + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
         break;
       default:
         break;
@@ -695,13 +651,11 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
 
-    closeBar(false);
-    openBar(type, barPage, loginInfo);
+    closeBar();
+    openBar(type, barPage);
   }
 
-  function openBar(type: string, barPage: string, loginInfo: object) {
-    barType = type;
-
+  function openBar(type: string, barPage: string) {
     if (document.body == null) {
       return;
     }
@@ -710,12 +664,12 @@ document.addEventListener('DOMContentLoaded', event => {
 
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
-      height: 320px !important;
+      height: ${type === 'add' ? '330' : '270'}px !important;
       width: 450px;
       border: 0;
       min-height: initial;
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
-      border-radius: 12px;
+      border-radius: 4px;
     `;
     iframe.id = 'bit-notification-bar-iframe';
     iframe.src = barPageUrl;
@@ -724,7 +678,7 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.setAttribute('aria-live', 'polite');
     frameDiv.id = 'bit-notification-bar';
     frameDiv.style.cssText = `
-      height: 325px !important;
+      height: 300px !important;
       width: 450px;
       top: 40px;
       right: 40px;
@@ -739,7 +693,7 @@ document.addEventListener('DOMContentLoaded', event => {
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 
-  function closeBar(explicitClose: boolean) {
+  function closeBar(explicitClose: boolean = false) {
     const barEl = document.getElementById('bit-notification-bar');
     if (barEl != null) {
       barEl.parentElement.removeChild(barEl);
@@ -749,45 +703,11 @@ document.addEventListener('DOMContentLoaded', event => {
     if (spacerEl) {
       spacerEl.parentElement.removeChild(spacerEl);
     }
-
-    if (!explicitClose) {
-      return;
+    if (explicitClose) {
+      sendPlatformMessage({
+        command: 'bgCloseNotificationBar',
+      })
     }
-
-    switch (barType) {
-      case 'add':
-        sendPlatformMessage({
-          command: 'bgAddClose',
-        });
-        break;
-      case 'change':
-        sendPlatformMessage({
-          command: 'bgChangeClose',
-        });
-        break;
-      default:
-        break;
-    }
-  }
-
-  function adjustBar(data: any) {
-    if (data != null && data.height !== 42) {
-      const newHeight = data.height + 'px';
-      doHeightAdjustment('bit-notification-bar-iframe', newHeight);
-      doHeightAdjustment('bit-notification-bar', newHeight);
-      doHeightAdjustment('bit-notification-bar-spacer', newHeight);
-    }
-  }
-
-  function doHeightAdjustment(elId: string, heightStyle: string) {
-    const el = document.getElementById(elId);
-    if (el != null) {
-      el.style.height = heightStyle;
-    }
-  }
-
-  function sendPlatformMessage(msg: any) {
-    chrome.runtime.sendMessage(msg);
   }
 
   function getOffsetTop(elem) {

@@ -257,6 +257,7 @@ Vue.mixin({
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
           this.getSyncData()
+          this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
         } else {
@@ -283,6 +284,7 @@ Vue.mixin({
             }
             await this.$runtimeBackground.handleUnlocked('unlocked')
             this.getSyncData()
+            this.getExcludeDomains()
             this.$router.push({ name: 'vault' }).catch(() => ({}));
             this.$store.commit('UPDATE_CALLING_API', false)
           }, 1000);
@@ -353,6 +355,15 @@ Vue.mixin({
     },
     async getFolders() {
       return await this.$folderService.getAllDecrypted()
+    },
+    async getExcludeDomains() {
+      await cystackPlatformAPI.exclude_domains().then(response => {
+        this.$cipherService.saveNeverDomains(response.results)
+        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
+      }).catch(() => {
+        this.$cipherService.saveNeverDomains([])
+        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
+      })
     },
     clipboardSuccessHandler() {
       this.notify(this.$t('common.copied'), 'success')
@@ -672,7 +683,24 @@ Vue.mixin({
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");
       }
-    }
+    },
+    async addExcludeDomain(url: string) {
+      try {
+        await cystackPlatformAPI.add_exclude_domain({ domain: url })
+        await this.getExcludeDomains();
+        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.item') }), 'success')
+      } catch (e) {
+        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t('common.item') }), 'error')
+      }
+    },
+    async removeDomain(domain: any) {
+      cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
+        await this.getExcludeDomains()
+        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.item') }), 'success')
+      }).catch(() => {
+        this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.item') }, 'error'))
+      })
+    },
   }
 })
 

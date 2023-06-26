@@ -91,7 +91,9 @@ module.exports = {
     upgrade_now: 'Nâng cấp ngay',
     update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn",
     submit: "Gửi",
-    detail: "Chi tiết"
+    detail: "Chi tiết",
+    add_url: "Thêm tên miền hoặc đường dẫn",
+    item: "Item"
   },
   sort: {
     name_asc: 'Tên tăng dần',

@@ -19,7 +19,7 @@ export function handleResponseErrorMessage(error) {
         store.commit('CLEAR_ALL_DATA')
 
         setTimeout(async () => {
-          if (router.currentRoute.name !== 'login') {
+          if (router.currentRoute.name !== 'login' && !router.currentRoute.meta?.isOver) {
             router.push({ name: "login" }).catch(() => ({}));
           }
         }, 1000);

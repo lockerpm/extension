@@ -521,17 +521,13 @@ export class CipherService implements CipherServiceAbstraction {
     }
   }
 
-  async saveNeverDomain(domain: string): Promise<void> {
-    if (!domain) {
-      return;
-    }
-
-    let domains = await this.storageService.get<{ [id: string]: any; }>(Keys.neverDomains);
-    if (!domains) {
-      domains = {};
-    }
-    domains[domain] = null;
+  async saveNeverDomains(domains: any[]): Promise<void> {
     await this.storageService.save(Keys.neverDomains, domains);
+  }
+
+  async getIncludedDomainByUrl(url: string): Promise<void> {
+    const excludeDomains: any[] = await this.storageService.get(Keys.neverDomains) || [];
+    return excludeDomains.find((d) => url.includes(d.domain)) || null
   }
 
   async saveWithServer(cipher: Cipher): Promise<any> {

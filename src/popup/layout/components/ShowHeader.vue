@@ -40,17 +40,29 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+        <el-button
+          v-else-if="showMenuData.isCreate"
+          icon="el-icon-plus"
+          circle
+          type="primary"
+          size="mini"
+          @click="() => openDialog()"
+        />
       </div>
     </div>
+    <AddExcludeDomain
+      ref="addExcludeDomain"
+    />
   </div>
 </template>
 
 <script>
 import Vnodes from "@/popup/components/Vnodes.vue";
+import AddExcludeDomain from '@/popup/components/setting/AddExcludeDomain.vue'
 
 export default {
   name: 'ShowHeader',
-  components: { Vnodes },
+  components: { Vnodes, AddExcludeDomain },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
@@ -64,6 +76,7 @@ export default {
         Icon: null,
         title: '',
         menus: [],
+        isCreate: false,
         back: () => this.$router.back()
       }
       switch (this.$route.name) {
@@ -149,6 +162,7 @@ export default {
         result.Icon = null
         result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.excluded_domains')
+        result.isCreate = true
         break;
       case 'settings-vault-timeout':
         result.Icon = null
@@ -167,6 +181,10 @@ export default {
     }
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    openDialog () {
+      this.$refs.addExcludeDomain?.openDialog({}, true)
+    },
   },
 }
 </script>
