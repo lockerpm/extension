@@ -145,8 +145,6 @@ export default class RuntimeBackground {
             break;
         }
         break;
-      case "bgGeneratePassword":
-        this.generatePassword(sender.tab, msg.responseCommand, msg.options, msg.isReplace);
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
@@ -261,39 +259,6 @@ export default class RuntimeBackground {
     if (currentVaultTimeoutAction == null) {
       await this.storageService.save(ConstantsService.vaultTimeoutActionKey, 'lock');
     }
-  }
-
-  private async generatePassword(tab, responseCommand, inputOptions, isReplace) {
-    const oldGeneratePassword = await this.passService.getGeneratePassword();
-    let password = '';
-    let options = null;
-    if (oldGeneratePassword && !isReplace && tab.id === oldGeneratePassword.tab.id) {
-      password = oldGeneratePassword.password;
-      options = JSON.parse(oldGeneratePassword.options)
-    }
-    if (!options) {
-      options = inputOptions || (await this.passwordGenerator.getOptions())[0]
-    } else {
-      await BrowserApi.tabSendMessageData(tab, 'setGeneratePasswordOptions', { options });
-    }
-    if (!password) {
-      password = await this.passwordGenerator.generatePassword(options);
-    }
-    if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
-      options.lowercase = true
-    }
-    let passwordStrength: any = {}
-    if (password) {
-      passwordStrength = this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
-    }
-    await this.passService.setInformation(password, options, tab)
-    const responseData: any = {};
-    responseData.password = password
-    responseData.passwordStrength = passwordStrength
-    responseData.isLocked = await this.vaultTimeoutService.isLocked();
-    await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-    this.platformUtilsService.copyToClipboard(password, { window: self });
-    this.passwordGenerator.addHistory(password);
   }
 
   async authAccessToken(type: string, provider: string) {

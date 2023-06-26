@@ -41,6 +41,13 @@ export default Vue.extend({
     }
   },
 
+  async mounted() {
+    const locked = await this.$vaultTimeoutService.isLocked()
+    if (!locked) {
+      this.getSyncData()
+    }
+  },
+
   watch: {
     'locked' (newValue) {
       if (newValue) {

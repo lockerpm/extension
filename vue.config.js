@@ -10,11 +10,6 @@ module.exports = {
       entry: './src/notification/bar.js',
       title: 'Bar'
     },
-    menu: {
-      template: './src/inform-menu/menu.html',
-      entry: './src/inform-menu/menu.js',
-      title: 'Menu'
-    },
     popup: {
       template: 'public/index.html',
       entry: './src/popup/main.ts',

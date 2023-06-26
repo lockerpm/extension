@@ -86,7 +86,6 @@ export default Vue.extend({
         {
           value: 2,
           name: this.$t('menu.fill_something_else'),
-          disabled: this.isLocked,
           onclick: () => { this.tab = 2 }
         },
         {

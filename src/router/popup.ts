@@ -159,6 +159,23 @@ const routes: Array<RouteConfig> = [
       },
     ]
   },
+  {
+    path: "/bar",
+    component: OtherLayout,
+    children: [
+      {
+        path: "",
+        name: "bar",
+        meta: {
+          isOver: true
+        },
+        component: () =>
+          import(
+            "../bar/index.vue"
+          )
+      },
+    ]
+  },
 ];
 
 const router = new VueRouter({

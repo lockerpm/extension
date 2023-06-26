@@ -63,15 +63,6 @@ export default class NotificationBackground {
         }
         await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
         break;
-      case 'bgGetDataForTab':
-        if (msg.responseCommand === 'informMenuGetCiphersForCurrentTab') {
-          await Promise.all([
-            this.getDataForTab(sender.tab, msg.responseCommand, msg.type),
-          ])
-        } else {
-          await this.getDataForTab(sender.tab, msg.responseCommand, msg.type);
-        }
-        break;
       case 'bgCloseNotificationBar':
         await BrowserApi.tabSendMessageData(sender.tab, 'closeNotificationBar');
         break;
@@ -140,63 +131,8 @@ export default class NotificationBackground {
             break;
         }
         break;
-      case 'informMenuFillCipher':
-        const ciphers = await this.cipherService.getAllDecrypted();
-        const cipher = ciphers.find(c => c.id === msg.id);
-        if (cipher == null) {
-          break;
-        }
-        await this.startAutofillPage(cipher)
-        break;
-      case 'informMenuLogin':
-        if (await this.vaultTimeoutService.isLocked()) {
-          const retryMessage: any = {
-            commandToRetry: {
-              msg: msg,
-              sender: sender,
-            },
-            target: 'notification.background',
-          };
-          await BrowserApi.tabSendMessageData(sender.tab, 'addToLockedVaultPendingInformMenu', retryMessage);
-          await BrowserApi.tabSendMessageData(sender.tab, 'promptForLogin');
-          return
-        }
-        await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
-        break;
-      case 'informMenuUsePassword':
-        const cTab = await BrowserApi.getTabFromCurrentWindow();
-        if (cTab) {
-          await BrowserApi.tabSendMessageData(cTab, 'informMenuPassword', {
-            password: msg.password
-          });
-        }
-        break;
-      case 'bgGeneratePassword':
-        const tab_ = await BrowserApi.getTabFromCurrentWindow();
-        if (tab_ == null) {
-          return;
-        }
-        if (msg.responseCommand === 'informMenuGetGeneratedPasswordNoOptions') {
-          await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
-            width: '400px', height: '180px'
-          });
-        } else {
-          await BrowserApi.tabSendMessageData(tab_, "resizeInformMenu", {
-            width: '320px', height: '416px'
-          });
-        }
-        break;
       case 'informMenuTurnOff':
         await this.turnOffAutofill(sender.tab)
-        break;
-      case 'bgResizeInformMenu':
-        const tab__ = await BrowserApi.getTabFromCurrentWindow();
-        if (tab__ == null) {
-          return;
-        }
-        await BrowserApi.tabSendMessageData(tab__, "resizeInformMenu", {
-          width: msg.data?.width, height: msg.data?.height
-        });
         break;
       case 'barFormChange':
         const currentTab = await BrowserApi.getTabFromCurrentWindow();
@@ -211,13 +147,6 @@ export default class NotificationBackground {
             this.notificationQueue[notificationQueueIndex].newPassword = msg.newPassword
           }
         }
-        break;
-      case 'markFavorite':
-        const currentCipher = await this.getDecryptedCipherById(msg.id);
-        currentCipher.favorite = !currentCipher.favorite;
-        const password = currentCipher.login.password;
-        await this.updateCipher(currentCipher, password);
-        await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
         break;
       case 'scanQRCode':
         if (chrome.tabs && chrome.tabs.captureVisibleTab) {
@@ -335,18 +264,12 @@ export default class NotificationBackground {
       if (this.notificationQueue[i].type === NotificationQueueMessageType.addLogin) {
         BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
           type: 'add',
-          typeData: {
-            isVaultLocked: this.notificationQueue[i].wasVaultLocked,
-          },
           loginInfo,
           queueMessage: this.notificationQueue[0]
         });
       } else if (this.notificationQueue[i].type === NotificationQueueMessageType.changePassword) {
         BrowserApi.tabSendMessageData(tab, "openNotificationBar", {
           type: "change",
-          typeData: {
-            isVaultLocked: this.notificationQueue[i].wasVaultLocked
-          },
           loginInfo,
           queueMessage: this.notificationQueue[0]
         });
@@ -619,66 +542,6 @@ export default class NotificationBackground {
       const hostname = Utils.getHostname(tab.url);
       await this.cipherService.saveNeverDomain(hostname);
     }
-  }
-
-  private async getDataForTab(tab: chrome.tabs.Tab, responseCommand: string, type: number) {
-    const otherTypes: CipherType[] = []
-    const responseData: any = {};
-    const csStore: any = await this.storageService.get("cs_store");
-    const isLoggedIn = csStore ? csStore.isLoggedIn : false;
-    const isLocked = await this.vaultTimeoutService.isLocked();
-    if (responseCommand === 'notificationBarGetFoldersList') {
-      if (isLocked) {
-        responseData.folders = []
-      } else {
-        try {
-          responseData.folders = await this.folderService.getAllDecrypted();
-        } catch (error) {
-          responseData.folders = []
-        }
-      }
-    }
-    if (responseCommand === 'informMenuGetCiphersForCurrentTab') {
-      if (isLocked) {
-        responseData.ciphers = []
-      } else {
-        try {
-          responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || []
-        } catch (error) {
-          responseData.ciphers = []
-        }
-      }
-    }
-    if (responseCommand === 'informMenuGetCiphers') {
-      if (type === CipherType.Card) {
-        otherTypes.push(CipherType.Card)
-      }
-      if (type === CipherType.Identity) {
-        otherTypes.push(CipherType.Identity);
-      }
-      if (isLocked) {
-        responseData.ciphers = [];
-      } else {
-        try {
-          if (type === CipherType.Login) {
-            responseData.ciphers = await this.cipherService.getAllDecrypted();
-            responseData.ciphers = responseData.ciphers.filter(c => c.type === CipherType.Login)
-          } else {
-            responseData.ciphers = await this.cipherService.getAllDecryptedForUrl(
-              tab.url,
-              otherTypes
-            ) || [];
-            responseData.ciphers = responseData.ciphers.filter(c => c.type === type)
-          }
-        } catch (error) {
-          responseData.ciphers = [];
-        }
-      }
-    }
-    responseData.ciphers = this.cipherService.sortCiphers(responseData.ciphers || [])
-    responseData.isLoggedIn = isLoggedIn;
-    responseData.isLocked = isLocked;
-    await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
   }
 
   private async allowPersonalOwnership(): Promise<boolean> {

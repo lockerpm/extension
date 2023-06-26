@@ -63,7 +63,8 @@ module.exports = {
     submit: "Submit",
     detail: "Detail",
     payment_card: "Payment Card",
-    personal_information: "Personal Information"
+    personal_information: "Personal Information",
+    never: 'Never'
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -729,5 +730,9 @@ module.exports = {
     unlock_your_vault: "Unlock your vault",
     login_now: "Login now",
     unlock_now: "Unlock now"
+  },
+  bar: {
+    create_title: "Should Locker remember this password for you?",
+    update_title: "Do you want to update this password in Locker?"
   }
 }
