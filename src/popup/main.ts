@@ -627,7 +627,7 @@ Vue.mixin({
     },
     async autoFillCipher(pageDetails) {
       if (
-        this.selectedCipher.reprompt !== CipherRepromptType.None &&
+        this.selectedCipher.reprompt !== CipherRepromptType.None && this.$passwordRepromptService &&
         !(await this.$passwordRepromptService.showPasswordPrompt())
       ) {
         return;
@@ -662,6 +662,12 @@ Vue.mixin({
           } else {
             setTimeout(() => BrowserApi.closePopup(self), 50);
           }
+        }
+        if (this.selectedCipher?.id) {
+          await cystackPlatformAPI.use_cipher(
+            this.selectedCipher.id,
+            { use: true, favorite: this.selectedCipher.favorite },
+          )
         }
       } catch (e) {
         this.notify(this.$t("errors.autofill"), "error");

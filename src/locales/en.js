@@ -527,6 +527,7 @@ module.exports = {
       date: 'Date',
       monthYear: 'Month/Year',
       markFavorite: 'Mark favorite',
+      markNotFavorite: 'Mark not favorite',
       select_networks: 'Select networks',
       select_wallet: 'Select wallets'
     },
@@ -723,6 +724,10 @@ module.exports = {
     empty_password: "No passwords found for this site.",
     empty_card: "No cards found.",
     empty_identity: "No identities found.",
-    use_this_password: "Use this password"
+    use_this_password: "Use this password",
+    log_in_to_autofill: "Log in to autofill",
+    unlock_your_vault: "Unlock your vault",
+    login_now: "Login now",
+    unlock_now: "Unlock now"
   }
 }

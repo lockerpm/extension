@@ -6,7 +6,7 @@
       :tabs="tabs"
     />
     <MenuSearch
-      v-if="tab === 2"
+      v-if="tab === 2 && !isLocked"
       :fill-types="fillTypes"
       :fill-type="currentFillType"
       @change="(v) => fillType = v"
@@ -17,9 +17,12 @@
         is-over
       />
       <MenuCiphers
-        v-else-if="tab === 2"
+        v-else-if="tab === 2 && !isLocked"
         :fill-types="fillTypes"
         :fill-type="currentFillType"
+      />
+      <MenuLocked
+        v-else-if="tab === 2 && isLocked"
       />
     </div>
   </div>
@@ -30,6 +33,7 @@ import Vue from 'vue';
 import MenuHeader from './components/Header.vue';
 import MenuSearch from './components/Search.vue';
 import MenuCiphers from './components/Ciphers.vue';
+import MenuLocked from './components/Locked.vue';
 import PasswordGenerator from '@/popup/components/password/PasswordGenerator.vue'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
@@ -40,12 +44,13 @@ export default Vue.extend({
     MenuHeader,
     MenuSearch,
     MenuCiphers,
+    MenuLocked,
     PasswordGenerator
   },
   data () {
     return {
-      tab: 2,
-      fillType: CipherType.Login
+      tab: this.$route.query?.generate == 1 ? 1 : 2,
+      fillType: 0
     }
   },
   asyncComputed: {
@@ -63,9 +68,14 @@ export default Vue.extend({
       },
       watch: []
     },
+    isLocked: {
+      async get () {
+        return await this.$vaultTimeoutService.isLocked()
+      },
+      watch: []
+    }
   },
   computed: {
-    
     tabs() {
       return [
         {
@@ -76,6 +86,7 @@ export default Vue.extend({
         {
           value: 2,
           name: this.$t('menu.fill_something_else'),
+          disabled: this.isLocked,
           onclick: () => { this.tab = 2 }
         },
         {
@@ -83,6 +94,7 @@ export default Vue.extend({
           name: this.$t('menu.turn_off'),
           class: 'text-danger',
           divided: true,
+          disabled: this.isLocked,
           onclick: () => {
             //
           }
@@ -91,6 +103,12 @@ export default Vue.extend({
     },
     fillTypes() {
       return [
+        {
+          value: 0,
+          name: this.$t('data.home.for_current'),
+          title: this.$t('menu.saved_login'),
+          empty: this.$t('data.home.no_for_current'),
+        },
         {
           value: CipherType.Login,
           name: this.$t('common.password'),

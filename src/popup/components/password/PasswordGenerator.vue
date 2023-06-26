@@ -111,6 +111,8 @@
 import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { CipherType } from "jslib-common/enums/cipherType";
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -200,12 +202,7 @@ export default {
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async handleUsePassword () {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        await BrowserApi.tabSendMessageData(tab, 'informMenuPassword', {
-          password: this.password
-        });
-      }
+      this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
     }
   }
 }

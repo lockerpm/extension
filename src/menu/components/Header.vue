@@ -23,6 +23,7 @@
             class="flex items-center justify-between"
             :class="t.class || ''"
             :divided="t.divided"
+            :disabled="t.disabled"
             @click.native="() => t.onclick()"
           >
             <span class="mr-2">

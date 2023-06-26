@@ -103,7 +103,7 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
-        runtimeBackground.updateStoreService('isLoggedIn', true)
+        runtimeBackground.updateStoreService('isLoggedIn', isLoggedIn)
       },
       CLEAR_ALL_DATA (state) {
         state.use = JSON.parse(JSON.stringify(defaultUser)),
