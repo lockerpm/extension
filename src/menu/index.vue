@@ -6,14 +6,14 @@
       :tabs="tabs"
       :excluded="excluded"
     />
-    <div v-if="!excluded">
+    <div class="menu-info" :class="{ 'is-search': tab === 2 }" v-if="!excluded">
       <MenuSearch
         v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes"
         :fill-type="currentFillType"
         @change="(v) => fillType = v"
       />
-      <div class="menu-info" :class="{ 'is-search': tab === 2 }">
+      <div>
         <PasswordGenerator
           v-if="tab === 1"
           is-over
