@@ -72,7 +72,7 @@ export default Vue.extend({
     },
     async handleAddExcludeDomain() {
       this.callingAPI = true
-      await this.addExcludeDomain(this.url)
+      await this.addExcludeDomain(this.url, () => this.visible = false)
       this.callingAPI = false
     }
   }

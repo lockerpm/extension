@@ -687,10 +687,12 @@ Vue.mixin({
         this.notify(this.$t("errors.autofill"), "error");
       }
     },
-    async addExcludeDomain(url: string) {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async addExcludeDomain(url: string, callback = () => {}) {
       try {
         await cystackPlatformAPI.add_exclude_domain({ domain: url })
         await this.getExcludeDomains();
+        callback()
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.item') }), 'success')
       } catch (e) {
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t('common.item') }), 'error')
