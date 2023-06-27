@@ -121,7 +121,7 @@ export default Vue.extend({
     async excludeDomain() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       await this.addExcludeDomain(tab.url);
-      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
+      this.close()
     },
     async notificationAlert(type) {
       const tab = await BrowserApi.getTabFromCurrentWindow();

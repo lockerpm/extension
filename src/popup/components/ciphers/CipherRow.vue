@@ -70,6 +70,13 @@
                 >
                   {{ $t('common.copy') }} {{ $t('common.password') }}
                 </el-dropdown-item>
+                <el-dropdown-item
+                  v-clipboard:copy="otp"
+                  v-clipboard:success="clipboardSuccessHandler"
+                  :disabled="!otp"
+                >
+                  {{ $t('data.otp.copy') }}
+                </el-dropdown-item>
               </template>
               <template v-if="item.type === CipherType.SecureNote">
                 <el-dropdown-item
@@ -188,6 +195,14 @@ export default Vue.extend(
           return result
         },
         watch: ['$store.state.syncedCiphersToggle']
+      },
+      otp: {
+        async get () {
+          if (this.item?.login?.totp) {
+            return await this.$totpService.getCode(this.item.login.totp)
+          }
+          return null
+        }
       }
     },
     methods: {

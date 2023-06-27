@@ -16,6 +16,7 @@ export default Vue.extend({
     return {
       locked: true,
       ws1: null,
+      isFirst: true
     }
   },
   asyncComputed: {
@@ -41,14 +42,6 @@ export default Vue.extend({
     }
   },
 
-  async mounted() {
-    const locked = await this.$vaultTimeoutService.isLocked()
-    if (!locked) {
-      this.getSyncData()
-      this.getExcludeDomains()
-    }
-  },
-
   watch: {
     'locked' (newValue) {
       if (newValue) {
@@ -66,11 +59,16 @@ export default Vue.extend({
         if (newValue.meta?.isOver) {
           return
         }
+        if (this.isFirst && newValue.meta?.isAuth) {
+          this.getSyncData()
+          this.getExcludeDomains()
+        }
         await this.$storageService.save('current_router', JSON.stringify({
           name: newValue.name,
           params: newValue.params,
           query: newValue.query
         }))
+        this.isFirst = false
       },
       deep: true
     }

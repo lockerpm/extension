@@ -21,26 +21,35 @@ const routes: Array<RouteConfig> = [
           import("../popup/views/auth/login.vue")
       },
       {
-        path: "lock",
-        name: "lock",
-        component: () =>
-          import("../popup/views/auth/lock.vue")
-      },
-      {
-        path: "pwl-unlock",
-        name: "pwl-unlock",
-        component: () =>
-          import("../popup/views/auth/pwl-unlock.vue")
-      },
-      {
         path: "forgot-password",
         name: "forgot-password",
         component: () =>
           import("../popup/views/auth/forgot-password.vue")
       },
       {
+        path: "lock",
+        name: "lock",
+        meta: {
+          isLock: true
+        },
+        component: () =>
+          import("../popup/views/auth/lock.vue")
+      },
+      {
+        path: "pwl-unlock",
+        name: "pwl-unlock",
+        meta: {
+          isLock: true
+        },
+        component: () =>
+          import("../popup/views/auth/pwl-unlock.vue")
+      },
+      {
         path: "set-master-password",
         name: "set-master-password",
+        meta: {
+          isLock: true
+        },
         component: () =>
           import(
             "../popup/views/auth/set-master-password.vue"
@@ -55,12 +64,18 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         name: "vault",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import("../popup/views/vault/index.vue")
       },
       {
         path: "folders",
         name: "folders",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/folders/index.vue"
@@ -69,18 +84,27 @@ const routes: Array<RouteConfig> = [
       {
         path: "generator",
         name: "generator",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import("../popup/views/generator/index.vue")
       },
       {
         path: "otp",
         name: "otp",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import("../popup/views/otp/index.vue")
       },
       {
         path: "settings",
         name: "settings",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/index.vue"
@@ -95,6 +119,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "vault/:id",
         name: "vault-detail",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/vault/detail.vue"
@@ -103,6 +130,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "folders/:id",
         name: "folder-detail",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/folders/detail.vue"
@@ -111,6 +141,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "vault/add-edit",
         name: "add-edit-cipher",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/vault/show.vue"
@@ -119,6 +152,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "settings/excluded-domains",
         name: "settings-excluded-domains",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/excluded-domains.vue"
@@ -127,6 +163,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "settings/vault-timeout",
         name: "settings-vault-timeout",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/vault-timeout.vue"
@@ -135,6 +174,9 @@ const routes: Array<RouteConfig> = [
       {
         path: "settings/info",
         name: "settings-info",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/info.vue"

@@ -69,7 +69,6 @@ import InputText from '@/components/input/InputText'
 import { ValidationProvider } from 'vee-validate'
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherType } from "jslib-common/enums/cipherType";
-import { CipherView } from 'jslib-common/models/view/cipherView';
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
 
@@ -117,19 +116,7 @@ export default Vue.extend({
     async createOTP () {
       try {
         this.callingAPI = true;
-        const cipher = new CipherView()
-        cipher.name = this.form.name
-        cipher.type = CipherType.SecureNote
-        cipher.secureNote = new SecureNote()
-        cipher.secureNote.type = 0
-        cipher.notes = `otpauth://totp/${encodeURIComponent(this.form.name)}?secret=${this.form.secretKey}&issuer=${encodeURIComponent(this.form.name)}&algorithm=sha1&digits=6&period=30`;
-        const cipherEnc = await this.$cipherService.encrypt(cipher)
-        const data = new CipherRequest(cipherEnc)
-        data.type = CipherType.OTP;
-        await cystackPlatformAPI.create_ciphers_vault({
-          ...data,
-          collectionIds: [],
-        })
+        await this.createAuthenticator(this.form)
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t(`type.${CipherType.OTP}`, 1) }), 'success')
         this.visible = false
       } catch (e) {

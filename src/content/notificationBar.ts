@@ -129,12 +129,9 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       })
     } else if (msg.command === "closeInformMenu") {
-      if (inIframe) {
-        return;
-      }
-      for (const logoField of inputWithLogo) {
-        closeInformMenu(logoField.inputEl);
-      }
+      closeAllInformMenu()
+    } else if (msg.command === 'openPopupIframe') {
+      openPopupIframe()
     }
     sendResponse();
     return true;
@@ -728,5 +725,51 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } while ((elem = elem.offsetParent));
     return offsetLeft;
+  }
+
+  function closePopupIframe() {
+    let frameDiv = document?.getElementById('locker_popup-iframe-container');
+    if (frameDiv) {
+      frameDiv.remove();
+    }
+  }
+
+  function openPopupIframe() {
+    closePopupIframe()
+    if (document.body == null) {
+      return;
+    }
+    let frameDiv = document.getElementById('locker_popup-iframe-container');
+    let barPageUrl: string = chrome.runtime.getURL('popup.html');
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = `
+      height: 602px;
+      width: 402px;
+      border: 1px solid rgb(189 190 190);
+      background-color: white
+    `;
+    iframe.id = 'popup-iframe';
+    iframe.src = barPageUrl;
+    frameDiv = document.createElement('div');
+    frameDiv.id = 'locker_popup-iframe-container';
+    frameDiv.style.cssText = `
+      height: 600px;
+      width: 402px;
+      top: 40px;
+      right: 40px;
+      position: fixed;
+      z-index: 2147483647;
+      visibility: visible;
+    `;
+    frameDiv.appendChild(iframe);
+    window.addEventListener('click', function (e: any) {
+      if (frameDiv.contains(e.target)) {
+      } else {
+        closePopupIframe();
+      }
+    });
+    document.body.appendChild(frameDiv);
+
+    (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

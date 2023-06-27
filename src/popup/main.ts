@@ -20,6 +20,9 @@ import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { CipherRepromptType } from 'jslib-common/enums/cipherRepromptType';
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { SecureNote } from 'jslib-common/models/domain/secureNote';
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import userAPI from '@/api/user'
@@ -701,6 +704,27 @@ Vue.mixin({
         this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.item') }, 'error'))
       })
     },
+    async createAuthenticator (otpCipher) {
+      const cipher = new CipherView()
+      cipher.name = otpCipher.name
+      cipher.type = CipherType.SecureNote
+      cipher.secureNote = new SecureNote()
+      cipher.secureNote.type = 0
+      cipher.notes = `otpauth://totp/${encodeURIComponent(otpCipher.name)}?secret=${otpCipher.secretKey}&issuer=${encodeURIComponent(otpCipher.name)}&algorithm=sha1&digits=6&period=30`;
+      const cipherEnc = await this.$cipherService.encrypt(cipher)
+      const data = new CipherRequest(cipherEnc)
+      data.type = CipherType.OTP;
+      await cystackPlatformAPI.create_ciphers_vault({
+        ...data,
+        collectionIds: [],
+      })
+    },
+    closeMenu() {
+      setTimeout(async () => {
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        BrowserApi.tabSendMessageData(tab, 'closeInformMenu')
+      }, 100);
+    }
   }
 })
 
