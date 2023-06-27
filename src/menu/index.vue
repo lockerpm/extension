@@ -6,14 +6,17 @@
       :tabs="tabs"
       :excluded="excluded"
     />
-    <div class="menu-info" :class="{ 'is-search': tab === 2 }" v-if="!excluded">
+    <div
+      v-if="!excluded"
+      style="height: calc(100% - 56px)"
+    >
       <MenuSearch
         v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes"
         :fill-type="currentFillType"
         @change="(v) => fillType = v"
       />
-      <div>
+      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked }">
         <PasswordGenerator
           v-if="tab === 1"
           is-over
@@ -155,10 +158,10 @@ export default Vue.extend({
 
 <style lang="scss">
 .menu-info {
-  height: calc(100% - 56px);
+  height: 100%;
   overflow: auto;
   &.is-search {
-    height: calc(100% - 56px - 48px);
+    height: calc(100% - 48px);
   }
 }
 </style>
