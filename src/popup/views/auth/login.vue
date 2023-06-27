@@ -48,7 +48,7 @@
       @get-access-token="getAccessToken"
     />
     <LogInWith
-      :login_step="loginInfo.login_step"
+      v-if="loginInfo.login_step === 1"
     />
   </div>
 </template>

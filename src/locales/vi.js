@@ -93,7 +93,8 @@ module.exports = {
     submit: "Gửi",
     detail: "Chi tiết",
     add_url: "Thêm tên miền hoặc đường dẫn",
-    item: "Item"
+    item: "Item",
+    option: 'Lựa chọn'
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -589,7 +590,15 @@ module.exports = {
       markFavorite: 'Đánh dấu yêu thích',
       markNotFavorite: 'Bỏ yêu thích',
       select_networks: 'Chọn Mạng Blockchain',
-      select_wallet: 'Chọn ví Blockchain'
+      select_wallet: 'Chọn ví Blockchain',
+      otp: {
+        setup: 'Thiết lập bảo mật 2 lớp',
+        no_otp: 'Chưa thiết lập',
+        add_new: 'Thêm mới OTP',
+        select: 'Thiết lập từ một OTP hiện có',
+        select_placeholder: 'Chọn 1 OTP',
+        secret_key: 'Khóa bí mật hoặc Đường dẫn'
+      }
     },
     settings: {
       account: 'Tài khoản',
@@ -761,5 +770,28 @@ module.exports = {
         secret_key_required: 'Khóa bí mật không được để trống!'
       }
     }
+  },
+  menu: {
+    generate_password: "Tạo mật khẩu",
+    fill_something_else: "Điền vào một Item khác",
+    turn_off: "Tắt cho trang này",
+    turn_on: "Bật cho trang này",
+    saved_login: "Đăng nhập đã lưu",
+    saved_card: "Thẻ thanh toán đã lưu",
+    saved_identity: "Thông tin cá nhân đã lưu",
+    empty_password: "Không tìm thấy mật khẩu cho trang web này.",
+    empty_card: "Không tìm thấy thẻ nào",
+    empty_identity: "Không tìm thấy danh tính.",
+    use_this_password: "Sử dụng mật khẩu này",
+    log_in_to_autofill: "Đăng nhập để tự động điền",
+    unlock_your_vault: "Mở khóa kho của bạn",
+    login_now: "Đăng nhập",
+    unlock_now: "Mở khóa",
+    domain_excluded_note: 'Bạn đã tắt tính năng tự động điền cho trang web này. Xóa trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho trang web đó.',
+    remove_now: 'Xóa',
+  },
+  bar: {
+    create_title: "Locker có nên nhớ mật khẩu này cho bạn không?",
+    update_title: "Bạn có muốn cập nhật mật khẩu này trong Locker không?"
   }
 }

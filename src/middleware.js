@@ -27,36 +27,27 @@ router.beforeEach(async (to, from, next) => {
     } else {
       router.push({ name: 'vault'}).catch(() => ({}))
     }
-  } else if (!!store.state.isLoggedIn && accessToken) {
-    if (!isLocked && ['login', 'pwl-unlock', 'forgot-password', 'lock', 'set-master-password'].includes(to.name)) {
-      router.push({ name: "vault" }).catch(() => ({}))
-    } else if (isLocked && !['pwl-unlock', 'lock', 'set-master-password'].includes(to.name)) {
-      router.push({ name: "lock" }).catch(() => ({}))
-    } else if (store.state.user.email && !!store.state.userPw) {
-      const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
-      const isMpm = store.state.userPw && store.state.userPw.is_pwd_manager
-      if (!isMpm && !isPwl) {
-        if (['set-master-password'].includes(to.name)) {
+  } else if (isLocked) {
+    if (!!store.state.isLoggedIn && accessToken && store.state.user.email && !!store.state.userPw) {
+      if (to.meta?.isLock) {
+        const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
+        const isMpm = store.state.userPw && store.state.userPw.is_pwd_manager
+        if (!isMpm && !isPwl && !['set-master-password'].includes(to.name)) {
           router.push({ name: "set-master-password" }).catch(() => ({}))
         } else {
           next()
         }
       } else {
-        if (['login', 'forgot-password'].includes(to.name)) {
-          router.push({ name: "vault" }).catch(() => ({}))
-        } else {
-          next();
-        }
-      }
+        router.push({ name: "lock" }).catch(() => ({}))
+      } 
+    } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
+      router.push({ name: "login" }).catch(() => ({}))
     } else {
-      if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
-        router.push({ name: "login" }).catch(() => ({}))
-      } else {
-        next();
-      }
+      next();
     }
-  }
-  else {
+  } else if (!isLocked && !to.meta?.isAuth) {
+    router.push({ name: "vault" }).catch(() => ({}))
+  } else {
     next();
   }
   NProgress.done()

@@ -66,7 +66,8 @@ module.exports = {
     personal_information: "Personal Information",
     never: 'Never',
     add_url: "Add Domain or URL",
-    item: "Item"
+    item: "Item",
+    option: 'Option'
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -158,7 +159,7 @@ module.exports = {
       create_success: 'The {type} has been added! | The {type} have been added!',
       create_failed: 'The {type} has not been added! | The {type} have not been added!',
       update_success: 'The {type} has been updated! | The {type} have been updated!',
-      update_failed: 'The {type} has been updated! | The {type} have been updated!',
+      update_failed: 'The {type} has not been updated! | The {type} have not been updated!',
       trash_success: 'The {type} has been moved to trash! | The {type} have been moved to trash!',
       trash_failed: 'The {type} has not been moved to trash! | The {type} have been moved to trash!',
       delete_success: 'The {type} has been permanently deleted! | The {type} have been permanently deleted!',
@@ -532,7 +533,15 @@ module.exports = {
       markFavorite: 'Mark favorite',
       markNotFavorite: 'Mark not favorite',
       select_networks: 'Select networks',
-      select_wallet: 'Select wallets'
+      select_wallet: 'Select wallets',
+      otp: {
+        setup: '2FA setup',
+        no_otp: 'No OTP',
+        add_new: 'Add new OTP',
+        select: 'Set up from an existing OTP',
+        select_placeholder: 'Select an OTP',
+        secret_key: 'Secret key or Path'
+      }
     },
     settings: {
       account: 'Account',

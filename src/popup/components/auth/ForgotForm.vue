@@ -90,6 +90,7 @@ export default Vue.extend({
           },
           user_info: payload
         })
+        this.$runtimeBackground.authAccessToken('captcha')
         this.$emit('next');
         this.callingAPI = false
       }).catch((error) => {

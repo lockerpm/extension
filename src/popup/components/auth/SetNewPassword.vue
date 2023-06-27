@@ -103,7 +103,7 @@ export default Vue.extend({
           }
           authAPI.sso_new_password(payload).then(async () => {
             this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-              login_step: 2,
+              login_step: 1,
               forgot_step: 1
             })
             this.notify(this.$t('data.notifications.change_password_success'), 'success')

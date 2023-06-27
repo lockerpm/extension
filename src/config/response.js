@@ -8,7 +8,7 @@ import storePromise from '@/store'
 export function handleResponseErrorMessage(error) {
   if (error.response) {
     if (error.response.status === 404) {
-      router.push({ name: 'Home' })
+      router.push({ name: 'vault' })
     }
     if (error.response.status === 401) {
       storageService.remove('cs_token')

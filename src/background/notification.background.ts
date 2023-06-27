@@ -97,6 +97,9 @@ export default class NotificationBackground {
               if (!!excludeDomain) {
                 return;
               }
+              if (await this.vaultTimeoutService.isLocked()) {
+                return
+              }
               // check is login page
               if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
                 this.autofillFirstPage(sender.tab);

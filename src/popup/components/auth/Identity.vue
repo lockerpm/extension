@@ -57,7 +57,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { load } from 'recaptcha-v3';
 import authAPI from '@/api/auth'
 
 export default Vue.extend({
@@ -70,13 +69,10 @@ export default Vue.extend({
     return {
       newIdentity: null,
       callingAPI: false,
-      siteKey: process.env.VUE_APP_RECAPTCHA_SITE_KEY,
-      recaptcha: null
     }
   },
   computed: {},
   async mounted () {
-    this.recaptcha = await load(this.siteKey);
     const currentIdentity = this.getOtpMethod(this.loginInfo.identity)
     this.newIdentity = currentIdentity ? this.loginInfo.identity : this.loginInfo?.auth_info?.methods[0].type;
     this.changeIdentity(this.newIdentity)
@@ -91,19 +87,19 @@ export default Vue.extend({
       return this.loginInfo?.auth_info?.methods?.find((m) => m.type === type)
     },
     async nextMethod () {
-      // if (this.callingAPI) { return }
-      // if (this.loginInfo.identity === 'mail') {
-      //   this.callingAPI = true;
-      //   this.recaptcha = await load(this.siteKey);
-      //   const token = await this.recaptcha.execute('login');
-      //   if (this.$route.name === 'login') {
-      //     await this.authOtpMail(token)
-      //   } else {
-      //     await this.resetPassword(token)
-      //   }
-      // } else {
-      //   this.$emit('next')
-      // }
+      if (this.callingAPI) { return }
+      if (this.loginInfo.identity === 'mail') {
+        this.callingAPI = true;
+        const token = await this.$storageService.get('recaptcha_token');
+        if (this.$route.name === 'login') {
+          await this.authOtpMail(token)
+        } else {
+          await this.resetPassword(token)
+        }
+        this.callingAPI = false;
+      } else {
+        this.$emit('next')
+      }
     },
     async authOtpMail (token: any) {
       authAPI.sso_auth_otp_mail({
@@ -145,7 +141,4 @@ export default Vue.extend({
 </style>
 
 <style>
-.grecaptcha-badge {
-  display: none !important;
-}
 </style>

@@ -113,6 +113,7 @@ export default Vue.extend({
           user_info: payload
         })
         if (response.is_factor2) {
+          this.$runtimeBackground.authAccessToken('captcha')
           this.$emit('next');
         } else {
           try {

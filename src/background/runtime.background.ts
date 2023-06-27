@@ -158,25 +158,11 @@ export default class RuntimeBackground {
               const access_token = result ? result.access_token : "";
               await this.storageService.save("cs_token", access_token);
               await this.updateStoreService('isLoggedIn', true);
+              await this.handleOpenPopupIframe(3000)
             });
           } catch (e) {
           }
         }
-        break;
-      case "cs-logout":
-        const userId = await this.userService.getUserId();
-        await Promise.all([
-          this.cryptoService.clearKeys(),
-          this.storageService.remove("cs_token"),
-
-          this.folderService.clear(userId),
-          this.collectionService.clear(userId),
-          this.cipherService.clear(userId),
-          this.settingsService.clear(userId),
-          this.policyService.clear(userId),
-          this.tokenService.clearToken(),
-          this.userService.clear()
-        ]);
         break;
       case "sso-authResult":
         if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
@@ -198,11 +184,19 @@ export default class RuntimeBackground {
         }
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
         await BrowserApi.updateCurrentTab(tab, this.currentLocation);
+        await this.handleOpenPopupIframe(3000)
+        break;
+      case "cs-authCaptcha":
+        await this.storageService.save('recaptcha_token', msg.token || '')
+        await this.handleOpenPopupIframe(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
           window: self
         });
+        break;
+      case "cs-logout":
+        this.main.onLogout();
         break;
       default:
         break;
@@ -262,8 +256,10 @@ export default class RuntimeBackground {
   }
 
   async authAccessToken(type: string, provider: string) {
-    // check open popup
-    await this.updateStoreService('savePopup', true);
+    if (type === 'captcha') {
+      BrowserApi.createNewTab(`${process.env.VUE_APP_ID_URL}/captcha`, true, true);
+      return;
+    }
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
       let url = ''
@@ -331,5 +327,18 @@ export default class RuntimeBackground {
         item
       );
     }
+  }
+
+  async handleOpenPopupIframe(timeout = 0) {
+    setTimeout(async () => {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (!tab) {
+        return;
+      }
+      BrowserApi.tabSendMessage(tab, {
+        command: 'openPopupIframe',
+        tab: tab,
+      });
+    }, timeout);
   }
 }

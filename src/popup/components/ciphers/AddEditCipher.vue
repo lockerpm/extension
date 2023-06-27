@@ -102,6 +102,19 @@
               :disabled="isDeleted"
             />
           </template>
+          <div>
+            <div
+              class="mb-2 text-gray text-head-6 font-semibold"
+            >
+              {{ $t('data.ciphers.otp.setup') }}
+            </div>
+            <PasswordOTP
+              class="w-full"
+              :value="cipher.login.totp"
+              @change="val => cipher.login.totp = val"
+              @createNewOtp="val => isCreateAuthenticator = val"
+            />
+          </div>
         </template>
         <template v-if="cipher.type === CipherType.Card">
           <div class="mb-2 text-gray text-head-6 font-semibold">
@@ -563,6 +576,8 @@ import InputSelectCryptoWallet from '@/components/input/InputSelectCryptoWallet'
 import InputSelectCryptoNetworks from '@/components/input/InputSelectCryptoNetworks'
 import InputSeedPhrase from '@/components/input/InputSeedPhrase'
 import InputCustomFields from '@/components/input/InputCustomFields.vue'
+import PasswordOTP from './PasswordOTP.vue'
+
 import { BrowserApi } from "@/browser/browserApi";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
@@ -587,7 +602,8 @@ export default Vue.extend({
     InputSelectCryptoNetworks,
     InputSeedPhrase,
     InputCustomFields,
-    UpgrateToPremium
+    UpgrateToPremium,
+    PasswordOTP
   },
   props: {
     type: {
@@ -615,6 +631,7 @@ export default Vue.extend({
       writeableCollections: [],
       cloneMode: false,
       popupVisible: false,
+      isCreateAuthenticator: false,
       cryptoAccount: {
         username: null,
         password: null,
@@ -763,13 +780,13 @@ export default Vue.extend({
   methods: {
     async handleSave () {
       if (this.cipher.id) {
-        await this.putCipher(this.cipher)
+        await this.putCipher()
       } else {
-        await this.postCipher(this.cipher)
+        await this.postCipher()
       }
     },
-    async postCipher (cipher) {
-      if (!cipher.name) { return }
+    async postCipher () {
+      if (!this.cipher.name) { return }
       try {
         this.callingAPI = true
         this.errors = {}
@@ -781,15 +798,21 @@ export default Vue.extend({
         if (this.cloneMode) {
           this.cipher.organizationId = null
         }
-        const cipherEnc = await this.$cipherService.encrypt(cipher)
+        const cipherEnc = await this.$cipherService.encrypt(this.cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = type_
         this.cipher.type = type_
         await cystackPlatformAPI.create_ciphers_vault({
           ...data,
           score: this.passwordStrength.score,
-          collectionIds: cipher.collectionIds,
+          collectionIds: this.cipher.collectionIds,
         })
+        if (this.isCreateAuthenticator && this.cipher.login.totp) {
+          const otpCipher = new CipherView()
+          otpCipher.name = this.cipher.name
+          otpCipher.secretKey = this.cipher.login.totp
+          await this.createAuthenticator(otpCipher)
+        }
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {
           this.$router.push({ name: 'folder-detail', params: { data: this.$route.params?.folder } })
@@ -808,7 +831,7 @@ export default Vue.extend({
         this.callingAPI = false
       }
     },
-    async putCipher (cipher) {
+    async putCipher () {
       try {
         const type_ = this.cipher.type
         if (this.cipher.type === CipherType.CryptoAccount || this.cipher.type === CipherType.CryptoWallet) {
@@ -817,15 +840,21 @@ export default Vue.extend({
           this.cipher.secureNote = new SecureNote(this.cipher.secureNote, true)
           this.cipher.secureNote.type = 0
         }
-        const cipherEnc = await this.$cipherService.encrypt(cipher)
+        const cipherEnc = await this.$cipherService.encrypt(this.cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = type_
         this.cipher.type = type_
-        await cystackPlatformAPI.update_cipher(cipher.id, {
+        await cystackPlatformAPI.update_cipher(this.cipher.id, {
           ...data,
           score: this.passwordStrength.score,
-          collectionIds: cipher.collectionIds,
+          collectionIds: this.cipher.collectionIds,
         })
+        if (this.isCreateAuthenticator && this.cipher.login.totp) {
+          const otpCipher = new CipherView()
+          otpCipher.name = this.cipher.name
+          otpCipher.secretKey = this.cipher.login.totp
+          await this.createAuthenticator(otpCipher)
+        }
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {
           this.$router.push({ name: 'folder-detail', params: { data: this.$route.params?.folder } })
