@@ -31,7 +31,7 @@
           </small>
         </div>
       </div>
-      <div class="col-actions">
+      <div v-if="fillType.value === 0" class="col-actions">
         <el-button
           class="btn-icon"
           :title="item.favorite ? $t('data.ciphers.markNotFavorite') : $t('data.ciphers.markFavorite')"
@@ -62,6 +62,10 @@ export default Vue.extend(
       item:{
         type: [CipherView, Object],
         default: () => new CipherView()
+      },
+      fillType: {
+        type: Object,
+        default: () => ({})
       }
     },
     data(){
