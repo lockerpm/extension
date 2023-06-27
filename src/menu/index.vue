@@ -110,8 +110,9 @@ export default Vue.extend({
           class: 'text-danger',
           divided: true,
           disabled: this.isLocked,
-          onclick: () => {
-            //
+          onclick: async () => {
+            const currentUrlTab = await BrowserApi.getTabFromCurrentWindow();
+            this.addExcludeDomain(currentUrlTab.url)
           }
         },
       ]

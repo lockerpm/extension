@@ -12,6 +12,7 @@
       <ul class="list-ciphers">
         <CipherRow
           v-for="item in (ciphers || [])"
+          :fill-type="fillType"
           :key="item.id"
           :item="item"
           @do-fill="$emit('do-fill', item)"
