@@ -1,5 +1,6 @@
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
+import autofill from './autofill';
 import {
   OBSERVE_IGNORED_ELEMENTS,
   CANCEL_BUTTON_NAMES,
@@ -13,18 +14,7 @@ document.addEventListener('DOMContentLoaded', event => {
   if (window.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
-  const test = window.document.createElement('div');
-  test.style.position = 'fixed';
-  test.style.top = '0px';
-  test.style.right = '0px';
-  test.style.height = '100vh';
-  test.style.width = '100%'
-  test.style.backgroundColor = 'red'
-  test.style.opacity = '0.2'
-  test.style.zIndex = '1000000000'
-  // window.document.body.appendChild(test)
-
-  let pageDetails: any[] = [];
+  let currentMessage: any = null
   const formData: any[] = [];
   let barType: string = null;
   let pageHref: string = null;
@@ -34,7 +24,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let observeDomTimeout: number = null;
   let disabledAddLoginNotification = false;
   let disabledChangedPasswordNotification = false;
-  let inputWithLogo: any[] = []
   let isSignUp = false
   const inIframe = !window || window.self !== window.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
@@ -63,6 +52,10 @@ document.addEventListener('DOMContentLoaded', event => {
   });
 
   chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+    if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+      return;
+    }
+    currentMessage = msg;
     processMessages(msg, sendResponse);
   });
 
@@ -89,9 +82,6 @@ document.addEventListener('DOMContentLoaded', event => {
       sendResponse();
       return true;
     } else if (msg.command === 'notificationBarPageDetails') {
-      pageDetails = [];
-      inputWithLogo = [];
-      pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
         if (autofillObj && autofillObj.enableAutofill === false) return;
@@ -103,55 +93,15 @@ document.addEventListener('DOMContentLoaded', event => {
           ) {
             for (let i = 0; i < msg.data.passwordFields.length; i++) {
               try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-                );
+                setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
               } catch (error) {
               }
             }
             for (let i = 0; i < msg.data.usernameFields.length; i++) {
               try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-                );
+                setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
               } catch (error) {
               }
-            }
-            inputWithLogo = inputWithLogo.filter(e => e != null)
-            document.onclick = check;
-            function check(e) {
-              const target = e && e.target;
-              let check = false;
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (
-                  checkParent(target, inputWithLogo[i].inputEl) ||
-                  checkParent(target, inputWithLogo[i].logo)
-                ) {
-                  check = true;
-                  closeOtherMenu(i);
-                }
-              }
-              if (!check) {
-                for (let i = 0; i < inputWithLogo.length; i++) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function closeOtherMenu(indexClick) {
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (i !== indexClick) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function checkParent(t, elm) {
-              while (t.parentNode) {
-                if (t === elm) {
-                  return true;
-                }
-                t = t.parentNode;
-              }
-              return false;
             }
           }
         });
@@ -159,30 +109,19 @@ document.addEventListener('DOMContentLoaded', event => {
       sendResponse();
       return true;
     } else if (msg.command === 'informMenuPageDetails') {
-      pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       sendResponse();
       return true;
-    } else if (msg.command === 'informMenuPassword') {
-      useGeneratedPassword(msg.data.password)
     } else if (msg.command === "resizeInformMenu") {
-      for (const logoField of inputWithLogo) {
-        const elPosition = logoField.inputEl.getBoundingClientRect();
-        const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
-        if (menuEl) {
-          if (msg.data) {
-            menuEl.style.height = msg.data.height
-            menuEl.style.width = elPosition.width
-          }
-        }
+      const allMenuFrames: any = document.getElementsByClassName('cs-inform-menu-iframe')
+      for (let index = 0; index < allMenuFrames.length; index++) {
+        allMenuFrames[index].style.height = msg.data.height
       }
     } else if (msg.command === "closeInformMenu") {
       if (inIframe) {
         return;
       }
-      for (const logoField of inputWithLogo) {
-        closeInformMenu(logoField.inputEl);
-      }
+      closeAllInformMenu();
       sendResponse();
       return true;
     } else if (msg.command === "openPopupIframe") {
@@ -324,17 +263,6 @@ document.addEventListener('DOMContentLoaded', event => {
     });
   }
 
-  function useGeneratedPassword(password) {
-    for (const logoField of inputWithLogo) {
-      if (logoField.type === 'password') {
-        logoField.inputEl.value = password;
-      }
-    }
-    for (const logoField of inputWithLogo) {
-      closeInformMenu(logoField.inputEl);
-    }
-  }
-
   function setFillLogo(el, type = 'password', isLocked = false) {
     const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
@@ -346,10 +274,6 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
-      inputEl.addEventListener("click", () => {
-        openInformMenu(inputEl, type);
-      });
-
       const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
@@ -369,12 +293,18 @@ document.addEventListener('DOMContentLoaded', event => {
           z-index: 1000 !important;
           cursor: pointer;
         `;
-        logo.addEventListener("click", () => {
+        window.addEventListener('click', function (e: any) {
           const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
-          if (menuEl) {
-            menuEl.parentElement.removeChild(menuEl);
+          if (logo.contains(e.target)) {
+            if (!menuEl) {
+              openInformMenu(inputEl, type);
+            } else {
+              menuEl.parentElement.removeChild(menuEl)
+            }
           } else {
-            openInformMenu(inputEl, type);
+            if (menuEl) {
+              menuEl.parentElement.removeChild(menuEl);
+            }
           }
         });
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);

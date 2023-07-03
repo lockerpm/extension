@@ -337,7 +337,6 @@ export default Vue.extend({
           }
         }
       } catch (e) {
-        console.log(1, e);
         this.notify(this.$t("errors.autofill"), "error");
       }
     },
