@@ -726,6 +726,16 @@ Vue.mixin({
         const tab = await BrowserApi.getTabFromCurrentWindow();
         BrowserApi.tabSendMessageData(tab, 'closeInformMenu')
       }, 100);
+    },
+    async scanQRCode(isPasswordOTP = false) {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "firstScanQRCode",
+          tab: tab,
+          isPasswordOTP: isPasswordOTP
+        });  
+      }
     }
   }
 })

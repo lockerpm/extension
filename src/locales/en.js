@@ -465,7 +465,7 @@ module.exports = {
     },
     ciphers: {
       add_cipher: 'Add item',
-      password_security: 'Password Security',
+      password_security: 'Password Strength',
       website_address: 'Website address',
       password: 'Password',
       card_holder: 'Cardholder name',

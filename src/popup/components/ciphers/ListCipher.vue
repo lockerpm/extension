@@ -98,12 +98,14 @@ export default Vue.extend({
       return !filteredCiphers.length;
     },
     cipherFilters() {
-      const filters = [(c) => c.type === this.type]
-      if (this.folder) {
-        filters.push((c) => c.folderId === this.folder.id)
-      }
+      const filters = []
       if (this.type == CipherType.CryptoBackup) {
         filters.push((c) => c.type ===  CipherType.CryptoAccount || c.type === CipherType.CryptoWallet)
+      } else {
+        filters.push((c) => c.type === this.type)
+      }
+      if (this.folder) {
+        filters.push((c) => c.folderId === this.folder.id)
       }
       return filters
     }

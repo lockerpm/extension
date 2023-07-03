@@ -111,13 +111,14 @@ export default class NotificationBackground {
             break;
         }
         break;
-      case 'scanQRCode':
+      case 'useImage':
         if (chrome.tabs && chrome.tabs.captureVisibleTab) {
           chrome.tabs.captureVisibleTab(null, {}, function (dataUri) {
             BrowserApi.tabSendMessage(msg.tab, {
               command: 'capturedImage',
               tab: msg.tab,
-              sender: dataUri
+              sender: dataUri,
+              isPasswordOTP: msg.isPasswordOTP
             });
           });
         } else {
@@ -131,15 +132,35 @@ export default class NotificationBackground {
           otp = await this.totpService.getCode(msg.sender.data);
         }
         if (otp) {
-          const name = msg.tab?.url?.split('/')[2]
-          const notes = msg.sender.data;
-          let currentOtps = await this.cipherService.getAllDecrypted();
-          currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
-          if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
-            this.notificationAlert('qr_existed')
-          } else {
-            await this.createNewOTP({ name: name, notes: notes })
+          if (msg.isPasswordOTP) {
+            const currentRouterString: any = await this.storageService.get('current_router')
+            const currentRouter = JSON.parse(currentRouterString);
+            await this.storageService.save('current_router', JSON.stringify({
+              ...currentRouter,
+              params: {
+                ...currentRouter.params,
+                cipherForm: {
+                  ...currentRouter.params.cipherForm,
+                  login: {
+                    ...currentRouter.params.cipherForm.login,
+                    totp: msg.sender.data
+                  }
+                }
+              },
+            }))
+            this.notificationAlert('password_otp_added')
             senderMessage = 'removeLockerWrapper';
+          } else {
+            const name = msg.tab?.url?.split('/')[2]
+            const notes = msg.sender.data;
+            let currentOtps = await this.cipherService.getAllDecrypted();
+            currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
+            if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
+              this.notificationAlert('qr_existed')
+            } else {
+              await this.createNewOTP({ name: name, notes: notes })
+              senderMessage = 'removeLockerWrapper';
+            }
           }
         } else {
           this.notificationAlert('qr_invalid')

@@ -160,14 +160,7 @@ export default {
       if (command === 'setup-key') {
         this.$refs.addEditOTP?.openDialog({})
       } else {
-        const tab = await BrowserApi.getTabFromCurrentWindow();
-        if (tab) {
-          BrowserApi.tabSendMessage(tab, {
-            command: "scanQRCode",
-            tab: tab,
-            sender: 'scanQRCode',
-          });  
-        }
+        this.scanQRCode()
       }
     },
   }

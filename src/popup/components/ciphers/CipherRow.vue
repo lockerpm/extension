@@ -129,7 +129,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown
-            v-if="!item.isDeleted && canManageItem(organizations, item)"
+            v-if="!item.isDeleted"
             trigger="click"
             :hide-on-click="false"
           >
@@ -145,11 +145,13 @@
                 {{ $t('common.detail') }}
               </el-dropdown-item>
               <el-dropdown-item
+                v-if="canManageItem(organizations, item)"
                 @click.native="() => addEdit(item)"
               >
                 {{ $t('common.edit') }}
               </el-dropdown-item>
               <el-dropdown-item
+                v-if="canManageItem(organizations, item)"
                 class="text-danger"
                 @click.native="deleteCiphers([item.id])"
               >

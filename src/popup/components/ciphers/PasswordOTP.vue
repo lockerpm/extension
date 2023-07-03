@@ -99,13 +99,17 @@ export default {
           value: null
         },
         {
-          label: this.$t('data.ciphers.otp.add_new'),
-          value: 'new'
+          label: this.$t('data.otp.scan_qr'),
+          value: 'scan_qr'
         },
         {
           label: this.$t('data.ciphers.otp.select'),
           value: 'select'
-        }
+        },
+        {
+          label: this.$t('data.ciphers.otp.add_new'),
+          value: 'new'
+        },
       ]
     }
   },
@@ -189,6 +193,9 @@ export default {
     changeOption (option) {
       this.option = option
       this.changeOtp(null)
+      if (option === 'scan_qr') {
+        this.scanQRCode(true)
+      }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     changeOtp (notes) {

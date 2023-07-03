@@ -78,14 +78,16 @@
                 popper-class="locker-pw-generator"
               >
                 <PasswordGenerator
-                  @generated="setPassword"
+                  v-show="popoverDisabled"
                   @fill-password="fillPassword"
+                  @toggle="(v) => popoverDisabled = v"
                 />
 
                 <el-button
                   slot="reference"
                   type="text"
                   class="p-0"
+                  @click="() => popoverDisabled = true"
                 >
                   {{ $t('data.ciphers.generate_random_password') }}
                 </el-button>
@@ -313,11 +315,14 @@
                 popper-class="locker-pw-generator"
               >
                 <PasswordGenerator
+                  v-show="popoverDisabled"
                   @fill-password="fillPassword"
+                  @toggle="(v) => popoverDisabled = v"
                 />
                 <button
                   slot="reference"
                   class="btn btn-clean !text-primary"
+                  @click="() => popoverDisabled = true"
                 >
                   {{ $t('data.ciphers.generate_random_password') }}
                 </button>
@@ -393,11 +398,14 @@
               popper-class="locker-pw-generator"
             >
               <PasswordGenerator
+                v-show="popoverDisabled"
                 @fill-password="fillPassword"
+                @toggle="(v) => popoverDisabled = v"
               />
               <button
                 slot="reference"
                 class="btn btn-clean !text-primary"
+                @click="() => popoverDisabled = true"
               >
                 {{ $t('data.ciphers.generate_random_password') }}
               </button>
@@ -526,18 +534,20 @@
             </el-checkbox-group>
           </div>
         </template>
-
-        <div class="mt-4">
-          <el-button
-            class="w-full"
-            type="primary"
-            plain
-            :loading="callingAPI"
-            @click="handleSave"
-          >
-            {{ $t('common.save') }}
-          </el-button>
-        </div>
+      </div>
+      <div
+        class="p-4"
+        style="position: fixed; bottom: 0; left: 0; right: 0; background-color: white;"
+      >
+        <el-button
+          class="w-full"
+          type="primary"
+          plain
+          :loading="callingAPI"
+          @click="handleSave"
+        >
+          {{ $t('common.save') }}
+        </el-button>
       </div>
     </div>
     <AddEditFolder
@@ -658,50 +668,63 @@ export default Vue.extend({
         seed: '',
         networks: [],
         notes: ''
-      }
+      },
+      popoverDisabled: false
     }
   },
   async mounted () {
-    this.folders = await this.getFolders()
-    if (this.data.id) {
-      if (this.data.type === CipherType.CryptoAccount) {
-        this.cryptoAccount = this.data.cryptoAccount
-      }
-      if (this.data.type === CipherType.CryptoWallet) {
-        this.cryptoWallet = this.data.cryptoWallet
-      }
-      if (this.data.type === CipherType.Login && this.data.login && this.data.login.uris == null) {
-        this.data.login.uris = [{
-          match: null,
-          uri: null
-        }]
-      }
-
-      if (this.data.fields == null) {
-        this.data.fields = []
-      }
-      this.cipher = new Cipher({ ...this.data }, true)
-      this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
-    } else if (this.type) {
-      this.newCipher(this.type, this.data)
-      if(this.type === CipherType.Login){
+    const currentRouterString = await this.$storageService.get('current_router')
+    const currentRouter = JSON.parse(currentRouterString)
+    if (currentRouter && currentRouter.name === this.$route.name && currentRouter.params.cipherForm) {
+      this.cipher = currentRouter.params.cipherForm
+    } else {
+      this.folders = await this.getFolders()
+      if (this.data.id) {
+        if (this.data.type === CipherType.CryptoAccount) {
+          this.cryptoAccount = this.data.cryptoAccount
+        }
+        if (this.data.type === CipherType.CryptoWallet) {
+          this.cryptoWallet = this.data.cryptoWallet
+        }
+        if (this.data.type === CipherType.Login && this.data.login && this.data.login.uris == null) {
+          this.data.login.uris = [{
+            match: null,
+            uri: null
+          }]
+        }
+  
+        if (this.data.fields == null) {
+          this.data.fields = []
+        }
+        this.cipher = new Cipher({ ...this.data }, true)
+        this.writeableCollections = await this.getWritableCollections(this.cipher.organizationId)
+      } else if (this.type) {
+        this.newCipher(this.type, this.data)
+        if(this.type === CipherType.Login){
+          const url = (await BrowserApi.getTabFromCurrentWindow()).url
+          this.cipher.name = Utils.getDomain(url);
+          this.cipher.login.uris[0].uri = url
+        }
+      } else {
+        this.newCipher(CipherType.Login, this.data)
+        if (this.password) {
+          this.cipher.login.password = this.password
+        }
         const url = (await BrowserApi.getTabFromCurrentWindow()).url
         this.cipher.name = Utils.getDomain(url);
-        this.cipher.login.uris[0].uri = url
+        this.cipher.login.uris[0].uri = url;
       }
-    } else {
-      this.newCipher(CipherType.Login, this.data)
-      if (this.password) {
-        this.cipher.login.password = this.password
-      }
-      const url = (await BrowserApi.getTabFromCurrentWindow()).url
-      this.cipher.name = Utils.getDomain(url);
-      this.cipher.login.uris[0].uri = url;
     }
   },
   watch: {
     cryptoAccount () {
       this.cipher.cryptoAccount = this.cryptoAccount
+    },
+    cipher: {
+      async handler() {
+        this.handleChangeForm()
+      },
+      deep: true
     }
   },
   computed: {
@@ -911,13 +934,6 @@ export default Vue.extend({
       const allCollections = await this.$collectionService.getAllDecrypted()
       return allCollections.filter(c => !c.readOnly && c.organizationId === orgId)
     },
-    setPassword (p) {
-      if (!this.cipher.login.password) {
-        this.cipher.login.password = p
-      } else if (!this.cryptoWallet.password) {
-        this.cryptoWallet.password = p
-      }
-    },
     fillPassword (p) {
       if (this.cipher.type === CipherType.Login) {
         this.cipher.login.password = p
@@ -958,6 +974,16 @@ export default Vue.extend({
       } else {
         this.cipher.fields.push(v.value)
       }
+    },
+    async handleChangeForm() {
+      await this.$storageService.save('current_router', JSON.stringify({
+        name: this.$route.name,
+        params: {
+          ...this.$route.params,
+          cipherForm: this.cipher
+        },
+        query: this.$route.query
+      }))
     }
   }
 }

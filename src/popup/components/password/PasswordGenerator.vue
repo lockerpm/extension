@@ -45,7 +45,17 @@
             {{ $t('data.tools.copy_password') }}
           </el-button>
         </div>
-        <div class="mt-2">
+        <div v-if="$route.name === 'add-edit-cipher'" class="mt-2">
+          <el-button
+            type="primary"
+            class="w-full"
+            plain
+            @click="formUsePassword"
+          >
+            {{ $t('menu.use_this_password') }}
+          </el-button>
+        </div>
+        <div v-else class="mt-2">
           <el-button
             class="w-full"
             type="primary"
@@ -111,7 +121,6 @@
 import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import { CipherView } from "jslib-common/models/view/cipherView";
 import { CipherType } from "jslib-common/enums/cipherType";
 
 import cystackPlatformAPI from '@/api/cystack_platform';
@@ -169,8 +178,13 @@ export default {
       }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async formUsePassword () {
+      this.$emit('fill-password', this.password)
+      this.$emit('toggle', false)
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
-      this.$router.push({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
+      this.$router.replace({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {

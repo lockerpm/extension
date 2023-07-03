@@ -12,7 +12,8 @@
       class="show-body px-4 py-4"
       :class="{
         'is-search pt-0': isSearch,
-        'is-setting': isSetting
+        'is-setting': isSetting,
+        'is-add-edit-cipher': isAddEditCipher
       }"
     >
       <router-view />
@@ -42,6 +43,9 @@ export default Vue.extend({
     },
     isSetting() {
       return this.$route.name.includes('settings')
+    },
+    isAddEditCipher() {
+      return this.$route.name === 'add-edit-cipher'
     }
   },
   methods: {
@@ -53,7 +57,7 @@ export default Vue.extend({
 .show-body {
   position: absolute !important;
   top: 60px;
-  bottom: 0px !important;
+  bottom: 0px;
   width: 100% !important;
   overflow: auto !important;
   &.is-search {
@@ -61,6 +65,9 @@ export default Vue.extend({
   }
   &.is-setting {
     background: white !important;
+  }
+  &.is-add-edit-cipher {
+    bottom: 72px !important;
   }
 }
 </style>

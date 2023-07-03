@@ -131,7 +131,7 @@ export default {
         } else {
           result.back = () => this.$router.push({
             name: 'vault',
-            query: { type: this.$route.params?.data?.type }
+            query: { type: this.$route.params?.data?.type || this.$route.params?.type }
           }).catch(() => ({}))
         }
         if (this.$route.params?.data) {

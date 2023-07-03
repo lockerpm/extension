@@ -1011,6 +1011,10 @@ select {
   margin-bottom: 0px !important;
 }
 
+.mb-0 {
+  margin-bottom: 0px !important;
+}
+
 .mr-2\.5 {
   margin-right: 0.625rem;
 }

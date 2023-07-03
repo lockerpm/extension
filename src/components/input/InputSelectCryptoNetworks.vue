@@ -7,10 +7,11 @@
       'is-hover': hovering,
       'is-error': errorText,
       'is-disabled': disabled,
-      'no-border': noBorder
+      'no-border': noBorder,
+      'is-label': !!label
     }"
   >
-    <label>{{ label }} <span v-if="required" class="text-danger">*</span></label>
+    <label v-if="label">{{ label }} <span v-if="required" class="text-danger">*</span></label>
     <el-select
       v-model="value"
       multiple
@@ -24,10 +25,11 @@
       <el-option
         v-for="item in options"
         :key="item.alias"
-        :label="item.name || $t('data.folders.no_folder')"
         :value="item.alias"
+        :label="item.name"
       >
         <div class="flex items-center">
+          <img style="height: 24px;" :src="item.logo" class="mr-2" alt="">
           <div class="text-black">{{ item.name || $t('data.folders.no_folder') }}</div>
         </div>
       </el-option>
@@ -136,14 +138,15 @@ export default {
 
 <style scoped lang="scss">
 .cs-field {
-  //width: 100%;
-  min-height: 60px;
   @apply mb-2.5 last:mb-6;
   display: flex;
   position: relative;
   border-radius: 4px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
+  &.is-label {
+    min-height: 64px;
+  }
   &.is-hover, &.is-focus {
     @apply border-primary;
     label {
