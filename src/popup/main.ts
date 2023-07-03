@@ -498,16 +498,6 @@ Vue.mixin({
 
       return connectionUrl
     },
-    async setupFillPage() {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "collectPageDetails",
-          tab: tab,
-          sender: 'notificationBar',
-        });
-      }
-    },
     generateOTP() {
       const digits = '0123456789';
       let OTP = '';
@@ -598,8 +588,7 @@ Vue.mixin({
         })
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async deleteCiphers (ids, callback = () => {}) {
+    async deleteCiphers (ids, callback = () => ({})) {
       this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
@@ -614,8 +603,7 @@ Vue.mixin({
         }
       })
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async deleteFolder (id, callback = () => {}) {
+    async deleteFolder (id, callback = () => ({})) {
       this.$confirm(this.$tc('data.notifications.delete_selected_desc', 1), this.$t('common.warning'), {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
@@ -687,8 +675,7 @@ Vue.mixin({
         this.notify(this.$t("errors.autofill"), "error");
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async addExcludeDomain(url: string, callback = () => {}) {
+    async addExcludeDomain(url: string, callback = () => ({})) {
       try {
         await cystackPlatformAPI.add_exclude_domain({ domain: url })
         await this.getExcludeDomains();
@@ -721,7 +708,17 @@ Vue.mixin({
         collectionIds: [],
       })
     },
-    closeMenu() {
+    async setupFillPage() {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "collectPageDetails",
+          tab: tab,
+          sender: 'notificationBar',
+        });
+      }
+    },
+    async closeMenu() {
       setTimeout(async () => {
         const tab = await BrowserApi.getTabFromCurrentWindow();
         BrowserApi.tabSendMessageData(tab, 'closeInformMenu')

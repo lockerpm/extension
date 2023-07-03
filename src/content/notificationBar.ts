@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', event => {
     return;
   }
   let currentMessage: any = null
-  let pageDetails: any[] = [];
   const formData: any[] = [];
   let pageHref: string = null;
   let observer: MutationObserver = null;
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let observeDomTimeout: number = null;
   let disabledAddLoginNotification = false;
   let disabledChangedPasswordNotification = false;
-  let inputWithLogo: any[] = []
   let isSignUp = false
   const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
@@ -68,64 +66,20 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       closeBar(true);
     } else if (msg.command === 'notificationBarPageDetails') {
-      pageDetails = [];
-      inputWithLogo = [];
-      pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
         if (autofillObj && autofillObj.enableAutofill === false) return;
         for (let i = 0; i < msg.data.passwordFields.length; i++) {
           try {
-            inputWithLogo.push(
-              setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-            );
+            setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
           } catch (error) {
           }
         }
         for (let i = 0; i < msg.data.usernameFields.length; i++) {
           try {
-            inputWithLogo.push(
-              setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-            );
+            setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
           } catch (error) {
           }
-        }
-        inputWithLogo = inputWithLogo.filter(e => e != null)
-        
-        document.onclick = check;
-        function check(e) {
-          const target = e && e.target;
-          let check = false;
-          for (let i = 0; i < inputWithLogo.length; i++) {
-            if (
-              checkParent(target, inputWithLogo[i].inputEl) ||
-              checkParent(target, inputWithLogo[i].logo)
-            ) {
-              check = true;
-              closeOtherMenu(i);
-            }
-          }
-          if (!check) {
-            for (let i = 0; i < inputWithLogo.length; i++) {
-              closeInformMenu(inputWithLogo[i].inputEl);
-            }
-          }
-        }
-        function closeOtherMenu(indexClick) {
-          for (let i = 0; i < inputWithLogo.length; i++) {
-            if (i !== indexClick) {
-              closeInformMenu(inputWithLogo[i].inputEl);
-            }
-          }
-        }
-        function checkParent(t, elm) {
-          while (t.parentNode) {
-            if (t === elm) {
-              return true;
-            }
-            t = t.parentNode;
-          }
-          return false;
         }
       })
     } else if (msg.command === "closeInformMenu") {
@@ -275,9 +229,6 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
-      inputEl.addEventListener("click", () => {
-        openInformMenu(inputEl, type);
-      });
       const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
@@ -297,14 +248,20 @@ document.addEventListener('DOMContentLoaded', event => {
           z-index: 1000 !important;
           cursor: pointer;
         `;
-        logo.addEventListener("click", () => {
+        window.addEventListener('click', (e: any) => {
           const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
-          if (menuEl) {
-            menuEl.parentElement.removeChild(menuEl);
+          if (logo.contains(e.target)) {
+            if (!menuEl) {
+              openInformMenu(inputEl, type);
+            } else {
+              menuEl.parentElement.removeChild(menuEl)
+            }
           } else {
-            openInformMenu(inputEl, type);
+            if (menuEl) {
+              menuEl.parentElement.removeChild(menuEl);
+            }
           }
-        });
+        })
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
         if (elPosition.width <= 0) {
           logo.style.right = `16px`;

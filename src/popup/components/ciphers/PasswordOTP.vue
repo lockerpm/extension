@@ -132,7 +132,6 @@ export default {
       this.notes = notes
       this.$emit('change', notes)
       this.$emit('createNewOtp', !!notes && this.option === 'new')
-      this.getOTP()
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     removeOtp () {
