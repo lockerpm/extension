@@ -8,12 +8,16 @@
       @add-cipher="() => addFolder()"
     />
     <div v-else>
-      <div class="font-semibold mb-2 text-gray">
-        {{ $t('type.folder') }} ({{ filteredFolder ? filteredFolder.length || 0 : 0}})
-      </div>
+      <SortMenu
+        :ciphers="filteredFolders || []"
+        :label="$t('type.folder')"
+        :order-field="orderField"
+        :order-direction="orderDirection"
+        @sort="changeSort"
+      />
       <ul class="list-folders">
         <li
-          v-for="folder in filteredFolder"
+          v-for="folder in filteredFolders"
           :key="folder.id"
         >
           <FolderRow
@@ -33,15 +37,24 @@
 
 <script>
 import Vue from "vue";
+import orderBy from "lodash/orderBy";
 import NoCipher from "@/popup/components/ciphers/NoCipher";
 import FolderRow from "@/popup/components/folder/FolderRow.vue";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
+import SortMenu from "@/components/SortMenu.vue";
 
 export default Vue.extend({
   components: {
     NoCipher,
     FolderRow,
-    AddEditFolder
+    AddEditFolder,
+    SortMenu
+  },
+  data() {
+    return {
+      orderField: "revisionDate",
+      orderDirection: 'desc',
+    }
   },
   asyncComputed: {
     folders: {
@@ -58,15 +71,18 @@ export default Vue.extend({
           results = []
         }
         results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => c.folderId === f.id)}));
+        results = orderBy(results, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         return results;
       },
       watch: [
-        "$store.state.syncedCiphersToggle"
+        "$store.state.syncedCiphersToggle",
+        "orderField",
+        "orderDirection"
       ]
     },
   },
   computed: {
-    filteredFolder() {
+    filteredFolders() {
       return (this.folders || []).filter((f) => this.searchText ? f.name.toLowerCase().includes(this.searchText.toLowerCase() || '') : true)
     }
   },
@@ -77,6 +93,10 @@ export default Vue.extend({
     editFolder (folder) {
       this.$refs.addEditFolder?.openDialog(folder, true)
     },
+    changeSort (sortValue) {
+      this.orderField = sortValue.orderField;
+      this.orderDirection = sortValue.orderDirection;
+    }
   }
 })
 </script>

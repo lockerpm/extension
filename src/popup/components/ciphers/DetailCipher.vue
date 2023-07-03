@@ -67,6 +67,13 @@
           :text-area="true"
         />
       </template>
+      <template v-if="cipher.type === CipherType.SecureNote">
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.notes"
+          :text-area="true"
+        />
+      </template>
       <template v-if="cipher.type === CipherType.Card">
         <TextHaveCopy
           :label="$t('data.ciphers.card_holder')"
@@ -285,6 +292,14 @@
           :text-area="true"
         />
       </template>
+      <div>
+        <TextHaveCopy
+          v-for="(item, index) in cipher.fields"
+          :key="index"
+          :label="item.name"
+          :text="item.value"
+        />
+      </div>
       <div
         class="grid md:grid-cols-6 cipher-field"
         style=""

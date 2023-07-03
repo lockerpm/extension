@@ -231,7 +231,11 @@ module.exports = {
       max_password_length: 'Maximum password length is {length}',
       password_composition: 'Password must contain at least 1 special character',
       authentication_failed: 'Authentication failed',
-      change_password_success: 'Change password success.'
+      change_password_success: 'Change password success.',
+      added_excluded_domain: 'Autofill for this domain has been disabled!',
+      deleted_excluded_domain: 'Autofill for this domain has been enabled!',
+      cannot_add_excluded_domain: "Can't disabled Autofill for this domain!",
+      cannot_deleted_excluded_domain: "Can't enabled Autofill for this domain"
     },
     profile_menu: {
       lock: 'Lock your account',
