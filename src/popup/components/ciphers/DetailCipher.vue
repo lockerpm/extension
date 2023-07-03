@@ -26,6 +26,20 @@
           should-hide
         />
         <div
+          v-if="cipher.login.totp"
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
+        >
+          <div class="">{{ $t('data.ciphers.totp') }}</div>
+          <div class="col-span-4">
+            <ShowOTP
+              justify="space-between"
+              :notes="cipher.login.totp"
+              :show-copy="true"
+            />
+          </div>
+        </div>
+        <div
           class="grid md:grid-cols-6 cipher-field"
           style=""
         >
@@ -352,6 +366,7 @@ import PasswordStrength from '@/popup/components/password/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
 import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy';
 import InputSeedPhrase from '@/components/input/InputSeedPhrase';
+import ShowOTP from '@/popup/components/otp/ShowOTP.vue';
 
 import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
 
@@ -360,6 +375,7 @@ export default Vue.extend({
     TextHaveCopy,
     PasswordStrength,
     InputSeedPhrase,
+    ShowOTP
   },
   props: {
   },

@@ -20,22 +20,24 @@
       </span>
       </p> 
     </div>
-    <el-progress
-      type="circle"
-      color="#268334"
-      :width="32"
-      :show-text="false"
-      :percentage="(start / period) * 100"
-      :stroke-width="3"
-    />
-    <button
-      v-if="showCopy"
-      class="ml-2 btn btn-icon btn-xs hover:bg-black-400"
-      v-clipboard:copy="otp"
-      v-clipboard:success="clipboardSuccessHandler"
-    >
-      <i class="far fa-clone" />
-    </button>
+    <div class="flex items-center">
+      <el-progress
+        type="circle"
+        color="#268334"
+        :width="32"
+        :show-text="false"
+        :percentage="(start / period) * 100"
+        :stroke-width="3"
+      />
+      <button
+        v-if="showCopy"
+        class="ml-2 btn btn-icon btn-xs hover:bg-black-400"
+        v-clipboard:copy="otp"
+        v-clipboard:success="clipboardSuccessHandler"
+      >
+        <i class="far fa-clone" />
+      </button>
+    </div>
   </el-row>
 </template>
 

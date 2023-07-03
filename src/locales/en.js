@@ -538,6 +538,7 @@ module.exports = {
       markNotFavorite: 'Mark not favorite',
       select_networks: 'Select networks',
       select_wallet: 'Select wallets',
+      totp: "TOTP",
       otp: {
         setup: '2FA setup',
         no_otp: 'No OTP',

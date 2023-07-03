@@ -72,7 +72,10 @@ export default Vue.extend({
     };
   },
   watch: {
-    "$store.state.syncedCiphersToggle": 'load'
+    "$store.state.syncedCiphersToggle": 'load',
+  },
+  mounted() {
+    this.load()
   },
   methods: {
     async load() {
