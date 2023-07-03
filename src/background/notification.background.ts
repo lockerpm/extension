@@ -93,6 +93,9 @@ export default class NotificationBackground {
             chrome.storage.local.get('enableAutofill', async (autofillObj: any) => {
               if (autofillObj.enableAutofill === false) return;
               const tab = await BrowserApi.getTabFromCurrentWindow();
+              if (!tab || !tab.url) {
+                return;
+              }
               const excludeDomain: any = await this.cipherService.getIncludedDomainByUrl(tab.url)
               if (!!excludeDomain) {
                 return;
