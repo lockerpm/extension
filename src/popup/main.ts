@@ -693,17 +693,17 @@ Vue.mixin({
         await cystackPlatformAPI.add_exclude_domain({ domain: url })
         await this.getExcludeDomains();
         callback()
-        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.item') }), 'success')
+        this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
       } catch (e) {
-        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t('common.item') }), 'error')
+        this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
       }
     },
     async removeDomain(domain: any) {
       cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
         await this.getExcludeDomains()
-        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.item') }), 'success')
+        this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
       }).catch(() => {
-        this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.item') }, 'error'))
+        this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
       })
     },
     async createAuthenticator (otpCipher) {
@@ -726,6 +726,16 @@ Vue.mixin({
         const tab = await BrowserApi.getTabFromCurrentWindow();
         BrowserApi.tabSendMessageData(tab, 'closeInformMenu')
       }, 100);
+    },
+    async scanQRCode(isPasswordOTP = false) {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "firstScanQRCode",
+          tab: tab,
+          isPasswordOTP: isPasswordOTP
+        });  
+      }
     }
   }
 })

@@ -277,7 +277,11 @@ module.exports = {
       max_password_length: 'Độ dài tối đa của mật khẩu là {length}',
       password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
       authentication_failed: 'Xác thực thông tin thất bại',
-      change_password_success: 'Đổi mật khẩu thành công.'
+      change_password_success: 'Đổi mật khẩu thành công.',
+      added_excluded_domain: 'Tự động điền cho tên miền này đã bị tắt!',
+      deleted_excluded_domain: 'Tự động điền cho tên miền này đã được bật!',
+      cannot_add_excluded_domain: "Không thể tắt tự động điền cho tên miền này",
+      cannot_deleted_excluded_domain: "Không thể bật tự động điền cho tên miền này"
     },
     profile_menu: {
       lock: 'Khóa tài khoản',

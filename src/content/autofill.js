@@ -943,7 +943,7 @@
     });
   }
 
-  function scanQRCode(document, tab) {
+  function scanQRCode(document, tab, isPasswordOTP) {
     const docHeight = self.innerHeight;
     const docWidth = self.innerWidth;
     let isMove = false;
@@ -1057,7 +1057,7 @@
           margin-right: 8px;
         `
       useButton.addEventListener('click', () => {
-        captureImage();
+        handleUseImage();
       })
       wrapperActions.appendChild(useButton);
 
@@ -1305,14 +1305,15 @@
       bottom.style.bottom = 0;
     }
 
-    async function captureImage() {
+    async function handleUseImage() {
       isReading = true;
       const actions = document.getElementById('locker_screenshot_wrapper--actions');
       actions.style.visibility = 'hidden';
       setTimeout(() => {
         chrome.runtime.sendMessage({
-          command: 'scanQRCode',
+          command: 'useImage',
           tab: tab,
+          isPasswordOTP: isPasswordOTP
         });
       }, 100);
     };
@@ -1349,7 +1350,8 @@
       chrome.runtime.sendMessage({
         command: 'saveNewQRCode',
         tab: msg.tab,
-        sender: code
+        sender: code,
+        isPasswordOTP: msg.isPasswordOTP
       });
     }
   }
@@ -1365,11 +1367,10 @@
       });
     } else if (msg.command === 'fillForm') {
       fill(document, msg.fillScript);
-    } else if (msg.command === 'scanQRCode') {
-      scanQRCode(document, msg.tab);
+    } else if (msg.command === 'firstScanQRCode') {
+      scanQRCode(document, msg.tab, msg.isPasswordOTP);
     } else if (msg.command === 'capturedImage') {
       readAndAddQRCode(document, msg);
-      
     } else if (msg.command === 'addedOTP') {
       isReading = false;
       const actions = document.querySelector('locker-select-wrapper');
@@ -1401,6 +1402,13 @@
               : "QR code OTP added!"
           );
           break;
+        case 'password_otp_added':
+          self.alert(
+            self.navigator.language === "vi"
+              ? "OTP đã được thêm cho Mật Khẩu."
+              : "QR code OTP added to Password"
+          );
+          break
         case 'password_limited':
           self.alert(
             self.navigator.language === "vi"

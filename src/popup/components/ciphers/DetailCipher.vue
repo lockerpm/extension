@@ -25,7 +25,20 @@
           :view-password="cipher.viewPassword"
           should-hide
         />
-        <!-- {{passwordStrength}} -->
+        <div
+          v-if="cipher.login.totp"
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
+        >
+          <div class="">{{ $t('data.ciphers.totp') }}</div>
+          <div class="col-span-4">
+            <ShowOTP
+              justify="space-between"
+              :notes="cipher.login.totp"
+              :show-copy="true"
+            />
+          </div>
+        </div>
         <div
           class="grid md:grid-cols-6 cipher-field"
           style=""
@@ -62,6 +75,18 @@
             </div>
           </div>
         </div>
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.notes"
+          :text-area="true"
+        />
+      </template>
+      <template v-if="cipher.type === CipherType.SecureNote">
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.notes"
+          :text-area="true"
+        />
       </template>
       <template v-if="cipher.type === CipherType.Card">
         <TextHaveCopy
@@ -88,6 +113,11 @@
           :label="$t('data.ciphers.cvv')"
           :text="cipher.card.code"
           should-hide
+        />
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.notes"
+          :text-area="true"
         />
       </template>
       <template v-if="cipher.type === CipherType.Identity">
@@ -151,6 +181,11 @@
           :label="$t('data.ciphers.country')"
           :text="cipher.identity.country"
         />
+        <TextHaveCopy
+          :label="$t('data.ciphers.notes')"
+          :text="cipher.notes"
+          :text-area="true"
+        />
       </template>
       <template v-if="cipher.type === CipherType.CryptoAccount && cipher.cryptoAccount">
         <TextHaveCopy
@@ -212,31 +247,73 @@
           :view-password="cipher.viewPassword"
           should-hide
         />
-        <div class="grid md:grid-cols-6 cipher-item">
+        <div
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
+        >
           <div class="">{{ $t('data.ciphers.password_security') }}</div>
-          <div class="col-span-4 font-semibold">
+          <div v-if="cipher.cryptoWallet.password" class="col-span-4 font-semibold">
             <PasswordStrength :score="passwordStrength.score" />
           </div>
         </div>
+        <TextHaveCopy
+          :label="$t('data.ciphers.pin')"
+          :text="cipher.cryptoWallet.pin"
+          :view-password="cipher.viewPassword"
+          should-hide
+        />
         <TextHaveCopy
           :label="$t('data.ciphers.wallet_address')"
           :text="cipher.cryptoWallet.address"
         />
         <TextHaveCopy
-          :label="$t('data.ciphers.seed')"
-          :text="cipher.cryptoWallet.seed"
+          :label="$t('data.ciphers.private_key')"
+          :text="cipher.cryptoWallet.privateKey"
+          :view-password="cipher.viewPassword"
+          should-hide
         />
+        <div
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
+        >
+          <div class="mb-1">{{ $t('data.ciphers.seed') }}</div>
+          <InputSeedPhrase
+            v-if="cipher.cryptoWallet.seed"
+            v-model="cipher.cryptoWallet.seed"
+            :disabled="true"
+            class="w-full"
+          />
+        </div>
+        <div
+          class="grid md:grid-cols-6 cipher-field"
+          style=""
+        >
+          <div class="mb-1">{{ $t('data.ciphers.networks') }}</div>
+          <div class="flex items-center" style="flex-wrap: wrap;">
+            <div
+              v-for="item in selectedNetworks"
+              :key="item.alias"
+              class="flex items-center mr-4"
+            >
+              <img :src="item.logo" style="width: 24px;" alt="" class="mr-2">
+              <b>{{ item.name }}</b>
+            </div>
+          </div>
+        </div>
         <TextHaveCopy
           :label="$t('data.ciphers.notes')"
           :text="cipher.cryptoWallet.notes"
           :text-area="true"
         />
       </template>
-      <TextHaveCopy
-        :label="$t('data.ciphers.notes')"
-        :text="cipher.notes"
-        :text-area="true"
-      />
+      <div>
+        <TextHaveCopy
+          v-for="(item, index) in cipher.fields"
+          :key="index"
+          :label="item.name"
+          :text="item.value"
+        />
+      </div>
       <div
         class="grid md:grid-cols-6 cipher-field"
         style=""
@@ -247,9 +324,9 @@
         </div>
       </div>
       <div
+        v-if="(cipher.collectionIds && cipher.collectionIds.length) || cipher.folderId"
         class="grid md:grid-cols-6 cipher-field"
         style=""
-        v-if="(cipher.collectionIds && cipher.collectionIds.length) || cipher.folderId"
       >
         <div class="">{{ $t('data.ciphers.folder') }}</div>
         <div class="col-span-4">
@@ -287,11 +364,18 @@ import Vue from 'vue';
 import find from 'lodash/find'
 import PasswordStrength from '@/popup/components/password/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
-import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy'
+import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy';
+import InputSeedPhrase from '@/components/input/InputSeedPhrase';
+import ShowOTP from '@/popup/components/otp/ShowOTP.vue';
+
+import { CHAIN_LIST } from '@/utils/crypto/chainlist/index'
+
 export default Vue.extend({
   components: {
     TextHaveCopy,
-    PasswordStrength
+    PasswordStrength,
+    InputSeedPhrase,
+    ShowOTP
   },
   props: {
   },
@@ -354,15 +438,23 @@ export default Vue.extend({
       return this.$route.params.data || {}
     },
     passwordStrength () {
-      if (this.cipher && this.cipher.login) {
+      if (this.cipher && this.cipher.login && this.cipher.type == CipherType.Login) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.login.password, ['cystack']) || {}
-      } else if (this.cipher.cryptoAccount) {
+      }
+      if (this.cipher && this.cipher.cryptoAccount && this.cipher.type == CipherType.CryptoAccount) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoAccount.password, ['cystack']) || {}
-      } else if (this.cipher.cryptoWallet) {
+      }
+      if (this.cipher && this.cipher.cryptoWallet && this.cipher.type == CipherType.CryptoWallet) {
         return this.$passwordGenerationService.passwordStrength(this.cipher.cryptoWallet.password, ['cystack']) || {}
       }
       return {}
-    }
+    },
+    selectedNetworks () {
+      if (this.cipher && this.cipher.cryptoWallet && this.cipher.type == CipherType.CryptoWallet) {
+        return this.cipher.cryptoWallet.networks.map((network) => CHAIN_LIST.find(n => n.alias === network.alias))
+      }
+      return []
+    },
   },
   methods: {
     findFolder (folders, id) {

@@ -5,7 +5,7 @@
     <template>
       <!-- Login Ciphers -->
       <LoginCiphers
-        v-if="cipherType === CipherType.Login"
+        v-if="cipherType == CipherType.Login"
       />
       <!-- All Passwords -->
       <ListCipher

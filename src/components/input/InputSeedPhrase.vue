@@ -13,13 +13,14 @@
         class="cs-input"
         :ref="index"
         :value="w"
+        :disabled="disabled"
         type="text"
         @input="handleChange($event.target.value, index)"
         @keyup.enter="handleEnter($event, index)"
       />
     </div>
     
-    <div v-if="wordCount<24">
+    <div v-if="wordCount<24 && !disabled">
       <el-button
         class="h-10 w-full"
         type="primary"
@@ -44,6 +45,10 @@ export default Vue.extend ({
       default: ''
     },
     editMode: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
