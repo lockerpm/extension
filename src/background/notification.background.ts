@@ -165,12 +165,24 @@ export default class NotificationBackground {
         await this.getDataForTab(sender.tab, 'informMenuGetCiphersForCurrentTab', msg.type);
         break;
       case 'informMenuUsePassword':
-        const crrentTab = await BrowserApi.getTabFromCurrentWindow();
-        if (crrentTab) {
-          await BrowserApi.tabSendMessageData(crrentTab, 'informMenuPassword', {
-            password: msg.password
-          });
-        }
+        const cTab = await BrowserApi.getTabFromCurrentWindow();
+        BrowserApi.tabSendMessageData(cTab, "informMenuPassword", {
+          password: msg.password,
+          tab: cTab,
+        });
+        break;
+      case 'notificationUsePassword':
+        await this.autofillService.doAutoFill({
+          cipher: { type: CipherType.Login,  login: { password: msg.password } },
+          pageDetails: [
+            {
+              frameId: sender.frameId,
+              tab: msg.tab,
+              details: msg.details,
+            }
+          ],
+          fillNewPassword: true,
+        });
         break;
       case 'bgGeneratePassword':
         const tab_ = await BrowserApi.getTabFromCurrentWindow();
