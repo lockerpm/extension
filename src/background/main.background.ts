@@ -67,6 +67,7 @@ import { TotpService as TotpServiceAbstraction } from 'jslib-common/abstractions
 import { UserService as UserServiceAbstraction } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService as VaultTimeoutServiceAbstraction } from 'jslib-common/abstractions/vaultTimeout.service';
 import { AutofillService as AutofillServiceAbstraction } from '../services/abstractions/autofill.service';
+import { PasswordRepromptService as PasswordRepromptServiceAbstraction } from 'jslib-common/abstractions/passwordReprompt.service';
 
 import { BrowserApi } from '../browser/browserApi';
 import { SafariApp } from '../browser/safariApp';
@@ -129,6 +130,7 @@ export default class MainBackground {
   popupUtilsService: PopupUtilsService;
   sendService: SendServiceAbstraction;
   fileUploadService: FileUploadServiceAbstraction;
+  passwordRepromptService: PasswordRepromptServiceAbstraction;
 
   onUpdatedRan: boolean;
   onReplacedRan: boolean;
@@ -422,7 +424,10 @@ export default class MainBackground {
       this.folderService,
       this.userService,
       this.totpService,
-      this.requestBackground
+      this.requestBackground,
+      this.passwordRepromptService,
+      this.popupUtilsService,
+      this.platformUtilsService
     );
 
     this.tabsBackground = new TabsBackground(

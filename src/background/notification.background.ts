@@ -11,8 +11,12 @@ import { TotpService } from 'jslib-common/abstractions/totp.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
+import { CipherRepromptType } from 'jslib-common/enums/cipherRepromptType';
+import { PasswordRepromptService } from 'jslib-common/abstractions/passwordReprompt.service';
+import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.service';
 
 import { BrowserApi } from '../browser/browserApi';
+import { PopupUtilsService } from '../popup/services/popup-utils.service';
 
 import MainBackground from './main.background';
 import Requestground from './request.backgroud';
@@ -41,7 +45,10 @@ export default class NotificationBackground {
     private folderService: FolderService,
     private userService: UserService,
     private totpService: TotpService,
-    private request: Requestground
+    private request: Requestground,
+    private passwordRepromptService: PasswordRepromptService,
+    private popupUtilsService: PopupUtilsService,
+    private platformUtilsService: PlatformUtilsService
   ) {}
   async init() {
     if (chrome.runtime == null) {
@@ -110,6 +117,37 @@ export default class NotificationBackground {
             })
             this.main.refreshBadgeAndMenu()
             break;
+          case 'autofillItem':
+            const pageDetails = [msg.details];
+            if (
+              msg.cipher.reprompt !== CipherRepromptType.None && this.passwordRepromptService &&
+              !(await this.passwordRepromptService.showPasswordPrompt())
+            ) {
+              return;
+            }
+      
+            if (pageDetails == null || pageDetails.length === 0) {
+              return;
+            }
+            const pageDetailsObj = {
+              frameId: sender.frameId,
+              tab: msg.tab,
+              details: msg.details,
+            };
+            try {
+              await this.autofillService.doAutoFill({
+                cipher: msg.cipher,
+                pageDetails: [pageDetailsObj],
+                fillNewPassword: true,
+              });
+            } catch (e) {
+              BrowserApi.tabSendMessage(msg.tab, {
+                command: 'alert',
+                tab: msg.tab,
+                type: 'autofill_error',
+              });
+            }
+            break
           default:
             break;
         }
