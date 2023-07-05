@@ -12,6 +12,7 @@
         <el-input
           v-model="data.username"
           size="small"
+          :disabled="disabled"
         ></el-input>
       </el-form-item>
       <el-form-item :label="$t('common.password')">
@@ -19,6 +20,7 @@
           v-model="data.password"
           size="small"
           :type="showPassword ? 'text' : 'password'"
+          :disabled="disabled"
         >
           <i
             class="el-icon-view"
@@ -33,6 +35,7 @@
           size="small"
           class="w-full"
           :placeholder="$t('data.folders.select_folder')"
+          :disabled="disabled"
         >
           <el-option
             v-for="folder in (folders || [])"
@@ -55,6 +58,10 @@ export default Vue.extend({
     data: {
       type: Object,
       default: () => ({})
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

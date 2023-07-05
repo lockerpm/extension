@@ -7,6 +7,7 @@
       size="small"
       type="warning"
       class="mr-2"
+      :disabled="callingAPI"
       @click="() => $emit('exclude')"
     >
       {{ $t('common.never') }}
@@ -14,6 +15,7 @@
     <el-button
       size="small"
       type="primary"
+      :loading="callingAPI"
       @click="() => $emit('save')"
     >
       {{ $t('common.save') }}
@@ -30,6 +32,10 @@ export default Vue.extend({
     data: {
       type: Object,
       default: () => ({})
+    },
+    callingAPI: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {

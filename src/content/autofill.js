@@ -55,6 +55,13 @@ document.addEventListener('DOMContentLoaded', event => {
               : "Username and Password are updated!"
           );
           break;
+        case 'username_password_update_error':
+          self.alert(
+            self.navigator.language === "vi"
+              ? "Lỗi! Không thể cập nhật không."
+              : "Error! Can't update Username and Password."
+          );
+          break;
         case 'otp_limited':
           self.alert(
             self.navigator.language === "vi"
@@ -87,6 +94,13 @@ document.addEventListener('DOMContentLoaded', event => {
             self.navigator.language === "vi"
               ? "Thêm mới thành công."
               : "Username and Password are added!"
+          );
+          break;
+        case 'password_add_error':
+          self.alert(
+            self.navigator.language === "vi"
+              ? "Lỗi! Không thể thêm mới tài khoản."
+              : "Error! Can't add Username and Password."
           );
           break;
         case 'qr_invalid':
