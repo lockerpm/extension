@@ -278,13 +278,13 @@ export default class NotificationBackground {
     if (loginInfo) {
       currentLoginInfo = loginInfo
     }
-    if (tab != null) {
+    if (tab) {
       this.doNotificationQueueCheck(tab, currentLoginInfo);
       return;
     }
 
     const currentTab = await BrowserApi.getTabFromCurrentWindow();
-    if (currentTab != null) {
+    if (currentTab) {
       this.doNotificationQueueCheck(currentTab, currentLoginInfo);
     }
   }

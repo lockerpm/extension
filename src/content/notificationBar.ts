@@ -63,9 +63,6 @@ document.addEventListener('DOMContentLoaded', event => {
       }
       closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
-      if (inIframe) {
-        return;
-      }
       closeBar(true);
     } else if (msg.command === 'notificationBarPageDetails') {
       watchForms(msg.data.forms);
@@ -633,7 +630,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
-      height: ${type === 'add' ? '330' : '270'}px !important;
+      height: ${type === 'add' ? '338' : '278'}px !important;
       width: 450px;
       border: 0;
       min-height: initial;
@@ -647,7 +644,7 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.setAttribute('aria-live', 'polite');
     frameDiv.id = 'bit-notification-bar';
     frameDiv.style.cssText = `
-      height: 300px !important;
+      height: ${type === 'add' ? '308' : '248'}px !important;
       width: 450px;
       top: 40px;
       right: 40px;

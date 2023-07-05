@@ -8,8 +8,10 @@
       <BarForm
         ref="barForm"
         :data="data"
+        :disabled="callingAPI"
       />
       <BarFooter
+        :callingAPI="callingAPI"
         @save="handleSave"
         @exclude="excludeDomain"
       />
@@ -43,7 +45,8 @@ export default Vue.extend({
   },
   data () {
     return {
-      data: { ...this.$route.query || {}, folderId: null }
+      data: { ...this.$route.query || {}, folderId: null },
+      callingAPI: false
     }
   },
   asyncComputed: {
@@ -53,17 +56,21 @@ export default Vue.extend({
   methods: {
     async close() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
+      if (tab) {
+        BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
+      }
     },
     async handleSave() {
-      this.$refs.barForm.$refs.form.validate((valid) => {
+      this.$refs.barForm.$refs.form.validate(async (valid) => {
+        this.callingAPI = true;
         if (valid) {
           if (this.data.id) {
-            this.updateCipher()
+            await this.updateCipher()
           } else {
-            this.createCipher()
+            await this.createCipher()
           }
         }
+        this.callingAPI = false;
       })
     },
     async createCipher() {
@@ -88,11 +95,13 @@ export default Vue.extend({
         const userId = await this.$userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId)
         this.$cipherService.upsert(cipherData)
-        this.notificationAlert('password_added')
         this.close()
+        this.notificationAlert('password_added')
       } catch (e) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           this.notificationAlert('password_limited')
+        } else {
+          this.notificationAlert('password_add_error')
         }
       }
     },
@@ -110,10 +119,10 @@ export default Vue.extend({
           const userId = await this.$userService.getUserId();
           const cipherData = new CipherData(cipherResponse, userId);
           await this.$cipherService.upsert(cipherData);
-          this.notificationAlert('username_password_updated');
           this.close()
+          this.notificationAlert('username_password_updated');
         } catch (e) {
-          //
+          this.notificationAlert('username_password_update_error');
         }
       }
         
