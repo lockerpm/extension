@@ -12,7 +12,7 @@
     >
       <MenuSearch
         v-if="tab === 2 && !isLocked && !isOTP"
-        :fill-types="fillTypes"
+        :fill-types="fillTypes.filter((t) => t.value !== CipherType.OTP)"
         :fill-type="currentFillType"
         @change="(v) => fillType = v"
       />
@@ -23,7 +23,6 @@
         />
         <MenuCiphers
           v-else-if="tab === 2 && !isLocked"
-          :fill-types="fillTypes"
           :fill-type="currentFillType"
         />
         <MenuLocked
@@ -62,6 +61,7 @@ export default Vue.extend({
   },
   data () {
     return {
+      CipherType,
       tab: Number(this.$route.query?.tab || 2),
       fillType: Number(this.$route.query?.type || 0),
     }

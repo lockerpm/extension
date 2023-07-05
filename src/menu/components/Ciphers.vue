@@ -39,10 +39,6 @@ export default Vue.extend({
   name: 'MenuCiphers',
   components: { CipherRow, OTPRow },
   props: {
-    fillTypes: {
-      type: Array,
-      default: () => []
-    },
     fillType: {
       type: Object,
       default: () => ({})
@@ -79,10 +75,6 @@ export default Vue.extend({
               [(c) => c.type === this.fillType.value, (c) => !c.isDeleted],
               null
             )) || [];
-  
-          result = result.filter((cipher) =>
-            this.fillTypes.map((t) => t.value).includes(cipher.type)
-          );
         }
         return result
       },

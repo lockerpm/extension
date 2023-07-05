@@ -544,7 +544,7 @@ module.exports = {
       otp: {
         setup: '2FA setup',
         no_otp: 'No OTP',
-        add_new: 'Add new OTP',
+        add_new: 'Enter Setup key',
         select: 'Set up from an existing OTP',
         select_placeholder: 'Select an OTP',
         secret_key: 'Secret key or Path'

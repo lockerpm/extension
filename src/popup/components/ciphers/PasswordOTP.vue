@@ -79,12 +79,12 @@ export default {
           value: 'scan_qr'
         },
         {
-          label: this.$t('data.ciphers.otp.select'),
-          value: 'select'
-        },
-        {
           label: this.$t('data.ciphers.otp.add_new'),
           value: 'new'
+        },
+        {
+          label: this.$t('data.ciphers.otp.select'),
+          value: 'select'
         },
       ]
     }
