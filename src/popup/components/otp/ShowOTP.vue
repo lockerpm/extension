@@ -7,7 +7,7 @@
   >
     <div
       class="otp-show mr-2"
-      v-clipboard:copy="otp"
+      v-clipboard:copy="isCopy ? otp : ''"
       v-clipboard:success="handleCopy"
     >
       <p v-if="name" class="name text-black font-semibold truncate">
@@ -62,6 +62,10 @@ export default {
       type: Boolean,
       default: false
     },
+    isCopy: {
+      type: Boolean,
+      default: true
+    }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
@@ -118,10 +122,12 @@ export default {
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     handleCopy () {
-      this.isCopied = true;
-      setTimeout(() => {
-        this.isCopied = false;
-      }, 1000);
+      if (this.isCopy) {
+        this.isCopied = true;
+        setTimeout(() => {
+          this.isCopied = false;
+        }, 1000);
+      }
     },
   }
 }

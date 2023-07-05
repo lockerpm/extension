@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     } else if (msg.command === 'fillForm') {
       fill(document, msg.fillScript);
+    } else if (msg.command === 'fillOTPForm') {
+      for (let index = 0; index < msg.forms.length; index++) {
+        const form = msg.forms[index];
+        if (form.otps.length === 1) {
+          const otpInput = document.getElementById(form.otps[0].htmlID)
+          if (otpInput) {
+            fillTheElement(otpInput, msg.totp, true, true)
+          }
+        } else if (form.otps.length === 6) {
+          form.otps.forEach((o, index) => {
+            const otpInput = document.getElementById(o.htmlID)
+            if (otpInput) {
+              fillTheElement(otpInput, msg.totp[index] || null, true, true)
+            }
+          })
+        }
+      }
     } else if (msg.command === 'firstScanQRCode') {
       scanQRCode(document, msg.tab, msg.isPasswordOTP);
     } else if (msg.command === 'capturedImage') {
@@ -108,6 +125,150 @@ document.addEventListener('DOMContentLoaded', event => {
     return true;
   });  
 })
+
+// normalize the event based on API support
+function normalizeEvent(el, eventName) {
+  let ev;
+  if ('KeyboardEvent' in self) {
+    ev = new self.KeyboardEvent(eventName, {
+      bubbles: true,
+      cancelable: false,
+    });
+  }
+  else {
+    ev = el.ownerDocument.createEvent('Events');
+    ev.initEvent(eventName, true, false);
+    ev.charCode = 0;
+    ev.keyCode = 0;
+    ev.which = 0;
+    ev.srcElement = el;
+    ev.target = el;
+  }
+
+  return ev;
+}
+
+// focus an element and optionally re-set its value after focusing
+function doFocusElement(el, setValue) {
+  if (setValue) {
+    const existingValue = el.value;
+    el.focus();
+    el.value !== existingValue && (el.value = existingValue);
+  } else {
+    el.focus();
+  }
+}
+
+// set value of the given element
+function setValueForElement(el, setValue = false) {
+  const valueToSet = el.value;
+  doFocusElement(el, setValue);
+  el.dispatchEvent(normalizeEvent(el, 'keydown'));
+  el.dispatchEvent(normalizeEvent(el, 'keypress'));
+  el.dispatchEvent(normalizeEvent(el, 'keyup'));
+  el.value !== valueToSet && (el.value = valueToSet);
+}
+
+// can we see the element to apply some styling?
+function canSeeElementToStyle(el, animateTheFilling) {
+  let currentEl;
+  if (currentEl == animateTheFilling) {
+    a: {
+      currentEl = el;
+      for (var owner = el.ownerDocument, owner = owner ? owner.defaultView : {}, theStyle; currentEl && currentEl !== document;) {
+        theStyle = owner.getComputedStyle ? owner.getComputedStyle(currentEl, null) : currentEl.style;
+        if (!theStyle) {
+          currentEl = true;
+          break a;
+        }
+        if ('none' === theStyle.display || 'hidden' == theStyle.visibility) {
+          currentEl = false;
+          break a;
+        }
+        currentEl = currentEl.parentNode;
+      }
+      currentEl = currentEl === document;
+    }
+  }
+  // START MODIFICATION
+  if (el && !el.type && el.tagName.toLowerCase() === 'span') {
+    return true;
+  }
+  // END MODIFICATION
+  return currentEl ? -1 !== 'email text password number tel url'.split(' ').indexOf(el.type || '') : false;
+}
+
+// set value of the given element by using events
+function setValueForElementByEvent(el) {
+  const valueToSet = el.value,
+    ev1 = el.ownerDocument.createEvent('HTMLEvents'),
+    ev2 = el.ownerDocument.createEvent('HTMLEvents');
+
+  el.dispatchEvent(normalizeEvent(el, 'keydown'));
+  el.dispatchEvent(normalizeEvent(el, 'keypress'));
+  el.dispatchEvent(normalizeEvent(el, 'keyup'));
+  ev2.initEvent('input', true, true);
+  el.dispatchEvent(ev2);
+  ev1.initEvent('change', true, true);
+  el.dispatchEvent(ev1);
+  el.blur();
+  el.value !== valueToSet && (el.value = valueToSet);
+}
+
+// do all the full operations needed
+function doAllFillOperations(el, animateTheFilling, afterValSetFunc) {
+  setValueForElement(el);
+  afterValSetFunc(el);
+  setValueForElementByEvent(el);
+
+  // START MODIFICATION
+  if (canSeeElementToStyle(el, animateTheFilling)) {
+    el.classList.add('com-bitwarden-browser-animated-fill');
+    setTimeout(function () {
+      if (el) {
+        el.classList.remove('com-bitwarden-browser-animated-fill');
+      }
+    }, 200);
+  }
+  // END MODIFICATION
+}
+
+const checkRadioTrueOps = {
+  'true': true,
+  y: true,
+  1: true,
+  yes: true,
+  '✓': true
+}
+
+// fill an element
+function fillTheElement(el, op, animateTheFilling, markTheFilling) {
+  let shouldCheck;
+  if (el && null !== op && void 0 !== op && !(el.disabled || el.a || el.readOnly)) {
+    switch (markTheFilling && el.form && !el.form.opfilled && (el.form.opfilled = true),
+    el.type ? el.type.toLowerCase() : null) {
+      case 'checkbox':
+        shouldCheck = op && 1 <= op.length && checkRadioTrueOps.hasOwnProperty(op.toLowerCase()) && true === checkRadioTrueOps[op.toLowerCase()];
+        el.checked === shouldCheck || doAllFillOperations(el, animateTheFilling, function (theEl) {
+          theEl.checked = shouldCheck;
+        });
+        break;
+      case 'radio':
+        true === checkRadioTrueOps[op.toLowerCase()] && el.click();
+        break;
+      default:
+        el.value == op || doAllFillOperations(el, animateTheFilling, function (theEl) {
+          // START MODIFICATION
+          if (!theEl.type && theEl.tagName.toLowerCase() === 'span') {
+            theEl.innerText = op;
+            return;
+          }
+          // END MODIFICATION
+          theEl.value = op;
+        });
+    }
+  }
+}
 
 function collect(document, undefined) {
   // START MODIFICATION
@@ -293,6 +454,7 @@ function collect(document, undefined) {
 
       return op;
     });
+
     // get all the form fields
     var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
       if (!el.id) {
@@ -754,6 +916,8 @@ function fill(document, fillScript, undefined) {
 
   // fill for reference
   var thisFill = {
+    fill_by_id: doFillById,
+    fill_by_opid: doFillByOpId,
     fill_by_opid: doFillByOpId,
     fill_by_query: doFillByQuery,
     click_on_opid: doClickByOpId,
@@ -780,17 +944,23 @@ function fill(document, fillScript, undefined) {
     return thisFill.hasOwnProperty(thisOperation) ? thisFill[thisOperation].apply(this, op) : null;
   }
 
+  // do a fill by id operation
+  function doFillById(id, op) {
+    var el = document.getElementById(id);
+    return el ? (fillTheElement(el, op, animateTheFilling, markTheFilling), [el]) : null;
+  }
+
   // do a fill by opid operation
   function doFillByOpId(opId, op) {
     var el = getElementByOpId(opId);
-    return el ? (fillTheElement(el, op), [el]) : null;
+    return el ? (fillTheElement(el, op, animateTheFilling, markTheFilling), [el]) : null;
   }
 
   // do a fill by query operation
   function doFillByQuery(query, op) {
     var elements = selectAllFromDoc(query);
     return Array.prototype.map.call(Array.prototype.slice.call(elements), function (el) {
-      fillTheElement(el, op);
+      fillTheElement(el, op, animateTheFilling, markTheFilling);
       return el;
     }, this);
   }
@@ -811,7 +981,6 @@ function fill(document, fillScript, undefined) {
     if (el) {
       'function' === typeof el.focus && doFocusElement(el, true);
     }
-
     return null;
   }
 
@@ -830,114 +999,7 @@ function fill(document, fillScript, undefined) {
     }, this);
   }
 
-  var checkRadioTrueOps = {
-    'true': true,
-    y: true,
-    1: true,
-    yes: true,
-    '✓': true
-  },
-
-    styleTimeout = 200;
-
-  // fill an element
-  function fillTheElement(el, op) {
-    var shouldCheck;
-    if (el && null !== op && void 0 !== op && !(el.disabled || el.a || el.readOnly)) {
-      switch (markTheFilling && el.form && !el.form.opfilled && (el.form.opfilled = true),
-      el.type ? el.type.toLowerCase() : null) {
-        case 'checkbox':
-          shouldCheck = op && 1 <= op.length && checkRadioTrueOps.hasOwnProperty(op.toLowerCase()) && true === checkRadioTrueOps[op.toLowerCase()];
-          el.checked === shouldCheck || doAllFillOperations(el, function (theEl) {
-            theEl.checked = shouldCheck;
-          });
-          break;
-        case 'radio':
-          true === checkRadioTrueOps[op.toLowerCase()] && el.click();
-          break;
-        default:
-          el.value == op || doAllFillOperations(el, function (theEl) {
-            // START MODIFICATION
-            if (!theEl.type && theEl.tagName.toLowerCase() === 'span') {
-              theEl.innerText = op;
-              return;
-            }
-            // END MODIFICATION
-            theEl.value = op;
-          });
-      }
-
-    }
-  }
-
-  // do all the full operations needed
-  function doAllFillOperations(el, afterValSetFunc) {
-    setValueForElement(el);
-    afterValSetFunc(el);
-    setValueForElementByEvent(el);
-
-    // START MODIFICATION
-    if (canSeeElementToStyle(el)) {
-      el.classList.add('com-bitwarden-browser-animated-fill');
-      setTimeout(function () {
-        if (el) {
-          el.classList.remove('com-bitwarden-browser-animated-fill');
-        }
-      }, styleTimeout);
-    }
-    // END MODIFICATION
-  }
-
   document.elementForOPID = getElementByOpId;
-
-  // normalize the event based on API support
-  function normalizeEvent(el, eventName) {
-    var ev;
-    if ('KeyboardEvent' in self) {
-      ev = new self.KeyboardEvent(eventName, {
-        bubbles: true,
-        cancelable: false,
-      });
-    }
-    else {
-      ev = el.ownerDocument.createEvent('Events');
-      ev.initEvent(eventName, true, false);
-      ev.charCode = 0;
-      ev.keyCode = 0;
-      ev.which = 0;
-      ev.srcElement = el;
-      ev.target = el;
-    }
-
-    return ev;
-  }
-
-  // set value of the given element
-  function setValueForElement(el) {
-    var valueToSet = el.value;
-    doFocusElement(el, false);
-    el.dispatchEvent(normalizeEvent(el, 'keydown'));
-    el.dispatchEvent(normalizeEvent(el, 'keypress'));
-    el.dispatchEvent(normalizeEvent(el, 'keyup'));
-    el.value !== valueToSet && (el.value = valueToSet);
-  }
-
-  // set value of the given element by using events
-  function setValueForElementByEvent(el) {
-    var valueToSet = el.value,
-      ev1 = el.ownerDocument.createEvent('HTMLEvents'),
-      ev2 = el.ownerDocument.createEvent('HTMLEvents');
-
-    el.dispatchEvent(normalizeEvent(el, 'keydown'));
-    el.dispatchEvent(normalizeEvent(el, 'keypress'));
-    el.dispatchEvent(normalizeEvent(el, 'keyup'));
-    ev2.initEvent('input', true, true);
-    el.dispatchEvent(ev2);
-    ev1.initEvent('change', true, true);
-    el.dispatchEvent(ev1);
-    el.blur();
-    el.value !== valueToSet && (el.value = valueToSet);
-  }
 
   // click on an element
   function clickElement(el) {
@@ -965,35 +1027,6 @@ function fill(document, fillScript, undefined) {
       setValueForElement(el);
       setValueForElementByEvent(el);
     });
-  }
-
-  // can we see the element to apply some styling?
-  function canSeeElementToStyle(el) {
-    var currentEl;
-    if (currentEl = animateTheFilling) {
-      a: {
-        currentEl = el;
-        for (var owner = el.ownerDocument, owner = owner ? owner.defaultView : {}, theStyle; currentEl && currentEl !== document;) {
-          theStyle = owner.getComputedStyle ? owner.getComputedStyle(currentEl, null) : currentEl.style;
-          if (!theStyle) {
-            currentEl = true;
-            break a;
-          }
-          if ('none' === theStyle.display || 'hidden' == theStyle.visibility) {
-            currentEl = false;
-            break a;
-          }
-          currentEl = currentEl.parentNode;
-        }
-        currentEl = currentEl === document;
-      }
-    }
-    // START MODIFICATION
-    if (el && !el.type && el.tagName.toLowerCase() === 'span') {
-      return true;
-    }
-    // END MODIFICATION
-    return currentEl ? -1 !== 'email text password number tel url'.split(' ').indexOf(el.type || '') : false;
   }
 
   // find the element for this operation
@@ -1033,21 +1066,7 @@ function fill(document, fillScript, undefined) {
     return elements;
   }
 
-  // focus an element and optionally re-set its value after focusing
-  function doFocusElement(el, setValue) {
-    if (setValue) {
-      var existingValue = el.value;
-      el.focus();
-      el.value !== existingValue && (el.value = existingValue);
-    } else {
-      el.focus();
-    }
-  }
-
   doFill(fillScript);
-  return JSON.stringify({
-    success: true
-  });
 }
 
 function scanQRCode(document, tab, isPasswordOTP) {

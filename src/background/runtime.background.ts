@@ -128,19 +128,6 @@ export default class RuntimeBackground {
               });
             }
             break;
-          case "informMenu":
-          case "contextMenu":
-            clearTimeout(this.autofillTimeout);
-            this.pageDetailsToAutoFill.push({
-              frameId: sender.frameId,
-              tab: msg.tab,
-              details: msg.details
-            });
-            this.autofillTimeout = setTimeout(
-              async () => await this.autofillPage(),
-              500
-            );
-            break;
           default:
             break;
         }
@@ -200,32 +187,6 @@ export default class RuntimeBackground {
         break;
       default:
         break;
-    }
-  }
-
-  private async autofillPage() {
-    if (this.main.loginToAutoFill?.id) {
-      const cipherId = this.main.loginToAutoFill.id
-      const cipherFavorite = this.main.loginToAutoFill.favorite
-      const totpCode = await this.autofillService.doAutoFill({
-        cipher: this.main.loginToAutoFill,
-        pageDetails: this.pageDetailsToAutoFill,
-        fillNewPassword: true,
-      });
-  
-      if (totpCode != null) {
-        this.platformUtilsService.copyToClipboard(totpCode, { window: self });
-      }
-      this.main.loginToAutoFill = null;
-      this.pageDetailsToAutoFill = [];
-      const res: any = await this.request.use_cipher(
-        cipherId,
-        { use: true, favorite: cipherFavorite },
-      )
-      const cipherResponse = new CipherResponse(res)
-      const userId = await this.userService.getUserId();
-      const cipherData = new CipherData(cipherResponse, userId);
-      this.cipherService.upsert(cipherData)
     }
   }
 

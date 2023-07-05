@@ -627,7 +627,7 @@ Vue.mixin({
       cipher.type = CipherType.SecureNote
       cipher.secureNote = new SecureNote()
       cipher.secureNote.type = 0
-      cipher.notes = `otpauth://totp/${encodeURIComponent(otpCipher.name)}?secret=${otpCipher.secretKey}&issuer=${encodeURIComponent(otpCipher.name)}&algorithm=sha1&digits=6&period=30`;
+      cipher.notes = otpCipher.secretKey;
       const cipherEnc = await this.$cipherService.encrypt(cipher)
       const data = new CipherRequest(cipherEnc)
       data.type = CipherType.OTP;

@@ -9,13 +9,20 @@
       <div class="mb-2 font-semibold text-gray">
         {{ fillType.name }} ({{ ciphers ? ciphers.length : 0 }})
       </div>
-      <ul class="list-ciphers">
+      <ul v-if="fillType.value !== CipherType.OTP" class="list-ciphers">
         <CipherRow
           v-for="item in (ciphers || [])"
           :fill-type="fillType"
           :key="item.id"
           :item="item"
           @do-fill="$emit('do-fill', item)"
+        />
+      </ul>
+      <ul v-else class="list-ciphers">
+        <OTPRow
+          v-for="item in (ciphers || [])"
+          :key="item.id"
+          :item="item"
         />
       </ul>
     </div>
@@ -25,11 +32,12 @@
 <script>
 import Vue from 'vue'
 import CipherRow from './CipherRow.vue'
+import OTPRow from './OTPRow.vue'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
 export default Vue.extend({
   name: 'MenuCiphers',
-  components: { CipherRow },
+  components: { CipherRow, OTPRow },
   props: {
     fillTypes: {
       type: Array,
@@ -42,6 +50,7 @@ export default Vue.extend({
   },
   data () {
     return {
+      CipherType
     }
   },
   computed: {

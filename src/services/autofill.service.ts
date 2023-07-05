@@ -151,29 +151,25 @@ export default class AutofillService implements AutofillServiceInterface {
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
-    
-    if (passwordFields.length === 0) {
-      return formData;
-    }
+    const otpFields = this.loadOTPFields(pageDetails, true, true, false)
 
     for (const formKey in pageDetails.forms) {
       if (!pageDetails.forms.hasOwnProperty(formKey)) {
         continue;
       }
-
       const formPasswordFields = passwordFields.filter(pf => formKey === pf.form);
-      if (formPasswordFields.length > 0) {
-        let uf = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false);
-        if (uf == null) {
-          uf = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false);
-        }
-        formData.push({
-          form: pageDetails.forms[formKey],
-          password: formPasswordFields[0],
-          username: uf,
-          passwords: formPasswordFields,
-        });
+      const formOTPFields = otpFields.filter(pf => formKey === pf.form);
+      let uf = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false, pageDetails.forms[formKey]);
+      if (uf == null) {
+        uf = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false, pageDetails.forms[formKey]);
       }
+      formData.push({
+        form: pageDetails.forms[formKey],
+        password: formPasswordFields[0] || null,
+        username: uf || null,
+        passwords: formPasswordFields,
+        otps: formOTPFields,
+      });
     }
 
     return formData;
@@ -391,7 +387,6 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   // Helpers
-
   private async getActiveTab(): Promise<any> {
     const tab = await BrowserApi.getTabFromCurrentWindow();
     if (!tab) {
@@ -454,7 +449,6 @@ export default class AutofillService implements AutofillServiceInterface {
       default:
         return null;
     }
-
     return fillScript;
   }
 
@@ -463,11 +457,8 @@ export default class AutofillService implements AutofillServiceInterface {
     if (!options.cipher.login) {
       return null;
     }
-
     const passwords: AutofillField[] = [];
     const usernames: AutofillField[] = [];
-    let pf: AutofillField = null;
-    let username: AutofillField = null;
     const login = options.cipher.login;
 
     if (!login.password || login.password === '') {
@@ -476,74 +467,26 @@ export default class AutofillService implements AutofillServiceInterface {
       return fillScript;
     }
 
-    let passwordFields = this.loadPasswordFields(pageDetails, false, false, options.onlyEmptyFields,
-      options.fillNewPassword);
+    let passwordFields = this.loadPasswordFields(pageDetails, false, false, options.onlyEmptyFields, options.fillNewPassword);
     if (!passwordFields.length && !options.onlyVisibleFields) {
       // not able to find any viewable password fields. maybe there are some "hidden" ones?
-      passwordFields = this.loadPasswordFields(pageDetails, true, true, options.onlyEmptyFields,
-        options.fillNewPassword);
+      passwordFields = this.loadPasswordFields(pageDetails, true, true, options.onlyEmptyFields, options.fillNewPassword);
     }
 
-    for (const formKey in pageDetails.forms) {
-      if (!pageDetails.forms.hasOwnProperty(formKey)) {
-        continue;
-      }
+    passwordFields.forEach(passField => {
+      passwords.push(passField);
+    });
 
-      const passwordFieldsForForm: AutofillField[] = [];
-      passwordFields.forEach(passField => {
-        if (formKey === passField.form) {
-          passwordFieldsForForm.push(passField);
+    if (login.username) {
+      for (const formKey in pageDetails.forms) {
+        if (!pageDetails.forms.hasOwnProperty(formKey)) {
+          continue;
         }
-      });
-
-      passwordFields.forEach(passField => {
-        pf = passField;
-        passwords.push(pf);
-
-        if (login.username) {
-          username = this.findUsernameField(pageDetails, pf, false, false, false);
-
-          if (!username && !options.onlyVisibleFields) {
-            // not able to find any viewable username fields. maybe there are some "hidden" ones?
-            username = this.findUsernameField(pageDetails, pf, true, true, false);
-          }
-
-          if (username) {
-            usernames.push(username);
-          }
-        }
-      });
-    }
-
-    if (passwordFields.length && !passwords.length) {
-      // The page does not have any forms with password fields. Use the first password field on the page and the
-      // input field just before it as the username.
-
-      pf = passwordFields[0];
-      passwords.push(pf);
-
-      if (login.username && pf.elementNumber > 0) {
-        username = this.findUsernameField(pageDetails, pf, false, false, true);
-
-        if (!username && !options.onlyVisibleFields) {
-          // not able to find any viewable username fields. maybe there are some "hidden" ones?
-          username = this.findUsernameField(pageDetails, pf, true, true, true);
-        }
-
+        const username = this.findUsernameField(pageDetails, null, false, false, false, pageDetails.forms[formKey]);
         if (username) {
           usernames.push(username);
         }
       }
-    }
-
-    if (!passwordFields.length && !options.skipUsernameOnlyFill) {
-      // No password fields on this page. Let's try to just fuzzy fill the username.
-      pageDetails.fields.forEach((f: any) => {
-        if (f.viewable && (f.type === 'text' || f.type === 'email' || f.type === 'tel') &&
-          this.fieldIsFuzzyMatch(f, UsernameFieldNames)) {
-          usernames.push(f);
-        }
-      });
     }
 
     usernames.forEach(u => {
@@ -1137,12 +1080,74 @@ export default class AutofillService implements AutofillServiceInterface {
     return arr;
   }
 
+  private loadOTPFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
+    mustBeEmpty: boolean) {
+    const arr: AutofillField[] = [];
+    pageDetails.fields.forEach(f => {
+      if (this.forCustomFieldsOnly(f)) {
+        return;
+      }
+
+      const valueIsLikeOTP = (value: string) => {
+        if (value == null) {
+          return false;
+        }
+        // Removes all whitespace, _ and - characters
+        const cleanedValue = value.toLowerCase().replace(/[\s_\-]/g, '');
+        if (cleanedValue.indexOf('otp') < 0 && cleanedValue.indexOf('code') < 0) {
+          return false;
+        }
+        return true;
+      };
+      const isLikeOTP = () => {
+        if (f.type === 'password') {
+          return false;
+        }
+        if (valueIsLikeOTP(f.htmlID)) {
+          return true;
+        }
+        if (valueIsLikeOTP(f.htmlName)) {
+          return true;
+        }
+        if (valueIsLikeOTP(f.placeholder)) {
+          return true;
+        }
+        return false;
+      };
+      if (
+        !f.disabled
+        && isLikeOTP()
+        && (canBeReadOnly || !f.readonly)
+        && (canBeHidden || f.viewable)
+        && (!mustBeEmpty || f.value == null || f.value.trim() === '')
+      ) {
+        arr.push(f);
+      }
+    });
+    return arr;
+  }
+
   private findUsernameField(pageDetails: AutofillPageDetails, passwordField: AutofillField, canBeHidden: boolean,
-                            canBeReadOnly: boolean, withoutForm: boolean) {
+                            canBeReadOnly: boolean, withoutForm: boolean, form?: any) {
     let usernameField: AutofillField = null;
-    for (let i = 0; i < pageDetails.fields.length; i++) {
+    for (let i = 0; i < pageDetails.fields.length; i += 1) {
       const f = pageDetails.fields[i];
       if (this.forCustomFieldsOnly(f)) {
+        continue;
+      }
+      if (!passwordField) {
+        if (
+          !f.disabled &&
+          (canBeReadOnly || !f.readonly) &&
+          (f.form === form.opid) &&
+          (canBeHidden || f.viewable) &&
+          (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
+          usernameField = f;
+  
+          if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
+            break;
+          }
+        }
         continue;
       }
 
@@ -1150,8 +1155,11 @@ export default class AutofillService implements AutofillServiceInterface {
         break;
       }
 
-      if (!f.disabled && (canBeReadOnly || !f.readonly) &&
-        (withoutForm || f.form === passwordField.form) && (canBeHidden || f.viewable) &&
+      if (
+        !f.disabled &&
+        (canBeReadOnly || !f.readonly) &&
+        (withoutForm || f.form === passwordField.form) &&
+        (canBeHidden || f.viewable) &&
         (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
         usernameField = f;
 
@@ -1327,6 +1335,7 @@ export default class AutofillService implements AutofillServiceInterface {
       fillScript.script.push(['focus_by_opid', field.opid]);
     }
     fillScript.script.push(['fill_by_opid', field.opid, value]);
+    fillScript.script.push(['fill_by_id', field.htmlID, value]);
   }
 
   private forCustomFieldsOnly(field: AutofillField): boolean {

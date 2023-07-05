@@ -114,19 +114,19 @@ export default class NotificationBackground {
               if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
                 this.autofillFirstPage(sender.tab);
               }
+
+              // check is otp page
+              if (forms.find((f) => f.otps.length > 0)) {
+                this.autofillOTPFirstPage(sender.tab);
+              }
             })
             this.main.refreshBadgeAndMenu()
             break;
           case 'autofillItem':
-            const pageDetails = [msg.details];
             if (
               msg.cipher.reprompt !== CipherRepromptType.None && this.passwordRepromptService &&
               !(await this.passwordRepromptService.showPasswordPrompt())
             ) {
-              return;
-            }
-      
-            if (pageDetails == null || pageDetails.length === 0) {
               return;
             }
             const pageDetailsObj = {
@@ -135,16 +135,42 @@ export default class NotificationBackground {
               details: msg.details,
             };
             try {
-              await this.autofillService.doAutoFill({
+              const totpPromise = await this.autofillService.doAutoFill({
                 cipher: msg.cipher,
                 pageDetails: [pageDetailsObj],
                 fillNewPassword: true,
               });
+              await this.request.use_cipher(
+                msg.cipher.id,
+                { use: true, favorite: msg.cipher.favorite },
+              )
+              if (totpPromise) {
+                this.storageService.save('login_totp_cipher', msg.cipher)
+                setTimeout(async () => {
+                  await this.storageService.remove('login_totp_cipher')
+                }, 60000);
+              }
             } catch (e) {
               BrowserApi.tabSendMessage(msg.tab, {
                 command: 'alert',
                 tab: msg.tab,
                 type: 'autofill_error',
+              });
+            }
+            break
+          case 'autofillOTP':
+            let totp = '';
+            if (msg.cipher.type == CipherType.Login) {
+              totp = await this.totpService.getCode(msg.cipher.login.totp);
+            } else if (msg.cipher.type == CipherType.OTP) {
+              totp = await this.totpService.getCode(msg.cipher.notes);
+            }
+            if (totp) {
+              const otpForms = this.autofillService.getFormsWithPasswordFields(msg.details);
+              BrowserApi.tabSendMessage(msg.tab, {
+                command: 'fillOTPForm',
+                forms: otpForms.filter((f) => f.otps.length > 0),
+                totp: totp
               });
             }
             break
@@ -223,25 +249,29 @@ export default class NotificationBackground {
         const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
         const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
         if (loginCiphers.length > 0) {
-          await this.startAutofillPage(loginCiphers[0])
+          BrowserApi.tabSendMessage(tab, {
+            command: 'collectPageDetails',
+            tab: tab,
+            sender: 'autofillItem',
+            cipher: loginCiphers[0]
+          });
         }
       }
     } catch (error) {
     }
   }
 
-  private async startAutofillPage(cipher: CipherView) {
-    this.main.loginToAutoFill = cipher;
-    const tab = await BrowserApi.getTabFromCurrentWindow();
-    if (tab == null) {
-      return;
+  private async autofillOTPFirstPage(tab: chrome.tabs.Tab) {
+    const loginTOTPCipher: any = await this.storageService.get('login_totp_cipher') || null
+    if (loginTOTPCipher && loginTOTPCipher.login?.totp) {
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillOTP',
+        cipher: loginTOTPCipher
+      });
     }
-
-    BrowserApi.tabSendMessage(tab, {
-      command: 'collectPageDetails',
-      tab: tab,
-      sender: 'informMenu'
-    });
+    await this.storageService.remove('login_totp_cipher')
   }
 
   async checkNotificationQueue(tab: chrome.tabs.Tab = null, loginInfo: object = null): Promise<void> {

@@ -67,7 +67,9 @@ module.exports = {
     never: 'Never',
     add_url: "Add Domain or URL",
     item: "Item",
-    option: 'Option'
+    option: 'Option',
+    otp: 'OTP',
+    saved_otp: ''
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -748,6 +750,8 @@ module.exports = {
     unlock_now: "Unlock now",
     domain_excluded_note: 'You turned off autofill for this website. Remove website from this list will re-enable autofill for it.',
     remove_now: 'Remove Now',
+    empty_otp: "No OTPs found.",
+    saved_otp: "Saved OTP"
   },
   bar: {
     create_title: "Should Locker remember this password for you?",
