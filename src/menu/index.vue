@@ -11,14 +11,14 @@
       style="height: calc(100% - 56px)"
     >
       <MenuSearch
-        v-if="tab === 2 && !isLocked"
+        v-if="tab === 2 && !isLocked && !isOTP"
         :fill-types="fillTypes"
         :fill-type="currentFillType"
         @change="(v) => fillType = v"
       />
-      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked }">
+      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked && !isOTP}">
         <PasswordGenerator
-          v-if="tab === 1"
+          v-if="tab === 1 && !isOTP"
           is-over
         />
         <MenuCiphers
@@ -62,8 +62,8 @@ export default Vue.extend({
   },
   data () {
     return {
-      tab: this.$route.query?.generate == 1 ? 1 : 2,
-      fillType: 0
+      tab: Number(this.$route.query?.tab || 2),
+      fillType: Number(this.$route.query?.type || 0),
     }
   },
   asyncComputed: {
@@ -97,6 +97,7 @@ export default Vue.extend({
         {
           value: 1,
           name: this.$t('menu.generate_password'),
+          disabled: this.isOTP,
           onclick: () => { this.tab = 1 }
         },
         {
@@ -142,6 +143,12 @@ export default Vue.extend({
           name: this.$t('common.personal_information'),
           title: this.$t('menu.saved_identity'),
           empty: this.$t('menu.empty_identity'),
+        },
+        {
+          value: CipherType.OTP,
+          name: this.$t('common.otp'),
+          title: this.$t('menu.saved_otp'),
+          empty: this.$t('menu.empty_otp'),
         }
       ]
     },
@@ -150,7 +157,10 @@ export default Vue.extend({
     },
     currentFillType() {
       return this.fillTypes.find((t) => t.value == this.fillType)
-    }
+    },
+    isOTP () {
+      return this.currentFillType.value === CipherType.OTP
+    },
   },
   methods: {
   }

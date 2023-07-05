@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', event => {
 
             pageHref = self.location.href;
             const msg: any = {
-                command: 'bgCollectPageDetails',
-                sender: 'autofiller',
+              command: 'bgCollectPageDetails',
+              sender: 'autofiller',
             };
 
             chrome.runtime.sendMessage(msg);

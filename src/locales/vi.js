@@ -94,7 +94,8 @@ module.exports = {
     detail: "Chi tiết",
     add_url: "Thêm tên miền hoặc đường dẫn",
     item: "Item",
-    option: 'Lựa chọn'
+    option: 'Lựa chọn',
+    otp: 'OTP'
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -793,6 +794,8 @@ module.exports = {
     unlock_now: "Mở khóa",
     domain_excluded_note: 'Bạn đã tắt tính năng tự động điền cho trang web này. Xóa trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho trang web đó.',
     remove_now: 'Xóa',
+    empty_otp: "Không tìm thấy mã.",
+    saved_otp: "Mã đã lưu"
   },
   bar: {
     create_title: "Locker có nên nhớ mật khẩu này cho bạn không?",

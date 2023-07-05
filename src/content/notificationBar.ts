@@ -1,5 +1,7 @@
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
+import { CipherType } from "jslib-common/enums/cipherType";
+
 import {
   OBSERVE_IGNORED_ELEMENTS,
   CANCEL_BUTTON_NAMES,
@@ -81,6 +83,14 @@ document.addEventListener('DOMContentLoaded', event => {
           } catch (error) {
           }
         }
+        for (let i = 0; i < msg.data.forms.length; i++) {
+          const form = msg.data.forms[i];
+          if (form.otps?.length === 1) {
+            setFillLogo(form.otps[0], "otp", msg.data.isLocked)
+          } else if (form.otps.length === 6) {
+            setFillLogo(form.otps[5], "otp", msg.data.isLocked, true)
+          }
+        }
       })
     } else if (msg.command === "closeInformMenu") {
       closeAllInformMenu()
@@ -135,12 +145,10 @@ document.addEventListener('DOMContentLoaded', event => {
             break;
           }
         }
-
         if (doCollect) {
           if (domObservationCollectTimeout != null) {
             self.clearTimeout(domObservationCollectTimeout);
           }
-
           domObservationCollectTimeout = self.setTimeout(() => {
             sendPlatformMessage({
               command: 'bgCollectPageDetails',
@@ -149,7 +157,6 @@ document.addEventListener('DOMContentLoaded', event => {
           }, 1000);
         }
       });
-
       observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter: ['style'] });
     }
   }
@@ -168,22 +175,20 @@ document.addEventListener('DOMContentLoaded', event => {
         observer.disconnect();
         observer = null;
       }
-
       sendPlatformMessage({
         command: 'bgCollectPageDetails',
         sender: 'notificationBar',
       });
-
       if (observeDomTimeout != null) {
         self.clearTimeout(observeDomTimeout);
       }
       observeDomTimeout = self.setTimeout(observeDom, 1000);
+    } else {
+      if (collectIfNeededTimeout != null) {
+        self.clearTimeout(collectIfNeededTimeout);
+      }
+      collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
     }
-
-    if (collectIfNeededTimeout != null) {
-      self.clearTimeout(collectIfNeededTimeout);
-    }
-    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function watchForms(forms: any[]) {
@@ -218,7 +223,7 @@ document.addEventListener('DOMContentLoaded', event => {
     });
   }
 
-  function setFillLogo(el, type = 'password', isLocked = false) {
+  function setFillLogo(el, type = 'password', isLocked = false, isOver = false) {
     const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
     for (let i = 0; i < elements.length; i++) {
@@ -263,7 +268,10 @@ document.addEventListener('DOMContentLoaded', event => {
           }
         })
         inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-        if (elPosition.width <= 0) {
+        if (isOver) {
+          logo.style.right = `-28px`;
+          logo.style.top = `20px`;
+        } else if (elPosition.width <= 0) {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
         } else {
@@ -316,12 +324,18 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
     closeAllInformMenu()
-
     const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
+    let defaultType = 0, defaultTab = 2
+    if (isSignUp && type === 'password') {
+      defaultTab = 1
+    } else if (type === 'otp') {
+      defaultTab = 2
+      defaultType = CipherType.OTP
+    }
     const barPageUrl: string = chrome.runtime.getURL(
-      "popup.html#/menu" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+      "popup.html#/menu" + `?tab=${defaultTab}&type=${defaultType}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -331,6 +345,7 @@ document.addEventListener('DOMContentLoaded', event => {
       left: ${getOffsetLeft(inputEl)}px;
       position: absolute;
       height: 300px;
+      min-width: 300px;
       width: ${elPosition.width}px !important;
       border: 0;
       min-height: initial;

@@ -90,16 +90,15 @@ export default class ContextMenusBackground {
   }
 
   private async startAutofillPage(cipher: CipherView) {
-    this.main.loginToAutoFill = cipher;
     const tab = await BrowserApi.getTabFromCurrentWindow();
     if (tab == null) {
       return;
     }
-
     BrowserApi.tabSendMessage(tab, {
       command: 'collectPageDetails',
       tab: tab,
-      sender: 'contextMenu'
+      sender: 'autofillItem',
+      cipher: cipher
     });
   }
 }
