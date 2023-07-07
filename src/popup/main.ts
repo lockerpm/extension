@@ -592,6 +592,10 @@ Vue.mixin({
       })
     },
     async fillCipher(cipher) {
+      await cystackPlatformAPI.use_cipher(
+        cipher.id,
+        { use: true, favorite: cipher.favorite },
+      )
       const tab = await BrowserApi.getTabFromCurrentWindow();
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
