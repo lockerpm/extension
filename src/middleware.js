@@ -12,7 +12,7 @@ NProgress.configure({ showSpinner: false })
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start()
-  const store = await storePromise;
+  const store = await storePromise();
   const isLocked = await vaultTimeoutService.isLocked()
   const accessToken = await browserStorageService.get('cs_token')
   if (to.meta?.isOver) {
@@ -28,7 +28,7 @@ router.beforeEach(async (to, from, next) => {
       router.push({ name: 'vault'}).catch(() => ({}))
     }
   } else if (isLocked) {
-    if (!!store.state.isLoggedIn && accessToken && store.state.user.email && !!store.state.userPw) {
+    if (accessToken && store.state.user.email && !!store.state.userPw) {
       if (to.meta?.isLock) {
         const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
         const isMpm = store.state.userPw && store.state.userPw.is_pwd_manager

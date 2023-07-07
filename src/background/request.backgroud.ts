@@ -1,4 +1,3 @@
-import axios from "axios";
 import MainBackground from './main.background';
 import ENDPOINT from "@/config/endpoint";
 
@@ -22,7 +21,7 @@ export default class RequestBackground {
     }).then(async (response) => {
       return await response.json()
     }).catch((error) => {
-      return error
+      return Promise.reject(error);
     });
   }
 
@@ -46,14 +45,6 @@ export default class RequestBackground {
     return await this.request({
       url: ENDPOINT.CYSTACK_PLATFORM_CIPHERS_VAULTS,
       method: "post",
-      data
-    });
-  }
-
-  async update_cipher(id: any, data = {}) {
-    return await this.request({
-      url: ENDPOINT.CYSTACK_PLATFORM_CIPHERS_DETAIL.replace(':id', id),
-      method: "put",
       data
     });
   }

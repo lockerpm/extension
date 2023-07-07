@@ -15,6 +15,7 @@ Vue.use(Vuex)
 const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
 
+const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
 const USER_KEY = 'cs_user'
 const USER_PW_KEY = 'cs_user_pw'
@@ -45,7 +46,31 @@ const defaultLoginInfo = {
   forgot_token: null
 }
 
-export default storageService.get(STORAGE_KEY).then(async oldStore => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const asyncStore = async () => {
+  const accessToken = await storageService.get(TOKEN_KEY)
+  const oldStore: any = await storageService.get(STORAGE_KEY)
+  let user: any = await storageService.get(USER_KEY)
+  let userPw = await storageService.get(USER_PW_KEY)
+  let isLoggedIn = !!accessToken
+
+  if (accessToken && (!user || !user.email)) {
+    await meAPI.me().then(async (response) => {
+      isLoggedIn = true;
+      user = response
+    }).catch(async () => {
+      isLoggedIn = false;
+      user = JSON.parse(JSON.stringify(defaultUser))
+    });
+    await cystackPlatformAPI.users_me().then(async response => {
+      userPw = response
+    }).catch(async () => {
+      userPw = { is_pwd_manager: false }
+    });
+    await storageService.save(USER_KEY, user)
+    await storageService.save(USER_PW_KEY, userPw)
+  }
+
   let oldStoreParsed = {
     language: 'en',
     ...JSON.parse(JSON.stringify(defaultLoginInfo)),
@@ -54,20 +79,20 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
     oldStoreParsed = {
       ...oldStoreParsed,
       ...oldStore,
+      isLoggedIn: isLoggedIn
     }
   }
-
-  const user = await storageService.get(USER_KEY)
-  const userPw = await storageService.get(USER_PW_KEY) || { is_pwd_manager: false }
+  
 
   return new Vuex.Store({
     state: {
       init: false,
       isLoggedIn: false,
       user: {
-        ...JSON.parse(JSON.stringify(user || defaultUser)),
+        ...JSON.parse(JSON.stringify(user)),
         language: oldStoreParsed.language,
       },
+      userPw: JSON.parse(JSON.stringify(userPw)),
       notifications: {
         results: [],
         unread_count: 0,
@@ -77,8 +102,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       isDev: 'dev',
       environment: 'dev',
       loading: false,
-      userPw: JSON.parse(JSON.stringify(userPw)),
-      isLoggedInPw: false,
       syncedCiphersToggle: false,
       syncedExcludeDomains: false,
       syncing: false,
@@ -104,7 +127,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
         state.isLoggedIn = isLoggedIn
-        runtimeBackground.updateStoreService('isLoggedIn', isLoggedIn)
       },
       CLEAR_ALL_DATA (state) {
         state.use = JSON.parse(JSON.stringify(defaultUser)),
@@ -134,9 +156,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
       },
       UPDATE_LOADING (state, loading) {
         state.loading = loading
-      },
-      UPDATE_IS_LOGGEDIN_PW (state, value) {
-        state.isLoggedInPw = value
       },
       UPDATE_SYNCED_CIPHERS (state) {
         state.syncedCiphersToggle = !state.syncedCiphersToggle
@@ -265,4 +284,6 @@ export default storageService.get(STORAGE_KEY).then(async oldStore => {
     },
     plugins: []
   })
-})
+}
+
+export default asyncStore

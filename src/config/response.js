@@ -12,7 +12,7 @@ export function handleResponseErrorMessage(error) {
     }
     if (error.response.status === 401) {
       storageService.remove('cs_token')
-      storePromise.then(async (store) => {
+      storePromise().then(async (store) => {
         store.commit('UPDATE_LOGIN_PAGE_INFO', null)
         await self.bitwardenMain.onLogout(false)
         store.commit('UPDATE_IS_LOGGEDIN', false)

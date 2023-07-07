@@ -421,7 +421,6 @@ export default class NotificationBackground {
     data.type = CipherType.OTP;
     try {
       const res: any = await this.request.create_ciphers_vault(data);
-
       const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
