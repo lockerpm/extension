@@ -93,6 +93,13 @@ document.addEventListener('DOMContentLoaded', event => {
       closeAllInformMenu()
     } else if (msg.command === 'openPopupIframe') {
       openPopupIframe()
+    } else if (msg.command === 'resizeMenuInfo') {
+      const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
+      if (menuEls && menuEls.length > 0) {
+        for (let i = 0; i < menuEls.length; i += 1) {
+          menuEls[i].style.setProperty('height', `${msg.data.height}px`, '');
+        };
+      }
     }
     sendResponse();
     return true;
@@ -254,7 +261,7 @@ document.addEventListener('DOMContentLoaded', event => {
           const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
           if (logo.contains(e.target)) {
             if (!menuEl) {
-              openInformMenu(inputEl, type);
+              openInformMenu(inputEl, type, isOver);
             } else {
               menuEl.parentElement.removeChild(menuEl)
             }
@@ -316,7 +323,7 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
-  function openInformMenu(inputEl: any, type: string = 'password') {
+  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
     if (!document.body) {
       return;
     }
@@ -338,8 +345,8 @@ document.addEventListener('DOMContentLoaded', event => {
     iframe.id = iframeId;
     iframe.className = iframeClass;
     iframe.style.cssText = `
-      top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
-      left: ${getOffsetLeft(inputEl)}px;
+      top: ${!isOver ? (getOffsetTop(inputEl) + elPosition.height + 10) : (getOffsetTop(inputEl) + elPosition.height / 2 + 18)}px;
+      left: ${!isOver ? getOffsetLeft(inputEl) : (getOffsetLeft(inputEl) + inputEl.offsetWidth + 10) }px;
       position: absolute;
       height: 300px;
       min-width: 300px;

@@ -1,6 +1,6 @@
 <template>
   <div id="password-generator" class="p-4">
-    <div class="pb-4">
+    <div>
       <div class="flex items-center justify-between mb-1 generated-password-container">
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
@@ -224,7 +224,7 @@ export default {
 </script>
 <style>
 .generator-option {
-  @apply w-full py-2;
+  @apply w-full pt-2;
   margin-right: 0 !important;
 }
 </style>

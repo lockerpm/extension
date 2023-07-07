@@ -736,7 +736,6 @@ module.exports = {
     generate_password: "Generate Password",
     fill_something_else: "Fill something else",
     turn_off: "Turn off for this page",
-    turn_on: "Turn on for this page",
     saved_login: "Saved Login",
     saved_card: "Saved Card Payment",
     saved_identity: "Saved Personal Information",
@@ -749,7 +748,7 @@ module.exports = {
     login_now: "Login now",
     unlock_now: "Unlock now",
     domain_excluded_note: 'You turned off autofill for this website. Remove website from this list will re-enable autofill for it.',
-    remove_now: 'Remove Now',
+    turn_on: 'Turn On',
     empty_otp: "No OTPs found.",
     saved_otp: "Saved OTP"
   },

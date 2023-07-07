@@ -32,7 +32,7 @@
     </div>
     <MenuExcluded
       v-else
-      @remove="() => removeDomain(excluded)"
+      @turnOn="() => removeDomain(excluded, false)"
     />
   </div>
 </template>
@@ -64,6 +64,7 @@ export default Vue.extend({
       CipherType,
       tab: Number(this.$route.query?.tab || 2),
       fillType: Number(this.$route.query?.type || 0),
+      browserTab: null
     }
   },
   asyncComputed: {
@@ -98,12 +99,22 @@ export default Vue.extend({
           value: 1,
           name: this.$t('menu.generate_password'),
           disabled: this.isOTP,
-          onclick: () => { this.tab = 1 }
+          onclick: async () => {
+            if (this.browserTab) {
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
+            }
+            this.tab = 1
+          }
         },
         {
           value: 2,
           name: this.$t('menu.fill_something_else'),
-          onclick: () => { this.tab = 2 }
+          onclick: async () => {
+            if (this.browserTab) {
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
+            }
+            this.tab = 2
+          }
         },
         {
           value: 3,
@@ -112,8 +123,9 @@ export default Vue.extend({
           divided: true,
           disabled: this.isLocked,
           onclick: async () => {
-            const currentUrlTab = await BrowserApi.getTabFromCurrentWindow();
-            this.addExcludeDomain(currentUrlTab.url)
+            if (this.browserTab) {
+              this.addExcludeDomain(this.browserTab.url, () => ({}), false)
+            }
           }
         },
       ]
@@ -161,6 +173,9 @@ export default Vue.extend({
     isOTP () {
       return this.currentFillType.value === CipherType.OTP
     },
+  },
+  async mounted() {
+    this.browserTab = await BrowserApi.getTabFromCurrentWindow();
   },
   methods: {
   }

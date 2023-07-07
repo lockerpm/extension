@@ -8,9 +8,9 @@
         type="primary"
         plain
         size="small"
-        @click="$emit('remove')"
+        @click="$emit('turnOn')"
       >
-        {{ $t('menu.remove_now') }}
+        {{ $t('menu.turn_on') }}
       </el-button>
     </div>
   </div>
