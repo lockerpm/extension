@@ -135,20 +135,19 @@ export default class RuntimeBackground {
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
-          try {
-            await this.storageService.save("cs_token", msg.token);
-            this.request.sso_access_token({
-              SERVICE_URL: "/sso",
-              SERVICE_SCOPE: "pwdmanager",
-              CLIENT: "browser"
-            }).then(async (result: any) => {
-              const access_token = result ? result.access_token : "";
-              await this.storageService.save("cs_token", access_token);
-              await this.updateStoreService('isLoggedIn', true);
-              await this.handleOpenPopupIframe(3000)
-            });
-          } catch (e) {
-          }
+          await this.storageService.save("cs_token", msg.token);
+          this.request.sso_access_token({
+            SERVICE_URL: "/sso",
+            SERVICE_SCOPE: "pwdmanager",
+            CLIENT: "browser"
+          }).then(async (result: any) => {
+            const access_token = result ? result.access_token : "";
+            await this.storageService.save("cs_token", access_token);
+            this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
+            await this.handleOpenPopupIframe(3000)
+          }).catch(() => {
+            this.storageService.save("cs_token", null);
+          });
         }
         break;
       case "sso-authResult":
@@ -161,7 +160,6 @@ export default class RuntimeBackground {
             }
           })
         } else {
-          await this.updateStoreService('isLoggedIn', true);
           this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
@@ -223,6 +221,7 @@ export default class RuntimeBackground {
     }
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
+      BrowserApi.tabSendMessageData(tab, 'closePopupIframe')
       let url = ''
       if (type === 'id-info') {
         BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);

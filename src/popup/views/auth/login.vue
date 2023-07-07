@@ -109,20 +109,18 @@ export default Vue.extend({
         const data: any = await authAPI.sso_access_token(payload);
         if(data.access_token){
           await this.$storageService.save('cs_token', data.access_token)
-          const userInfo = await meAPI.me();
+          await this.$store.dispatch("LoadCurrentUser");
           cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
             this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
               preloginData: {
-                ...userInfo,
+                ...this.$store.state.user,
                 ...response,
               }
             })
             if (response.login_method === 'passwordless' || response.require_passwordless) {
               this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
             } else {
-              await this.$store.dispatch("LoadCurrentUser");
               await this.$store.dispatch("LoadCurrentUserPw");
-              await this.$runtimeBackground.updateStoreService('isLoggedIn', true)
               this.$store.commit('UPDATE_IS_LOGGEDIN', true)
               this.$router.push({ name: 'lock' }).catch(() => ({}))
             }

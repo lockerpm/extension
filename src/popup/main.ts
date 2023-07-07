@@ -13,6 +13,7 @@ import VueNativeSock from "vue-native-websocket";
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
 import storePromise from '@/store'
+
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
 import { CipherType } from "jslib-common/enums/cipherType";
@@ -206,10 +207,6 @@ Vue.mixin({
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
-      const deviceIdentifier = deviceId || this.randomString();
-      if (!deviceId) {
-        this.$storageService.save("device_id", deviceIdentifier);
-      }
       try {
         await this.$cryptoService.clearKeys();
         if (!isPwl) {
@@ -220,7 +217,7 @@ Vue.mixin({
             password: hashedPassword,
             device_name: this.$platformUtilsService.getDeviceString(),
             device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceIdentifier
+            device_identifier: deviceId
           })
 
           await this.$runtimeBackground.handleUnlocked('loggedIn')
@@ -246,7 +243,7 @@ Vue.mixin({
             email: this.loginInfo.user_info.email,
             device_name: this.$platformUtilsService.getDeviceString(),
             device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceIdentifier
+            device_identifier: deviceId
           })
           await this.$storageService.save('cs_token', res.access_token)
           setTimeout( async () => {
@@ -688,7 +685,7 @@ Vue.filter('filterString', function (value) {
   return value
 })
 
-storePromise.then((store) => {
+storePromise().then((store) => {
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
   new Vue({

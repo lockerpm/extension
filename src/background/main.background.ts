@@ -91,6 +91,8 @@ import BrowserStorageService from '../services/browserStorage.service';
 import I18nService from '../services/i18n.service';
 import VaultTimeoutService from '../services/vaultTimeout.service';
 
+import { nanoid } from 'nanoid'
+
 export default class MainBackground {
   messagingService: MessagingServiceAbstraction;
   storageService: StorageServiceAbstraction;
@@ -475,6 +477,10 @@ export default class MainBackground {
   }
 
   async bootstrap() {
+    const deviceId = this.storageService.get("device_id");
+    if (!deviceId) {
+      this.storageService.save("device_id", nanoid());
+    }
     this.containerService.attachToWindow(self);
 
     (this.authService as AuthService).init();
@@ -592,8 +598,6 @@ export default class MainBackground {
 
     this.searchService.clearIndex();
     this.messagingService.send('doneLoggingOut', { expired: expired });
-
-    await this.runtimeBackground.updateStoreService('isLoggedIn', false)
 
     await this.setIcon();
     await this.refreshBadgeAndMenu();
