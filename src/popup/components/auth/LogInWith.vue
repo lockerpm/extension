@@ -57,18 +57,10 @@ export default Vue.extend({
   },
   methods: {
     async openRegister() {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'register' },
-      };
-      chrome.runtime.sendMessage(msg);
+      await this.$runtimeBackground.authAccessToken('register')
     },
-    async loginWith (provider) {
-      const msg: any = {
-        command: 'authAccessToken',
-        sender: { type: 'login', provider: provider },
-      };
-      chrome.runtime.sendMessage(msg);
+    async loginWith (provider: string) {
+      await this.$runtimeBackground.authAccessToken('login', provider)
     },
   }
 })

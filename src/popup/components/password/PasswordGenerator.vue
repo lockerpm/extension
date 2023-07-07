@@ -1,38 +1,73 @@
 <template>
-  <div id="password-generator">
-    <div class="p-4">
+  <div id="password-generator" class="p-4">
+    <div>
       <div class="flex items-center justify-between mb-1 generated-password-container">
         <div class="generated-password text-head-6 flex-grow truncate leading-[1.25rem]">
           {{ password }}
         </div>
-        <div class="ml-2">
-          <button
-            class="btn btn-icon btn-default w-8 h-8 !rounded-full flex items-center justify-center"
+        <div>
+          <el-button
+            circle
+            plain
+            type="primary"
+            size="mini"
             @click="regenerate()"
           >
             <i class="fas fa-redo-alt" />
-          </button>
+          </el-button>
         </div>
       </div>
-      <PasswordStrength
-        v-if="password"
-        :score="passwordStrength.score"
-      />
-      <button
-        v-clipboard:copy="password"
-        v-clipboard:success="clipboardSuccessHandler"
-        class="btn btn-primary w-full mt-4"
-      >
-        {{ $t('data.tools.copy_password') }}
-      </button>
-      <button
-        class="btn btn-primary-reserve w-full mt-2"
-        @click="savePassword"
-      >
-        {{ $t('data.tools.save_with_locker') }}
-      </button>
+      <div class="flex justify-end">
+        <PasswordStrength
+          v-if="password"
+          :score="passwordStrength.score"
+        />
+      </div>
+      <div v-if="isOver">
+        <div class="mt-2">
+          <el-button
+            type="primary"
+            class="w-full"
+            @click="handleUsePassword"
+          >
+            {{ $t('menu.use_this_password') }}
+          </el-button>
+        </div>
+      </div>
+      <div v-else>
+        <div class="mt-2">
+          <el-button
+            v-clipboard:copy="password"
+            v-clipboard:success="clipboardSuccessHandler"
+            type="primary"
+            class="w-full"
+          >
+            {{ $t('data.tools.copy_password') }}
+          </el-button>
+        </div>
+        <div v-if="$route.name === 'add-edit-cipher'" class="mt-2">
+          <el-button
+            type="primary"
+            class="w-full"
+            plain
+            @click="formUsePassword"
+          >
+            {{ $t('menu.use_this_password') }}
+          </el-button>
+        </div>
+        <div v-else class="mt-2">
+          <el-button
+            class="w-full"
+            type="primary"
+            plain
+            @click="savePassword"
+          >
+            {{ $t('data.tools.save_with_locker') }}
+          </el-button>
+        </div>
+      </div>
     </div>
-    <div class="password-generator-options">
+    <div>
       <div class="generator-option">
         <div class="text-black font-semibold -mb-2">{{ $t('common.length') }}</div>
         <el-slider
@@ -86,11 +121,18 @@
 import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import { CipherType } from "jslib-common/enums/cipherType";
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
+  props: {
+    isOver: {
+      type: Boolean,
+      default: false
+    }
+  },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data () {
     return {
@@ -136,8 +178,13 @@ export default {
       }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async formUsePassword () {
+      this.$emit('fill-password', this.password)
+      this.$emit('toggle', false)
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
-      this.$router.push({ name: 'add-item-create', params: { password: this.password } })
+      this.$router.replace({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     padNumber (num, width, padCharacter = '0') {
@@ -165,13 +212,19 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async handleUsePassword () {
+      this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
+      this.closeMenu()
     }
   }
 }
 </script>
 <style>
 .generator-option {
-  @apply w-full py-2;
+  @apply w-full pt-2;
   margin-right: 0 !important;
 }
 </style>

@@ -28,20 +28,28 @@ import { StateService } from 'jslib-common/services/state.service';
 import { PopupSearchService } from './popup-search.service';
 import { PopupUtilsService } from './popup-utils.service';
 import { ImportService } from "jslib-common/abstractions/import.service";
-import AutofillService from '@/services/autofill.service'
 import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
+
+import AutofillService from '@/services/autofill.service';
+import MainBackground from '../../background/main.background';
+import RuntimeBackground from '../../background/runtime.background';
+
 function getBgService<T>(service: string) {
   return (): T => {
     const page = BrowserApi.getBackgroundPage();
-    return page ? page.bitwardenMain[service] as T : null;
+    if (page) {
+      return page.bitwardenMain[service] as T
+    }
+    const bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
+    bitwardenMain.bootstrap().then(() => {});
+    return bitwardenMain[service] as T;
   };
 }
 
-const isPrivateMode = BrowserApi.getBackgroundPage() == null;
-
 const stateService = new StateService();
-const searchService = isPrivateMode ? null : new PopupSearchService(getBgService<SearchService>('searchService')(),
+
+const searchService = new PopupSearchService(getBgService<SearchService>('searchService')(),
   getBgService<CipherService>('cipherService')(), getBgService<ConsoleLogService>('consoleLogService')(),
   getBgService<I18nService>('i18nService')());
 
@@ -75,34 +83,33 @@ export default {
     Vue.prototype.$settingsService = getBgService<SettingsService>("settingsService")()
     Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
     Vue.prototype.$totpService = getBgService<TotpService>('totpService')();
+    Vue.prototype.$runtimeBackground = getBgService<RuntimeBackground>('runtimeBackground')();
 
-    if (!popupUtilsService.inPopup(window)) {
-      window.document.body.classList.add('body-full');
-    } else if (window.screen.availHeight < 600) {
-      window.document.body.classList.add('body-xs');
-    } else if (window.screen.availHeight <= 800) {
-      window.document.body.classList.add('body-sm');
+    if (!popupUtilsService.inPopup(self)) {
+      self.document.body.classList.add('body-full');
+    } else if (self.screen.availHeight < 600) {
+      self.document.body.classList.add('body-xs');
+    } else if (self.screen.availHeight <= 800) {
+      self.document.body.classList.add('body-sm');
     }
 
-    if (!isPrivateMode) {
-      await stateService.save(ConstantsService.disableFaviconKey,
-        await storageService.get<boolean>(ConstantsService.disableFaviconKey));
+    await stateService.save(ConstantsService.disableFaviconKey,
+      await storageService.get<boolean>(ConstantsService.disableFaviconKey));
 
-      await stateService.save(ConstantsService.disableBadgeCounterKey,
-        await storageService.get<boolean>(ConstantsService.disableBadgeCounterKey));
+    await stateService.save(ConstantsService.disableBadgeCounterKey,
+      await storageService.get<boolean>(ConstantsService.disableBadgeCounterKey));
 
-      let theme = await storageService.get<string>(ConstantsService.themeKey);
-      if (theme == null) {
-        theme = await platformUtilsService.getDefaultSystemTheme();
+    let theme = await storageService.get<string>(ConstantsService.themeKey);
+    if (theme == null) {
+      theme = await platformUtilsService.getDefaultSystemTheme();
 
-        platformUtilsService.onDefaultSystemThemeChange(sysTheme => {
-          window.document.documentElement.classList.remove('theme_light', 'theme_dark');
-          window.document.documentElement.classList.add('theme_' + sysTheme);
-        });
-      }
-      window.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
-      window.document.documentElement.classList.add('theme_' + theme);
+      platformUtilsService.onDefaultSystemThemeChange(sysTheme => {
+        self.document.documentElement.classList.remove('theme_light', 'theme_dark');
+        self.document.documentElement.classList.add('theme_' + sysTheme);
+      });
     }
+    self.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
+    self.document.documentElement.classList.add('theme_' + theme);
   },
   getBgService
 }

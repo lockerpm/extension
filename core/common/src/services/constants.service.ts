@@ -13,7 +13,6 @@ export class ConstantsService {
     static readonly vaultTimeoutKey: string = 'lockOption';
     static readonly vaultTimeoutActionKey: string = 'vaultTimeoutAction';
     static readonly lastActiveKey: string = 'lastActive';
-    static readonly neverDomainsKey: string = 'neverDomains';
     static readonly installedVersionKey: string = 'installedVersion';
     static readonly localeKey: string = 'locale';
     static readonly themeKey: string = 'theme';
@@ -46,7 +45,6 @@ export class ConstantsService {
     readonly vaultTimeoutKey: string = ConstantsService.vaultTimeoutKey;
     readonly vaultTimeoutActionKey: string = ConstantsService.vaultTimeoutActionKey;
     readonly lastActiveKey: string = ConstantsService.lastActiveKey;
-    readonly neverDomainsKey: string = ConstantsService.neverDomainsKey;
     readonly installedVersionKey: string = ConstantsService.installedVersionKey;
     readonly localeKey: string = ConstantsService.localeKey;
     readonly themeKey: string = ConstantsService.themeKey;

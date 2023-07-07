@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
-    "dev": "vue-cli-service build --mode development --watch",
+    "dev": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build --watch",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build",
     "build:staging": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build --mode staging",
     "build:production": "cross-env NODE_OPTIONS=--max_old_space_size=10000 vue-cli-service build --mode production",

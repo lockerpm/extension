@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import router from '@/router/popup'
 import JSLib from '@/popup/services/services'
-const browserStorageService = JSLib.getBgService('storageService')()
-import storePromise from '@/store';
-import { BrowserApi } from "@/browser/browserApi";
+const storageService = JSLib.getBgService('storageService')();
+
+import storePromise from '@/store'
 
 export function handleResponseErrorMessage(error) {
   if (error.response) {
     if (error.response.status === 404) {
-      router.push({ name: 'Home' })
+      router.push({ name: 'vault' })
     }
     if (error.response.status === 401) {
-      browserStorageService.remove('cs_token')
+      storageService.remove('cs_token')
       storePromise.then(async (store) => {
         store.commit('UPDATE_LOGIN_PAGE_INFO', null)
-        const page = BrowserApi.getBackgroundPage();
-        await page.bitwardenMain.onLogout(false)
+        await self.bitwardenMain.onLogout(false)
         store.commit('UPDATE_IS_LOGGEDIN', false)
         store.commit('CLEAR_ALL_DATA')
 
-        setTimeout(() => {
-          if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
+        setTimeout(async () => {
+          if (router.currentRoute.name !== 'login' && !router.currentRoute.meta?.isOver) {
+            router.push({ name: "login" }).catch(() => ({}));
           }
         }, 1000);
       })

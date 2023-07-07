@@ -16,25 +16,25 @@ document.addEventListener('DOMContentLoaded', event => {
     });
 
     function doFillIfNeeded(force: boolean = false) {
-        if (force || pageHref !== window.location.href) {
+        if (force || pageHref !== self.location.href) {
             if (!force) {
                 // Some websites are slow and rendering all page content. Try to fill again later
                 // if we haven't already.
                 filledThisHref = false;
                 if (delayFillTimeout != null) {
-                    window.clearTimeout(delayFillTimeout);
+                  self.clearTimeout(delayFillTimeout);
                 }
-                delayFillTimeout = window.setTimeout(() => {
+                delayFillTimeout = self.setTimeout(() => {
                     if (!filledThisHref) {
                         doFillIfNeeded(true);
                     }
                 }, 1500);
             }
 
-            pageHref = window.location.href;
+            pageHref = self.location.href;
             const msg: any = {
-                command: 'bgCollectPageDetails',
-                sender: 'autofiller',
+              command: 'bgCollectPageDetails',
+              sender: 'autofiller',
             };
 
             chrome.runtime.sendMessage(msg);
