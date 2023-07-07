@@ -13,6 +13,7 @@ import VueNativeSock from "vue-native-websocket";
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
 import storePromise from '@/store'
+
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
 import { CipherType } from "jslib-common/enums/cipherType";
@@ -688,7 +689,7 @@ Vue.filter('filterString', function (value) {
   return value
 })
 
-storePromise.then((store) => {
+storePromise().then((store) => {
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
   new Vue({

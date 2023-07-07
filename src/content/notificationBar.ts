@@ -93,6 +93,8 @@ document.addEventListener('DOMContentLoaded', event => {
       closeAllInformMenu()
     } else if (msg.command === 'openPopupIframe') {
       openPopupIframe()
+    } else if (msg.command === 'closePopupIframe') {
+      closePopupIframe()
     } else if (msg.command === 'resizeMenuInfo') {
       const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
       if (menuEls && menuEls.length > 0) {

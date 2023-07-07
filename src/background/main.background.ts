@@ -590,8 +590,6 @@ export default class MainBackground {
     this.searchService.clearIndex();
     this.messagingService.send('doneLoggingOut', { expired: expired });
 
-    await this.runtimeBackground.updateStoreService('isLoggedIn', false)
-
     await this.setIcon();
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
