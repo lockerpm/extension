@@ -207,10 +207,6 @@ Vue.mixin({
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
-      const deviceIdentifier = deviceId || this.randomString();
-      if (!deviceId) {
-        this.$storageService.save("device_id", deviceIdentifier);
-      }
       try {
         await this.$cryptoService.clearKeys();
         if (!isPwl) {
@@ -221,7 +217,7 @@ Vue.mixin({
             password: hashedPassword,
             device_name: this.$platformUtilsService.getDeviceString(),
             device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceIdentifier
+            device_identifier: deviceId
           })
 
           await this.$runtimeBackground.handleUnlocked('loggedIn')
@@ -247,7 +243,7 @@ Vue.mixin({
             email: this.loginInfo.user_info.email,
             device_name: this.$platformUtilsService.getDeviceString(),
             device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceIdentifier
+            device_identifier: deviceId
           })
           await this.$storageService.save('cs_token', res.access_token)
           setTimeout( async () => {
