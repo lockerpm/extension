@@ -140,10 +140,6 @@ export default class NotificationBackground {
                 pageDetails: [pageDetailsObj],
                 fillNewPassword: true,
               });
-              await this.request.use_cipher(
-                msg.cipher.id,
-                { use: true, favorite: msg.cipher.favorite },
-              )
               if (totpPromise) {
                 this.storageService.save('login_totp_cipher', msg.cipher)
                 setTimeout(async () => {

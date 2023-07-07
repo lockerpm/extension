@@ -25,14 +25,6 @@ export default class RequestBackground {
     });
   }
 
-  async use_cipher(id: any, data = {}) {
-    return await this.request({
-      url: ENDPOINT.CYSTACK_PLATFORM_CIPHER_USE.replace(':id', id),
-      method: "put",
-      data
-    });
-  }
-
   async sso_access_token(data: any) {
     return this.request({
       url: ENDPOINT.SSO_ACCESS_TOKEN,
