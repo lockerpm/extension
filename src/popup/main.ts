@@ -603,22 +603,30 @@ Vue.mixin({
         cipher: cipher
       });
     },
-    async addExcludeDomain(url: string, callback = () => ({})) {
+    async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
       try {
         await cystackPlatformAPI.add_exclude_domain({ domain: url })
         await this.getExcludeDomains();
         callback()
-        this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
+        }
       } catch (e) {
-        this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
+        }
       }
     },
-    async removeDomain(domain: any) {
+    async removeDomain(domain: any, isNotification = true) {
       cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
         await this.getExcludeDomains()
-        this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
+        }
       }).catch(() => {
-        this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
+        }
       })
     },
     async createAuthenticator (otpCipher) {

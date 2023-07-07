@@ -599,7 +599,7 @@ module.exports = {
       otp: {
         setup: 'Thiết lập bảo mật 2 lớp',
         no_otp: 'Chưa thiết lập',
-        add_new: 'Thêm mới OTP',
+        add_new: 'Nhập khóa bảo mật',
         select: 'Thiết lập từ một OTP hiện có',
         select_placeholder: 'Chọn 1 OTP',
         secret_key: 'Khóa bí mật hoặc Đường dẫn'
@@ -780,7 +780,6 @@ module.exports = {
     generate_password: "Tạo mật khẩu",
     fill_something_else: "Điền vào một Item khác",
     turn_off: "Tắt cho trang này",
-    turn_on: "Bật cho trang này",
     saved_login: "Đăng nhập đã lưu",
     saved_card: "Thẻ thanh toán đã lưu",
     saved_identity: "Thông tin cá nhân đã lưu",
@@ -793,7 +792,7 @@ module.exports = {
     login_now: "Đăng nhập",
     unlock_now: "Mở khóa",
     domain_excluded_note: 'Bạn đã tắt tính năng tự động điền cho trang web này. Xóa trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho trang web đó.',
-    remove_now: 'Xóa',
+    turn_on: 'Bật',
     empty_otp: "Không tìm thấy mã.",
     saved_otp: "Mã đã lưu"
   },
