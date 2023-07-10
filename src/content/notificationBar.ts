@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', event => {
           z-index: 1000 !important;
           cursor: pointer;
         `;
-        window.addEventListener('click', (e: any) => {
+        document.addEventListener('click', (e: any) => {
           const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
           if (logo.contains(e.target)) {
             if (!menuEl) {
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', event => {
       top: ${!isOver ? (getOffsetTop(inputEl) + elPosition.height + 10) : (getOffsetTop(inputEl) + elPosition.height / 2 + 18)}px;
       left: ${!isOver ? getOffsetLeft(inputEl) : (getOffsetLeft(inputEl) + inputEl.offsetWidth + 10) }px;
       position: absolute;
-      height: 300px;
+      height: ${ defaultTab === 1 ? 428 : 300}px;
       min-width: 300px;
       width: ${elPosition.width}px !important;
       border: 0;
@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', event => {
       visibility: visible;
     `;
     frameDiv.appendChild(iframe);
-    window.addEventListener('click', function (e: any) {
+    document.addEventListener('click', function (e: any) {
       if (frameDiv.contains(e.target)) {
       } else {
         closePopupIframe();

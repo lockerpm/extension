@@ -33,8 +33,7 @@ const UsernameFieldNames: string[] = [
   // German
   'benutzername', 'benutzer name', 'email adresse', 'e-mail adresse', 'benutzerid', 'benutzer id',
   // Vietnamese
-  'tên đăng nhập', 'tài khoản'
-
+  'tên đăng nhập', 'tài khoản', 'số điện thoại', 'điện thoại'
 ];
 
 const FirstnameFieldNames: string[] = [
@@ -1142,9 +1141,8 @@ export default class AutofillService implements AutofillServiceInterface {
           (f.form === form.opid) &&
           (canBeHidden || f.viewable) &&
           (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
-          usernameField = f;
-  
           if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
+            usernameField = f;
             break;
           }
         }
@@ -1161,8 +1159,7 @@ export default class AutofillService implements AutofillServiceInterface {
         (withoutForm || f.form === passwordField.form) &&
         (canBeHidden || f.viewable) &&
         (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
-        usernameField = f;
-
+          usernameField = f;
         if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
           // We found an exact match. No need to keep looking.
           break;

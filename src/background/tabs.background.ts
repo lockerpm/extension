@@ -1,5 +1,6 @@
 import MainBackground from './main.background';
 import NotificationBackground from './notification.background';
+import { BrowserApi } from "@/browser/browserApi";
 
 export default class TabsBackground {
   constructor(private main: MainBackground, private notificationBackground: NotificationBackground) {
@@ -12,6 +13,10 @@ export default class TabsBackground {
 
     chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.TabActiveInfo) => {
       await this.main.refreshBadgeAndMenu();
+      const tab = await BrowserApi.getTabFromCurrentWindowId();
+      if (tab) {
+        await this.main.collectPageDetailsForContentScript(tab, 'notificationBar');
+      }
     });
 
     chrome.tabs.onReplaced.addListener(async (addedTabId: number, removedTabId: number) => {
