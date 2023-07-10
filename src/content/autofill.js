@@ -453,12 +453,13 @@ function collect(document, undefined) {
       passwordRegEx = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|(\\\\b|_|-)passe(\\\\b|_|-)|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
 
     // get all the docs
-    var theForms = Array.prototype.slice.call(queryDoc(theDoc, 'form')).map(function (formEl, elIndex) {
-      var op = {},
-        formOpId = '__form__' + elIndex;
-
+    var theForms = Array.prototype.slice.call(queryDoc(theDoc, 'form, .form, #form')).map(function (formEl, elIndex) {
+      var op = {}, formOpId = '__form__' + elIndex;
       formEl.opid = formOpId;
       op.opid = formOpId;
+      if (!formEl.id) {
+        formEl.id = `locker-form-id-${elIndex}`;
+      }
       addProp(op, 'htmlName', getElementAttrValue(formEl, 'name'));
       addProp(op, 'htmlID', getElementAttrValue(formEl, 'id'));
       formOpId = getElementAttrValue(formEl, 'action');
