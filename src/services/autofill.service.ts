@@ -481,7 +481,8 @@ export default class AutofillService implements AutofillServiceInterface {
         if (!pageDetails.forms.hasOwnProperty(formKey)) {
           continue;
         }
-        const username = this.findUsernameField(pageDetails, null, false, false, false, pageDetails.forms[formKey]);
+        const password = passwordFields.find((p) => p.form === formKey)
+        const username = this.findUsernameField(pageDetails, password, false, false, false, pageDetails.forms[formKey]);
         if (username) {
           usernames.push(username);
         }

@@ -16,7 +16,6 @@ export default Vue.extend({
     return {
       locked: true,
       ws1: null,
-      isFirst: true
     }
   },
   asyncComputed: {
@@ -48,8 +47,6 @@ export default Vue.extend({
         this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')
-        this.getSyncData()
-        this.getExcludeDomains()
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }
@@ -59,16 +56,11 @@ export default Vue.extend({
         if (newValue.meta?.isOver) {
           return
         }
-        if (this.isFirst && newValue.meta?.isAuth) {
-          this.getSyncData()
-          this.getExcludeDomains()
-        }
         await this.$storageService.save('current_router', JSON.stringify({
           name: newValue.name,
           params: newValue.params,
           query: newValue.query
         }))
-        this.isFirst = false
       },
       deep: true
     }
