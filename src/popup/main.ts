@@ -591,8 +591,8 @@ Vue.mixin({
         }
       })
     },
-    async fillCipher(cipher) {
-      if (cipher.id) {
+    async fillCipher(cipher, enableUpdate = false) {
+      if (cipher.id && enableUpdate) {
         await cystackPlatformAPI.use_cipher(
           cipher.id,
           { use: true, favorite: cipher.favorite },
@@ -605,6 +605,7 @@ Vue.mixin({
         sender: 'autofillItem',
         cipher: cipher
       });
+      this.closeMenu()
     },
     async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
       try {
