@@ -217,7 +217,6 @@ export default {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async handleUsePassword () {
       this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
-      this.closeMenu()
     }
   }
 }
