@@ -11,7 +11,7 @@
       v-loading="callingAPI"
     >
       <SortMenu
-        :ciphers="dataRendered"
+        :ciphers="ciphers || []"
         :label="$t('data.parts.otp')"
         :order-field="orderField"
         :order-direction="orderDirection"
@@ -19,7 +19,7 @@
       />
       <div class="list-ciphers">
         <OTPRow
-          v-for="item in dataRendered"
+          v-for="item in ciphers || []"
           :key="item.id"
           :item="item"
           @edit-otp="() => $emit('edit-otp', item)"
@@ -52,32 +52,7 @@ export default {
       orderField: "revisionDate",
       orderDirection: 'desc',
       callingAPI: false,
-      renderIndex: 0,
-      dataRendered: []
     }
-  },
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  mounted() {
-    self.onscroll = () => {
-      const bottomOfWindow =
-        Math.max(
-          self.pageYOffset,
-          document.documentElement.scrollTop,
-          document.body.scrollTop
-        ) +
-          self.innerHeight +
-          500 >=
-        document.documentElement.scrollHeight;
-
-      if (bottomOfWindow) {
-        this.renderIndex += 50;
-        if ( this.ciphers && this.renderIndex <= this.ciphers.length) {
-          this.dataRendered = this.dataRendered.concat(
-            this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
-          );
-        }
-      }
-    };
   },
   asyncComputed: {
     ciphers: {
@@ -89,8 +64,6 @@ export default {
           null
         )) || [];
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
-        this.dataRendered = result.slice(0, 50);
-        this.renderIndex = 0;
         return result || []
       },
       watch: [
@@ -104,7 +77,10 @@ export default {
   computed: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     shouldRenderNoCipher() {
-      return !this.ciphers || !this.ciphers.length;
+      if (this.ciphers) {
+        return !this.ciphers.length;
+      }
+      return false
     },
   },
   methods: {

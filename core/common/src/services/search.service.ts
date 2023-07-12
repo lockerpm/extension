@@ -17,6 +17,7 @@ export class SearchService implements SearchServiceAbstraction {
   private indexing = false;
   private index: lunr.Index = null;
   private searchableMinLength = 1;
+  private currentCiphers = [];
 
   constructor(private cipherService: CipherService, private logService: LogService,
     private i18nService: I18nService) {
@@ -87,7 +88,6 @@ export class SearchService implements SearchServiceAbstraction {
     if (!query) {
       query = null;
     }
-
     ciphers = await this.cipherService.getAllDecrypted();
 
     if (filter && Array.isArray(filter) && filter.length > 0) {

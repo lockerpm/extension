@@ -51,8 +51,10 @@ export default Vue.extend({
   },
   computed: {
     shouldRenderNoCipher() {
-      const filteredCiphers = this.ciphers || [];
-      return !filteredCiphers.length;
+      if (this.ciphers) {
+        return !this.ciphers.length;
+      }
+      return false
     },
   },
   asyncComputed: {

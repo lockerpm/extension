@@ -486,7 +486,7 @@ export default class MainBackground {
     (this.authService as AuthService).init();
     await (this.vaultTimeoutService as VaultTimeoutService).init(true);
     await (this.i18nService as I18nService).init();
-    await (this.eventService as EventService).init(true);
+    await (this.eventService as EventService).init(false);
     await this.runtimeBackground.init();
     await this.notificationBackground.init();
     await this.commandsBackground.init();
@@ -570,7 +570,6 @@ export default class MainBackground {
   }
 
   async logout(expired: boolean = false) {
-    await this.eventService.uploadEvents();
     const userId = await this.userService.getUserId();
 
     await this.passService.clearGeneratePassword();
@@ -622,9 +621,6 @@ export default class MainBackground {
   }
 
   async openPopup() {
-    // Chrome APIs cannot open popup
-
-    // TODO: Do we need to open this popup?
     if (this.platformUtilsService.isFirefox()) {
       browser.browserAction.openPopup();
       return;

@@ -82,7 +82,6 @@ export default class ContextMenusBackground {
       this.platformUtilsService.copyToClipboard(cipher.login.username, { window: self });
     } else if (info.parentMenuItemId === 'copy-password') {
       this.platformUtilsService.copyToClipboard(cipher.login.password, { window: self });
-      this.eventService.collect(EventType.Cipher_ClientCopiedPassword, cipher.id);
     } else if (info.parentMenuItemId === 'copy-totp') {
       const totpValue = await this.totpService.getCode(cipher.login.totp);
       this.platformUtilsService.copyToClipboard(totpValue, { window: self });

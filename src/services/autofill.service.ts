@@ -331,7 +331,6 @@ export default class AutofillService implements AutofillServiceInterface {
     });
 
     if (didAutofill) {
-      this.eventService.collect(EventType.Cipher_ClientAutofilled, options.cipher.id);
       if (totpPromise != null) {
         return await totpPromise;
       } else {
