@@ -83,12 +83,16 @@ export class SearchService implements SearchServiceAbstraction {
     const results: CipherView[] = [];
     if (query) {
       query = query.trim().toLowerCase();
-    }
-    if (!query) {
+    } else {
       query = null;
     }
-
-    ciphers = await this.cipherService.getAllDecrypted();
+    if (!ciphers) {
+      if (this.cipherService.decryptedCipherCache?.length > 0) {
+        ciphers = this.cipherService.decryptedCipherCache
+      } else {
+        ciphers = await this.cipherService.getAllDecrypted();
+      }
+    }
 
     if (filter && Array.isArray(filter) && filter.length > 0) {
       ciphers = ciphers.filter(c => filter.every(f => !f || f(c)));

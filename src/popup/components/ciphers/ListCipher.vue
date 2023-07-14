@@ -1,6 +1,7 @@
 <template>
   <div
     class="relative mx-auto"
+    v-loading="loading"
   >
     <NoCipher
       v-if="shouldRenderNoCipher && !$store.state.syncing"
@@ -17,7 +18,7 @@
       />
       <ul class="list-ciphers">
         <cipher-row
-          v-for="item in dataRendered"
+          v-for="item in (ciphers || [])"
           :key="item.id"
           :item="item"
           :folder="folder"
@@ -61,32 +62,9 @@ export default Vue.extend({
   data() {
     return {
       CipherType,
-      dataRendered: [],
-      renderIndex: 0,
       orderField: "revisionDate",
       orderDirection: "desc",
-    };
-  },
-  async mounted() {
-    self.onscroll = () => {
-      const bottomOfWindow =
-        Math.max(
-          self.pageYOffset,
-          document.documentElement.scrollTop,
-          document.body.scrollTop
-        ) +
-          self.innerHeight +
-          500 >=
-        document.documentElement.scrollHeight;
-
-      if (bottomOfWindow) {
-        this.renderIndex += 50;
-        if ( this.ciphers && this.renderIndex <= this.ciphers.length) {
-          this.dataRendered = this.dataRendered.concat(
-            this.ciphers.slice(this.renderIndex, this.renderIndex + 50)
-          );
-        }
-      }
+      loading: false
     };
   },
   computed: {
@@ -94,8 +72,10 @@ export default Vue.extend({
       return `${this.orderField}_${this.orderDirection}`;
     },
     shouldRenderNoCipher() {
-      const filteredCiphers = this.ciphers || [];
-      return !filteredCiphers.length;
+      if (this.ciphers) {
+        return !this.ciphers.length;
+      }
+      return false
     },
     cipherFilters() {
       const filters = []
@@ -113,6 +93,7 @@ export default Vue.extend({
   asyncComputed: {
     ciphers: {
       async get() {
+        this.loading = true
         const deletedFilter = (c) => {
           return c.isDeleted === this.deleted;
         };
@@ -152,8 +133,7 @@ export default Vue.extend({
           };
         });
         result = orderBy(result, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
-        this.dataRendered = result.slice(0, 50);
-        this.renderIndex = 0;
+        this.loading = false
         return result
       },
       watch: [
