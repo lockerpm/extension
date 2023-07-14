@@ -48,7 +48,7 @@ import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import '../middleware';
+import middleware from '../middleware';
 
 Vue.mixin({
   data() {
@@ -320,6 +320,7 @@ Vue.mixin({
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
+        await this.$cipherService.getAllDecrypted()
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
@@ -693,6 +694,7 @@ Vue.filter('filterString', function (value) {
 })
 
 storePromise().then((store) => {
+  middleware(store)
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
   new Vue({

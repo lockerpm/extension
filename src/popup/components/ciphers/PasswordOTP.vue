@@ -96,7 +96,11 @@ export default {
         let result = []
         try {
           const filter = c => c.type === CipherType.OTP
-          result = await this.$searchService.searchCiphers(this.otpSearchText, [filter], null) || []
+          result = await this.$searchService.searchCiphers(
+            this.otpSearchText,
+            [filter],
+            null
+          ) || []
         } catch (error) {
           result = []
         }

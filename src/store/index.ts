@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import RuntimeBackground from '../background/runtime.background';
-import {StorageService} from "jslib-common/abstractions/storage.service";
+import { StorageService } from "jslib-common/abstractions/storage.service";
+import { CipherService } from "jslib-common/abstractions/cipher.service";
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -14,6 +15,7 @@ Vue.use(Vuex)
 
 const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+const cipherService = JSLib.getBgService<CipherService>('cipherService')()
 
 const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
@@ -52,7 +54,7 @@ const asyncStore = async () => {
     storageService.get(TOKEN_KEY),
     storageService.get(STORAGE_KEY),
     storageService.get(USER_KEY),
-    storageService.get(USER_PW_KEY)
+    storageService.get(USER_PW_KEY),
   ]).then(async ([accessToken, oldStore, storeUser, storeUserPw]) => {
     let user: any = storeUser
     let userPw = storeUserPw
