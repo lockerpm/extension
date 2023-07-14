@@ -107,7 +107,7 @@ export default {
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async getOTP () {
-      this.otp = await this.$totpService.getCode(this.notes);
+      this.otp = await this.$totpService.getCode(this.notes || '');
       this.period = await this.$totpService.getTimeInterval(this.notes);
       this.$emit('change', this.otp)
     },

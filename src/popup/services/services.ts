@@ -35,13 +35,14 @@ import AutofillService from '@/services/autofill.service';
 import MainBackground from '../../background/main.background';
 import RuntimeBackground from '../../background/runtime.background';
 
+let bitwardenMain = chrome['bitwardenMain'];
 function getBgService<T>(service: string) {
   return (): T => {
-    const page = BrowserApi.getBackgroundPage();
-    if (page) {
-      return page.bitwardenMain[service] as T
+    if (bitwardenMain) {
+      (self as any ).bitwardenMain = bitwardenMain
+      return bitwardenMain[service] as T
     }
-    const bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
+    bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
     bitwardenMain.bootstrap().then(() => {});
     return bitwardenMain[service] as T;
   };

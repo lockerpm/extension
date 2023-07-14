@@ -970,7 +970,6 @@ export class CipherService implements CipherServiceAbstraction {
   }
 
   // Helpers
-
   private async shareAttachmentWithServer(attachmentView: AttachmentView, cipherId: string,
     organizationId: string): Promise<any> {
     const attachmentResponse = await this.apiService.nativeFetch(
