@@ -477,9 +477,9 @@ export default class MainBackground {
   }
 
   async bootstrap() {
-    const deviceId = this.storageService.get("device_id");
+    const deviceId = await this.storageService.get("device_id");
     if (!deviceId) {
-      this.storageService.save("device_id", nanoid());
+      await this.storageService.save("device_id", nanoid());
     }
     this.containerService.attachToWindow(self);
 
