@@ -15,7 +15,6 @@ export function handleResponseErrorMessage(error) {
       storePromise().then(async (store) => {
         store.commit('UPDATE_LOGIN_PAGE_INFO', null)
         await self.bitwardenMain.onLogout(false)
-        store.commit('UPDATE_IS_LOGGEDIN', false)
         store.commit('CLEAR_ALL_DATA')
 
         setTimeout(async () => {

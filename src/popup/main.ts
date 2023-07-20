@@ -86,7 +86,7 @@ Vue.mixin({
       }
     },
     language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user },
+    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
     currentUserPw() { return this.$store.state.userPw },
     environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
@@ -164,7 +164,6 @@ Vue.mixin({
         //
       }
       await self.bitwardenMain.onLogout(false)
-      this.$store.commit('UPDATE_IS_LOGGEDIN', false)
       this.$store.commit('CLEAR_ALL_DATA')
       await this.setupFillPage();
       this.$router.push({ name: 'login' }).catch(() => ({}));
@@ -215,12 +214,12 @@ Vue.mixin({
           const res = await cystackPlatformAPI.users_session({
             client_id: 'browser',
             password: hashedPassword,
+            email: this.currentUser.email,
             device_name: this.$platformUtilsService.getDeviceString(),
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceId
           })
-
-          await this.$runtimeBackground.handleUnlocked('loggedIn')
+          await this.$storageService.save('cs_token', res.access_token)
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
           await this.$cryptoService.setKey(key)
@@ -246,24 +245,22 @@ Vue.mixin({
             device_identifier: deviceId
           })
           await this.$storageService.save('cs_token', res.access_token)
-          setTimeout( async () => {
-            await this.$store.dispatch("LoadCurrentUser");
-            await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-            await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
-            await this.$cryptoService.setKey(decryptData.key)
-            await this.$cryptoService.setKeyHash(decryptData.keyHash)
-            await this.$cryptoService.setEncKey(res.key)
-            await this.$cryptoService.setEncPrivateKey(res.private_key)
+          await this.$store.dispatch("LoadCurrentUser");
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
+          await this.$cryptoService.setKey(decryptData.key)
+          await this.$cryptoService.setKeyHash(decryptData.keyHash)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
 
-            if (this.$vaultTimeoutService != null) {
-              this.$vaultTimeoutService.biometricLocked = false
-            }
-            await this.$runtimeBackground.handleUnlocked('unlocked')
-            this.getSyncData()
-            this.getExcludeDomains()
-            this.$router.push({ name: 'vault' }).catch(() => ({}));
-            this.$store.commit('UPDATE_CALLING_API', false)
-          }, 1000);
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          await this.$runtimeBackground.handleUnlocked('unlocked')
+          this.getSyncData()
+          this.getExcludeDomains()
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
+          this.$store.commit('UPDATE_CALLING_API', false)
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)

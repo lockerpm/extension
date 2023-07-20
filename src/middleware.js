@@ -13,7 +13,6 @@ const middleware = (store) => {
   router.beforeEach(async (to, from, next) => {
     NProgress.start()
     const isLocked = await vaultTimeoutService.isLocked()
-    const accessToken = await browserStorageService.get('cs_token')
     if (to.meta?.isOver) {
       next();
     } else if (isFirst) {
@@ -27,10 +26,10 @@ const middleware = (store) => {
         router.push({ name: 'vault'}).catch(() => ({}))
       }
     } else if (isLocked) {
-      if (accessToken && store.state.user.email && !!store.state.userPw) {
+      if ((store.state.user.email && !!store.state.userPw) || store.state.preloginData?.email) {
         if (to.meta?.isLock) {
           const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
-          const isMpm = store.state.userPw && store.state.userPw.is_pwd_manager
+          const isMpm = (store.state.userPw && store.state.userPw.is_pwd_manager) || store.state.preloginData?.login_method === 'password'
           if (!isMpm && !isPwl && !['set-master-password'].includes(to.name)) {
             router.push({ name: "set-master-password" }).catch(() => ({}))
           } else {
