@@ -121,7 +121,6 @@ export default Vue.extend({
               this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
             } else {
               await this.$store.dispatch("LoadCurrentUserPw");
-              this.$store.commit('UPDATE_IS_LOGGEDIN', true)
               this.$router.push({ name: 'lock' }).catch(() => ({}))
             }
             callback()
