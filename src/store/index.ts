@@ -129,7 +129,7 @@ const asyncStore = async () => {
           state.isLoggedIn = isLoggedIn
         },
         CLEAR_ALL_DATA (state) {
-          state.use = JSON.parse(JSON.stringify(defaultUser)),
+          state.user = JSON.parse(JSON.stringify(defaultUser)),
           state.userPw = {}
           state.preloginData = null
           state.isLoggedIn = false

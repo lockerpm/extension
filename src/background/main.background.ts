@@ -590,6 +590,7 @@ export default class MainBackground {
       this.policyService.clear(userId),
       this.passwordGenerationService.clear(),
       this.vaultTimeoutService.clear(),
+      this.storageService.remove("cs_store"),
       this.storageService.remove("cs_token"),
       this.storageService.remove("cs_user"),
       this.storageService.remove("cs_user_pw"),
