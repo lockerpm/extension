@@ -219,7 +219,9 @@ Vue.mixin({
             device_type: this.$platformUtilsService.getDevice(),
             device_identifier: deviceId
           })
-          await this.$storageService.save('cs_token', res.access_token)
+          if (!this.$store.state.user?.email) {
+            await this.$storageService.save('cs_token', res.access_token)
+          }
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
           await this.$cryptoService.setKey(key)
