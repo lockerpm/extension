@@ -230,12 +230,17 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false, isOver = false) {
-    const elements : any = document.getElementsByClassName(el.htmlClass)
     let inputEl = null
-    for (let i = 0; i < elements.length; i++) {
-      if (elements[i].id === el.htmlID && !elements[i].disabled) {
-        inputEl = elements[i]
-        break
+    const element = document.getElementById(el.htmlID)
+    if (element) {
+      inputEl = element
+    } else {
+      const elements : any = document.getElementsByClassName(el.htmlClass)
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i].id === el.htmlID && !elements[i].disabled) {
+          inputEl = elements[i]
+          break
+        }
       }
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
