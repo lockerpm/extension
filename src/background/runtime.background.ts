@@ -172,8 +172,8 @@ export default class RuntimeBackground {
         await this.handleOpenPopupIframe(3000)
         break;
       case "cs-authCaptcha":
-        await this.storageService.save('recaptcha_token', msg.token || '')
-        await this.handleOpenPopupIframe(3000)
+        // await this.storageService.save('recaptcha_token', msg.token || '')
+        // await this.handleOpenPopupIframe(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
