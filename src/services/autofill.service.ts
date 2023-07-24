@@ -1082,7 +1082,7 @@ export default class AutofillService implements AutofillServiceInterface {
   private loadOTPFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
     mustBeEmpty: boolean) {
     const arr: AutofillField[] = [];
-    pageDetails.fields.forEach(f => {
+    pageDetails.fields.forEach(f => {      
       if (this.forCustomFieldsOnly(f)) {
         return;
       }
@@ -1093,11 +1093,19 @@ export default class AutofillService implements AutofillServiceInterface {
         }
         // Removes all whitespace, _ and - characters
         const cleanedValue = value.toLowerCase().replace(/[\s_\-]/g, '');
+
         if (cleanedValue.indexOf('otp') < 0 && cleanedValue.indexOf('code') < 0) {
           return false;
         }
+
+        const ignoreList = ['countrycode'];
+        if (ignoreList.some(i => cleanedValue.indexOf(i) > -1)) {
+          return false;
+        }
+
         return true;
       };
+
       const isLikeOTP = () => {
         if (f.type === 'password') {
           return false;
@@ -1113,6 +1121,7 @@ export default class AutofillService implements AutofillServiceInterface {
         }
         return false;
       };
+
       if (
         !f.disabled
         && isLikeOTP()
