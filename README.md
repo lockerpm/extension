@@ -1,8 +1,8 @@
 ![Locker Password Manager](https://raw.githubusercontent.com/lockerpm/.github/main/images/locker3.png)
 
-# Locker Browser Extension
+# Locker Extension
 
-Locker Browser Extension is a cross-platform browser extension that integrates with popular browsers, including Chrome, Firefox, Edge, and Safari. The extension enhances the browsing experience by allowing users to securely store and manage their passwords and secrets directly from the browser.
+Locker Extension is a cross-platform browser extension that integrates with popular browsers, including Chrome, Firefox, Edge, and Safari. The extension enhances the browsing experience by allowing users to securely store and manage their passwords and secrets directly from the browser.
 
 ## Getting Started
 
@@ -77,3 +77,15 @@ To load the browser extension built:
 
 
 The temporary add-on will remain installed only for the current browsing session. If you close and then reopen Firefox, you'll need to load the temporary add-on again to use it.
+
+## Credits
+The Locker Extension project utilizes the [Jslib library from Bitwarden](https://github.com/bitwarden/jslib). Jslib is a JavaScript library for working with cryptographic algorithms and other utility functions.
+
+
+## Contributing
+Contributions to the Locker Extension project are welcome! If you find any issues or want to suggest improvements, please feel free to open an issue or submit a pull request.
+
+Before contributing, please review the [Contribution Guidelines](https://github.com/lockerpm/.github/blob/main/CONTRIBUTING.md).
+
+## License
+The Locker Extension is open-source and released under the [GPLv3](./LICENSE) License. Feel free to use, modify, and distribute the code as per the terms of the license.
