@@ -1,19 +1,22 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': true,
-             'is-hover': hovering,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': true,
+      'is-hover': hovering,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder,
+      'is-label': !!label
     }"
   >
-    <label>{{ label }} <span v-if="required" class="text-danger">*</span></label>
+    <label v-if="label">{{ label }} <span v-if="required" class="text-danger">*</span></label>
     <el-select
       v-model="value"
       multiple
-      :placeholder="placeholder"
       class="cs-select w-full"
+      :placeholder="placeholder"
       :disabled="disabled"
       @focus="handleFocus"
       @blur="focusing = false"
@@ -22,10 +25,11 @@
       <el-option
         v-for="item in options"
         :key="item.alias"
-        :label="item.name || $t('data.folders.no_folder')"
         :value="item.alias"
+        :label="item.name"
       >
         <div class="flex items-center">
+          <img style="height: 24px;" :src="item.logo" class="mr-2" alt="">
           <div class="text-black">{{ item.name || $t('data.folders.no_folder') }}</div>
         </div>
       </el-option>
@@ -82,6 +86,10 @@ export default {
     initialValue: {
       type: [String, Number, Object, Array],
       default: ''
+    },
+    noBorder: {
+      type: Boolean,
+      default: true
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -130,14 +138,15 @@ export default {
 
 <style scoped lang="scss">
 .cs-field {
-  //width: 100%;
-  min-height: 48px;
   @apply mb-2.5 last:mb-6;
   display: flex;
   position: relative;
-  border-radius: 2px;
+  border-radius: 4px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
+  &.is-label {
+    min-height: 64px;
+  }
   &.is-hover, &.is-focus {
     @apply border-primary;
     label {
@@ -193,6 +202,9 @@ export default {
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none !important;
   }
 }
 </style>

@@ -5,21 +5,11 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const os = require('os');
 module.exports = {
   pages: {
-    bar: {
-      template: './src/notification/bar.html',
-      entry: './src/notification/bar.js',
-      title: 'Bar'
-    },
-    menu: {
-      template: './src/inform-menu/menu.html',
-      entry: './src/inform-menu/menu.js',
-      title: 'Bar'
-    },
     popup: {
-      template: 'public/browser-extension.html',
+      template: 'public/index.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
-    }
+    },
   },
   pluginOptions: {
     browserExtension: {
@@ -40,8 +30,7 @@ module.exports = {
       },
       manifestTransformer: (manifest) => {
         if (process.env.NODE_ENV === 'development') {
-          manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
-          manifest.content_security_policy = manifest.content_security_policy.replace('script-src-elem', 'script-src-elem http://localhost:8098');
+          manifest.content_security_policy = manifest.content_security_policy.replace('script-src', `script-src http://localhost:8098 'unsafe-eval'`);
         }
         return manifest;
       }
@@ -50,8 +39,7 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        'jslib-common': path.resolve(__dirname, 'core/common/src'),
-        'jslib/angular': path.resolve(__dirname, 'jslib/angular/src'),
+        'jslib-common': path.resolve(__dirname, 'core'),
       }
     },
     plugins: [

@@ -1,66 +1,102 @@
 <template>
   <div
-    class="p-4 text-[#A2A3A7] vault-body"
+    v-loading="$store.state.syncing"
   >
-    <div v-if="folders" class="mt-5 font-semibold mb-4">
-      {{ $t('type.folder') }} ({{folders.length}})
+    <NoCipher
+      v-if="folders && !folders.length && !$store.state.syncing"
+      :type="0"
+      @add-cipher="() => addFolder()"
+    />
+    <div v-else>
+      <SortMenu
+        :ciphers="filteredFolders || []"
+        :label="$t('type.folder')"
+        :order-field="orderField"
+        :order-direction="orderDirection"
+        @sort="changeSort"
+      />
+      <ul class="list-folders">
+        <li
+          v-for="folder in filteredFolders"
+          :key="folder.id"
+        >
+          <FolderRow
+            :folder="folder"
+            @edit-folder="() => editFolder(folder)"
+          />
+        </li>
+      </ul>
     </div>
-    <ul class="list-folders">
-      <li
-        v-for="item in folders"
-        :key="item.id"
-        class="folder-item"
-        @click="routerFolder(item)"
-      >
-        <div class="menu-icon mr-4">
-          <!-- <i class="fas fa-folder text-[20px]"></i> -->
-          <img
-            src="@/assets/images/icons/icon_folder.svg"
-            alt=""
-            style="border-radius: 50%"
-          >
-        </div>
-        <div class="flex-grow flex justify-between mr-2">
-          <div class="w-[200px] truncate text-black font-semibold">
-            {{ item.name }}
-          </div>
-          <!-- <div>
-            {{ item.ciphersCount }} {{$tc('type.Vault', item.ciphersCount)}}
-          </div> -->
-        </div>
-        <div>
-          <i class="fas fa-chevron-right"></i>
-        </div>
-      </li>
-    </ul>
+    <AddEditFolder
+      key="folders"
+      ref="addEditFolder"
+      @done="() => {}"
+    />
   </div>
 </template>
 
 <script>
 import Vue from "vue";
+import orderBy from "lodash/orderBy";
+import NoCipher from "@/popup/components/ciphers/NoCipher";
+import FolderRow from "@/popup/components/folder/FolderRow.vue";
+import AddEditFolder from '@/popup/components/folder/AddEditFolder'
+import SortMenu from "@/components/SortMenu.vue";
+
 export default Vue.extend({
+  components: {
+    NoCipher,
+    FolderRow,
+    AddEditFolder,
+    SortMenu
+  },
+  data() {
+    return {
+      orderField: "revisionDate",
+      orderDirection: 'desc',
+    }
+  },
   asyncComputed: {
     folders: {
       async get () {
         let results = []
+        const allCiphers = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => !c.isDeleted],
+          null
+        )) || [];
         try {
           results = await this.$folderService.getAllDecrypted() || [];
         } catch (error) {
           results = []
         }
-        results = results.filter((f) => f.id);
+        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => c.folderId === f.id)}));
+        results = orderBy(results, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         return results;
       },
-      watch: []
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "orderField",
+        "orderDirection"
+      ]
     },
   },
+  computed: {
+    filteredFolders() {
+      return (this.folders || []).filter((f) => this.searchText ? f.name.toLowerCase().includes(this.searchText.toLowerCase() || '') : true)
+    }
+  },
   methods: {
-    routerFolder (item) {
-      this.$router.push({
-        name: "folders-folderId",
-        params: { folderId: item.id },
-      });
+    addFolder () {
+      this.$refs.addEditFolder?.openDialog({}, true)
     },
+    editFolder (folder) {
+      this.$refs.addEditFolder?.openDialog(folder, true)
+    },
+    changeSort (sortValue) {
+      this.orderField = sortValue.orderField;
+      this.orderDirection = sortValue.orderDirection;
+    }
   }
 })
 </script>

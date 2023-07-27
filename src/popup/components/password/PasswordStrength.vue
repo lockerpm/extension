@@ -1,6 +1,7 @@
 <template>
   <div
     class="flex items-center"
+    style="border-radius: 4px"
     :class="{
       'text-success': score === 4,
       'text-info': score === 3,

@@ -1,12 +1,15 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': value,
-             'is-hover': hovering,
-             'is-password': isPassword,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': value,
+      'is-hover': hovering,
+      'is-password': isPassword,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder,
+      'bottom-border': bottomBorder
     }"
   >
     <label for="">{{ label }} <span v-if="required" class="text-danger">*</span></label>
@@ -94,6 +97,14 @@ export default Vue.extend({
     required: {
       type: Boolean,
       default: false
+    },
+    noBorder: {
+      type: Boolean,
+      default: true
+    },
+    bottomBorder: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -170,7 +181,7 @@ export default Vue.extend({
   border: solid 1px #e6e8f4;
   padding-top: 16px;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 4px;
   &.is-hover, &.is-focus {
     @apply border-primary bg-white;
     label {
@@ -248,6 +259,31 @@ export default Vue.extend({
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none;
+  }
+  &.bottom-border {
+    border: none;
+    border-bottom: solid 1px #e6e8f4;
+    border-radius: 0 !important;
+    &.is-hover {
+      label {
+        left: 0 !important;
+      }
+    }
+    &.is-focus {
+      label {
+        left: 0 !important;
+      }
+    }
+    label {
+      left: 0 !important;
+    }
+    .cs-input {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
   }
 }
 </style>
