@@ -5,26 +5,11 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const os = require('os');
 module.exports = {
   pages: {
-    web: {
-      template: 'public/web.html',
-      entry: './src/web/main.ts',
-      title: 'Web'
-    },
-    bar: {
-      template: './src/notification/bar.html',
-      entry: './src/notification/bar.js',
-      title: 'Bar'
-    },
-    menu: {
-      template: './src/inform-menu/menu.html',
-      entry: './src/inform-menu/menu.js',
-      title: 'Bar'
-    },
     popup: {
-      template: 'public/browser-extension.html',
+      template: 'public/index.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
-    }
+    },
   },
   pluginOptions: {
     browserExtension: {
@@ -54,8 +39,7 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        'jslib-common': path.resolve(__dirname, 'core/common/src'),
-        'jslib/angular': path.resolve(__dirname, 'jslib/angular/src'),
+        'jslib-common': path.resolve(__dirname, 'core'),
       }
     },
     plugins: [

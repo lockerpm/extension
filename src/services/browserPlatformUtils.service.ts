@@ -18,11 +18,15 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   private showDialogResolves = new Map<number, { resolve: (value: boolean) => void, date: Date }>();
   private passwordDialogResolves = new Map<number, { tryResolve: (canceled: boolean, password: string) => Promise<boolean>, date: Date }>();
   private deviceCache: DeviceType = null;
-  private prefersColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)');
+  private prefersColorSchemeDark: any = self
+  // private prefersColorSchemeDark = self.matchMedia('(prefers-color-scheme: dark)');
 
-  constructor(private messagingService: MessagingService, private storageService: StorageService,
-              private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
-              private biometricCallback: () => Promise<boolean>) { }
+  constructor(
+    private messagingService: MessagingService,
+    private storageService: StorageService,
+    private clipboardWriteCallback: (clipboardValue: string, clearMs: number) => void,
+    private biometricCallback: () => Promise<boolean>
+  ) { }
 
   getDevice(): DeviceType {
     if (this.deviceCache) {
@@ -31,14 +35,14 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
 
     if (navigator.userAgent.indexOf(' Firefox/') !== -1 || navigator.userAgent.indexOf(' Gecko/') !== -1) {
       this.deviceCache = DeviceType.FirefoxExtension;
-    } else if ((!!(window as any).opr && !!opr.addons) || !!(window as any).opera ||
+    } else if ((!!(self as any).opr && !!opr.addons) || !!(self as any).opera ||
       navigator.userAgent.indexOf(' OPR/') >= 0) {
       this.deviceCache = DeviceType.OperaExtension;
     } else if (navigator.userAgent.indexOf(' Edg/') !== -1) {
       this.deviceCache = DeviceType.EdgeExtension;
     } else if (navigator.userAgent.indexOf(' Vivaldi/') !== -1) {
       this.deviceCache = DeviceType.VivaldiExtension;
-    } else if ((window as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
+    } else if ((self as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
       this.deviceCache = DeviceType.ChromeExtension;
     } else if (navigator.userAgent.indexOf(' Safari/') !== -1) {
       this.deviceCache = DeviceType.SafariExtension;
@@ -111,7 +115,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     BrowserApi.createNewTab(uri, options && options.extensionPage === true);
   }
 
-  saveFile(win: Window, blobData: any, blobOptions: any, fileName: string): void {
+  saveFile(win: any, blobData: any, blobOptions: any, fileName: string): void {
     BrowserApi.downloadFile(win, blobData, blobOptions, fileName);
   }
 
@@ -119,7 +123,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
     return Promise.resolve(BrowserApi.getApplicationVersion());
   }
 
-  supportsWebAuthn(win: Window): boolean {
+  supportsWebAuthn(win: any): boolean {
     return (typeof(PublicKeyCredential) !== 'undefined');
   }
 
@@ -163,93 +167,93 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   }
 
   copyToClipboard(text: string, options?: any): void {
-    let win = window;
-    let doc = window.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
-      doc = win.document;
-    } else if (options && options.doc) {
-      doc = options.doc;
-    }
-    const clearing = options ? !!options.clearing : false;
-    const clearMs: number = options && options.clearMs ? options.clearMs : null;
+    // let win = self;
+    // let doc = self.document;
+    // if (options && (options.window || options.win || self)) {
+    //   win = options.window || options.win || self;
+    //   doc = win.document;
+    // } else if (options && options.doc) {
+    //   doc = options.doc;
+    // }
+    // const clearing = options ? !!options.clearing : false;
+    // const clearMs: number = options && options.clearMs ? options.clearMs : null;
 
-    if (this.isSafari()) {
-      SafariApp.sendMessageToApp('copyToClipboard', text).then(() => {
-        if (!clearing && this.clipboardWriteCallback != null) {
-          this.clipboardWriteCallback(text, clearMs);
-        }
-      });
-    } else if (this.isFirefox() && (win as any).navigator.clipboard && (win as any).navigator.clipboard.writeText) {
-      (win as any).navigator.clipboard.writeText(text).then(() => {
-        if (!clearing && this.clipboardWriteCallback != null) {
-          this.clipboardWriteCallback(text, clearMs);
-        }
-      });
-    } else if ((win as any).clipboardData && (win as any).clipboardData.setData) {
-      // IE specific code path to prevent textarea being shown while dialog is visible.
-      (win as any).clipboardData.setData('Text', text);
-      if (!clearing && this.clipboardWriteCallback != null) {
-        this.clipboardWriteCallback(text, clearMs);
-      }
-    } else if (doc.queryCommandSupported && doc.queryCommandSupported('copy')) {
-      if (this.isChrome() && text === '') {
-        text = '\u0000';
-      }
+    // if (this.isSafari()) {
+    //   SafariApp.sendMessageToApp('copyToClipboard', text).then(() => {
+    //     if (!clearing && this.clipboardWriteCallback != null) {
+    //       this.clipboardWriteCallback(text, clearMs);
+    //     }
+    //   });
+    // } else if (this.isFirefox() && (win as any).navigator.clipboard && (win as any).navigator.clipboard.writeText) {
+    //   (win as any).navigator.clipboard.writeText(text).then(() => {
+    //     if (!clearing && this.clipboardWriteCallback != null) {
+    //       this.clipboardWriteCallback(text, clearMs);
+    //     }
+    //   });
+    // } else if ((win as any).clipboardData && (win as any).clipboardData.setData) {
+    //   // IE specific code path to prevent textarea being shown while dialog is visible.
+    //   (win as any).clipboardData.setData('Text', text);
+    //   if (!clearing && this.clipboardWriteCallback != null) {
+    //     this.clipboardWriteCallback(text, clearMs);
+    //   }
+    // } else if (doc.queryCommandSupported && doc.queryCommandSupported('copy')) {
+    //   if (this.isChrome() && text === '') {
+    //     text = '\u0000';
+    //   }
 
-      const textarea = doc.createElement('textarea');
-      textarea.textContent = text == null || text === '' ? ' ' : text;
-      // Prevent scrolling to bottom of page in MS Edge.
-      textarea.style.position = 'fixed';
-      doc.body.appendChild(textarea);
-      textarea.select();
+    //   const textarea = doc.createElement('textarea');
+    //   textarea.textContent = text == null || text === '' ? ' ' : text;
+    //   // Prevent scrolling to bottom of page in MS Edge.
+    //   textarea.style.position = 'fixed';
+    //   doc.body.appendChild(textarea);
+    //   textarea.select();
 
-      try {
-        // Security exception may be thrown by some browsers.
-        if (doc.execCommand('copy') && !clearing && this.clipboardWriteCallback != null) {
-          this.clipboardWriteCallback(text, clearMs);
-        }
-      } catch (e) {
-        // tslint:disable-next-line
-        console.warn('Copy to clipboard failed.', e);
-      } finally {
-        doc.body.removeChild(textarea);
-      }
-    }
+    //   try {
+    //     // Security exception may be thrown by some browsers.
+    //     if (doc.execCommand('copy') && !clearing && this.clipboardWriteCallback != null) {
+    //       this.clipboardWriteCallback(text, clearMs);
+    //     }
+    //   } catch (e) {
+    //     // tslint:disable-next-line
+    //     console.warn('Copy to clipboard failed.', e);
+    //   } finally {
+    //     doc.body.removeChild(textarea);
+    //   }
+    // }
   }
 
   async readFromClipboard(options?: any): Promise<string> {
-    let win = window;
-    let doc = window.document;
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win;
-      doc = win.document;
-    } else if (options && options.doc) {
-      doc = options.doc;
-    }
+    // let win = self;
+    // let doc = self.document;
+    // if (options && (options.window || options.win || self)) {
+    //   win = options.window || options.win || self;
+    //   doc = win.document;
+    // } else if (options && options.doc) {
+    //   doc = options.doc;
+    // }
 
-    if (this.isSafari()) {
-      return await SafariApp.sendMessageToApp('readFromClipboard');
-    } else if (this.isFirefox() && (win as any).navigator.clipboard && (win as any).navigator.clipboard.readText) {
-      return await (win as any).navigator.clipboard.readText();
-    } else if (doc.queryCommandSupported && doc.queryCommandSupported('paste')) {
-      const textarea = doc.createElement('textarea');
-      // Prevent scrolling to bottom of page in MS Edge.
-      textarea.style.position = 'fixed';
-      doc.body.appendChild(textarea);
-      textarea.focus();
-      try {
-        // Security exception may be thrown by some browsers.
-        if (doc.execCommand('paste')) {
-          return textarea.value;
-        }
-      } catch (e) {
-        // tslint:disable-next-line
-        console.warn('Read from clipboard failed.', e);
-      } finally {
-        doc.body.removeChild(textarea);
-      }
-    }
+    // if (this.isSafari()) {
+    //   return await SafariApp.sendMessageToApp('readFromClipboard');
+    // } else if (this.isFirefox() && (win as any).navigator.clipboard && (win as any).navigator.clipboard.readText) {
+    //   return await (win as any).navigator.clipboard.readText();
+    // } else if (doc.queryCommandSupported && doc.queryCommandSupported('paste')) {
+    //   const textarea = doc.createElement('textarea');
+    //   // Prevent scrolling to bottom of page in MS Edge.
+    //   textarea.style.position = 'fixed';
+    //   doc.body.appendChild(textarea);
+    //   textarea.focus();
+    //   try {
+    //     // Security exception may be thrown by some browsers.
+    //     if (doc.execCommand('paste')) {
+    //       return textarea.value;
+    //     }
+    //   } catch (e) {
+    //     // tslint:disable-next-line
+    //     console.warn('Read from clipboard failed.', e);
+    //   } finally {
+    //     doc.body.removeChild(textarea);
+    //   }
+    // }
     return null;
   }
 
@@ -308,7 +312,7 @@ export default class BrowserPlatformUtilsService implements PlatformUtilsService
   }
 
   sidebarViewName(): string {
-    if ((window as any).chrome.sidebarAction && this.isFirefox()) {
+    if ((self as any).chrome.sidebarAction && this.isFirefox()) {
       return 'sidebar';
     } else if (this.isOpera() && (typeof opr !== 'undefined') && opr.sidebarAction) {
       return 'sidebar_panel';

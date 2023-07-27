@@ -6,7 +6,6 @@ import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { SystemService } from 'jslib-common/abstractions/system.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
 import { AutofillService } from '../services/abstractions/autofill.service';
-import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import { CryptoService } from 'jslib-common/abstractions/crypto.service';
 import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { FolderService } from 'jslib-common/abstractions/folder.service';
@@ -24,10 +23,10 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
+import RequestBackground from './request.backgroud';
 
-import { Utils } from 'jslib-common/misc/utils';
+import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
-import axios from "axios";
 
 export default class RuntimeBackground {
   private autofillTimeout: any;
@@ -35,6 +34,7 @@ export default class RuntimeBackground {
   private onInstalledReason: string = null;
   private lockedVaultPendingNotifications: LockedVaultPendingNotificationsItem[] = [];
   private lockedVaultPendingInformMenu: any[] = []
+  private currentLocation = ''
   constructor(
     private main: MainBackground,
     private autofillService: AutofillService,
@@ -55,6 +55,7 @@ export default class RuntimeBackground {
     private tokenService: TokenService,
     private passwordGenerator: PasswordGenerationService,
     private passService: PassService,
+    private request: RequestBackground,
     private vaultTimeoutService: VaultTimeoutService
   ) {
     chrome.runtime?.onInstalled?.addListener((details: any) => {
@@ -82,29 +83,7 @@ export default class RuntimeBackground {
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
-        let item: LockedVaultPendingNotificationsItem;
-
-        if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
-          await BrowserApi.closeLoginTab();
-
-          item = this.lockedVaultPendingNotifications.pop() || this.lockedVaultPendingInformMenu.pop();
-          if (item.commandToRetry.sender?.tab?.id) {
-            await BrowserApi.focusSpecifiedTab(
-              item.commandToRetry.sender.tab.id
-            );
-          }
-        }
-        await this.main.refreshBadgeAndMenu(false);
-        this.notificationsService.updateConnection(msg.command === "unlocked");
-        this.systemService.cancelProcessReload();
-
-        if (item) {
-          await BrowserApi.tabSendMessageData(
-            item.commandToRetry.sender.tab,
-            "unlockCompleted",
-            item
-          );
-        }
+        this.handleUnlocked(msg.command)
         break;
       case "addToLockedVaultPendingNotifications":
         this.lockedVaultPendingNotifications.push(msg.data);
@@ -115,22 +94,11 @@ export default class RuntimeBackground {
       case "logout":
         await this.main.logout(msg.expired);
         break;
-      case "syncCompleted":
-        if (msg.successfully) {
-          setTimeout(async () => await this.main.refreshBadgeAndMenu(), 2000);
-        }
-        break;
       case "promptForLogin":
         await BrowserApi.createNewTab(
           "popup.html?uilocation=popout",
           true,
           true
-        );
-        break;
-      case "showDialogResolve":
-        this.platformUtilsService.resolveDialogPromise(
-          msg.dialogId,
-          msg.confirmed
         );
         break;
       case "bgCollectPageDetails":
@@ -139,12 +107,6 @@ export default class RuntimeBackground {
           msg.sender,
           sender.frameId
         );
-        break;
-      case "deletedCipher":
-        await this.main.refreshBadgeAndMenu();
-        break;
-      case "bgReseedStorage":
-        await this.main.reseedStorage();
         break;
       case "collectPageDetailsResponse":
         switch (msg.sender) {
@@ -162,193 +124,74 @@ export default class RuntimeBackground {
             );
             if (totpCode != null) {
               this.platformUtilsService.copyToClipboard(totpCode, {
-                window: window
+                window: self
               });
             }
-            break;
-          case "informMenu":
-          case "contextMenu":
-            clearTimeout(this.autofillTimeout);
-            this.pageDetailsToAutoFill.push({
-              frameId: sender.frameId,
-              tab: msg.tab,
-              details: msg.details
-            });
-            this.autofillTimeout = setTimeout(
-              async () => await this.autofillPage(),
-              300
-            );
             break;
           default:
             break;
         }
         break;
-      case "bgGeneratePassword":
-        this.generatePassword(sender.tab, msg.responseCommand, msg.options, msg.isReplace);
-      case "authResult":
-        const vaultUrl = this.environmentService.getWebVaultUrl();
-
-        if (
-          msg.referrer == null ||
-          Utils.getHostname(vaultUrl) !== msg.referrer
-        ) {
-          return;
-        }
-
-        try {
-          BrowserApi.createNewTab(
-            "popup/index.html?uilocation=popout#/sso?code=" +
-            msg.code +
-            "&state=" +
-            msg.state
-          );
-        } catch { }
-        break;
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
-          const myHeaders = {
-            headers: { Authorization: `Bearer ${msg.token}` }
-          };
-          try {
-            const url = `${process.env.VUE_APP_BASE_API_URL}/sso/access_token`;
-            await axios
-              .post(
-                url,
-                {
-                  SERVICE_URL: "/sso",
-                  SERVICE_SCOPE: "pwdmanager",
-                  CLIENT: "browser"
-                },
-                myHeaders
-              )
-              .then(async result => {
-                const access_token = result.data ? result.data.access_token : "";
-                const store: any = await this.storageService.get("cs_store");
-                await this.storageService.save("cs_token", access_token);
-                await this.updateStoreService('isLoggedIn', true);
-                this.messagingService.send('loggedIn')
-                if (store && store.savePopup) {
-                  setTimeout(async () => {
-                    const tab = await BrowserApi.getTabFromCurrentWindow();
-                    await BrowserApi.tabSendMessageData(tab, 'openPopupIframe');
-                  }, 4000);
-                }
-              });
-          } catch (e) {
-            console.log(e);
-          }
+          await this.storageService.save("cs_token", msg.token);
+          this.request.sso_access_token({
+            SERVICE_URL: "/sso",
+            SERVICE_SCOPE: "pwdmanager",
+            CLIENT: "browser"
+          }).then(async (result: any) => {
+            const access_token = result ? result.access_token : "";
+            await this.storageService.save("cs_token", access_token);
+            this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
+            await this.handleOpenPopupIframe(3000)
+          }).catch(() => {
+            this.storageService.save("cs_token", null);
+          });
         }
         break;
-      case "cs-logout":
-        const userId = await this.userService.getUserId();
-        await Promise.all([
-          this.cryptoService.clearKeys(),
-          this.storageService.remove("cs_token"),
-
-          this.folderService.clear(userId),
-          this.collectionService.clear(userId),
-          this.cipherService.clear(userId),
-          this.settingsService.clear(userId),
-          this.policyService.clear(userId),
-          this.tokenService.clearToken(),
-          this.userService.clear()
-        ]);
-        break;
-      case "locker-authResult":
-        break;
-      case "webAuthnResult":
-        const vaultUrl2 = this.environmentService.getWebVaultUrl();
-
-        if (
-          msg.referrer == null ||
-          Utils.getHostname(vaultUrl2) !== msg.referrer
-        ) {
-          return;
+      case "sso-authResult":
+        if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
+          this.storageService.save('current_router', JSON.stringify({ name: 'pwl-unlock' }))
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            user_info: {
+              email: msg.data.email
+            }
+          })
+        } else {
+          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
+          await this.updateStoreServiceInfo({
+            preloginData: msg.data,
+            baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
+            baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
+          })
         }
-
-        const params = `webAuthnResponse=${encodeURIComponent(
-          msg.data
-        )};remember=${msg.remember}`;
-        BrowserApi.createNewTab(
-          `popup/index.html?uilocation=popout#/2fa;${params}`,
-          undefined,
-          false
-        );
+        const tab: any = await BrowserApi.getTabFromCurrentWindow()
+        await BrowserApi.updateCurrentTab(tab, this.currentLocation);
+        await this.handleOpenPopupIframe(3000)
         break;
-      case "reloadPopup":
-        this.messagingService.send("reloadPopup");
-        break;
-      case "emailVerificationRequired":
-        this.messagingService.send("showDialog", {
-          dialogId: "emailVerificationRequired",
-          title: this.i18nService.t("emailVerificationRequired"),
-          text: this.i18nService.t("emailVerificationRequiredDesc"),
-          confirmText: this.i18nService.t("ok"),
-          type: "info"
-        });
+      case "cs-authCaptcha":
+        // await this.storageService.save('recaptcha_token', msg.token || '')
+        // await this.handleOpenPopupIframe(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
-          window: window
+          window: self
         });
         break;
-      case "authAccessToken":
-        await this.authAccessToken(msg.sender)
+      case "cs-logout":
+        this.main.onLogout();
         break;
-      case "openPopupIframe":
-        if (!this.platformUtilsService.isFirefox()) {
-          await this.updateStoreService('savePopup', true);
-        }
-        break;
-      case "closePopupIframe":
-        await this.updateStoreService('savePopup', false);
-      case "updateStoreService":
-        if (msg.sender) {
-          await this.updateStoreService(msg.sender.key, msg.sender.value);
-        }
       default:
         break;
     }
-  }
-
-  private async autofillPage() {
-    const cipherId = this.main.loginToAutoFill.id
-    const cipherFavorite = this.main.loginToAutoFill.favorite
-    const totpCode = await this.autofillService.doAutoFill({
-      cipher: this.main.loginToAutoFill,
-      pageDetails: this.pageDetailsToAutoFill,
-      fillNewPassword: true,
-    });
-
-    if (totpCode != null) {
-      this.platformUtilsService.copyToClipboard(totpCode, { window: window });
-    }
-    this.main.loginToAutoFill = null;
-    this.pageDetailsToAutoFill = [];
-
-    // Update used time
-    const csToken = await this.main.storageService.get<string>("cs_token");
-    const headers = {
-      "Authorization": "Bearer " + csToken,
-      "Content-Type": "application/json; charset=utf-8"
-    };
-    const res = await axios.put(
-      `${process.env.VUE_APP_BASE_API_URL}/cystack_platform/pm/ciphers/${cipherId}/use`,
-      { use: true, favorite: cipherFavorite },
-      { headers: headers }
-    )
-    const cipherResponse = new CipherResponse(res.data)
-    const userId = await this.userService.getUserId();
-    const cipherData = new CipherData(cipherResponse, userId);
-    this.cipherService.upsert(cipherData)
   }
 
   private async checkOnInstalled() {
     setTimeout(async () => {
       if (this.onInstalledReason != null) {
         if (this.onInstalledReason === 'install') {
-
           await this.setDefaultSettings();
         }
 
@@ -371,51 +214,30 @@ export default class RuntimeBackground {
     }
   }
 
-  private async generatePassword(tab, responseCommand, inputOptions, isReplace) {
-    const oldGeneratePassword = await this.passService.getGeneratePassword();
-    let password = '';
-    let options = null;
-    if (oldGeneratePassword && !isReplace && tab.id === oldGeneratePassword.tab.id) {
-      password = oldGeneratePassword.password;
-      options = JSON.parse(oldGeneratePassword.options)
+  async authAccessToken(type: string, provider: string) {
+    if (type === 'captcha') {
+      BrowserApi.createNewTab(`${process.env.VUE_APP_ID_URL}/captcha`, true, true);
+      return;
     }
-    if (!options) {
-      options = inputOptions || (await this.passwordGenerator.getOptions())[0]
-    } else {
-      await BrowserApi.tabSendMessageData(tab, 'setGeneratePasswordOptions', { options });
-    }
-    if (!password) {
-      password = await this.passwordGenerator.generatePassword(options);
-    }
-    if (!options.lowercase && !options.uppercase && !options.lowercase && !options.number && !options.special) {
-      options.lowercase = true
-    }
-    let passwordStrength: any = {}
-    if (password) {
-      passwordStrength = this.passwordGenerator.passwordStrength(password, ['cystack']) || {}
-    }
-    await this.passService.setInformation(password, options, tab)
-    const responseData: any = {};
-    responseData.password = password
-    responseData.passwordStrength = passwordStrength
-    await BrowserApi.tabSendMessageData(tab, responseCommand, responseData);
-    this.platformUtilsService.copyToClipboard(password, { window: window });
-    this.passwordGenerator.addHistory(password);
-  }
-
-  private async authAccessToken(sender: any) {
-    // check open popup
-    await this.updateStoreService('savePopup', true);
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      let url = `${process.env.VUE_APP_ID_URL}/${sender.type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
-      if (sender.provider) {
-        url += `&provider=${sender.provider}`
+      BrowserApi.tabSendMessageData(tab, 'closePopupIframe')
+      let url = ''
+      if (type === 'id-info') {
+        BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);
+      } else if (provider === 'sso') {
+        this.currentLocation = tab.url
+        BrowserApi.createNewTab(`${process.env.VUE_APP_ID_URL}/login/sso?client=extension`, true, true);
+      } else {
+        url = `${process.env.VUE_APP_ID_URL}/${type}?SERVICE_URL=${encodeURIComponent("/sso")}&SERVICE_SCOPE=pwdmanager&CLIENT=browser&EXTERNAL_URL=${tab.url || ''}`;
+        if (provider) {
+          url += `&provider=${provider}`
+        }
+        if (process.env.VUE_APP_ENVIRONMENT) {
+          url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
+        }
+        BrowserApi.createNewTab(url, true, true);
       }
-      if (process.env.VUE_APP_ENVIRONMENT) {
-        url += `&ENVIRONMENT=${process.env.VUE_APP_ENVIRONMENT}`
-      }
-      BrowserApi.createNewTab(url, true, true);
     }
   }
 
@@ -429,5 +251,54 @@ export default class RuntimeBackground {
       ...oldStoreParsed,
       [key]: value
     });
+  }
+
+  async updateStoreServiceInfo(value = {}) {
+    const store = await this.storageService.get("cs_store");
+    let oldStoreParsed = {};
+    if (typeof store === "object") {
+      oldStoreParsed = store;
+    }
+    await this.storageService.save("cs_store", {
+      ...oldStoreParsed,
+      ...value
+    });
+  }
+
+  async handleUnlocked(command: string) {
+    let item: LockedVaultPendingNotificationsItem;
+    if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
+      await BrowserApi.closeLoginTab();
+
+      item = this.lockedVaultPendingNotifications.pop() || this.lockedVaultPendingInformMenu.pop();
+      if (item.commandToRetry.sender?.tab?.id) {
+        await BrowserApi.focusSpecifiedTab(
+          item.commandToRetry.sender.tab.id
+        );
+      }
+    }
+    await this.main.refreshBadgeAndMenu(false);
+    this.notificationsService.updateConnection(command === "unlocked");
+    this.systemService.cancelProcessReload();
+    if (item) {
+      await BrowserApi.tabSendMessageData(
+        item.commandToRetry.sender.tab,
+        "unlockCompleted",
+        item
+      );
+    }
+  }
+
+  async handleOpenPopupIframe(timeout = 0) {
+    setTimeout(async () => {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (!tab) {
+        return;
+      }
+      BrowserApi.tabSendMessage(tab, {
+        command: 'openPopupIframe',
+        tab: tab,
+      });
+    }, timeout);
   }
 }

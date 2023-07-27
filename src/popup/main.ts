@@ -3,8 +3,6 @@
 import Vue from 'vue'
 
 import AsyncComputed from 'vue-async-computed'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import Clipboard from 'vue-clipboard2'
 import Element from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -15,13 +13,19 @@ import VueNativeSock from "vue-native-websocket";
 import App from '@/popup/App.vue'
 import router from '@/router/popup'
 import storePromise from '@/store'
+
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
-import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { CipherType } from "jslib-common/enums/cipherType";
 import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
+import { CipherView } from "jslib-common/models/view/cipherView";
+import { SecureNote } from 'jslib-common/models/domain/secureNote';
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
+
+import cystackPlatformAPI from '@/api/cystack_platform'
+import userAPI from '@/api/user'
 
 Vue.config.productionTip = false;
 
@@ -44,25 +48,45 @@ import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import '../middleware'
+import middleware from '../middleware';
 
 Vue.mixin({
   data() {
     return {
+      totpCode: "",
+      totpTimeout: null,
+      loadedTimeout: null,
+      pageDetails: null,
+      selectedCipher: null,
+
       folders: [],
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
         { key: "facebook", name: "Facebook", color: "#3c65c4" },
-        { key: "github", name: "GitHub", color: "#202326" }
-      ],
-      enableAutofillKey: 'enableAutofill',
-      showFoldersKey: 'showFolders',
-      hideIconsKey: 'hideIcons',
+        { key: "github", name: "GitHub", color: "#202326" },
+        { key: "sso", name: "Enterprise Single Sign-On", color: "#268334" },
+      ]
     };
   },
   computed: {
+    loginInfo() {
+      return {
+        login_step: this.$store.state.login_step,
+        identity: this.$store.state.identity,
+        auth_info: this.$store.state.auth_info,
+        user_info: this.$store.state.user_info,
+        ws2: this.$store.state.ws2,
+        clientId: this.$store.state.clientId,
+        desktopAppInstalled: this.$store.state.desktopAppInstalled,
+        desktopAppData: this.$store.state.desktopAppData,
+        preloginData: this.$store.state.preloginData,
+        sending: this.$store.state.sending,
+        forgot_step: this.$store.state.forgot_step,
+        forgot_token: this.$store.state.forgot_token
+      }
+    },
     language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user },
+    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
     currentUserPw() { return this.$store.state.userPw },
     environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
@@ -83,6 +107,9 @@ Vue.mixin({
     enableAutofill() {
       return this.$store.state.enableAutofill
     }
+  },
+  destroyed() {
+    self.clearTimeout(this.loadedTimeout);
   },
   methods: {
     changeLang(value) {
@@ -126,55 +153,25 @@ Vue.mixin({
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
-        chrome.runtime.sendMessage({
-          command: 'updateStoreService',
-          sender: { key: 'language', value: value },
-        });
+        this.$runtimeBackground.updateStoreService('language', value)
       })
     },
     async logout() {
-      await this.$passService.clearGeneratePassword()
-      const userId = await this.$userService.getUserId()
+      await this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       try {
-        await this.axios.post('/users/logout')
+        await userAPI.logout();
       } catch (error) {
         //
       }
-      await Promise.all([
-        this.$cryptoService.clearKeys(),
-        this.$userService.clear(),
-        this.$folderService.clear(userId),
-        this.$collectionService.clear(userId),
-        this.$cipherService.clear(userId),
-        this.$settingsService.clear(userId),
-        this.$policyService.clear(userId),
-        this.$tokenService.clearToken(),
-        this.$storageService.remove("cs_token"),
-      ]);
-      this.$store.commit('UPDATE_IS_LOGGEDIN', false)
-      this.$store.commit('CLEAR_ALL_DATA', false)
-      this.$router.push({ name: 'login' });
-
-      chrome.runtime.sendMessage({
-        command: 'updateStoreService',
-        sender: { key: 'isLoggedIn', value: false },
-      });
+      await self.lockerMain.onLogout(false)
+      this.$store.commit('CLEAR_ALL_DATA')
       await this.setupFillPage();
+      this.$router.push({ name: 'login' }).catch(() => ({}));
     },
     async lock() {
-      await this.$passService.clearGeneratePassword()
-      await Promise.all([
-        this.$cryptoService.clearKey(),
-        this.$cryptoService.clearOrgKeys(true),
-        this.$cryptoService.clearKeyPair(true),
-        this.$cryptoService.clearEncKey(true)
-      ])
-
-      this.$folderService.clearCache()
-      this.$cipherService.clearCache()
-      this.$collectionService.clearCache()
-      this.$router.push({ name: 'lock' });
+      await self.lockerMain.onLock()
       await this.setupFillPage();
+      this.$router.push({ name: 'lock' }).catch(() => ({}));
     },
     randomString() {
       return nanoid()
@@ -197,57 +194,85 @@ Vue.mixin({
         return ''
       }
     },
-    async login() {
+    async login(isPwl = false, decryptData: any) {
+      this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
-      const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
       const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
-        browserStorageService.get("device_id"),
-        browserStorageService.get("hideIcons"),
-        browserStorageService.get("showFolders"),
-        browserStorageService.get("enableAutofill"),
+        this.$storageService.get("device_id"),
+        this.$storageService.get("hideIcons"),
+        this.$storageService.get("showFolders"),
+        this.$storageService.get("enableAutofill"),
       ]);
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
       this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
-      const deviceIdentifier = deviceId || this.randomString();
-      if (!deviceId) {
-        browserStorageService.save("device_id", deviceIdentifier);
-      }
       try {
-        await this.clearKeys()
-        const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-        const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
-        const res = await this.axios.post('cystack_platform/pm/users/session', {
-          client_id: 'browser',
-          password: hashedPassword,
-          device_name: this.$platformUtilsService.getDeviceString(),
-          device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: deviceIdentifier
-        })
-        chrome.runtime.sendMessage({ command: 'loggedIn' })
-        await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-        await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
-        await this.$cryptoService.setKey(key)
-        await this.$cryptoService.setKeyHash(hashedPassword)
-        await this.$cryptoService.setEncKey(res.key)
-        await this.$cryptoService.setEncPrivateKey(res.private_key)
+        await this.$cryptoService.clearKeys();
+        if (!isPwl) {
+          const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
+          const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: hashedPassword,
+            email: this.currentUser.email,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceId
+          })
+          if (!this.$store.state.user?.email) {
+            await this.$storageService.save('cs_token', res.access_token)
+          }
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
+          await this.$cryptoService.setKey(key)
+          await this.$cryptoService.setKeyHash(hashedPassword)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
 
-        if (this.$vaultTimeoutService != null) {
-          this.$vaultTimeoutService.biometricLocked = false
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          await this.$runtimeBackground.handleUnlocked('unlocked')
+          this.getSyncData()
+          this.getExcludeDomains()
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
+          this.$store.commit('UPDATE_CALLING_API', false)
+        } else {
+          const res = await cystackPlatformAPI.users_session({
+            client_id: 'browser',
+            password: decryptData.keyHash,
+            email: this.loginInfo.user_info.email,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceId
+          })
+          await this.$storageService.save('cs_token', res.access_token)
+          await this.$store.dispatch("LoadCurrentUser");
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
+          await this.$cryptoService.setKey(decryptData.key)
+          await this.$cryptoService.setKeyHash(decryptData.keyHash)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
+
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          await this.$runtimeBackground.handleUnlocked('unlocked')
+          this.getSyncData()
+          this.getExcludeDomains()
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
+          this.$store.commit('UPDATE_CALLING_API', false)
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
-        chrome.runtime.sendMessage({ command: "unlocked" });
-        this.$router.push({ name: 'home' });
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
+        this.$store.commit('UPDATE_CALLING_API', false)
       }
       setTimeout(() => {
         this.setupFillPage();
       }, 1000);
-    },
-    async clearKeys() {
-      await this.$cryptoService.clearKeys()
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
@@ -259,7 +284,11 @@ Vue.mixin({
         this.$messagingService.send('syncStarted')
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          let res = await this.axios.get(`cystack_platform/pm/sync?paging=1&size=${pageSize}&page=${page}`)
+          let res = await cystackPlatformAPI.sync({
+            paging: 1,
+            size: pageSize,
+            page
+          })
           if (res.count && res.count.ciphers) {
             this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
           }
@@ -273,7 +302,6 @@ Vue.mixin({
           await this.$syncService.syncSettings(userId, res.domains);
           await this.$syncService.syncPolicies(res.policies);
           await this.$syncService.setLastSync(new Date());
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           if (page * pageSize >= this.cipherCount) {
             break
           }
@@ -290,19 +318,28 @@ Vue.mixin({
           }
         }
         await this.$storageService.save(`ciphers_${userId}`, storageRes);
-
         this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        await this.$cipherService.getAllDecrypted()
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$store.commit('UPDATE_SYNCING', false);
       } catch (e) {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
-        this.$store.commit('UPDATE_SYNCED_CIPHERS')
-      } finally {
-        this.$store.commit('UPDATE_SYNCING', false)
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        this.$store.commit('UPDATE_SYNCING', false);
       }
     },
     async getFolders() {
       return await this.$folderService.getAllDecrypted()
+    },
+    async getExcludeDomains() {
+      await cystackPlatformAPI.exclude_domains().then(response => {
+        this.$cipherService.saveNeverDomains(response.results)
+        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
+      }).catch(() => {
+        this.$cipherService.saveNeverDomains([])
+        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
+      })
     },
     clipboardSuccessHandler() {
       this.notify(this.$t('common.copied'), 'success')
@@ -403,61 +440,6 @@ Vue.mixin({
         }
       })
     },
-    routerCipher(cipher, callbackDeleted) {
-      if (cipher.isDeleted) {
-        callbackDeleted(cipher)
-        return
-      }
-      if (this.$route.name === 'vault') {
-        this.$router.push({
-          name: 'vault-id',
-          params: { id: cipher.id }
-        })
-        return
-      }
-      if (this.$route.name === "home") {
-        this.$router.push({
-          name: "home-id",
-          params: { id: cipher.id }
-        });
-        return;
-      }
-      if (this.$route.name === 'vault-folders-folderId') {
-        this.$router.push({
-          name: 'vault-folders-folderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      if (this.$route.name === 'vault-teams-teamId-tfolders-tfolderId') {
-        this.$router.push({
-          name: 'vault-teams-teamId-tfolders-tfolderId-id',
-          params: { ...this.$route.params, id: cipher.id }
-        })
-        return
-      }
-
-      let name = ''
-      switch (cipher.type) {
-      case CipherType.Login:
-        name = 'passwords'
-        break
-      case CipherType.SecureNote:
-        name = 'notes'
-        break
-      case CipherType.Card:
-        name = 'cards'
-        break
-      case CipherType.Identity:
-        name = 'identities'
-        break
-      }
-      this.$router.push({
-        name: name + '-id',
-        params: { id: cipher.id }
-      })
-    },
     getTeam(teams, orgId) {
       return find(teams, e => e.id === orgId) || {}
     },
@@ -479,15 +461,192 @@ Vue.mixin({
       if (!link.match(/^https?:\/\//i)) {
         link = "http://" + link;
       }
-      window.open(link, '_blank')
+      self.open(link, '_blank')
     },
     sanitizeUrl(connectionUrl) {
       if (connectionUrl.startsWith('//')) {
-        const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
+        const scheme = self.location.protocol === 'https:' ? 'wss' : 'ws'
         connectionUrl = `${scheme}:${connectionUrl}`
       }
 
       return connectionUrl
+    },
+    generateOTP() {
+      const digits = '0123456789';
+      let OTP = '';
+      for (let i = 0; i < 6; i++ ) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
+      return OTP;
+    },
+    async reconnectDesktopAppSocket (email = this.loginInfo.preloginData.email || this.loginInfo.preloginData.name || this.currentUser.email, isCreatedApp = false) {
+      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, { format: 'json' })
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', { ws2: this.$socket, sending: true })
+
+      setTimeout(async () => {
+        this.wsDesktopAppSendMessage(email);
+      }, 100)
+
+      this.loginInfo.ws2.onmessage = async (message) => {
+        let data = JSON.parse(message.data)
+        // Gen OTP
+        if (data.msgType === 3) {
+          data = {
+            ...data,
+            otp: this.generateOTP()
+          }
+        }
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          sending: false,
+          desktopAppData: {
+            ...this.loginInfo.desktopAppData,
+            ...data
+          },
+        })
+        if (data.msgType === 3) {
+          // Connect success and show OTP
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
+          }
+        } else if (data.msgType === 4) {
+          // Unlock success
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            baseApiUrl: this.loginInfo.preloginData.base_api ? `${this.loginInfo.preloginData.base_api}/v3` : null,
+            baseWsUrl: this.loginInfo.preloginData.base_ws ? `${this.loginInfo.preloginData.base_ws}/ws` : null,
+          })
+          setTimeout(async () => {
+            try {
+              const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
+              this.login(true, decryptData);
+            } catch (error) {
+              this.notify(error?.response?.data?.message || this.$t('data.login.message.otp_invalid'), 'error')
+              this.reconnectDesktopAppSocket(this.loginInfo.preloginData.email || this.loginInfo.preloginData.name, true);
+            }
+          }, 1000);
+        } else if (data.msgType === 6) {
+          // Not Install Desktop App or Not Unlock
+          if (!isCreatedApp) {
+            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
+          }
+        } else if (data.msgType === 7) {
+          // Desktop Lock
+          this.lock();
+        } else if (data.msgType === 9) {
+          // Desktop Logout
+          this.logout();
+        } 
+      }
+    },
+    async wsDesktopAppSendMessage(email = null) {
+      try {
+        const message = {
+          msgType: 1,
+          clientId: this.loginInfo?.clientId,
+          email
+        }
+        await this.loginInfo.ws2.sendObj(message)
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppInstalled: true,
+        })
+        setTimeout(() => {
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            sending: false
+          })
+        }, 10000);
+      } catch (error) {
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          desktopAppData: null,
+          desktopAppInstalled: false,
+          sending: false
+        })
+      }
+    },
+    async deleteCiphers (ids, callback = () => ({})) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.ciphers_permanent_delete({ ids })
+          this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', ids.length, { type: this.$tc('type.0', ids.length) }), 'warning')
+        }
+      })
+    },
+    async deleteFolder (id, callback = () => ({})) {
+      this.$confirm(this.$tc('data.notifications.delete_selected_desc', 1), this.$t('common.warning'), {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await cystackPlatformAPI.delete_folder(id)
+          this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
+          callback()
+        } catch (e) {
+          this.notify(this.$tc('data.notifications.delete_failed', 1, { type: this.$t('common.folder')  }), 'warning')
+        }
+      })
+    },
+    async fillCipher(cipher, enableUpdate = false) {
+      if (cipher.id && enableUpdate) {
+        await cystackPlatformAPI.use_cipher(
+          cipher.id,
+          { use: true, favorite: cipher.favorite },
+        )
+      }
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillItem',
+        cipher: cipher
+      });
+      this.closeMenu()
+    },
+    async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
+      try {
+        await cystackPlatformAPI.add_exclude_domain({ domain: url })
+        await this.getExcludeDomains();
+        callback()
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
+        }
+      } catch (e) {
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
+        }
+      }
+    },
+    async removeDomain(domain: any, isNotification = true) {
+      cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
+        await this.getExcludeDomains()
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
+        }
+      }).catch(() => {
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
+        }
+      })
+    },
+    async createAuthenticator (otpCipher) {
+      const cipher = new CipherView()
+      cipher.name = otpCipher.name
+      cipher.type = CipherType.SecureNote
+      cipher.secureNote = new SecureNote()
+      cipher.secureNote.type = 0
+      cipher.notes = otpCipher.secretKey;
+      const cipherEnc = await this.$cipherService.encrypt(cipher)
+      const data = new CipherRequest(cipherEnc)
+      data.type = CipherType.OTP;
+      await cystackPlatformAPI.create_ciphers_vault({
+        ...data,
+        collectionIds: [],
+      })
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
@@ -497,6 +656,22 @@ Vue.mixin({
           tab: tab,
           sender: 'notificationBar',
         });
+      }
+    },
+    async closeMenu() {
+      setTimeout(async () => {
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        BrowserApi.tabSendMessageData(tab, 'closeInformMenu')
+      }, 100);
+    },
+    async scanQRCode(isPasswordOTP = false) {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "firstScanQRCode",
+          tab: tab,
+          isPasswordOTP: isPasswordOTP
+        });  
       }
     }
   }
@@ -517,51 +692,10 @@ Vue.filter('filterString', function (value) {
   return value
 })
 
-storePromise.then((store) => {
-  const browserStorageService = JSLib.getBgService<StorageService>('storageService')()
+storePromise().then((store) => {
+  middleware(store)
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
-  axios.interceptors.request.use(
-    async (config) => {
-      const token = await browserStorageService.get('cs_token')
-      const deviceId = await browserStorageService.get('device_id')
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`
-      }
-      if (deviceId) {
-        config.headers['device-id'] = deviceId
-      }
-      config.baseURL = process.env.VUE_APP_BASE_API_URL
-      return config
-    },
-    (error) => {
-      return Promise.reject(error)
-    }
-  )
-  axios.interceptors.response.use(
-    (response) => {
-      if (response.headers['device-id']) {
-        browserStorageService.save("device_id", response.headers["device-id"]);
-      }
-      return response && response.data
-    },
-    (error) => {
-      if (error.response) {
-        if (error.response.status === 404) {
-          router.push({ name: 'Home' })
-        }
-        if (error.response.status === 401) {
-          chrome.runtime.sendMessage({ command: "logout" });
-          store.commit('UPDATE_IS_LOGGEDIN', false)
-          if (router.currentRoute.name !== 'login') {
-            router.push({ name: "login" });
-          }
-        }
-      }
-      return Promise.reject(error)
-    }
-  )
-  Vue.use(VueAxios, axios)
   new Vue({
     router,
     store,

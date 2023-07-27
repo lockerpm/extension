@@ -89,7 +89,13 @@ module.exports = {
     download: 'Tải ứng dụng',
     system_error: 'Có lỗi sảy ra, vui lòng thử lại sau!',
     upgrade_now: 'Nâng cấp ngay',
-    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn"
+    update_title: "Nâng cấp lên Premium để có Bộ nhớ không giới hạn",
+    submit: "Gửi",
+    detail: "Chi tiết",
+    add_url: "Thêm tên miền hoặc đường dẫn",
+    item: "Item",
+    option: 'Lựa chọn',
+    otp: 'OTP'
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -271,7 +277,12 @@ module.exports = {
       min_password_length: 'Mật khẩu phải chứ ít nhất {length} ký tự',
       max_password_length: 'Độ dài tối đa của mật khẩu là {length}',
       password_composition: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
-      authentication_failed: 'Xác thực thông tin thất bại'
+      authentication_failed: 'Xác thực thông tin thất bại',
+      change_password_success: 'Đổi mật khẩu thành công.',
+      added_excluded_domain: 'Tự động điền cho tên miền này đã bị tắt!',
+      deleted_excluded_domain: 'Tự động điền cho tên miền này đã được bật!',
+      cannot_add_excluded_domain: "Không thể tắt tự động điền cho tên miền này",
+      cannot_deleted_excluded_domain: "Không thể bật tự động điền cho tên miền này"
     },
     profile_menu: {
       lock: 'Khóa tài khoản',
@@ -316,22 +327,29 @@ module.exports = {
         btn: 'Thêm Thẻ thanh toán'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
+        title: 'Điền thông tin biểu mẫu nhanh chóng',
+        description: 'Thêm thẻ danh tính để Locker có thể tự động điền các biểu mẫu trực tuyến thay mặt bạn.',
         btn: 'Thêm Thẻ danh tính'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Thêm sao lưu ví crypto đầu tiên của bạn',
+        description: 'Lưu lại tài khoản/ví crypto của bạn',
+        btn: 'Thêm tài sản'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
+      OTP: {
+        title: 'Bảo vệ tài khoản của bạn',
+        description: 'Thêm một lớp bảo mật bổ sung cho tài khoản trực tuyến của bạn bằng cách thiết lập xác thực hai yếu tố với Locker',
+        btn: 'Thêm bảo mật 2 lớp'
       },
-      common: {
-        title: 'Các mục đã lưu của bạn sẽ xuất hiện ở đây. <br> Bắt đầu bằng cách thêm một tài khoản mà bạn đã sử dụng hàng ngày.',
-        btn: 'Thêm mục'
+      Folder: {
+        title: 'Thêm thư mục đầu tiên của bạn',
+        description: 'Thêm thư mục để quản lý Ciphers',
+        btn: 'Thêm thư mục'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {
@@ -574,7 +592,18 @@ module.exports = {
       hidden: 'Mật khẩu',
       date: 'Ngày',
       monthYear: 'Tháng/Năm',
-      markFavorite: 'Đánh dấu yêu thích'
+      markFavorite: 'Đánh dấu yêu thích',
+      markNotFavorite: 'Bỏ yêu thích',
+      select_networks: 'Chọn Mạng Blockchain',
+      select_wallet: 'Chọn ví Blockchain',
+      otp: {
+        setup: 'Thiết lập bảo mật 2 lớp',
+        no_otp: 'Chưa thiết lập',
+        add_new: 'Nhập khóa bảo mật',
+        select: 'Thiết lập từ một OTP hiện có',
+        select_placeholder: 'Chọn 1 OTP',
+        secret_key: 'Khóa bí mật hoặc Đường dẫn'
+      }
     },
     settings: {
       account: 'Tài khoản',
@@ -608,7 +637,8 @@ module.exports = {
       vault_timeout: 'Hẹn giờ khóa',
       vault_timeout_desc: 'Tự động khóa kho dữ liệu của bạn',
       vault_timeout_action: 'Hành động khi hết giờ',
-      vault_timeout_details: 'Chọn thời điểm khóa kho tiền của bạn. Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
+      vault_timeout_title: 'Chọn thời điểm khóa kho tiền của bạn',
+      vault_timeout_details: 'Bạn sẽ được yêu cầu nhập Mật khẩu chính để mở khóa khi bị khóa.',
       fingerprint_phase: 'Định danh',
       lock_now: 'Khóa ngay',
       upgrade_to_premium: 'Nâng cấp Premium',
@@ -688,6 +718,14 @@ module.exports = {
       login_option_locker: 'Tài khoản {option}',
       username_placeholder: 'Email hoặc Tên đăng nhập',
       password_placeholder: 'Mật khẩu',
+      new_password_placeholder: 'Mật khẩu mới',
+      confirm_new_password_placeholder: 'Xác nhận mật khẩu mới',
+      alert: {
+        th1: 'Email của bạn không thuộc về doanh nghiệp nào. Vui lòng thử lại với email khác.',
+        th2: 'Tài khoản của bạn được cài đặt đăng nhập không mật khẩu. Vui lòng đăng nhập vào ứng dụng máy tính trước để tiếp tục sử dụng tiện ích.',
+        th3: 'Vui lòng đăng nhập vào tài khoản này trên ứng dụng máy tính và thử lại.',
+        lock: "Vui lòng mở khóa Vault trên ứng dụng máy tính của bạn để tiếp tục. Hoặc đăng nhập vào tài khoản Locker khác.",
+      },
       options: {
         individual_vault: 'Cá nhân',
         business_vault: 'Doanh nghiệp',
@@ -715,7 +753,9 @@ module.exports = {
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',
-      sync_data: 'Đồng bộ tài khoản'
+      sync_data: 'Đồng bộ tài khoản',
+      folder: 'Thư mục',
+      folder_items: 'Phần tử'
     },
     otp: {
       scan_qr: 'Quét mã QR',
@@ -735,5 +775,29 @@ module.exports = {
         secret_key_required: 'Khóa bí mật không được để trống!'
       }
     }
+  },
+  menu: {
+    generate_password: "Tạo mật khẩu",
+    fill_something_else: "Điền vào một Item khác",
+    turn_off: "Tắt cho trang này",
+    saved_login: "Đăng nhập đã lưu",
+    saved_card: "Thẻ thanh toán đã lưu",
+    saved_identity: "Thông tin cá nhân đã lưu",
+    empty_password: "Không tìm thấy mật khẩu cho trang web này.",
+    empty_card: "Không tìm thấy thẻ nào",
+    empty_identity: "Không tìm thấy danh tính.",
+    use_this_password: "Sử dụng mật khẩu này",
+    log_in_to_autofill: "Đăng nhập để tự động điền",
+    unlock_your_vault: "Mở khóa kho của bạn",
+    login_now: "Đăng nhập",
+    unlock_now: "Mở khóa",
+    domain_excluded_note: 'Bạn đã tắt tính năng tự động điền cho trang web này. Xóa trang web khỏi danh sách này sẽ bật lại tính năng tự động điền cho trang web đó.',
+    turn_on: 'Bật',
+    empty_otp: "Không tìm thấy mã.",
+    saved_otp: "Mã đã lưu"
+  },
+  bar: {
+    create_title: "Locker có nên nhớ mật khẩu này cho bạn không?",
+    update_title: "Bạn có muốn cập nhật mật khẩu này trong Locker không?"
   }
 }

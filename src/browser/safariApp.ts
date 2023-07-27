@@ -8,7 +8,7 @@ export class SafariApp {
         return new Promise(resolve => {
             const now = new Date();
             const messageId = now.getTime().toString() + '_' + Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-            (browser as any).runtime.sendNativeMessage('com.bitwarden.desktop', {
+            (browser as any).runtime.sendNativeMessage('', {
                 id: messageId,
                 command: command,
                 data: data,

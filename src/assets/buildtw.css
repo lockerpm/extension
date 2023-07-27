@@ -1011,6 +1011,10 @@ select {
   margin-bottom: 0px !important;
 }
 
+.mb-0 {
+  margin-bottom: 0px !important;
+}
+
 .mr-2\.5 {
   margin-right: 0.625rem;
 }
@@ -1591,8 +1595,13 @@ select {
 }
 
 .p-0 {
-  padding: 0px;
+  padding: 0px !important;
 }
+
+.pt-0 {
+  padding-top: 0px !important;
+}
+
 
 .p-4 {
   padding: 1rem;
@@ -1888,7 +1897,7 @@ select {
 
 .text-danger {
   --tw-text-opacity: 1;
-  color: rgba(245, 79, 100, var(--tw-text-opacity));
+  color: rgba(245, 79, 100, var(--tw-text-opacity)) !important;
 }
 
 .\!text-black {

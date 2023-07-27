@@ -3,6 +3,7 @@
     <div
       class="progress-bar select-none"
       role="progressbar"
+      style="border-radius: 4px"
       :class="{
         'bg-success w-full': score === 4,
         'bg-info w-3/4': score === 3,
@@ -17,7 +18,8 @@
 </template>
 
 <script>
-export default {
+import Vue from "vue";
+export default  Vue.extend({
   props: {
     score: {
       type: Number,
@@ -35,10 +37,8 @@ export default {
         4: 'strong'
       }
     }
-  },
-  mounted () {
   }
-}
+})
 </script>
 
 <style scoped>
