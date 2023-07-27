@@ -380,11 +380,11 @@ export class PasswordGenerationService implements PasswordGenerationServiceAbstr
         return await this.storageService.remove(Keys.history);
     }
 
-    passwordStrength(password: string, userInputs: string[] = null): zxcvbn.ZXCVBNResult {
+    passwordStrength(password: string, userInputs: string[] = []): zxcvbn.ZXCVBNResult {
         if (password == null || password.length === 0) {
             return null;
         }
-        let globalUserInputs = ['bitwarden', 'bit', 'warden'];
+        let globalUserInputs = ['locker', 'loc', 'ker'];
         if (userInputs != null && userInputs.length > 0) {
             globalUserInputs = globalUserInputs.concat(userInputs);
         }

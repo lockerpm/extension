@@ -130,7 +130,7 @@ const asyncStore = async () => {
         },
         CLEAR_ALL_DATA (state) {
           state.user = JSON.parse(JSON.stringify(defaultUser)),
-          state.userPw = {}
+          state.userPw = null
           state.preloginData = null
           state.isLoggedIn = false
           state.notifications = {
@@ -194,7 +194,7 @@ const asyncStore = async () => {
         UPDATE_CALLING_API(state, value) {
           state.callingAPI = value
         },
-        UPDATE_LOGIN_PAGE_INFO(state, info) {
+        async UPDATE_LOGIN_PAGE_INFO(state, info) {
           let keys = []
           const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
           if (info) {
@@ -205,7 +205,7 @@ const asyncStore = async () => {
           keys.forEach((key) => {
             state[key] = defaultData[key]
           });
-          runtimeBackground.updateStoreServiceInfo({
+          await runtimeBackground.updateStoreServiceInfo({
             login_step: state.login_step,
             identity: state.identity,
             auth_info: state.auth_info,
