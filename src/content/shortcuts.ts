@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', event => {
         return;
     }
 
-    if (isSafari && (self as any).__bitwardenFrameId == null) {
-        (self as any).__bitwardenFrameId = Math.floor(Math.random() * Math.floor(99999999));
+    if (isSafari && (self as any).__lockerFrameId == null) {
+        (self as any).__lockerFrameId = Math.floor(Math.random() * Math.floor(99999999));
     }
 
     // @ts-ignore

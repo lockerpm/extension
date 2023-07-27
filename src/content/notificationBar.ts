@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', event => {
               continue;
             }
 
-            const forms = addedNode.querySelectorAll('form:not([data-bitwarden-watching])');
+            const forms = addedNode.querySelectorAll('form:not([data-locker-watching])');
             if (forms != null && forms.length > 0) {
               doCollect = true;
               break;
