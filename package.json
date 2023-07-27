@@ -1,6 +1,6 @@
 {
   "name": "locker-extention",
-  "version": "1.0.0",
+  "version": "1.21.31",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
@@ -14,7 +14,6 @@
     "sub:update": "git submodule update --remote"
   },
   "dependencies": {
-    "@bitwarden/jslib-common": "file:jslib/common",
     "@microsoft/signalr": "^7.0.0",
     "@microsoft/signalr-protocol-msgpack": "^7.0.0",
     "@sentry/tracing": "^7.9.0",
@@ -42,6 +41,7 @@
     "qr-scanner": "^1.4.2",
     "recaptcha-v3": "^1.10.0",
     "tldjs": "^2.3.1",
+    "uuid": "^9.0.0",
     "valid-url": "^1.0.9",
     "vee-validate": "^3.4.13",
     "vue": "^2.6.11",

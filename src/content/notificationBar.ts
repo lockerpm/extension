@@ -1,5 +1,7 @@
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
+import { CipherType } from "jslib-common/enums/cipherType";
+
 import {
   OBSERVE_IGNORED_ELEMENTS,
   CANCEL_BUTTON_NAMES,
@@ -7,26 +9,14 @@ import {
   SIGN_UP_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
-} from '@/constants/index'
+} from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
-  if (window.location.hostname.indexOf('id.locker.io') > -1) {
+  if (self.location.hostname.indexOf('id.locker.io') > -1) {
     return;
   }
-  const test = window.document.createElement('div');
-  test.style.position = 'fixed';
-  test.style.top = '0px';
-  test.style.right = '0px';
-  test.style.height = '100vh';
-  test.style.width = '100%'
-  test.style.backgroundColor = 'red'
-  test.style.opacity = '0.2'
-  test.style.zIndex = '1000000000'
-  // window.document.body.appendChild(test)
-
-  let pageDetails: any[] = [];
+  let currentMessage: any = null
   const formData: any[] = [];
-  let barType: string = null;
   let pageHref: string = null;
   let observer: MutationObserver = null;
   let domObservationCollectTimeout: number = null;
@@ -34,9 +24,8 @@ document.addEventListener('DOMContentLoaded', event => {
   let observeDomTimeout: number = null;
   let disabledAddLoginNotification = false;
   let disabledChangedPasswordNotification = false;
-  let inputWithLogo: any[] = []
   let isSignUp = false
-  const inIframe = !window || window.self !== window.top;
+  const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
   const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
   const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -44,25 +33,26 @@ document.addEventListener('DOMContentLoaded', event => {
   const changePasswordButtonNames = new Set(CHANGE_PASSWORD_BUTTON_NAMES);
   const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES);
 
-  chrome.storage.local.get('neverDomains', (ndObj: any) => {
-    const domains = ndObj.neverDomains;
-    if (domains != null && domains.hasOwnProperty(window.location.hostname)) {
-      return;
-    }
+  function sendPlatformMessage(msg: any) {
+    chrome.runtime.sendMessage(msg);
+  }
 
-    chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-      disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-      chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-        disabledChangedPasswordNotification = disChangedObj != null &&
-          disChangedObj.disableChangedPasswordNotification === true;
-        if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-          collectIfNeededWithTimeout();
-        }
-      });
+  chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+    disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+    chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+      disabledChangedPasswordNotification = disChangedObj != null &&
+        disChangedObj.disableChangedPasswordNotification === true;
+      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+        collectIfNeededWithTimeout();
+      }
     });
   });
 
   chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+    if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+      return;
+    }
+    currentMessage = msg;
     processMessages(msg, sendResponse);
   });
 
@@ -71,137 +61,57 @@ document.addEventListener('DOMContentLoaded', event => {
       if (inIframe) {
         return;
       }
-      closeExistingAndOpenBar(msg.data.type, msg.data.typeData, msg.data.queueMessage || msg.data.loginInfo);
-      sendResponse();
-      return true;
+      closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
-      if (inIframe) {
-        return;
-      }
       closeBar(true);
-      sendResponse();
-      return true;
-    } else if (msg.command === 'adjustNotificationBar') {
-      if (inIframe) {
-        return;
-      }
-      adjustBar(msg.data);
-      sendResponse();
-      return true;
     } else if (msg.command === 'notificationBarPageDetails') {
-      pageDetails = [];
-      inputWithLogo = [];
-      pageDetails.push(msg.data.details);
       watchForms(msg.data.forms);
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
-        if (autofillObj.enableAutofill === false) return;
-        chrome.storage.local.get("neverDomains", (ndObj: any) => {
-          const domains = ndObj.neverDomains;
-          if (
-            domains == null ||
-            !domains.hasOwnProperty(window.location.hostname)
-          ) {
-            for (let i = 0; i < msg.data.passwordFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            for (let i = 0; i < msg.data.usernameFields.length; i++) {
-              try {
-                inputWithLogo.push(
-                  setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-                );
-              } catch (error) {
-              }
-            }
-            inputWithLogo = inputWithLogo.filter(e => e != null)
-            document.onclick = check;
-            function check(e) {
-              const target = e && e.target;
-              let check = false;
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (
-                  checkParent(target, inputWithLogo[i].inputEl) ||
-                  checkParent(target, inputWithLogo[i].logo)
-                ) {
-                  check = true;
-                  closeOtherMenu(i);
-                }
-              }
-              if (!check) {
-                for (let i = 0; i < inputWithLogo.length; i++) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function closeOtherMenu(indexClick) {
-              for (let i = 0; i < inputWithLogo.length; i++) {
-                if (i !== indexClick) {
-                  closeInformMenu(inputWithLogo[i].inputEl);
-                }
-              }
-            }
-            function checkParent(t, elm) {
-              while (t.parentNode) {
-                if (t === elm) {
-                  return true;
-                }
-                t = t.parentNode;
-              }
-              return false;
-            }
-          }
-        });
-      })
-      sendResponse();
-      return true;
-    } else if (msg.command === 'informMenuPageDetails') {
-      pageDetails.push(msg.data.details);
-      watchForms(msg.data.forms);
-      sendResponse();
-      return true;
-    } else if (msg.command === 'informMenuPassword') {
-      useGeneratedPassword(msg.data.password)
-    } else if (msg.command === "resizeInformMenu") {
-      for (const logoField of inputWithLogo) {
-        const elPosition = logoField.inputEl.getBoundingClientRect();
-        const menuEl = document.getElementById(`cs-inform-menu-iframe-${logoField.inputEl.id}`);
-        if (menuEl) {
-          if (msg.data) {
-            menuEl.style.height = msg.data.height
-            menuEl.style.width = elPosition.width
+        if (autofillObj && autofillObj.enableAutofill === false) return;
+        for (let i = 0; i < msg.data.passwordFields.length; i++) {
+          try {
+            setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+          } catch (error) {
           }
         }
-      }
+        for (let i = 0; i < msg.data.usernameFields.length; i++) {
+          try {
+            setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+          } catch (error) {
+          }
+        }
+        for (let i = 0; i < msg.data.forms.length; i++) {
+          const form = msg.data.forms[i];
+          if (form.otps?.length === 1) {
+            setFillLogo(form.otps[0], "otp", msg.data.isLocked)
+          } else if (form.otps.length === 6) {
+            setFillLogo(form.otps[5], "otp", msg.data.isLocked, true)
+          }
+        }
+      })
     } else if (msg.command === "closeInformMenu") {
-      if (inIframe) {
-        return;
-      }
-      for (const logoField of inputWithLogo) {
-        closeInformMenu(logoField.inputEl);
-      }
-      sendResponse();
-      return true;
-    } else if (msg.command === "openPopupIframe") {
-      openPopupIframe();
+      closeAllInformMenu()
+    } else if (msg.command === 'openPopupIframe') {
+      openPopupIframe()
     } else if (msg.command === 'closePopupIframe') {
-      const frameDiv = document.getElementById('locker_popup-iframe-container');
-      if (frameDiv) {
-        frameDiv.remove();
+      closePopupIframe()
+    } else if (msg.command === 'resizeMenuInfo') {
+      const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
+      if (menuEls && menuEls.length > 0) {
+        for (let i = 0; i < menuEls.length; i += 1) {
+          menuEls[i].style.setProperty('height', `${msg.data.height}px`, '');
+        };
       }
-      sendResponse();
-      return true;
     }
+    sendResponse();
+    return true;
   }
 
   function observeDom() {
     const bodies = document.querySelectorAll('body');
     if (bodies && bodies.length > 0) {
       observer = new MutationObserver(mutations => {
-        if (mutations == null || mutations.length === 0 || pageHref !== window.location.href) {
+        if (mutations == null || mutations.length === 0 || pageHref !== self.location.href) {
           return;
         }
 
@@ -230,7 +140,7 @@ document.addEventListener('DOMContentLoaded', event => {
               continue;
             }
 
-            const forms = addedNode.querySelectorAll('form:not([data-bitwarden-watching])');
+            const forms = addedNode.querySelectorAll('form:not([data-locker-watching])');
             if (forms != null && forms.length > 0) {
               doCollect = true;
               break;
@@ -241,13 +151,11 @@ document.addEventListener('DOMContentLoaded', event => {
             break;
           }
         }
-
         if (doCollect) {
           if (domObservationCollectTimeout != null) {
-            window.clearTimeout(domObservationCollectTimeout);
+            self.clearTimeout(domObservationCollectTimeout);
           }
-
-          domObservationCollectTimeout = window.setTimeout(() => {
+          domObservationCollectTimeout = self.setTimeout(() => {
             sendPlatformMessage({
               command: 'bgCollectPageDetails',
               sender: 'notificationBar',
@@ -255,41 +163,38 @@ document.addEventListener('DOMContentLoaded', event => {
           }, 1000);
         }
       });
-
       observer.observe(bodies[0], { childList: true, subtree: true, attributeFilter: ['style'] });
     }
   }
 
   function collectIfNeededWithTimeout() {
     if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
+      self.clearTimeout(collectIfNeededTimeout);
     }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
+    collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
   }
 
   function collectIfNeeded() {
-    if (pageHref !== window.location.href) {
-      pageHref = window.location.href;
+    if (pageHref !== self.location.href) {
+      pageHref = self.location.href;
       if (observer) {
         observer.disconnect();
         observer = null;
       }
-
       sendPlatformMessage({
         command: 'bgCollectPageDetails',
         sender: 'notificationBar',
       });
-
       if (observeDomTimeout != null) {
-        window.clearTimeout(observeDomTimeout);
+        self.clearTimeout(observeDomTimeout);
       }
-      observeDomTimeout = window.setTimeout(observeDom, 1000);
+      observeDomTimeout = self.setTimeout(observeDom, 1000);
+    } else {
+      if (collectIfNeededTimeout != null) {
+        self.clearTimeout(collectIfNeededTimeout);
+      }
+      collectIfNeededTimeout = self.setTimeout(collectIfNeeded, 1000);
     }
-
-    if (collectIfNeededTimeout != null) {
-      window.clearTimeout(collectIfNeededTimeout);
-    }
-    collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
   }
 
   function watchForms(forms: any[]) {
@@ -324,54 +229,60 @@ document.addEventListener('DOMContentLoaded', event => {
     });
   }
 
-  function useGeneratedPassword(password) {
-    for (const logoField of inputWithLogo) {
-      if (logoField.type === 'password') {
-        logoField.inputEl.value = password;
+  function setFillLogo(el, type = 'password', isLocked = false, isOver = false) {
+    let inputEl = null
+    const element = document.getElementById(el.htmlID)
+    if (element) {
+      inputEl = element
+    } else {
+      const elements : any = document.getElementsByClassName(el.htmlClass)
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i].id === el.htmlID && !elements[i].disabled) {
+          inputEl = elements[i]
+          break
+        }
       }
-    }
-    for (const logoField of inputWithLogo) {
-      closeInformMenu(logoField.inputEl);
-    }
-  }
-
-  function setFillLogo(el, type = 'password', isLocked = false) {
-    let inputEl = document.getElementById(el.htmlID);
-    if (!inputEl) {
-      inputEl = document.getElementsByName(el.htmlName)[0]
     }
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
       closeInformMenu(inputEl)
-      inputEl.addEventListener("click", () => {
-        openInformMenu(inputEl, type);
-      });
-      const elPosition = inputEl.getBoundingClientRect();
+      const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
         relativeContainer.style.position = 'relative'
       }
       if (relativeContainer) {
         const containerPosition = relativeContainer.getBoundingClientRect();
-        const logiId = 'cs-logo-' + (el.htmlID || el.htmlName);
-        let logo = document.getElementById(logiId);
-        if (!logo) {
-          logo = document.createElement("span");
-          logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
-          logo.style.cssText = `
-            position: absolute;
-            height: 19px;
-            width: 19px;
-            background-position: center;
-            background-size: contain;
-            z-index: 1000 !important;
-            cursor: pointer;
-          `;
-          logo.addEventListener("click", () => {
-            openInformMenu(inputEl, type);
-          });
-          inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-        }
-        if (elPosition.width <= 0) {
+        removeFillLogo(el)
+        const logo = document.createElement("span");
+        logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
+        logo.style.cssText = `
+          position: absolute;
+          height: 19px;
+          width: 19px;
+          background-position: center;
+          background-size: contain;
+          z-index: 1000 !important;
+          cursor: pointer;
+        `;
+        document.addEventListener('click', (e: any) => {
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+          if (logo.contains(e.target)) {
+            if (!menuEl) {
+              openInformMenu(inputEl, type, isOver);
+            } else {
+              menuEl.parentElement.removeChild(menuEl)
+            }
+          } else {
+            if (menuEl) {
+              menuEl.parentElement.removeChild(menuEl);
+            }
+          }
+        })
+        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
+        if (isOver) {
+          logo.style.right = `-28px`;
+          logo.style.top = `20px`;
+        } else if (elPosition.width <= 0) {
           logo.style.right = `16px`;
           logo.style.top = `20px`;
         } else {
@@ -391,6 +302,7 @@ document.addEventListener('DOMContentLoaded', event => {
           type
         };
       }
+      return null
     }
     return null
   }
@@ -399,6 +311,13 @@ document.addEventListener('DOMContentLoaded', event => {
     const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
+    }
+  }
+
+  function removeFillLogo(inputEl: any) {
+    const fillLogo = document.getElementById('cs-logo-' + (inputEl.htmlID || inputEl.htmlName));
+    if (fillLogo) {
+      fillLogo.parentElement.removeChild(fillLogo);
     }
   }
 
@@ -411,27 +330,33 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
-  function openInformMenu(inputEl: any, type: string = 'password') {
-    const elPosition = inputEl.getBoundingClientRect();
+  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
     if (!document.body) {
       return;
     }
+    closeAllInformMenu()
+    const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
     const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
-    if (document.getElementById(iframeId)) {
-      return;
+    let defaultType = 0, defaultTab = 2
+    if (isSignUp && type === 'password') {
+      defaultTab = 1
+    } else if (type === 'otp') {
+      defaultTab = 2
+      defaultType = CipherType.OTP
     }
-    const barPageUrl: string = chrome.extension.getURL(
-      "menu.html" + `${isSignUp && type === 'password' ? "?generate=1" : "?ciphers=1"}`
+    const barPageUrl: string = chrome.runtime.getURL(
+      "popup.html#/menu" + `?tab=${defaultTab}&type=${defaultType}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
     iframe.className = iframeClass;
     iframe.style.cssText = `
-      top: ${getOffsetTop(inputEl) + elPosition.height + 10}px;
-      left: ${getOffsetLeft(inputEl)}px;
+      top: ${!isOver ? (getOffsetTop(inputEl) + elPosition.height + 10) : (getOffsetTop(inputEl) + elPosition.height / 2 + 18)}px;
+      left: ${!isOver ? getOffsetLeft(inputEl) : (getOffsetLeft(inputEl) + inputEl.offsetWidth + 10) }px;
       position: absolute;
-      height: 244px;
+      height: ${ defaultTab === 1 ? 428 : 300}px;
+      min-width: 300px;
       width: ${elPosition.width}px !important;
       border: 0;
       min-height: initial;
@@ -451,7 +376,7 @@ document.addEventListener('DOMContentLoaded', event => {
       border-style: initial;
       border-color: initial;
       border-image: initial;
-      border-radius: 8px;
+      border-radius: 4px;
       margin: 0px !important;
       padding: 0px !important;
     `;
@@ -683,19 +608,19 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function processedForm(form: HTMLFormElement) {
     form.dataset.bitwardenProcessed = '1';
-    window.setTimeout(() => {
+    self.setTimeout(() => {
       form.dataset.bitwardenProcessed = '0';
     }, 500);
   }
 
-  function closeExistingAndOpenBar(type: string, typeData: any, loginInfo: any) {
-    let barPage = 'bar.html';
+  function closeExistingAndOpenBar(type: string, loginInfo: any) {
+    let barPage = 'popup.html#/bar';
     switch (type) {
       case 'add':
-        barPage = barPage + '?add=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
+        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
         break;
       case 'change':
-        barPage = barPage + '?change=1&isVaultLocked=' + typeData.isVaultLocked + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
+        barPage = barPage + '?id=' + encodeURIComponent(loginInfo.cipherId) + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
         break;
       default:
         break;
@@ -706,27 +631,25 @@ document.addEventListener('DOMContentLoaded', event => {
       return;
     }
 
-    closeBar(false);
-    openBar(type, barPage, loginInfo);
+    closeBar();
+    openBar(type, barPage);
   }
 
-  function openBar(type: string, barPage: string, loginInfo: object) {
-    barType = type;
-
+  function openBar(type: string, barPage: string) {
     if (document.body == null) {
       return;
     }
 
-    const barPageUrl: string = chrome.extension.getURL(barPage);
+    const barPageUrl: string = chrome.runtime.getURL(barPage);
 
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
-      height: 320px !important;
+      height: ${type === 'add' ? '338' : '278'}px !important;
       width: 450px;
       border: 0;
       min-height: initial;
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
-      border-radius: 12px;
+      border-radius: 4px;
     `;
     iframe.id = 'bit-notification-bar-iframe';
     iframe.src = barPageUrl;
@@ -735,7 +658,7 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.setAttribute('aria-live', 'polite');
     frameDiv.id = 'bit-notification-bar';
     frameDiv.style.cssText = `
-      height: 325px !important;
+      height: ${type === 'add' ? '308' : '248'}px !important;
       width: 450px;
       top: 40px;
       right: 40px;
@@ -750,7 +673,7 @@ document.addEventListener('DOMContentLoaded', event => {
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 
-  function closeBar(explicitClose: boolean) {
+  function closeBar(explicitClose: boolean = false) {
     const barEl = document.getElementById('bit-notification-bar');
     if (barEl != null) {
       barEl.parentElement.removeChild(barEl);
@@ -760,45 +683,11 @@ document.addEventListener('DOMContentLoaded', event => {
     if (spacerEl) {
       spacerEl.parentElement.removeChild(spacerEl);
     }
-
-    if (!explicitClose) {
-      return;
+    if (explicitClose) {
+      sendPlatformMessage({
+        command: 'bgCloseNotificationBar',
+      })
     }
-
-    switch (barType) {
-      case 'add':
-        sendPlatformMessage({
-          command: 'bgAddClose',
-        });
-        break;
-      case 'change':
-        sendPlatformMessage({
-          command: 'bgChangeClose',
-        });
-        break;
-      default:
-        break;
-    }
-  }
-
-  function adjustBar(data: any) {
-    if (data != null && data.height !== 42) {
-      const newHeight = data.height + 'px';
-      doHeightAdjustment('bit-notification-bar-iframe', newHeight);
-      doHeightAdjustment('bit-notification-bar', newHeight);
-      doHeightAdjustment('bit-notification-bar-spacer', newHeight);
-    }
-  }
-
-  function doHeightAdjustment(elId: string, heightStyle: string) {
-    const el = document.getElementById(elId);
-    if (el != null) {
-      el.style.height = heightStyle;
-    }
-  }
-
-  function sendPlatformMessage(msg: any) {
-    chrome.runtime.sendMessage(msg);
   }
 
   function getOffsetTop(elem) {
@@ -821,17 +710,20 @@ document.addEventListener('DOMContentLoaded', event => {
     return offsetLeft;
   }
 
+  function closePopupIframe() {
+    let frameDiv = document?.getElementById('locker_popup-iframe-container');
+    if (frameDiv) {
+      frameDiv.remove();
+    }
+  }
+
   function openPopupIframe() {
+    closePopupIframe()
     if (document.body == null) {
       return;
     }
     let frameDiv = document.getElementById('locker_popup-iframe-container');
-    if (frameDiv) {
-      frameDiv.remove();
-      return
-    }
-
-    let barPageUrl: string = chrome.extension.getURL('popup.html');
+    let barPageUrl: string = chrome.runtime.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: 602px;
@@ -846,19 +738,17 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.style.cssText = `
       height: 600px;
       width: 402px;
-      top: 0px;
-      right: 0px;
+      top: 40px;
+      right: 40px;
       position: fixed;
       z-index: 2147483647;
       visibility: visible;
     `;
     frameDiv.appendChild(iframe);
-    window.addEventListener('click', function (e: any) {
+    document.addEventListener('click', function (e: any) {
       if (frameDiv.contains(e.target)) {
       } else {
-        sendPlatformMessage({
-          command: 'closePopupIframe',
-        });
+        closePopupIframe();
       }
     });
     document.body.appendChild(frameDiv);

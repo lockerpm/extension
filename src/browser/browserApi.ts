@@ -2,8 +2,6 @@ import { SafariApp } from './safariApp';
 
 import { Utils } from 'jslib-common/misc/utils';
 
-import MainBackground from '../background/main.background';
-
 export class BrowserApi {
   static isWebExtensionsApi: boolean = (typeof browser !== 'undefined');
   static isSafariApi: boolean = navigator.userAgent.indexOf(' Safari/') !== -1 &&
@@ -109,17 +107,10 @@ export class BrowserApi {
   }
 
   static async closeLoginTab() {
-    const tabs = await BrowserApi.tabsQuery({
-      active: true,
-      title: 'Popup',
-      windowType: 'normal',
-      currentWindow: true,
-    });
-
+    const tabs = await BrowserApi.tabsQuery({});
     if (tabs.length === 0) {
       return;
     }
-
     const tabToClose = tabs[tabs.length - 1].id;
     chrome.tabs?.remove(tabToClose);
   }
@@ -172,13 +163,13 @@ export class BrowserApi {
     return process.env.ENV !== 'production';
   }
 
-  static getUILanguage(win: Window) {
+  static getUILanguage() {
     return chrome.i18n.getUILanguage();
   }
 
   static reloadExtension(win: Window) {
     if (win != null) {
-      return win.location.reload(true);
+      return win.location.reload();
     } else {
       return chrome.runtime.reload();
     }

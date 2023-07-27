@@ -2,7 +2,7 @@
   <div class="w-full px-10">
     <el-form :model="form">
       <p class="mt-0">
-        {{ identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
+        {{ loginInfo.identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
       </p>
       <el-form-item
         prop="otpCode"
@@ -17,6 +17,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item
+        v-if="$route.name === 'login'"
         prop="saveDevice"
       >
         <el-checkbox
@@ -45,11 +46,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import authAPI from '@/api/auth'
+
 export default Vue.extend({
   props: {
-    identity: String,
     otpMethod: Object,
-    user_info: Object,
   },
   data () {
     return {
@@ -67,23 +68,48 @@ export default Vue.extend({
     async verifyOtp () {
       try {
         this.callingAPI = true
-        const res = await this.axios.post('/sso/auth/otp', {
-          ...this.user_info,
-          otp: this.form.otpCode,
-          method: this.identity,
-          save_device: this.form.saveDevice
-        })
-        try {
-          this.axios.post('/sso/me/last_active',{}, {headers: { Authorization: `Bearer ${res.token}` }})
-          await this.$emit('get-access-token', res.token)
-        } catch (error) {
-          this.notify(error?.response?.data?.message, 'error')
+        if (this.$route.name === 'login') {
+          await this.authOtp();
+        } else {
+          await this.resetPassword();
         }
         this.callingAPI = false
       } catch (error) {
-        this.notify(error?.response?.data?.message, 'error')
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
         this.callingAPI = false
       }
+    },
+    async authOtp () {
+      const res: any = await authAPI.sso_auth_otp({
+        ...this.loginInfo.user_info,
+        otp: this.form.otpCode,
+        method: this.loginInfo.identity,
+        save_device: this.form.saveDevice
+      })
+      try {
+        await this.$storageService.save('cs_token', res.token)
+        await this.$emit('get-access-token', res.token)
+      } catch (error) {
+        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
+      }
+    },
+    async resetPassword () {
+      authAPI.sso_reset_password_token({
+        username: this.loginInfo.user_info.username,
+        account_recovery: this.loginInfo.user_info.username,
+        code: this.form.otpCode,
+        language: this.language,
+        method: this.loginInfo.identity
+      }).then((response) => {
+        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+          forgot_token: response
+        })
+        this.$emit('next')
+        this.callingAPI = false
+      }).catch((error) => {
+        this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
+        this.callingAPI = false
+      })
     },
   }
 })

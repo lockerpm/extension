@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extName__",
-  "homepage_url": "http://localhost:8080/",
+  "homepage_url": "https://locker.io",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "permissions": [
@@ -36,7 +36,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": false,
+      "all_frames": true,
       "js": [
         "js/content/autofill.js",
         "js/content/autofiller.js",
@@ -51,7 +51,7 @@
       "run_at": "document_start"
     },
     {
-      "all_frames": false,
+      "all_frames": true,
       "js": [
         "js/content/shortcuts.js"
       ],
@@ -63,7 +63,7 @@
       "run_at": "document_start"
     },
     {
-      "all_frames": false,
+      "all_frames": true,
       "js": [
         "js/content/message_handler.js"
       ],
@@ -100,7 +100,7 @@
     "menu.html",
     "popup.html"
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; script-src-elem https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/* 'self' *",
+  "content_security_policy": "script-src 'self'",
   "externally_connectable": {
     "matches": [
       "https://*.demo.cystack.net:3011/*",

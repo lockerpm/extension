@@ -5,36 +5,36 @@ import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.se
 export class PopupUtilsService {
   constructor(private platformUtilsService: PlatformUtilsService) { }
 
-  inSidebar(win: Window): boolean {
+  inSidebar(win: any): boolean {
     return win.location.search !== '' && win.location.search.indexOf('uilocation=sidebar') > -1;
   }
 
-  inTab(win: Window): boolean {
+  inTab(win: any): boolean {
     return win.location.search !== '' && win.location.search.indexOf('uilocation=tab') > -1;
   }
 
-  inPopout(win: Window): boolean {
+  inPopout(win: any): boolean {
     return win.location.search !== '' && win.location.search.indexOf('uilocation=popout') > -1;
   }
 
-  inPopup(win: Window): boolean {
+  inPopup(win: any): boolean {
     return win.location.search === '' || win.location.search.indexOf('uilocation=') === -1 ||
       win.location.search.indexOf('uilocation=popup') > -1;
   }
 
-  getContentScrollY(win: Window, scrollingContainer: string = 'content'): number {
+  getContentScrollY(win: any, scrollingContainer: string = 'content'): number {
     const content = win.document.getElementsByTagName(scrollingContainer)[0];
     return content.scrollTop;
   }
 
-  setContentScrollY(win: Window, scrollY: number, scrollingContainer: string = 'content'): void {
+  setContentScrollY(win: any, scrollY: number, scrollingContainer: string = 'content'): void {
     if (scrollY != null) {
       const content = win.document.getElementsByTagName(scrollingContainer)[0];
       content.scrollTop = scrollY;
     }
   }
 
-  popOut(win: Window, href: string = null): void {
+  popOut(win: any, href: string = null): void {
 
     if (href === null) {
       href = win.location.href;

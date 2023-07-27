@@ -1,11 +1,13 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': true,
-             'is-hover': hovering,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': true,
+      'is-hover': hovering,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder
     }"
   >
     <label>{{ label }} <span v-if="required" class="text-danger">*</span></label>
@@ -128,7 +130,7 @@ export default Vue.extend({
   @apply mb-2.5 last:mb-6;
   display: flex;
   position: relative;
-  border-radius: 2px;
+  border-radius: 4px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
   &.is-hover, &.is-focus {
@@ -186,6 +188,9 @@ export default Vue.extend({
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none !important;
   }
 }
 </style>

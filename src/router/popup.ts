@@ -1,350 +1,182 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
-import Home from '../popup/views/home/index.vue'
-import Layout from '@/popup/components/layout/default.vue'
 import sentryConfig from './index'
+import VueRouter, { RouteConfig } from 'vue-router'
+
+import Layout from '@/popup/layout/index.vue'
+import AuthLayout from '@/popup/layout/auth.vue'
+import ShowLayout from '@/popup/layout/show.vue'
+import OtherLayout from '@/popup/layout/other.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
+  {
+    path: "/auth",
+    component: AuthLayout,
+    children: [
+      {
+        path: "login",
+        name: "login",
+        component: () =>
+          import("../popup/views/auth/login.vue")
+      },
+      {
+        path: "forgot-password",
+        name: "forgot-password",
+        component: () =>
+          import("../popup/views/auth/forgot-password.vue")
+      },
+      {
+        path: "lock",
+        name: "lock",
+        meta: {
+          isLock: true
+        },
+        component: () =>
+          import("../popup/views/auth/lock.vue")
+      },
+      {
+        path: "pwl-unlock",
+        name: "pwl-unlock",
+        meta: {
+          isLock: true
+        },
+        component: () =>
+          import("../popup/views/auth/pwl-unlock.vue")
+      },
+      {
+        path: "set-master-password",
+        name: "set-master-password",
+        meta: {
+          isLock: true
+        },
+        component: () =>
+          import(
+            "../popup/views/auth/set-master-password.vue"
+          )
+      },
+    ]
+  },
   {
     path: "/",
     component: Layout,
     children: [
       {
         path: "",
-        name: "home",
-        component: Home
-      }
-    ]
-  },
-  {
-    path: "/home/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "home-id",
-        component: () =>
-          import("../popup/views/home/_id.vue")
-      }
-    ]
-  },
-  {
-    path: "/set-master-password",
-    name: "set-master-password",
-    component: () =>
-      import(
-        "../popup/views/set-master-password.vue"
-      )
-  },
-  {
-    path: "/lock",
-    name: "lock",
-    component: () =>
-      import("../popup/views/lock.vue")
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: () =>
-      import("../popup/views/login.vue")
-  },
-  {
-    path: "/vault",
-    component: Layout,
-    children: [
-      {
-        path: "",
         name: "vault",
+        meta: {
+          isAuth: true
+        },
         component: () =>
-          import(
-            "../popup/views/vault/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/vault/:id",
-    component: Layout,
-    children: [
+          import("../popup/views/vault/index.vue")
+      },
       {
-        path: "",
-        name: "vault-id",
-        component: () =>
-          import("../popup/views/vault/_id.vue")
-      }
-    ]
-  },
-  {
-    path: "/passwords",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "passwords",
-        component: () =>
-          import(
-            "../popup/views/passwords/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/passwords/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "passwords-id",
-        component: () =>
-          import(
-            "../popup/views/passwords/_id.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/notes",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "notes",
-        component: () =>
-          import(
-            "../popup/views/notes/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/notes/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "notes-id",
-        component: () =>
-          import("../popup/views/notes/_id.vue")
-      }
-    ]
-  },
-  {
-    path: "/cards",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "cards",
-        component: () =>
-          import(
-            "../popup/views/cards/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/cards/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "cards-id",
-        component: () =>
-          import("../popup/views/cards/_id.vue")
-      }
-    ]
-  },
-  {
-    path: "/identities",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "identities",
-        component: () =>
-          import(
-            "../popup/views/identities/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/identities/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "identities-id",
-        component: () =>
-          import(
-            "../popup/views/identities/_id.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/crypto-backups",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "crypto-backups",
-        component: () =>
-          import(
-            "../popup/views/crypto-backups/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/crypto-backups/:id",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "crypto-backups-id",
-        component: () =>
-          import(
-            "../popup/views/crypto-backups/_id.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/folders",
-    component: Layout,
-    children: [
-      {
-        path: "",
+        path: "folders",
         name: "folders",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/folders/index.vue"
           )
-      }
-    ]
-  },
-  {
-    path: "/folders/:folderId",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "folders-folderId",
-        component: () =>
-          import(
-            "../popup/views/folders/_folderId/index.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/folders/:folderId/:id",
-    name: "folders-folderId-id",
-    component: () =>
-      import(
-        "../popup/views/folders/_folderId/_id.vue"
-      )
-  },
-  {
-    path: "/vault/folders/:folderId",
-    name: "vault-folders-folderId",
-    component: () =>
-      import(
-        "../popup/views/vault/folders/_folderId/index.vue"
-      )
-  },
-  {
-    path: "/vault/folders/:folderId/:id",
-    name: "vault-folders-folderId-id",
-    component: () =>
-      import(
-        "../popup/views/vault/folders/_folderId/_id.vue"
-      )
-  },
-  {
-    path: "/vault/teams/:teamId?/tfolders/:tfolderId",
-    name: "vault-teams-teamId-tfolders-tfolderId",
-    component: () =>
-      import(
-        "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/index.vue"
-      )
-  },
-  {
-    path: "/vault/teams/:teamId?/tfolders/:tfolderId/:id",
-    name: "vault-teams-teamId-tfolders-tfolderId-id",
-    component: () =>
-      import(
-        "../popup/views/vault/teams/_teamId/tfolders/_tfolderId/_id.vue"
-      )
-  },
-  {
-    path: "/add_item",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        name: "add_item",
-        component: () =>
-          import(
-            "../popup/views/add_item/index.vue"
-          )
       },
       {
-        path: "create",
-        name: "add-item-create",
-        component: () =>
-          import(
-            "../popup/views/add_item/create.vue"
-          )
-      }
-    ]
-  },
-  {
-    path: "/generator",
-    component: Layout,
-    children: [
-      {
+        path: "generator",
         name: "generator",
-        path: "",
+        meta: {
+          isAuth: true
+        },
         component: () =>
-          import("../popup/views/generator.vue")
-      }
-    ]
-  },
-  {
-    path: "/settings",
-    component: Layout,
-    children: [
+          import("../popup/views/generator/index.vue")
+      },
       {
-        path: "",
+        path: "otp",
+        name: "otp",
+        meta: {
+          isAuth: true
+        },
+        component: () =>
+          import("../popup/views/otp/index.vue")
+      },
+      {
+        path: "settings",
         name: "settings",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/index.vue"
           )
       },
+    ]
+  },
+  {
+    path: "/",
+    component: ShowLayout,
+    children: [
       {
-        path: "excluded-domains",
+        path: "vault/:id",
+        name: "vault-detail",
+        meta: {
+          isAuth: true
+        },
+        component: () =>
+          import(
+            "../popup/views/vault/detail.vue"
+          )
+      },
+      {
+        path: "folders/:id",
+        name: "folder-detail",
+        meta: {
+          isAuth: true
+        },
+        component: () =>
+          import(
+            "../popup/views/folders/detail.vue"
+          )
+      },
+      {
+        path: "vault/add-edit",
+        name: "add-edit-cipher",
+        meta: {
+          isAuth: true
+        },
+        component: () =>
+          import(
+            "../popup/views/vault/show.vue"
+          )
+      },
+      {
+        path: "settings/excluded-domains",
         name: "settings-excluded-domains",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/excluded-domains.vue"
           )
       },
       {
-        path: "vault-timeout",
+        path: "settings/vault-timeout",
         name: "settings-vault-timeout",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/vault-timeout.vue"
           )
       },
       {
-        path: "info",
+        path: "settings/info",
         name: "settings-info",
+        meta: {
+          isAuth: true
+        },
         component: () =>
           import(
             "../popup/views/settings/info.vue"
@@ -353,15 +185,37 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: "/otp",
-    component: Layout,
+    path: "/menu",
+    component: OtherLayout,
     children: [
       {
         path: "",
-        name: "otp",
+        name: "menu",
+        meta: {
+          isOver: true
+        },
         component: () =>
-          import("../popup/views/otp/index.vue")
-      }
+          import(
+            "../menu/index.vue"
+          )
+      },
+    ]
+  },
+  {
+    path: "/bar",
+    component: OtherLayout,
+    children: [
+      {
+        path: "",
+        name: "bar",
+        meta: {
+          isOver: true
+        },
+        component: () =>
+          import(
+            "../bar/index.vue"
+          )
+      },
     ]
   },
 ];

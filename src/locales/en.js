@@ -2,9 +2,7 @@ module.exports = {
   common: {
     username: 'Username',
     password: 'Password',
-    share: 'Share',
     copy: 'Copy',
-    move_folder: 'Move folder',
     delete: 'Delete',
     success: 'Success',
     warning: 'Warning',
@@ -30,47 +28,21 @@ module.exports = {
     collections: 'Team folders',
     length: 'Length',
     me: 'Me',
-    purge: 'Purge Account',
-    delete_account: 'Delete Account',
     confirm: 'Confirm',
-    cardholder: "Cardholder's name",
-    cardholder_placeholder: 'Jane Doe',
     email_placeholder: 'Enter your email',
-    first_name_placeholder: 'Enter your first name',
-    last_name_placeholder: 'Enter your last name',
     email: 'Email address',
-    email_address: 'Email address',
-    email_address_placeholder: 'Enter your email',
-    name: 'Name',
-    full_name_placeholder: 'Enter your full name',
     address: 'Address',
-    address_placeholder: 'Enter your address',
-    company: 'Company',
-    company_size: 'Number of staffs',
-    company_placeholder: 'Enter your company',
-    company_size_placeholder: 'Choose number of staffs',
     phone: 'Phone number',
     phone_placeholder: 'Enter your phone',
-    city: 'City',
-    state: 'Province/State',
-    zip: 'Postal/Zip Code',
-    country: 'Country',
-    country_placeholder: 'Select your country',
     cancel: 'Cancel',
     save: 'Save',
     folder_name: 'Folder name',
-    group_name: 'Group name',
     ownership: 'Ownership',
     master_password: 'Master Password',
-    joined: 'Joined at',
     close: 'Close',
     status: 'Status',
     amount: 'Amount',
     duration: 'Duration',
-    yearly: '1 year plan',
-    monthly: '1 month plan',
-    half_yearly: '6 months plan',
-    created_date: 'Created date',
     plan: 'Plan',
     go_to_website: 'Go to website',
     accept: 'Accept',
@@ -78,8 +50,6 @@ module.exports = {
     shared_with_you: 'Shared in Locker',
     back: 'Back',
     item_name: 'Item name',
-    details: 'Details',
-    type: 'Types',
     item_info: 'Item Information',
     select: 'Select',
     mr: 'Mr',
@@ -90,7 +60,16 @@ module.exports = {
     download: 'Download Desktop App',
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
-    update_title: "Upgrade to Premium to get Unlimited Storage"
+    submit: "Submit",
+    detail: "Detail",
+    payment_card: "Payment Card",
+    personal_information: "Personal Information",
+    never: 'Never',
+    add_url: "Add Domain or URL",
+    item: "Item",
+    option: 'Option',
+    otp: 'OTP',
+    saved_otp: ''
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -99,33 +78,11 @@ module.exports = {
     time_desc: 'Time Descending'
   },
   sidebar: {
-    all: 'All',
     passwords: 'Passwords',
-    dashboard: 'Dashboard',
-    vault: 'Vault',
     notes: 'Secure Notes',
     cards: 'Cards',
     identities: 'Identities',
     cryptoBackups: 'Crypto Backups',
-    folder: 'Folder',
-    shares: 'Shares',
-    trash: 'Trash',
-    users: 'Users',
-    groups: 'Groups',
-    shared_folders: 'Shared folders',
-    settings: 'Settings',
-    general: 'General',
-    import_export: 'Import Export',
-    download: 'Download',
-    excluded_domains: 'Excluded Domains',
-    upgrade: 'Upgrade',
-    tools: 'Tools',
-    logs: 'Logs',
-    overview: 'Overview',
-    billing: 'Billing',
-    family_members: 'Family Members',
-    policies: 'Policies'
-    
   },
   errors: {
     confirm_password: 'Master password confirmation does not match',
@@ -204,7 +161,7 @@ module.exports = {
       create_success: 'The {type} has been added! | The {type} have been added!',
       create_failed: 'The {type} has not been added! | The {type} have not been added!',
       update_success: 'The {type} has been updated! | The {type} have been updated!',
-      update_failed: 'The {type} has been updated! | The {type} have been updated!',
+      update_failed: 'The {type} has not been updated! | The {type} have not been updated!',
       trash_success: 'The {type} has been moved to trash! | The {type} have been moved to trash!',
       trash_failed: 'The {type} has not been moved to trash! | The {type} have been moved to trash!',
       delete_success: 'The {type} has been permanently deleted! | The {type} have been permanently deleted!',
@@ -275,7 +232,12 @@ module.exports = {
       min_password_length: 'Minimum password length is {length}',
       max_password_length: 'Maximum password length is {length}',
       password_composition: 'Password must contain at least 1 special character',
-      authentication_failed: 'Authentication failed'
+      authentication_failed: 'Authentication failed',
+      change_password_success: 'Password changed successfully.',
+      added_excluded_domain: 'Autofill for this domain has been disabled!',
+      deleted_excluded_domain: 'Autofill for this domain has been enabled!',
+      cannot_add_excluded_domain: "Can't disabled Autofill for this domain!",
+      cannot_deleted_excluded_domain: "Can't enabled Autofill for this domain"
     },
     profile_menu: {
       lock: 'Lock your account',
@@ -291,51 +253,46 @@ module.exports = {
       change_team: 'Change Team'
     },
     no_data: {
-      Dashboard: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
-      Vault: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mục đầu tiên của bạn. Bạn sẽ tìm thấy nó ở đây bất cứ khi nào bạn cần',
-        btn: 'Thêm danh mục',
-        btn_import: 'Nhập danh mục'
-      },
       Login: {
-        title: 'Hãy bắt đầu nào!',
-        description: 'Thêm mật khẩu của bạn và truy cập chúng trên mọi thiết bị, bất cứ lúc nào',
-        btn: 'Thêm mật khẩu',
-        btn_import: 'Nhập mật khẩu'
+        title: 'Let\'s get started!',
+        description: 'Add your passwords and access them on any device, anytime',
+        btn: 'Add password',
+        btn_import: 'Import'
       },
       SecureNote: {
-        title: 'Giải phóng bộ nhớ của bạn',
-        description: 'Lưu lại mã Wi-Fi, mã báo động an ninh văn phòng hoặc ngày sinh của bạn bè bạn...',
-        btn: 'Thêm ghi chú'
+        title: 'Free up your memory',
+        description: 'Save Wi-Fi codes, office security alarm codes or your friends\' birthdays...',
+        btn: 'Add note'
       },
       Card: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ thanh toán'
+        title: 'Simplify online shopping',
+        description: 'Add payment card to autofill when shopping online',
+        btn: 'Add payment card'
       },
       Identity: {
-        title: 'Mua sắm tiện lợi nhanh chóng',
-        description: 'Thêm chi tiết thẻ thanh toán để tự động điền khi mua sắm trực tuyến',
-        btn: 'Thêm Thẻ danh tính'
+        title: 'Fill online forms faster',
+        description: 'Add Identity card so that Locker can autofill online forms on behalf of you.',
+        btn: 'Add Identity card'
       },
-      Trash: {
-        title: 'Thùng rác trống',
-        description: 'Tất cả thư mục được chuyển vào Thùng rác đều có thể được khôi phục cho đến khi bạn xóa chúng vĩnh viễn'
+      CryptoBackup: {
+        title: 'Add your first crypto backup',
+        description: 'Keep your crypto account/wallet in safe place',
+        btn: 'Add Asset'
       },
-      Shares: {
-        title: 'Không có mục nào được chia sẻ',
-        description: 'Các mục được chia sẻ giữa bạn và người khác sẽ xuất hiện ở đây',
-        btn: 'Thêm danh mục'
+      OTP: {
+        title: 'Secure your account',
+        description: 'Add an additional layer of security for your online accounts by setting up two-factor authentication with Locker',
+        btn: 'Set up 2FA'
       },
-      common: {
-        title: 'Your saved items will appear here.<br>Start by adding an account that you used every day.',
-        btn: 'Add first item'
+      Folder: {
+        title: 'Add your first folder',
+        description: 'Add an folder to manage ciphers',
+        btn: 'Add Folder'
+      },
+      FolderItem: {
+        title: 'Add your first item to folder',
+        description: 'Add an item to folder',
+        btn: 'Add Item'
       }
     },
     members: {
@@ -514,7 +471,7 @@ module.exports = {
     },
     ciphers: {
       add_cipher: 'Add item',
-      password_security: 'Password Security',
+      password_security: 'Password Strength',
       website_address: 'Website address',
       password: 'Password',
       card_holder: 'Cardholder name',
@@ -579,7 +536,19 @@ module.exports = {
       hidden: 'Hidden',
       date: 'Date',
       monthYear: 'Month/Year',
-      markFavorite: 'Mark favorite'
+      markFavorite: 'Mark favorite',
+      markNotFavorite: 'Mark not favorite',
+      select_networks: 'Select networks',
+      select_wallet: 'Select wallets',
+      totp: "TOTP",
+      otp: {
+        setup: '2FA setup',
+        no_otp: 'No OTP',
+        add_new: 'Enter Setup key',
+        select: 'Set up from an existing OTP',
+        select_placeholder: 'Select an OTP',
+        secret_key: 'Secret key or Path'
+      }
     },
     settings: {
       account: 'Account',
@@ -616,7 +585,7 @@ module.exports = {
       go_to_web_vault: 'Go to Web Vault',
       import_export: 'Import & Export',
       vault_timeout: 'Vault Timeout',
-      vault_timeout_desc: 'Lock your vault automatically.',
+      vault_timeout_desc: 'Lock your vault automatically',
       vault_timeout_action: 'Vault Timeout Action',
       vault_timeout_details: 'Choose when to lock your vault. You will be asked to enter your Master Password to unlock it when it’s locked.',
       fingerprint_phase: 'Fingerprint Phrase',
@@ -698,13 +667,28 @@ module.exports = {
       login_option_locker: 'Sign in to your Locker {option}',
       username_placeholder: 'Email or Username',
       password_placeholder: 'Password',
+      new_password_placeholder: 'New password',
+      confirm_new_password_placeholder: 'Confirm new password',
+      alert: {
+        th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
+        th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',
+        th3: 'Please log in to this account on Desktop app and try again.',
+        lock: "Please unlock your Vault on desktop app to continue to extension. Or log in to another Locker account.",
+      },
+      unlock: {
+        title: "Passwordless Unlock",
+        subtitle: "The admin has required you to unlock your vault using Passwordless method only.",
+        enter_otp: "Enter the OTP code below to your Desktop app to continue Login."
+      },
       options: {
         individual_vault: 'Individual',
         business_vault: 'Business',
-        enterprise_vault: 'Enterprise',
+        enterprise_vault: 'On-Premise',
       },
       message: {
         required: '{name} is required!',
+        invalid: '{name} is invalid',
+        otp_invalid: 'The OTP input on desktop app is invalid. Please try again.'
       }
     },
     set_master_pass: {
@@ -725,7 +709,9 @@ module.exports = {
       settings: 'Settings',
       search: 'Search Vault',
       open_web_app: 'Open the web app',
-      sync_data: 'Sync your account'
+      sync_data: 'Sync your account',
+      folder: 'Folders',
+      folder_items: 'Folder items'
     },
     otp: {
       scan_qr: 'Scan QR code',
@@ -745,5 +731,29 @@ module.exports = {
         secret_key_required: 'Secret key is required'
       }
     }
+  },
+  menu: {
+    generate_password: "Generate Password",
+    fill_something_else: "Fill something else",
+    turn_off: "Turn off for this page",
+    saved_login: "Saved Login",
+    saved_card: "Saved Card Payment",
+    saved_identity: "Saved Personal Information",
+    empty_password: "No passwords found for this site.",
+    empty_card: "No cards found.",
+    empty_identity: "No identities found.",
+    use_this_password: "Use this password",
+    log_in_to_autofill: "Log in to autofill",
+    unlock_your_vault: "Unlock your vault",
+    login_now: "Login now",
+    unlock_now: "Unlock now",
+    domain_excluded_note: 'You turned off autofill for this website. Remove website from this list will re-enable autofill for it.',
+    turn_on: 'Turn On',
+    empty_otp: "No OTPs found.",
+    saved_otp: "Saved OTP"
+  },
+  bar: {
+    create_title: "Should Locker remember this password for you?",
+    update_title: "Do you want to update this password in Locker?"
   }
 }
