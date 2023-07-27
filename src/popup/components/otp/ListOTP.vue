@@ -3,7 +3,7 @@
     <NoCipher
       v-if="shouldRenderNoCipher && !$store.state.syncing"
       :type="CipherType.OTP"
-      @add-cipher="() => {}"
+      @add-cipher="() => $emit('add-edit', null)"
     />
     <div
       v-else
@@ -22,7 +22,7 @@
           v-for="item in ciphers || []"
           :key="item.id"
           :item="item"
-          @edit-otp="() => $emit('edit-otp', item)"
+          @edit-otp="() => $emit('add-edit', item)"
         />
       </div>
     </div>
