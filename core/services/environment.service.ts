@@ -46,13 +46,13 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
         if (this.baseUrl) {
             return this.baseUrl;
         }
-        return 'https://vault.bitwarden.com';
+        return 'https://locker.io';
     }
 
     getSendUrl() {
-        return this.getWebVaultUrl() === 'https://vault.bitwarden.com'
-            ? 'https://send.bitwarden.com/#'
-            : this.getWebVaultUrl() + '/#/send/';
+        return this.getWebVaultUrl() === ''
+            ? ''
+            : this.getWebVaultUrl() + '';
     }
 
     getIconsUrl() {
@@ -64,7 +64,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/icons';
         }
 
-        return 'https://icons.bitwarden.net';
+        return '';
     }
 
     getApiUrl() {
@@ -76,7 +76,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/api';
         }
 
-        return 'https://api.bitwarden.com';
+        return 'https://api.locker.io';
     }
 
     getIdentityUrl() {
@@ -88,7 +88,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/identity';
         }
 
-        return 'https://identity.bitwarden.com';
+        return '';
     }
 
     getEventsUrl() {
@@ -100,7 +100,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/events';
         }
 
-        return 'https://events.bitwarden.com';
+        return '';
     }
 
     async setUrlsFromStorage(): Promise<void> {

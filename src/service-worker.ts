@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import MainBackground from './background/main.background';
-const bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
-bitwardenMain.bootstrap().then(() => {});
+const lockerMain = (self as any ).lockerMain = new MainBackground();
+lockerMain.bootstrap().then(() => {});
 
 async function createOffscreen() {
   await chrome['offscreen']?.createDocument({
