@@ -517,6 +517,28 @@ async function delete_emergency_access(id) {
   });
 }
 
+async function exclude_domains() {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS,
+    method: "get",
+  });
+}
+
+async function add_exclude_domain(data = {}) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS,
+    method: "post",
+    data
+  });
+}
+
+async function delete_exclude_domain(id) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS_DETAIL.replace(':id', id),
+    method: "delete"
+  });
+}
+
 export default {
   sync,
   payments_cards,
@@ -582,5 +604,8 @@ export default {
   emergency_access,
   invite_emergency_access,
   update_emergency_access,
-  delete_emergency_access
+  delete_emergency_access,
+  exclude_domains,
+  add_exclude_domain,
+  delete_exclude_domain
 };

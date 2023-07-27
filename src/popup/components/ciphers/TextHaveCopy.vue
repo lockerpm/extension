@@ -2,9 +2,14 @@
   <div class="cipher-field" style="">
     <div class="">{{ label }}</div>
     <div class="flex justify-between">
-      <div class="col-span-4 font-semibold">
-        <div v-if="text&&textArea" class="whitespace-pre-wrap" v-html="text" />
-        <span v-if="text&&!textArea">{{ text | filterPassword(showPassword) }}</span>
+      <div
+        class="col-span-4 font-semibold"
+        :style="`width: ${shouldHide ? '70%' : '90%'};`"
+      >
+        <div v-if="text&&textArea" class="word-wrap" v-html="text" />
+        <span v-if="text&&!textArea" class="word-wrap">
+          {{ text | filterPassword(showPassword) }}
+        </span>
       </div>
       <div
         v-if="text&&viewPassword===true"
@@ -68,3 +73,8 @@ export default Vue.extend({
 }
 )
 </script>
+<style lang="scss">
+.word-wrap {
+  word-wrap: break-word;
+}
+</style>

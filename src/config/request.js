@@ -30,9 +30,6 @@ service.interceptors.request.use(async (config) => {
 // response interceptor
 service.interceptors.response.use(
   (response) => {
-    if (response.headers['device-id']) {
-      browserStorageService.save("device_id", response.headers["device-id"]);
-    }
     return response && response.data
   },
   (error) => {

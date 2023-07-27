@@ -163,13 +163,13 @@ export class BrowserApi {
     return process.env.ENV !== 'production';
   }
 
-  static getUILanguage(win: Window) {
+  static getUILanguage() {
     return chrome.i18n.getUILanguage();
   }
 
   static reloadExtension(win: Window) {
     if (win != null) {
-      return win.location.reload(true);
+      return win.location.reload();
     } else {
       return chrome.runtime.reload();
     }

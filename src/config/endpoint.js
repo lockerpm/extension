@@ -81,6 +81,9 @@ export default {
   CYSTACK_PLATFORM_EMERGENCY_ACCESS_DETAIL: '/cystack_platform/pm/emergency_access/:id',
   CYSTACK_PLATFORM_EMERGENCY_ACCESS_INVITE: '/cystack_platform/pm/emergency_access/invite',
 
+  CYSTACK_PLATFORM_EXCLUDE_DOMAINS: '/cystack_platform/pm/exclude_domains',
+  CYSTACK_PLATFORM_EXCLUDE_DOMAINS_DETAIL: '/cystack_platform/pm/exclude_domains/:id',
+
   // notifications
   NOTIFICATIONS: '/notifications'
 };
