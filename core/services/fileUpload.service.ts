@@ -11,22 +11,22 @@ import { AttachmentUploadDataResponse } from '../models/response/attachmentUploa
 import { SendFileUploadDataResponse } from '../models/response/sendFileUploadDataResponse';
 
 import { AzureFileUploadService } from './azureFileUpload.service';
-import { BitwardenFileUploadService } from './bitwardenFileUpload.service';
+import { LockerFileUploadService } from './lockerFileUpload.service';
 
 export class FileUploadService implements FileUploadServiceAbstraction {
     private azureFileUploadService: AzureFileUploadService;
-    private bitwardenFileUploadService: BitwardenFileUploadService;
+    private lockerFileUploadService: LockerFileUploadService;
 
     constructor(private logService: LogService, private apiService: ApiService) {
         this.azureFileUploadService = new AzureFileUploadService(logService);
-        this.bitwardenFileUploadService = new BitwardenFileUploadService(apiService);
+        this.lockerFileUploadService = new LockerFileUploadService(apiService);
     }
 
     async uploadSendFile(uploadData: SendFileUploadDataResponse, fileName: EncString, encryptedFileData: EncArrayBuffer) {
         try {
             switch (uploadData.fileUploadType) {
                 case FileUploadType.Direct:
-                    await this.bitwardenFileUploadService.upload(fileName.encryptedString, encryptedFileData,
+                    await this.lockerFileUploadService.upload(fileName.encryptedString, encryptedFileData,
                         fd => this.apiService.postSendFile(uploadData.sendResponse.id, uploadData.sendResponse.file.id, fd));
                     break;
                 case FileUploadType.Azure:
@@ -53,7 +53,7 @@ export class FileUploadService implements FileUploadServiceAbstraction {
         try {
             switch (uploadData.fileUploadType) {
                 case FileUploadType.Direct:
-                    await this.bitwardenFileUploadService.upload(encryptedFileName.encryptedString, encryptedFileData,
+                    await this.lockerFileUploadService.upload(encryptedFileName.encryptedString, encryptedFileData,
                         fd => this.apiService.postAttachmentFile(response.id, uploadData.attachmentId, fd));
                     break;
                 case FileUploadType.Azure:

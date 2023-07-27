@@ -10,8 +10,8 @@ export class ContainerService {
     }
 
     attachToGlobal(global: any) {
-        if (!global.bitwardenContainerService) {
-            global.bitwardenContainerService = this;
+        if (!global.lockerContainerService) {
+            global.lockerContainerService = this;
         }
     }
 
