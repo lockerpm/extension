@@ -30,8 +30,8 @@ export default Vue.extend({
     return {
       callingAPI: false,
       form: {
-        username: null,
-        password: null
+        username: '',
+        password: ''
       },
     }
   },
@@ -69,7 +69,7 @@ export default Vue.extend({
     language: {
       handler() {
         setTimeout(() => {
-          this.$refs.form.clearValidate();
+          this.$refs.form?.clearValidate();
         }, 10);
       },
       deep: true
@@ -113,6 +113,7 @@ export default Vue.extend({
           user_info: payload
         })
         if (response.is_factor2) {
+          // this.$runtimeBackground.authAccessToken('captcha')
           this.$emit('next');
         } else {
           try {
@@ -135,7 +136,7 @@ export default Vue.extend({
         user_info: this.form,
         forgot_step: 1,
       })
-      this.$router.push({ name: 'forgot-password' })
+      this.$router.push({ name: 'forgot-password' }).catch(() => ({}))
     }
   }
 })

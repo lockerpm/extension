@@ -20,11 +20,8 @@
         "./src/*"
       ],
       "jslib-common/*": [
-        "./core/common/src/*"
+        "./core/*"
       ],
-      "jslib-angular/*": [
-        "./jslib/angular/src/*"
-      ]
     },
     "lib": [
       "esnext",

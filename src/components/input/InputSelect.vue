@@ -1,18 +1,20 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': value === null || value !== '',
-             'is-hover': hovering,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': value === null || value !== '',
+      'is-hover': hovering,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder
     }"
   >
     <label>{{ label }}<span v-if="required" class="text-danger">*</span></label>
     <el-select
       v-model="value"
-      :placeholder="placeholder"
       class="cs-select w-full"
+      :placeholder="placeholder"
       :disabled="disabled"
       @focus="handleFocus"
       @blur="focusing = false"
@@ -76,7 +78,7 @@ export default Vue.extend({
     },
     initialValue: {
       type: [String, Number, Object, Array],
-      default: ''
+      default: () => ''
     },
     options: {
       type: Array,
@@ -95,6 +97,10 @@ export default Vue.extend({
     keyLabel: {
       type: String,
       default: 'label'
+    },
+    noBorder: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -141,7 +147,7 @@ export default Vue.extend({
   position: relative;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
-  border-radius: 8px;
+  border-radius: 4px;
   &.is-hover, &.is-focus {
     @apply border-primary;
     label {
@@ -197,6 +203,9 @@ export default Vue.extend({
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none !important;
   }
 }
 </style>

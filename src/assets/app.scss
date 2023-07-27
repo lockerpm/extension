@@ -20,7 +20,6 @@ html {
 body {
   display: flex;
   flex-direction: column;
-  height: 100%;
   @apply text-base;
   @apply text-black-700;
   @apply lg:text-base;
@@ -28,8 +27,8 @@ body {
   -ms-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-width: 400px;
-  height: 600px;
+  width: 100%;
+  height: 100%;
   &.body-full {
     @apply w-full h-full;
   }
@@ -76,18 +75,21 @@ select:focus {
 }
 
 .el-dialog.locker-dialog {
-  .el-dialog__header,
-  .el-dialog__footer {
-    @apply px-8;
-  }
+  border-radius: 8px;
   .el-dialog__header {
-    @apply pt-8;
+    @apply px-4 pt-4 py-2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .el-dialog__headerbtn {
+      position: initial
+    }
   }
   .el-dialog__footer {
-    @apply pb-8;
+    @apply px-4 pt-2 pb-4;
   }
   .el-dialog__body {
-    @apply px-8 py-5;
+    @apply px-4 py-2;
   }
 }
 .hover-table-row:hover {
@@ -397,7 +399,7 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .cipher-item {
-    @apply flex items-center cursor-pointer h-[60px] px-5 border-black-400;
+    @apply flex items-center cursor-pointer h-[50px] px-4 border-black-400;
   }
 }
 .list-ciphers li:hover {
@@ -409,7 +411,7 @@ input:-webkit-autofill:active {
   @apply bg-white;
   border-radius: 12px;
   .folder-item {
-    @apply flex items-center cursor-pointer h-[56px] px-5 border-black-400;
+    @apply flex items-center h-[50px] px-4 border-black-400;
   }
 }
 .list-folders li:hover {
@@ -418,23 +420,22 @@ input:-webkit-autofill:active {
   background-color: #E8E8E9;
 }
 #password-generator .generated-password-container {
-  padding: 12px 16px;
+  padding: 6px 16px;
   background-color: #E4F0E6;
-  border-radius: 93px;
-}
-#password-generator .password-generator-options {
-  padding: 0px 20px 16px 20px;
+  border-radius: 4px;
 }
 .popup-setting-wrapper {
   @apply bg-white;
-  border-radius: 16px;
+  border-radius: 12px;
   .popup-setting-section {
-    @apply flex items-center cursor-pointer p-4;
+    @apply flex items-center cursor-pointer px-4 py-2;
     .setting-title {
-      @apply text-black text-head-6;
+      @apply text-black;
+      font-size: 14px !important;
     }
     .setting-desc {
-      @apply text-black-500
+      @apply text-black-500;
+      font-size: 11px !important;
     }
 
   }
@@ -454,12 +455,12 @@ input:-webkit-autofill:active {
   visibility: visible !important;
 }
 .timeout-option{
-  @apply flex items-center justify-between px-4 py-2;
-}
-.timeout-option:hover {
-  background-color: #E8E8E9;
+  @apply flex items-center justify-between py-2;
 }
 .info-section {
-  @apply text-black text-head-6 p-4;
-  border-bottom: 1px solid #A2A3A7;
+  @apply text-black text-head-6 py-2;
+}
+
+.text-gray {
+  color: #A2A3A7 !important;
 }

@@ -1,18 +1,20 @@
 <template>
   <div
-    class="cs-field"
-    :class="{'is-focus': focusing,
-             'have-value': true,
-             'is-hover': hovering,
-             'is-error': errorText,
-             'is-disabled': disabled,
+    class="cs-field bg-white"
+    :class="{
+      'is-focus': focusing,
+      'have-value': true,
+      'is-hover': hovering,
+      'is-error': errorText,
+      'is-disabled': disabled,
+      'no-border': noBorder
     }"
   >
     <label>{{ label }} <span v-if="required" class="text-danger">*</span></label>
     <el-select
       v-model="value"
-      :placeholder="placeholder"
       class="cs-select w-full"
+      :placeholder="placeholder"
       :disabled="disabled"
       @focus="handleFocus"
       @blur="focusing = false"
@@ -81,6 +83,10 @@ export default {
     initialValue: {
       type: [String, Number, Object],
       default: ''
+    },
+    noBorder: {
+      type: Boolean,
+      default: true
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -134,7 +140,7 @@ export default {
   @apply mb-2.5 last:mb-6;
   display: flex;
   position: relative;
-  border-radius: 2px;
+  border-radius: 4px;
   border: solid 1px #e6e8f4;
   padding-top: 16px;
   &.is-hover, &.is-focus {
@@ -192,6 +198,9 @@ export default {
     transition-duration: .3s;
     line-height: 19px;
     user-select: none;
+  }
+  &.no-border {
+    border: none !important;
   }
 }
 </style>

@@ -1,43 +1,37 @@
 <template>
-  <div
-    class="relative h-screen"
-    style="background: #fff; padding-top: 82px"
-  >
-    <div
-      class="grid grid-cols-4 bg-white px-4 pb-4 fixed top-0"
-      style="z-index: 1; width: 400px; padding-top: 24px; align-items: center"
-    >
-      <div
-        class="menu-icon cursor-pointer"
-        @click="$router.back()"
-      >
-        <i class="fas fa-arrow-left text-[20px]"></i>
+  <div>
+    <div>
+      <div class="font-semibold">
+        {{$t('data.settings.vault_timeout_desc')}}
       </div>
-      <div class="text-center text-head-6 font-semibold col-span-2">
-        {{$t('data.settings.vault_timeout')}}
-      </div>
-    </div>
-    <div class="">
-      <div class="text-black-500 p-4">
+      <span class="text-black-500">
         {{$t('data.settings.vault_timeout_details')}}
-      </div>
-      <div class="">
-        <div
-          v-for="option in vaultTimeouts"
-          :key="option.value"
-          class="timeout-option"
-          @click="putUser(option.value)"
-        >
+      </span>
+    </div>
+    <div class="mt-2">
+      <div
+        v-for="option in vaultTimeouts"
+        :key="option.value"
+        class="timeout-option"
+        @click="putUser(option.value)"
+      >
+        <div class="font-semibold">
           {{option.label}}
-          <div v-if="user.timeout === option.value" class="text-primary" style="font-size: 8px; line-height: 8px; padding: 5px; border-radius: 50%; border: 1px solid green">
-            <i
-              class="fas fa-circle"
-            />
-          </div>
-          <div v-else style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid #A2A3A7">
-
-          </div>
         </div>
+        <div
+          v-if="user.timeout === option.value"
+          class="text-primary cursor-pointer"
+          style="font-size: 8px; line-height: 8px; padding: 5px; border-radius: 50%; border: 1px solid green"
+        >
+          <i
+            class="fas fa-circle"
+          />
+        </div>
+        <div
+          v-else
+          class="cursor-pointer"
+          style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid #A2A3A7"
+        />
       </div>
     </div>
   </div>
@@ -66,7 +60,7 @@ export default Vue.extend({
   },
   methods: {
     async getUser() {
-      const user = await this.$store.dispatch("LoadCurrentUserPw");
+      const user = await cystackPlatformAPI.users_me();
       this.user = { ...user };
     },
     async putUser(timeoutValue) {
