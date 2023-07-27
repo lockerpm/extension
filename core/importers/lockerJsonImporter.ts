@@ -11,7 +11,7 @@ import { FolderWithId } from '../models/export/folderWithId';
 import { CryptoService } from '../abstractions/crypto.service';
 import { I18nService } from '../abstractions/i18n.service';
 
-export class BitwardenJsonImporter extends BaseImporter implements Importer {
+export class LockerJsonImporter extends BaseImporter implements Importer {
     private results: any;
     private result: ImportResult;
 
