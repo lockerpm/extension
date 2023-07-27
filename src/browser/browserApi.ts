@@ -102,7 +102,6 @@ export class BrowserApi {
       setTimeout(function () {
         callback(msg, sender, response);
       }, 1);
-      return true;
     });
   }
 

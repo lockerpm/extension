@@ -72,7 +72,7 @@ export default class RuntimeBackground {
     BrowserApi.messageListener('runtime.background', async (msg: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
       await this.processMessage(msg, sender, sendResponse);
     });
-    chrome.runtime.onMessageExternal.addListener(
+    chrome.runtime.onMessageExternal?.addListener(
       async (msg, sender, sendResponse) => {
         await this.processMessage(msg, sender, sendResponse)
       }
