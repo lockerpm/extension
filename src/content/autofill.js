@@ -237,10 +237,10 @@ function doAllFillOperations(el, animateTheFilling, afterValSetFunc) {
 
   // START MODIFICATION
   if (canSeeElementToStyle(el, animateTheFilling)) {
-    el.classList.add('com-bitwarden-browser-animated-fill');
+    el.classList.add('com-locker-browser-animated-fill');
     setTimeout(function () {
       if (el) {
-        el.classList.remove('com-bitwarden-browser-animated-fill');
+        el.classList.remove('com-locker-browser-animated-fill');
       }
     }, 200);
   }
@@ -292,7 +292,7 @@ function collect(document, undefined) {
   document.addEventListener('input', function (inputevent) {
     inputevent.a !== false &&
       inputevent.target.tagName.toLowerCase() === 'input' &&
-      (inputevent.target.dataset['com.bitwarden.browser.userEdited'] = 'yes');
+      (inputevent.target.dataset['com.locker.browser.userEdited'] = 'yes');
   }, true);
 
   function getPageDetails(theDoc, oneShotId) {

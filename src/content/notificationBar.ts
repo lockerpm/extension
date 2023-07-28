@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
             const tagName = addedNode.tagName != null ? addedNode.tagName.toLowerCase() : null;
             if (tagName != null && tagName === 'form' &&
-              (addedNode.dataset == null || !addedNode.dataset.bitwardenWatching)) {
+              (addedNode.dataset == null || !addedNode.dataset.lockerWatching)) {
               doCollect = true;
               break;
             }
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', event => {
               continue;
             }
 
-            const forms = addedNode.querySelectorAll('form:not([data-bitwarden-watching])');
+            const forms = addedNode.querySelectorAll('form:not([data-locker-watching])');
             if (forms != null && forms.length > 0) {
               doCollect = true;
               break;
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', event => {
         const index = parseInt(f.form.opid.split('__')[2], null);
         formEl = document.getElementsByTagName('form')[index];
       }
-      if (formEl != null && formEl.dataset.bitwardenWatching !== '1') {
+      if (formEl != null && formEl.dataset.lockerWatching !== '1') {
         const formDataObj: any = {
           data: f,
           formEl: formEl,
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', event => {
         locateFields(formDataObj);
         formData.push(formDataObj);
         listen(formEl);
-        formEl.dataset.bitwardenWatching = '1';
+        formEl.dataset.lockerWatching = '1';
       }
     });
   }
@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', event => {
       form = e.target as HTMLFormElement;
     }
 
-    if (form == null || form.dataset.bitwardenProcessed === '1') {
+    if (form == null || form.dataset.lockerProcessed === '1') {
       return;
     }
 
@@ -607,9 +607,9 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function processedForm(form: HTMLFormElement) {
-    form.dataset.bitwardenProcessed = '1';
+    form.dataset.lockerProcessed = '1';
     self.setTimeout(() => {
-      form.dataset.bitwardenProcessed = '0';
+      form.dataset.lockerProcessed = '0';
     }, 500);
   }
 

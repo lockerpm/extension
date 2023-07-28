@@ -157,19 +157,19 @@ Vue.mixin({
       })
     },
     async logout() {
-      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
+      await this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       try {
         await userAPI.logout();
       } catch (error) {
         //
       }
-      await self.bitwardenMain.onLogout(false)
+      await self.lockerMain.onLogout(false)
       this.$store.commit('CLEAR_ALL_DATA')
       await this.setupFillPage();
       this.$router.push({ name: 'login' }).catch(() => ({}));
     },
     async lock() {
-      await self.bitwardenMain.onLock()
+      await self.lockerMain.onLock()
       await this.setupFillPage();
       this.$router.push({ name: 'lock' }).catch(() => ({}));
     },

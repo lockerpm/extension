@@ -507,7 +507,7 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async makeSendKey(keyMaterial: ArrayBuffer): Promise<SymmetricCryptoKey> {
-    const sendKey = await this.cryptoFunctionService.hkdf(keyMaterial, 'bitwarden-send', 'send', 64, 'sha256');
+    const sendKey = await this.cryptoFunctionService.hkdf(keyMaterial, 'locker-send', 'send', 64, 'sha256');
     return new SymmetricCryptoKey(sendKey);
   }
 

@@ -35,16 +35,16 @@ import AutofillService from '@/services/autofill.service';
 import MainBackground from '../../background/main.background';
 import RuntimeBackground from '../../background/runtime.background';
 
-let bitwardenMain = chrome['bitwardenMain'];
+let lockerMain = chrome['lockerMain'];
 function getBgService<T>(service: string) {
   return (): T => {
-    if (bitwardenMain) {
-      (self as any ).bitwardenMain = bitwardenMain
-      return bitwardenMain[service] as T
+    if (lockerMain) {
+      (self as any ).lockerMain = lockerMain
+      return lockerMain[service] as T
     }
-    bitwardenMain = (self as any ).bitwardenMain = new MainBackground();
-    bitwardenMain.bootstrap().then(() => {});
-    return bitwardenMain[service] as T;
+    lockerMain = (self as any ).lockerMain = new MainBackground();
+    lockerMain.bootstrap().then(() => {});
+    return lockerMain[service] as T;
   };
 }
 
