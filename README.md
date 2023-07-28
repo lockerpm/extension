@@ -78,10 +78,6 @@ To load the browser extension built:
 
 The temporary add-on will remain installed only for the current browsing session. If you close and then reopen Firefox, you'll need to load the temporary add-on again to use it.
 
-## Credits
-The Locker Extension project utilizes the [Jslib library from Bitwarden](https://github.com/bitwarden/jslib). Jslib is a JavaScript library for working with cryptographic algorithms and other utility functions.
-
-
 ## Contributing
 Contributions to the Locker Extension project are welcome! If you find any issues or want to suggest improvements, please feel free to open an issue or submit a pull request.
 
