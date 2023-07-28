@@ -15,7 +15,7 @@ import { CipherType } from '../enums/cipherType';
 import { FieldType } from '../enums/fieldType';
 import { SecureNoteType } from '../enums/secureNoteType';
 
-export class BitwardenCsvImporter extends BaseImporter implements Importer {
+export class LockerCsvImporter extends BaseImporter implements Importer {
     parse(data: string): Promise<ImportResult> {
         const result = new ImportResult();
         const results = this.parseCsv(data, true);
