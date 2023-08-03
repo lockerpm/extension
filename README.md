@@ -1,4 +1,4 @@
-![Locker Password Manager](https://raw.githubusercontent.com/lockerpm/.github/main/images/locker5.png)
+![Locker Password Manager](https://raw.githubusercontent.com/lockerpm/.github/main/images/extension-locker.png)
 
 # Locker Extension
 
