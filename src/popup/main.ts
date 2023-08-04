@@ -58,6 +58,7 @@ Vue.mixin({
       loadedTimeout: null,
       pageDetails: null,
       selectedCipher: null,
+      pageSize: 150,
 
       folders: [],
       strategies: [
@@ -106,6 +107,9 @@ Vue.mixin({
     },
     enableAutofill() {
       return this.$store.state.enableAutofill
+    },
+    syncCount() {
+      return this.$store.state.syncCount
     }
   },
   destroyed() {
@@ -233,7 +237,7 @@ Vue.mixin({
             this.$vaultTimeoutService.biometricLocked = false
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.getSyncData()
+          await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
@@ -248,6 +252,7 @@ Vue.mixin({
           })
           await this.$storageService.save('cs_token', res.access_token)
           await this.$store.dispatch("LoadCurrentUser");
+          await this.$store.dispatch("LoadSyncCount");
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
           await this.$cryptoService.setKey(decryptData.key)
@@ -259,7 +264,7 @@ Vue.mixin({
             this.$vaultTimeoutService.biometricLocked = false
           }
           await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.getSyncData()
+          await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
@@ -276,40 +281,24 @@ Vue.mixin({
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
-      const pageSize = 100
-      try {
-        let page = 1
-        let allCiphers = []
-        const userId = await this.$userService.getUserId()
+      const userId = await this.$userService.getUserId()
+      await cystackPlatformAPI.sync({ paging: 0 }).then(async (response) => {
         this.$messagingService.send('syncStarted')
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          let res = await cystackPlatformAPI.sync({
-            paging: 1,
-            size: pageSize,
-            page
-          })
-          if (res.count && res.count.ciphers) {
-            this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
-          }
-          res = new SyncResponse(res)
-          allCiphers = allCiphers.concat(res.ciphers)
-          await this.$syncService.syncProfile(res.profile)
-          await this.$syncService.syncFolders(userId, res.folders);
-          await this.$syncService.syncCollections(res.collections);
-          await this.$syncService.syncSomeCiphers(userId, res.ciphers);
-          await this.$syncService.syncSends(userId, res.sends);
-          await this.$syncService.syncSettings(userId, res.domains);
-          await this.$syncService.syncPolicies(res.policies);
-          await this.$syncService.setLastSync(new Date());
-          if (page * pageSize >= this.cipherCount) {
-            break
-          }
-          page += 1
+        if (response.count && response.count.ciphers) {
+          this.$store.commit('UPDATE_CIPHER_COUNT', response.count.ciphers)
         }
+        const res = new SyncResponse(response)
+        await this.$syncService.syncProfile(res.profile)
+        await this.$syncService.syncFolders(userId, res.folders);
+        await this.$syncService.syncCollections(res.collections);
+        await this.$syncService.syncSomeCiphers(userId, res.ciphers);
+        await this.$syncService.syncSends(userId, res.sends);
+        await this.$syncService.syncSettings(userId, res.domains);
+        await this.$syncService.syncPolicies(res.policies);
+        await this.$syncService.setLastSync(new Date());
 
         const deletedIds = [];
-        const cipherIds = allCiphers.map(c => c.id);
+        const cipherIds = res.ciphers.map(c => c.id);
         const storageRes = await this.$storageService.get(`ciphers_${userId}`);
         for (const id in { ...storageRes }) {
           if (!cipherIds.includes(id)) {
@@ -323,11 +312,12 @@ Vue.mixin({
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-      } catch (e) {
+
+      }).catch(() => {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-      }
+      })
     },
     async getFolders() {
       return await this.$folderService.getAllDecrypted()
@@ -693,7 +683,7 @@ Vue.filter('filterString', function (value) {
 })
 
 storePromise().then((store) => {
-  middleware(store)
+  middleware()
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
   new Vue({

@@ -61,7 +61,6 @@ import Identity from '@/popup/components/auth/Identity.vue'
 import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import authAPI from '@/api/auth'
-import meAPI from '@/api/me'
 import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
@@ -110,6 +109,7 @@ export default Vue.extend({
         if(data.access_token){
           await this.$storageService.save('cs_token', data.access_token)
           await this.$store.dispatch("LoadCurrentUser");
+          await this.$store.dispatch("LoadSyncCount");
           cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
             this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
               preloginData: {

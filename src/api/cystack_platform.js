@@ -10,6 +10,14 @@ async function sync(params = {}) {
   });
 }
 
+async function sync_count(params = {}) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_SYNC_COUNT,
+    method: "get",
+    params
+  });
+}
+
 async function payments_cards(params = {}) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_PAYMENTS_CARDS,
@@ -541,6 +549,7 @@ async function delete_exclude_domain(id) {
 
 export default {
   sync,
+  sync_count,
   payments_cards,
   create_payments_card,
   teams,
