@@ -98,11 +98,9 @@ export default {
     if (mainBody) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this
-      mainBody.addEventListener('scroll', (e) => {
-        if (e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight) {
-          if (self.ciphers && self.ciphers.length > self.pageSize) {
-            self.size = self.pageSize + self.size
-          }
+      mainBody.addEventListener('scrollend', () => {
+        if (self.ciphers && self.ciphers.length > self.size) {
+          self.size = self.pageSize + self.size
         }
       })
     }
