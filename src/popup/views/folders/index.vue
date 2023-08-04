@@ -17,7 +17,7 @@
       />
       <ul class="list-folders">
         <li
-          v-for="folder in filteredFolders"
+          v-for="folder in pagingFolders"
           :key="folder.id"
         >
           <FolderRow
@@ -54,6 +54,8 @@ export default Vue.extend({
     return {
       orderField: "revisionDate",
       orderDirection: 'desc',
+      pageSize: 10,
+      size: 10
     }
   },
   asyncComputed: {
@@ -84,6 +86,26 @@ export default Vue.extend({
   computed: {
     filteredFolders() {
       return (this.folders || []).filter((f) => this.searchText ? f.name.toLowerCase().includes(this.searchText.toLowerCase() || '') : true)
+    },
+    pagingFolders() {
+      if (this.filteredFolders) {
+        return this.filteredFolders.slice(0, this.size)
+      }
+      return []
+    },
+  },
+  mounted () {
+    const mainBody = document.querySelector('.main-body')
+    if (mainBody) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this
+      mainBody.addEventListener('scroll', (e) => {
+        if (e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight) {
+          if (self.filteredFolders && self.filteredFolders.length > self.pageSize) {
+            self.size = self.pageSize + self.size
+          }
+        }
+      })
     }
   },
   methods: {

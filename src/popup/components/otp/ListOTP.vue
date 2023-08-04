@@ -19,7 +19,7 @@
       />
       <div class="list-ciphers">
         <OTPRow
-          v-for="item in ciphers || []"
+          v-for="item in pagingCiphers || []"
           :key="item.id"
           :item="item"
           @edit-otp="() => $emit('add-edit', item)"
@@ -52,6 +52,8 @@ export default {
       orderField: "revisionDate",
       orderDirection: 'desc',
       callingAPI: false,
+      pageSize: 10,
+      size: 10
     }
   },
   asyncComputed: {
@@ -82,6 +84,28 @@ export default {
       }
       return false
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    pagingCiphers() {
+      if (this.ciphers) {
+        return this.ciphers.slice(0, this.size)
+      }
+      return []
+    },
+  },
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  mounted () {
+    const mainBody = document.querySelector('.main-body')
+    if (mainBody) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this
+      mainBody.addEventListener('scroll', (e) => {
+        if (e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight) {
+          if (self.ciphers && self.ciphers.length > self.pageSize) {
+            self.size = self.pageSize + self.size
+          }
+        }
+      })
+    }
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

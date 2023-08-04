@@ -54,6 +54,7 @@
                 class="form-control"
                 :class="[errors ? 'is-invalid' :'']"
                 :name="randomString()"
+                :disabled="loading"
                 autocomplete="new-password"
               >
               <div class="input-group-append !bg-white">
@@ -89,29 +90,35 @@
         </div>
         <div class="form-group">
           <div class="grid lg:grid-cols-2 grid-cols-1 gap-2">
-            <button
-              v-if="!isPasswordlessMethod"
-              class="btn btn-primary w-full"
-              :disabled="loading"
-              @click="setMasterPass"
-            >
-              {{ $t('master_password.unlock') }}
-            </button>
-            <button
-              v-else
-              class="btn btn-primary w-full"
-              :disabled="loading || lockedInDesktopApp"
-              @click="reconnectDesktopAppSocket()"
-            >
-              {{ $t('master_password.unlock') }}
-            </button>
-            <button
-              class="btn btn-default w-full"
-              :disabled="loading"
-              @click="logout"
-            >
-              {{ $t('common.logout') }}
-            </button>
+            <div>
+              <el-button
+                v-if="!isPasswordlessMethod"
+                type="primary"
+                class="w-full"
+                :loading="loading"
+                @click="setMasterPass"
+              >
+                {{ $t('master_password.unlock') }}
+              </el-button>
+              <el-button
+                v-else
+                type="primary"
+                class=" w-full"
+                :disabled="loading || lockedInDesktopApp"
+                @click="reconnectDesktopAppSocket()"
+              >
+                {{ $t('master_password.unlock') }}
+              </el-button>
+            </div>
+            <div>
+              <el-button
+                class="w-full"
+                :disabled="loading"
+                @click="logout"
+              >
+                {{ $t('common.logout') }}
+              </el-button>
+            </div>
           </div>
         </div>
       </template>
