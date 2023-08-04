@@ -11,7 +11,7 @@
       </div>
       <ul v-if="fillType.value !== CipherType.OTP" class="list-ciphers">
         <CipherRow
-          v-for="item in (ciphers || [])"
+          v-for="item in (pagingCiphers || [])"
           :fill-type="fillType"
           :key="item.id"
           :item="item"
@@ -20,7 +20,7 @@
       </ul>
       <ul v-else class="list-ciphers">
         <OTPRow
-          v-for="item in (ciphers || [])"
+          v-for="item in (pagingCiphers || [])"
           :key="item.id"
           :item="item"
         />
@@ -46,7 +46,9 @@ export default Vue.extend({
   },
   data () {
     return {
-      CipherType
+      CipherType,
+      pageSize: 10,
+      size: 10
     }
   },
   computed: {
@@ -55,6 +57,12 @@ export default Vue.extend({
         return !this.ciphers.length;
       }
       return false
+    },
+    pagingCiphers() {
+      if (this.ciphers) {
+        return this.ciphers.slice(0, this.size)
+      }
+      return []
     },
   },
   asyncComputed: {
@@ -87,6 +95,34 @@ export default Vue.extend({
       ],
     }
   },
+  watch: {
+    fillType: 'typeChanged'
+  },
+  mounted () {
+    const mainBody = document.querySelector('.menu-info')
+    if (mainBody) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this
+      mainBody.addEventListener('scroll', (e) => {
+        if (e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight) {
+          if (self.ciphers && self.ciphers.length > self.pageSize) {
+            self.size = self.pageSize + self.size
+          }
+        }
+      })
+    }
+  },
+  methods: {
+    typeChanged() {
+      const mainBody = document.querySelector('.menu-info')
+      if (mainBody) {
+        mainBody.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+      setTimeout(() => {
+        this.size = this.pageSize
+      }, 1000);
+    }
+  }
 })
 </script>
 
