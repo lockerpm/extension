@@ -99,11 +99,9 @@ export default Vue.extend({
     if (mainBody) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this
-      mainBody.addEventListener('scroll', (e) => {
-        if (e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight) {
-          if (self.filteredFolders && self.filteredFolders.length > self.pageSize) {
-            self.size = self.pageSize + self.size
-          }
+      mainBody.addEventListener('scrollend', () => {
+        if (self.filteredFolders && self.filteredFolders.length > self.size) {
+          self.size = self.pageSize + self.size
         }
       })
     }
