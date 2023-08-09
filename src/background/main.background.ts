@@ -276,8 +276,7 @@ export default class MainBackground {
         if (this.notificationsService) {
           this.notificationsService.updateConnection(false);
         }
-        await this.setIcon();
-        await this.refreshBadgeAndMenu(true);
+        await this.lock();
         if (this.systemService) {
           this.systemService.startProcessReload();
           await this.systemService.clearPendingClipboard();

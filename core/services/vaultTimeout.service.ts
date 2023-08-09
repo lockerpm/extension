@@ -44,7 +44,7 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 10 * 1000); // check every 10 seconds
+        setInterval(() => this.checkVaultTimeout(), 3 * 1000); // check every 3 seconds
     }
 
     // Keys aren't stored for a device that is locked or logged out.
@@ -69,8 +69,13 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         const vaultTimeout = await this.getVaultTimeout();
+        
         if (!vaultTimeout || vaultTimeout < 0) {
-            return;
+          const windows = await chrome.windows.getAll()
+          if (windows.length === 0) {
+            await this.lock();
+          }
+          return;
         }
 
         const lastActive = await this.storageService.get<number>(ConstantsService.lastActiveKey);
@@ -84,29 +89,15 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
         if (diffSeconds >= vaultTimeoutSeconds) {
             const timeoutAction = await this.storageService.get<string>(ConstantsService.vaultTimeoutActionKey);
-            timeoutAction === 'logOut' ? await this.logOut() : await this.lock(true);
+            timeoutAction === 'logOut' ? await this.logOut() : await this.lock();
         }
     }
 
-    async lock(allowSoftLock = false): Promise<void> {
-        const authed = await this.userService.isAuthenticated();
-        if (!authed) {
-            return;
-        }
+    async lock(): Promise<void> {
         this.biometricLocked = true;
         this.everBeenUnlocked = true;
-        await this.cryptoService.clearKey(false);
-        await this.cryptoService.clearOrgKeys(true);
-        await this.cryptoService.clearKeyPair(true);
-        await this.cryptoService.clearEncKey(true);
-
-        this.folderService.clearCache();
-        this.cipherService.clearCache();
-        this.collectionService.clearCache();
-        this.searchService.clearIndex();
-        this.messagingService.send('locked');
         if (this.lockedCallback != null) {
-            await this.lockedCallback();
+          await this.lockedCallback();
         }
     }
 
