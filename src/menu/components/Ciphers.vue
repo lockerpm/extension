@@ -74,9 +74,13 @@ export default Vue.extend({
           if (!tab) {
             result = []
           } else {
-            result = await this.$cipherService.getAllDecryptedForUrl( tab.url) || [];
-            result = result.filter((c) => c.type === CipherType.Login && !c.isDeleted && c.name?.toLowerCase()?.includes(this.searchText?.toLowerCase()))
-            result = this.$cipherService.sortCiphers(result) || [];
+            const ciphers = (await this.$searchService.searchCiphers(
+              this.searchText,
+              [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
+              null,
+              tab,
+            )) || [];
+            result = this.$cipherService.sortCiphers(ciphers) || [];
           }
         } else {
           result =

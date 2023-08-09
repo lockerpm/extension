@@ -78,7 +78,9 @@ export class SearchService implements SearchServiceAbstraction {
   async searchCiphers(
     query: string,
     filter: (((cipher: CipherView) => boolean) | (((cipher: CipherView) => boolean)[])) = null,
-    ciphers: CipherView[] = []
+    ciphers: CipherView[] = [],
+    tab: any = null,
+    otherTypes: any = null
   ): Promise<CipherView[]> {
     const results: CipherView[] = [];
     if (query) {
@@ -87,7 +89,9 @@ export class SearchService implements SearchServiceAbstraction {
       query = null;
     }
     if (!ciphers) {
-      if (this.cipherService.decryptedCipherCache?.length > 0) {
+      if (tab) {
+        ciphers = await this.cipherService.getAllDecryptedForUrl(tab.url, otherTypes);
+      } else if (this.cipherService.decryptedCipherCache?.length > 0) {
         ciphers = this.cipherService.decryptedCipherCache
       } else {
         ciphers = await this.cipherService.getAllDecrypted();
