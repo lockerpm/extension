@@ -12,7 +12,8 @@ import {
 } from '@/config/constants'
 
 document.addEventListener('DOMContentLoaded', event => {
-  if (self.location.hostname.indexOf('id.locker.io') > -1) {
+  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
+  if (hideDomains.includes(self.location.hostname)) {
     return;
   }
   let currentMessage: any = null
