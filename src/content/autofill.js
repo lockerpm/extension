@@ -1,6 +1,7 @@
 let isReading = false;
 document.addEventListener('DOMContentLoaded', event => {
-  if (self.location.hostname.indexOf('id.locker.io') > -1) {
+  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
+  if (hideDomains.includes(self.location.hostname)) {
     return;
   }
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {

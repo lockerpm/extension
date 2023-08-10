@@ -104,8 +104,7 @@
   "externally_connectable": {
     "matches": [
       "https://*.demo.cystack.net:3011/*",
-      "https://*.locker.io/*",
-      "https://*.id.locker.io/"
+      "https://*.locker.io/*"
     ]
   },
   "sidebar_action": {
