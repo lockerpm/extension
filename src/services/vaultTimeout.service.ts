@@ -3,12 +3,12 @@ import { SafariApp } from '../browser/safariApp';
 
 export default class VaultTimeoutService extends BaseVaultTimeoutService {
 
-  startCheck() {
+  async startCheck() {
     this.checkVaultTimeout();
     if (this.platformUtilsService.isSafari()) {
       this.checkSafari();
     } else {
-      setInterval(() => this.checkVaultTimeout(), 10 * 1000); // check every 10 seconds
+      setInterval(() => this.checkVaultTimeout(), 2000); // check every 10 seconds
     }
   }
 

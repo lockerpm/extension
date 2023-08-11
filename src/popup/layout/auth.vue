@@ -3,7 +3,7 @@
     class="relative mx-auto bg-white"
     style="height: 600px; width: 400px"
   >
-    <router-view style="height: 600px;"/>
+    <router-view />
   </div>
 </template>
 
