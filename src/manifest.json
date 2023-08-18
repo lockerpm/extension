@@ -38,7 +38,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": true,
+      "all_frames": false,
       "js": [
         "js/content/autofill.js",
         "js/content/autofiller.js",
@@ -53,7 +53,7 @@
       "run_at": "document_start"
     },
     {
-      "all_frames": true,
+      "all_frames": false,
       "js": [
         "js/content/shortcuts.js"
       ],
