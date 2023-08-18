@@ -11,12 +11,11 @@ export default class WindowsBackground {
     if (!this.windows) {
       return;
     }
-
+    
     this.windows.onFocusChanged.addListener(async (windowId: any) => {
       if (windowId === null || windowId < 0) {
         return;
       }
-
       await this.main.refreshBadgeAndMenu();
     });
   }

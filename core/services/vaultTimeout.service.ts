@@ -37,14 +37,12 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         this.inited = true;
-        if (checkOnInterval) {
-            this.startCheck();
-        }
+        this.startCheck();
     }
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 3 * 1000); // check every 3 seconds
+        setInterval(() => this.checkVaultTimeout(), 100);
     }
 
     // Keys aren't stored for a device that is locked or logged out.
@@ -71,8 +69,8 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         const vaultTimeout = await this.getVaultTimeout();
         
         if (!vaultTimeout || vaultTimeout < 0) {
-          const windows = await chrome.windows.getAll()
-          if (windows.length === 0) {
+          const windows = await chrome?.windows?.getAll() || null
+          if (!windows || !windows.length || windows.length === 0) {
             await this.lock();
           }
           return;

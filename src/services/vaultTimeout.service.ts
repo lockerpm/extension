@@ -8,7 +8,7 @@ export default class VaultTimeoutService extends BaseVaultTimeoutService {
     if (this.platformUtilsService.isSafari()) {
       this.checkSafari();
     } else {
-      setInterval(() => this.checkVaultTimeout(), 10 * 1000); // check every 10 seconds
+      setInterval(() => this.checkVaultTimeout(), 100);
     }
   }
 

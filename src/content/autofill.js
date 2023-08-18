@@ -1,4 +1,6 @@
 let isReading = false;
+document.addEventListener('DOMNodeInserted', event => {
+})
 document.addEventListener('DOMContentLoaded', event => {
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains.includes(self.location.hostname)) {
@@ -7,7 +9,8 @@ document.addEventListener('DOMContentLoaded', event => {
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {
       const pageDetailsObj = JSON.parse(collect(document));
-      if (pageDetailsObj.url === msg.tab.url) {
+      const domain = new URL(msg.tab.url)
+      if (pageDetailsObj.url.includes(domain.hostname)) {
         chrome.runtime.sendMessage({
           command: 'collectPageDetailsResponse',
           tab: msg.tab,
@@ -782,7 +785,7 @@ function collect(document, undefined) {
     // START MODIFICATION
     var els = [];
     try {
-      var elsList = theDoc.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="reset"])' +
+      const elsList = theDoc.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="reset"])' +
         ':not([type="button"]):not([type="image"]):not([type="file"]):not([data-bwignore]), select, ' +
         'span[data-bwautofill]');
       els = Array.prototype.slice.call(elsList);
