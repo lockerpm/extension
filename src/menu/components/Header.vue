@@ -9,7 +9,7 @@
     </div>
     <div v-if="!excluded">
       <el-dropdown
-        trigger="hover"
+        trigger="click"
       >
         <div class="icon flex items-center justify-center">
           <i class="el-icon-more"></i>
@@ -81,4 +81,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.el-dropdown-menu__item {
+  &--divided {
+    &::before {
+      display: none !important;
+    }
+  }
+}
 </style>
