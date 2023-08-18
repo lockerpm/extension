@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', event => {
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {
       const pageDetailsObj = JSON.parse(collect(document));
-      if (pageDetailsObj.url === msg.tab.url) {
+      const domain = new URL(msg.tab.url)
+      if (pageDetailsObj.url.includes(domain.hostname)) {
         chrome.runtime.sendMessage({
           command: 'collectPageDetailsResponse',
           tab: msg.tab,
