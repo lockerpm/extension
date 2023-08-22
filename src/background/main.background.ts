@@ -79,6 +79,7 @@ import { NativeMessagingBackground } from './nativeMessaging.background';
 import NotificationBackground from './notification.background';
 import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
+import WindowsBackground from './windows.background';
 import WebRequestBackground from './webRequest.background';
 import RequestBackground from './request.backgroud';
 
@@ -146,6 +147,7 @@ export default class MainBackground {
   private notificationBackground: NotificationBackground;
   private runtimeBackground: RuntimeBackground;
   private tabsBackground: TabsBackground;
+  private windowsBackground: WindowsBackground;
   private webRequestBackground: WebRequestBackground;
   private requestBackground: RequestBackground;
 
@@ -435,6 +437,10 @@ export default class MainBackground {
       this,
       this.notificationBackground
     );
+    this.windowsBackground = new WindowsBackground(
+      this,
+      this.vaultTimeoutService
+    )
     this.contextMenusBackground = new ContextMenusBackground(
       this,
       this.cipherService,
@@ -491,6 +497,7 @@ export default class MainBackground {
     await this.commandsBackground.init();
 
     await this.tabsBackground.init();
+    await this.windowsBackground.init();
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();

@@ -476,8 +476,10 @@ function collect(document, undefined) {
 
     // get all the form fields
     var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+      const lockerId = `locker-id-${elIndex}`
+      el.setAttribute("locker-id", lockerId);
       if (!el.id) {
-        el.id = `locker-id-${elIndex}`;
+        el.id = lockerId;
       }
       var field = {},
         opId = '__' + elIndex,
@@ -488,6 +490,7 @@ function collect(document, undefined) {
       theDoc.elementsByOPID[opId] = el;
       el.opid = opId;
       field.opid = opId;
+      field.lockerId = lockerId;
       field.elementNumber = elIndex;
       addProp(field, 'maxLength', Math.min(elMaxLen, 999), 999);
       field.visible = isElementVisible(el);
@@ -1022,7 +1025,8 @@ function fill(document, fillScript, undefined) {
 
   // click on an element
   function clickElement(el) {
-    const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.id}`);
+    const lockerId = el.getAttribute('locker-id')
+    const menuEl = document.getElementById(`cs-inform-menu-iframe-${lockerId}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
     }

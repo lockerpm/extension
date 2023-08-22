@@ -21,8 +21,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
     biometricLocked: boolean = true;
     everBeenUnlocked: boolean = false;
 
-    private inited = false;
-
     constructor(private cipherService: CipherService, private folderService: FolderService,
         private collectionService: CollectionService, private cryptoService: CryptoService,
         protected platformUtilsService: PlatformUtilsService, private storageService: StorageService,
@@ -32,17 +30,12 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
     }
 
     async init(checkOnInterval: boolean) {
-        if (this.inited) {
-            return;
-        }
-
-        this.inited = true;
-        this.startCheck();
+        this.startCheck();        
     }
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 100);
+        setInterval(() => this.checkVaultTimeout(), 1000);
     }
 
     // Keys aren't stored for a device that is locked or logged out.
