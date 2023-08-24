@@ -42,7 +42,7 @@ export default class CommandsBackground {
         await this.main.openPopup();
         break;
       case 'lock_vault':
-        await this.vaultTimeoutService.lock(true);
+        // await this.vaultTimeoutService.lock(true);
         break;
       default:
         break;

@@ -63,7 +63,7 @@ export class I18nService implements I18nServiceAbstraction {
 
     async init(locale?: string) {
         if (this.inited) {
-            throw new Error('i18n already initialized.');
+            return;
         }
         if (this.supportedTranslationLocales == null || this.supportedTranslationLocales.length === 0) {
             throw new Error('supportedTranslationLocales not set.');

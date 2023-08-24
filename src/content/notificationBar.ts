@@ -10,7 +10,6 @@ import {
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
 } from '@/config/constants'
-
 document.addEventListener('DOMContentLoaded', event => {
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains.includes(self.location.hostname)) {
@@ -235,85 +234,73 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false, isOver = false) {
-    const elements : any = document.getElementsByClassName(el.htmlClass)
-      for (let i = 0; i < elements.length; i++) {
-        if (elements[i].id === el.htmlID && !elements[i].disabled) {
-          const inputEl = elements[i]
-          if (inputEl && getComputedStyle(inputEl).display !== 'none') {
-            closeInformMenu(inputEl)
-            const elPosition = inputEl.getBoundingClientRect();      
-            let relativeContainer = inputEl.parentElement
-            if (relativeContainer) {
-              relativeContainer.style.position = 'relative'
+    const inputEl : any = document.querySelector(`[locker-id="${el.lockerId}"]`)
+    if (inputEl && getComputedStyle(inputEl).display !== 'none') {
+      closeInformMenu(el)
+      const elPosition = inputEl.getBoundingClientRect();      
+      let relativeContainer = inputEl.parentElement
+      if (relativeContainer) {
+        relativeContainer.style.position = 'relative'
+      }
+      if (relativeContainer) {
+        const containerPosition = relativeContainer.getBoundingClientRect();
+        removeFillLogo(el)
+        const logo = document.createElement("span");
+        logo.id = 'cs-logo-' + el.lockerId;
+        logo.style.cssText = `
+          position: absolute;
+          height: 19px;
+          width: 19px;
+          background-position: center;
+          background-size: contain;
+          z-index: 1000 !important;
+          cursor: pointer;
+        `;
+        document.addEventListener('click', (e: any) => {
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.lockerId}`);
+          if (logo.contains(e.target)) {
+            if (!menuEl) {
+              openInformMenu(inputEl, type, isOver);
+            } else {
+              menuEl.parentElement.removeChild(menuEl)
             }
-            if (relativeContainer) {
-              const containerPosition = relativeContainer.getBoundingClientRect();
-              removeFillLogo(el)
-              const logo = document.createElement("span");
-              logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
-              logo.style.cssText = `
-                position: absolute;
-                height: 19px;
-                width: 19px;
-                background-position: center;
-                background-size: contain;
-                z-index: 1000 !important;
-                cursor: pointer;
-              `;
-              document.addEventListener('click', (e: any) => {
-                const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
-                if (logo.contains(e.target)) {
-                  if (!menuEl) {
-                    openInformMenu(inputEl, type, isOver);
-                  } else {
-                    menuEl.parentElement.removeChild(menuEl)
-                  }
-                } else {
-                  if (menuEl) {
-                    menuEl.parentElement.removeChild(menuEl);
-                  }
-                }
-              })
-              inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
-              if (isOver) {
-                logo.style.right = `-28px`;
-                logo.style.top = `20px`;
-              } else if (elPosition.width <= 0) {
-                logo.style.right = `16px`;
-                logo.style.top = `20px`;
-              } else {
-                logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30}px`;
-                logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
-              }
-              if (isLocked) {
-                const image = 'data:image/png;base64,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'
-                logo.style.backgroundImage = `url('${image}')`;
-              } else {
-                const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAMAAABFjsb+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABIFBMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///+8vCC1AAAAXnRSTlMAABVEc5/B2urx8vDo17+eckITBJj0/fORAgi6+tb3swW5+VHesWPV+9JI3fZLx7XZUk1OvsBPwnHGSga0zYrOrZus50XclFv8jVMQtq8NKswmLcMoHqMbCmpkMKgrHCXsWAAAAAFiS0dEX3PRUS0AAAAHdElNRQflDBcJLw3hH93pAAAA1klEQVQY02NgYGJmYWVj5+Dk4ubh5eMXEBRiYBAWERWLQwAxcQlJBilpCEdGVg7CkFdgkFKM41ACMjmUVSBiqiAxOTX1OA1NFS1tJDEdXT19A0M2XRQxIz5jEyNTdDEzLGJGmGLmFpZWfEhi1jY6VrY63Hb2VlAxB2EGBkcxJx4g09nFFSLmxsDA4O4BZnJ6ckD84wUU8/aJQwa+fkAxBv8AJCHLQAYwCAqGC5mEgAQYgTg0TANiFn84WIQRJBgRCbLUIEoKJAQSAwkyRMdwhMWC9TEyAgDPwE6YM2fCkQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0yM1QwOTo0NzowOCswMDowMBHsN8QAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMjNUMDk6NDc6MDgrMDA6MDBgsY94AAAAAElFTkSuQmCC'
-                logo.style.backgroundImage = `url('${image}')`;
-              }
-              return {
-                logo,
-                inputEl,
-                type
-              };
+          } else {
+            if (menuEl) {
+              menuEl.parentElement.removeChild(menuEl);
             }
-            return null
           }
-          return null
+        })
+        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
+        if (isOver) {
+          logo.style.right = `-28px`;
+          logo.style.top = `20px`;
+        } else if (elPosition.width <= 0) {
+          logo.style.right = `16px`;
+          logo.style.top = `20px`;
+        } else {
+          logo.style.left = `${elPosition.left - containerPosition.left + elPosition.width - 30}px`;
+          logo.style.top = `${elPosition.top - containerPosition.top + (elPosition.height - 20) / 2}px`
+        }
+        if (isLocked) {
+          const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAcwSURBVHgB7Vp9TFNXFD/3lcL4HGggGyzSxU0wsKxM0BgzKeoUszjABZ1my4oummVZ1P25j1iyRZctZpJMp2ZqXRbnxxTQJaKLUuN/fmTMwSgsxmrWskAGFUTQwrs759HXvbbv9UtAWfZLbu57917uO+eez3sKgxAwH6xMF55MyOUiNzIGBgBuAM7SOfWMpdMaBjSuDg7gBmqcO6S1DLBnDs6xF7iDgeA+sPLor/AQYEpiWUpcKW5qwlEDZ2DCyXSYBHDObfgthwhCiyCALRqmmLm+ehMT2eZQJznZIMkxzhvEAc8Wa02DO9RaQRDZzseJeIIkecbMutT4inBrBZjimPIMxMH4wYHN6n22wCRh3CTAOHMceP1YLTWYRPz3bIAzZoNRoQZEtgWmAIIYYFx0HFh1xCrGsQaYAohZhQRRKKOGaUELPELE7IW+rT5io77mZDXmOgweFSKSABP45nhBeJYJbDM8ZohMhUaZe0/VEQf3sDvwmOH/SBwL9CweklmK1Mvw8AfgFnshWkwaA5m6pyAnLheewZbMUjXXdY92wU1PJ/Z/wRC/G3bfCWeACC+MfwmydE9HtJ7WyWuH+L3Ktec32hYvXnxLa/2E2QCpR1HCPFiU+Koq8ampqZCRkeFr9B6IRJZU6fF4bGfPnn1b6zsTIoFkIQUWPLEEMoTpfuNZWVkwY8YMSEtLg7i44E8PDQ1Bb28vuFwu6Ovrk8YYYwbsrMiEYdmyZbUTzsCZM2cMQ2zQT8/phAsLCyExMTHk39J8Tk6O1JxOJ9y4cQOGh4flaUtTU5OhvLy8Rvk3465CeGLNSuLz8vKgpKQkLPGBICbmz58PmZmZyr3NKImtynURSUAEbl53otrE+aiBgXbagJt/BYr7dUFBgURIIM432+DCBRs4UVVk5OfNgrfeXAs52dm+Mb1eD0VFRWC32+H27dvysOXcuXO2pUuXXqSXyFIJxkxUwBjr1ZGsSzNg50s16OQDiSeCzes3wIcfW+BO/wCUFM+RGhHfbu+EV8pXwK5v9gbtnZ+fL6mhDFEUrfX19VLJJ44KTVLBKkrU/FjdLD1wZqSuJGGBQZ7LxlPMzc0N+hsi7k9nF5w8dhiZyw6ar288BR99UitJobJihd+c0WiES5cuwcjIiGTYSUlJm3C4VsCiUsi6ixZIGlLDEgh5HaWrnDlzZtB6Ov2Gxp9g22dbVYknVFW8hmq0BupPnQ6aI3UKOBRJ2gIS4ZfPc2CVNSdW3WSi2AwRYpa+wPdMp69msHZUEcLc4mIIBZq/cuWa6hy5YIX7TUdbKBUw07yoXEQnSoWuaIpdytPPzlY/3YGBfj8D1UKaN6A5XV1BcyQF5f5oC5WCqB+mq2NMaiRtihE3XRGwpk2bBhOJgP2Nkk9cd2IV+VYLxADKdShdIFA6QL5biXZ7B+zesw8uo1oMDAxApCDPlJ+fB++9u8FPchStyZi9cEgKJQoP6gQxnozioarRgenBmNvcGBXhMuwdnVKjPQ7t3+cbD7AvgxQHrFUNbiynmGGc8d33h2MiXgky6MtXr2rO+wLZwZVHG2GcS4IdXs+jhkVlJvi56TT8fv0aWPfvRePUTrddzn8NGrNTvzm/SOwtC1ogCtxTXDoUiVdIkCf5um4HnMd0giIzeZ5tn1o01ytTjoBvtASlEl4mdkKEGBTvStdBAhkYRcpwmFsyB/pRtT7/Yodk3Nu/3IFjxWis4S89SpXEIOxQzYWQCSorWiBC9Il/+54pDQ4H+URltSGPMzbeFfZvu7u7la82zWyUJIHulR4tEI6gkVu+YEYfUMuDlCDDtHd0QP3xHzA3csFsdJe7du8N9xlJwkoGMLA1hMxGiQn0TpUwVvvXxM2RP3xqRDcpulURsnO0VcK8biNsRxW60DxmB7v27NNcm4+ZLYEuODLoh0G6K4dNp8k7iYJQFooJIr7D0+p7b2trk2yBUuVQaGg8jRnqWJALBVIxOn2XwpiRAel6qYMI0HK01f3Lsba6otVS0mZSW0M1nef0s0HHdBLx9+/fh9KFL0M/5v3Xf2uFWECR/YNN70PxnCK4irFAdhBIvHX58uV19Bx1VRaLuaX4a4wVVJI9g/55mJew0PdOaTU1J+o5BSNXBEYqE56amgJLFpVJ0Z2IJwl44cAxk1xqibmsrJU/FcQXSXUgGVSJoNtZtHdiAtlTa2urknjKQMvw9G3ye0QqpAZUqYsvrnnhEONS/mSUx3uwohaPGep0XZb0Pjg4CD09PVIqrFb7UQOpSmdnJ7S3twfGFTNWJRqVA+NS2H/n+BsmruNb8ccOw9gIt65OWU8PFuU6kgLdbUkq9CwzRETKNSFiVvZiPiIZc4+OjlYpT35cGdAC3ZjI4OAh/hMAibfpdDqzVnlxUn5a8ZYGLRAFI0Q4nnqt2qn7rYNJBFbtqBBQIQiCESVjAC9DpCLe4kKLl/BGJNwRyZ7/AO1hwiE5hLF7AAAAAElFTkSuQmCC'
+          logo.style.backgroundImage = `url('${image}')`;
+        } else {
+          const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAMAAABFjsb+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABIFBMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///+8vCC1AAAAXnRSTlMAABVEc5/B2urx8vDo17+eckITBJj0/fORAgi6+tb3swW5+VHesWPV+9JI3fZLx7XZUk1OvsBPwnHGSga0zYrOrZus50XclFv8jVMQtq8NKswmLcMoHqMbCmpkMKgrHCXsWAAAAAFiS0dEX3PRUS0AAAAHdElNRQflDBcJLw3hH93pAAAA1klEQVQY02NgYGJmYWVj5+Dk4ubh5eMXEBRiYBAWERWLQwAxcQlJBilpCEdGVg7CkFdgkFKM41ACMjmUVSBiqiAxOTX1OA1NFS1tJDEdXT19A0M2XRQxIz5jEyNTdDEzLGJGmGLmFpZWfEhi1jY6VrY63Hb2VlAxB2EGBkcxJx4g09nFFSLmxsDA4O4BZnJ6ckD84wUU8/aJQwa+fkAxBv8AJCHLQAYwCAqGC5mEgAQYgTg0TANiFn84WIQRJBgRCbLUIEoKJAQSAwkyRMdwhMWC9TEyAgDPwE6YM2fCkQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0yM1QwOTo0NzowOCswMDowMBHsN8QAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMjNUMDk6NDc6MDgrMDA6MDBgsY94AAAAAElFTkSuQmCC'
+          logo.style.backgroundImage = `url('${image}')`;
         }
       }
+    }
   }
 
-  function closeInformMenu(inputEl: any) {
-    const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+  function closeInformMenu(el: any) {
+    const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.lockerId}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
     }
   }
 
-  function removeFillLogo(inputEl: any) {
-    const fillLogo = document.getElementById('cs-logo-' + (inputEl.htmlID || inputEl.htmlName));
+  function removeFillLogo(el: any) {
+    const fillLogo = document.getElementById('cs-logo-' + el.lockerId);
     if (fillLogo) {
       fillLogo.parentElement.removeChild(fillLogo);
     }
@@ -328,14 +315,14 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
-  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
+  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {    
     if (!document.body) {
       return;
     }
     closeAllInformMenu()
     const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
-    const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
+    const iframeId = `cs-inform-menu-iframe-${inputEl.getAttribute('locker-id')}`
     let defaultType = 0, defaultTab = 2
     if (isSignUp && type === 'password') {
       defaultTab = 1
