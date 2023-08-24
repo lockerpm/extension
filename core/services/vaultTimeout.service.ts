@@ -35,12 +35,11 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 1000);
+        setInterval(() => this.checkVaultTimeout(), 100);
     }
 
     // Keys aren't stored for a device that is locked or logged out.
     async isLocked(): Promise<boolean> {
-        // Handle never lock startup situation
         if (await this.cryptoService.hasKeyStored('auto') && !this.everBeenUnlocked) {
             await this.cryptoService.getKey('auto');
         }
@@ -133,7 +132,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
             return timeout;
         }
-
         return vaultTimeout;
     }
 
