@@ -35,7 +35,7 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 100);
+        setInterval(() => this.checkVaultTimeout(), 10000);
     }
 
     // Keys aren't stored for a device that is locked or logged out.
