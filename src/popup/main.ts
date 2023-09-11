@@ -22,10 +22,13 @@ import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform'
-import userAPI from '@/api/user'
+import userAPI from '@/api/user';
+
 
 Vue.config.productionTip = false;
 
@@ -96,9 +99,6 @@ Vue.mixin({
     teams() { return this.$store.state.teams || [] },
     currentOrg() { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
     currentPlan() { return this.$store.state.currentPlan },
-    cipherCount() {
-      return this.$store.state.cipherCount
-    },
     hideIcons() {
       return this.$store.state.hideIcons
     },
@@ -281,12 +281,16 @@ Vue.mixin({
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
-      const userId = await this.$userService.getUserId()
-      await cystackPlatformAPI.sync({ paging: 0 }).then(async (response) => {
-        this.$messagingService.send('syncStarted')
-        if (response.count && response.count.ciphers) {
-          this.$store.commit('UPDATE_CIPHER_COUNT', response.count.ciphers)
-        }
+      const userId = await this.$userService.getUserId();
+      const syncCount = this.$store.state.syncCount;
+      const allRequests = [];
+      for (let i = 1; i <= Math.ceil(syncCount?.count.ciphers / this.pageSize); i += 1) {
+        allRequests.push(cystackPlatformAPI.sync({ paging: 1, page: i, size: this.pageSize }))
+      }
+      this.$messagingService.send('syncStarted')
+      await Promise.all(allRequests).then(async (r) => {
+        const allCiphers = r.map((res) => res.ciphers).flat();
+        const response = { ...r[0], ciphers: allCiphers }
         const res = new SyncResponse(response)
         await this.$syncService.syncProfile(res.profile)
         await this.$syncService.syncFolders(userId, res.folders);
@@ -312,7 +316,6 @@ Vue.mixin({
         this.$messagingService.send('syncCompleted', { successfully: true, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.$store.commit('UPDATE_SYNCING', false);
-
       }).catch(() => {
         this.$messagingService.send('syncCompleted', { successfully: false, trigger })
         this.$store.commit("UPDATE_SYNCED_CIPHERS");
@@ -559,6 +562,8 @@ Vue.mixin({
       }).then(async () => {
         try {
           await cystackPlatformAPI.ciphers_permanent_delete({ ids })
+          await this.$cipherService.delete(ids)
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           callback()
         } catch (e) {
@@ -574,6 +579,8 @@ Vue.mixin({
       }).then(async () => {
         try {
           await cystackPlatformAPI.delete_folder(id)
+          await this.$folderService.delete(id)
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
           callback()
         } catch (e) {
@@ -633,10 +640,13 @@ Vue.mixin({
       const cipherEnc = await this.$cipherService.encrypt(cipher)
       const data = new CipherRequest(cipherEnc)
       data.type = CipherType.OTP;
-      await cystackPlatformAPI.create_ciphers_vault({
-        ...data,
-        collectionIds: [],
-      })
+      data['collectionIds'] = []
+      const res = await cystackPlatformAPI.create_ciphers_vault(data)
+      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
+      const userId = await this.$userService.getUserId();
+      const cipherData = new CipherData(cipherResponse, userId);
+      await this.$cipherService.upsert(cipherData);
+      this.$store.commit("UPDATE_SYNCED_CIPHERS");
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();

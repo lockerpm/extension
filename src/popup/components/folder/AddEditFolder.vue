@@ -52,6 +52,8 @@ import Vue from 'vue'
 import InputText from '@/components/input/InputText'
 import { ValidationProvider } from 'vee-validate'
 import { FolderRequest } from "jslib-common/models/request/folderRequest";
+import { FolderResponse } from 'jslib-common/models/response/folderResponse';
+import { FolderData } from 'jslib-common/models/data/folderData';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -91,7 +93,13 @@ export default Vue.extend({
         this.callingAPI = true
         const folderEnc = await this.$folderService.encrypt(this.folder)
         const data = new FolderRequest(folderEnc)
-        const res = cystackPlatformAPI.create_folder(data)
+        const res = await cystackPlatformAPI.create_folder(data)
+        const folderResponse = new FolderResponse({ ...data, id: res ? res.id : '' })
+        const userId = await this.$userService.getUserId();
+        const folderData = new FolderData(folderResponse, userId);
+        this.$folderService.upsert(folderData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
         this.$emit('done')
         this.$emit('created-folder', { id: res.id, name: this.folder.name })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.folder') }), 'success')
@@ -114,6 +122,12 @@ export default Vue.extend({
         const folderEnc = await this.$folderService.encrypt(this.folder)
         const data = new FolderRequest(folderEnc)
         await cystackPlatformAPI.update_folder(this.folder.id, data)
+        const folderResponse = new FolderResponse({ ...data, id: this.folder.id })
+        const userId = await this.$userService.getUserId();
+        const folderData = new FolderData(folderResponse, userId);
+        this.$folderService.upsert(folderData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
         this.$emit('done')
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.folder') }), 'success')
         this.visible = false

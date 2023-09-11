@@ -71,6 +71,8 @@ import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { Cipher } from 'jslib-common/models/domain/cipher';
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -116,7 +118,7 @@ export default Vue.extend({
     async createOTP () {
       try {
         this.callingAPI = true;
-        await this.createAuthenticator(this.form)
+        await this.createAuthenticator(this.form);
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t(`type.${CipherType.OTP}`, 1) }), 'success')
         this.visible = false
       } catch (e) {
@@ -148,12 +150,16 @@ export default Vue.extend({
 
         // Change type back after encryption
         data.type = type_
+        data['collectionIds'] = []
         cipher.type = type_
 
-        await cystackPlatformAPI.update_cipher(cipher.id, {
-          ...data,
-          collectionIds: []
-        })
+        const res = await cystackPlatformAPI.update_cipher(cipher.id, data)
+        const cipherResponse = new CipherResponse(res)
+        const userId = await this.$userService.getUserId();
+        const cipherData = new CipherData(cipherResponse, userId);
+        await this.$cipherService.upsert(cipherData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t(`${CipherType[this.otp.type]}`, 1) }), 'success')
         this.visible = false
       } catch (e) {
