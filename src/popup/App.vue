@@ -86,7 +86,7 @@ export default Vue.extend({
         const data = JSON.parse(message.data)
         switch (data.event) {
         case 'sync':
-          this.getSyncData()
+          // this.getSyncData()
           break
         default:
           break

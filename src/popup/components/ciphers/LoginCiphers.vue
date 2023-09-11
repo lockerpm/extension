@@ -56,7 +56,6 @@ import { Avatar } from "element-ui";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
 import { ConstantsService } from "jslib-common/services/constants.service";
-import { get } from "lodash";
 
 export default Vue.extend({
   name: "LoginCiphers",

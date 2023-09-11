@@ -93,8 +93,9 @@ export default Vue.extend({
         const res = await cystackPlatformAPI.create_ciphers_vault(data);
         const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
         const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId)
-        this.$cipherService.upsert(cipherData)
+        const cipherData = new CipherData(cipherResponse, userId);
+        await this.$cipherService.upsert(cipherData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
         this.close()
         this.notificationAlert('password_added')
       } catch (e) {
@@ -119,6 +120,8 @@ export default Vue.extend({
           const userId = await this.$userService.getUserId();
           const cipherData = new CipherData(cipherResponse, userId);
           await this.$cipherService.upsert(cipherData);
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
           this.close()
           this.notificationAlert('username_password_updated');
         } catch (e) {
