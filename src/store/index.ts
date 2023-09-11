@@ -117,7 +117,6 @@ const asyncStore = async () => {
         teams: [],
         currentTeam: {},
         currentPlan: {},
-        cipherCount: null,
         hideIcons: false,
         showFolders: true,
         enableAutofill:  true,
@@ -189,9 +188,6 @@ const asyncStore = async () => {
         },
         UPDATE_CURRENT_PLAN (state, plan) {
           state.currentPlan = plan
-        },
-        UPDATE_CIPHER_COUNT (state, value) {
-          state.cipherCount = value
         },
         UPDATE_HIDE_ICONS(state, value) {
           state.hideIcons = value

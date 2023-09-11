@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import MainBackground from './background/main.background';
 const lockerMain = (self as any ).lockerMain = new MainBackground();
-lockerMain.bootstrap().then(() => {});
 
 async function createOffscreen() {
+  await lockerMain.bootstrap().then(() => {});
   await chrome['offscreen']?.createDocument({
     url: 'offscreen.html',
     reasons: [
+      'TESTING',
+      'AUDIO_PLAYBACK',
       'BLOBS',
       'IFRAME_SCRIPTING',
       'DOM_SCRAPING',
@@ -14,12 +16,16 @@ async function createOffscreen() {
       'WEB_RTC',
       'CLIPBOARD',
       'LOCAL_STORAGE',
-      'WORKERS'
+      'WORKERS',
+      'USER_MEDIA',
+      'DISPLAY_MEDIA',
+      'GEOLOCATION',
     ],
     justification: 'keep service worker running',
   }).catch(() => {
     //
   });
 }
+
 chrome.runtime.onStartup.addListener(createOffscreen);
 createOffscreen();

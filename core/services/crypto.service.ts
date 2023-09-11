@@ -161,11 +161,10 @@ export class CryptoService implements CryptoServiceAbstraction {
     const key = await this.retrieveKeyFromStorage(keySuffix);
     if (key) {
       const symmetricKey = new SymmetricCryptoKey(Utils.fromB64ToArray(key).buffer);
-      // if (!(await this.validateKey(symmetricKey))) {
-      //   this.logService.warning('Wrong key, throwing away stored key');
-      //   this.secureStorageService.remove(Keys.key, { keySuffix: keySuffix });
-      //   return null;
-      // }
+      if (!(await this.validateKey(symmetricKey))) {
+        this.secureStorageService.remove(Keys.key, { keySuffix: keySuffix });
+        return null;
+      }
       return symmetricKey;
     }
     return null;

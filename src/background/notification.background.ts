@@ -111,7 +111,7 @@ export default class NotificationBackground {
                 return
               }
               // check is login page
-              if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
+              if (passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
                 this.autofillFirstPage(sender.tab);
               }
 
@@ -420,11 +420,11 @@ export default class NotificationBackground {
       const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
-      this.cipherService.upsert(cipherData)
-      this.notificationAlert('otp_added')
+      this.cipherService.upsert(cipherData);
+      this.notificationAlert('otp_added');
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
-        this.notificationAlert('otp_limited')
+        this.notificationAlert('otp_limited');
       }
     }
   }

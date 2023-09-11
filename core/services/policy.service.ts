@@ -194,8 +194,7 @@ export class PolicyService implements PolicyServiceAbstraction {
 
         if (policyFilter != null) {
             filteredPolicies = policies.filter(p => p.enabled && policyFilter(p));
-        }
-        else {
+        } else {
             filteredPolicies = policies.filter(p => p.enabled);
         }
 

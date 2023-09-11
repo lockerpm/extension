@@ -273,9 +273,7 @@ export class NativeMessagingBackground {
                     try {
                         await this.cryptoService.getFingerprint(await this.userService.getUserId());
                     } catch (e) {
-                        // tslint:disable-next-line
-                        console.error('Unable to verify key:', e);
-                        await this.cryptoService.clearKey();
+                        // await this.cryptoService.clearKey();
                         this.showWrongUserDialog();
 
                         message = false;

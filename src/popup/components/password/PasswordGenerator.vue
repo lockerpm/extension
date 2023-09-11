@@ -122,6 +122,8 @@ import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -201,10 +203,14 @@ export default {
         this.errors = {}
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
-        await cystackPlatformAPI.create_ciphers_vault({
-          ...data,
-          score: this.passwordStrength.score
-        })
+        data['score'] = this.passwordStrength.score
+        const res = await cystackPlatformAPI.create_ciphers_vault(data)
+        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
+        const userId = await this.$userService.getUserId();
+        const cipherData = new CipherData(cipherResponse, userId);
+        await this.$cipherService.upsert(cipherData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'success')
       } catch (e) {
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'warning')

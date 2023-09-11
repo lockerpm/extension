@@ -575,6 +575,9 @@ import { IdentityView } from "jslib-common/models/view/identityView";
 import { CardView } from "jslib-common/models/view/cardView";
 import { LoginUriView } from "jslib-common/models/view/loginUriView";
 import { LoginView } from "jslib-common/models/view/loginView";
+import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
+import { CipherData } from 'jslib-common/models/data/cipherData';
+
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import PasswordGenerator from '@/popup/components/password/PasswordGenerator'
 import PasswordStrengthBar from '@/popup/components/password/PasswordStrengthBar'
@@ -824,17 +827,21 @@ export default Vue.extend({
         const cipherEnc = await this.$cipherService.encrypt(this.cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = type_
+        data['score'] = this.passwordStrength.score
+        data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
-        await cystackPlatformAPI.create_ciphers_vault({
-          ...data,
-          score: this.passwordStrength.score,
-          collectionIds: this.cipher.collectionIds,
-        })
+        const res = await cystackPlatformAPI.create_ciphers_vault(data)
+        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
+        const userId = await this.$userService.getUserId();
+        const cipherData = new CipherData(cipherResponse, userId);
+        await this.$cipherService.upsert(cipherData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()
           otpCipher.name = this.cipher.name
           otpCipher.secretKey = this.cipher.login.totp
-          await this.createAuthenticator(otpCipher)
+          await this.createAuthenticator(otpCipher);
         }
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {
@@ -866,17 +873,22 @@ export default Vue.extend({
         const cipherEnc = await this.$cipherService.encrypt(this.cipher)
         const data = new CipherRequest(cipherEnc)
         data.type = type_
+        data['score'] = this.passwordStrength.score
+        data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
-        await cystackPlatformAPI.update_cipher(this.cipher.id, {
-          ...data,
-          score: this.passwordStrength.score,
-          collectionIds: this.cipher.collectionIds,
-        })
+
+        const res = await cystackPlatformAPI.update_cipher(this.cipher.id, data)
+        const cipherResponse = new CipherResponse(res)
+        const userId = await this.$userService.getUserId();
+        const cipherData = new CipherData(cipherResponse, userId);
+        await this.$cipherService.upsert(cipherData);
+        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()
           otpCipher.name = this.cipher.name
           otpCipher.secretKey = this.cipher.login.totp
-          await this.createAuthenticator(otpCipher)
+          await this.createAuthenticator(otpCipher);
         }
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {
