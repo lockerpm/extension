@@ -40,4 +40,18 @@ export default class RequestBackground {
       data
     });
   }
+
+  async sync_cipher(id = '') {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC_CIPHER.replace(':id', id),
+      method: "get",
+    });
+  }
+
+  async sync_folder(id = '') {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC_FOLDER.replace(':id', id),
+      method: "get",
+    });
+  }
 }

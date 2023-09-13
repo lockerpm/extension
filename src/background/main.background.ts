@@ -160,6 +160,7 @@ export default class MainBackground {
   constructor() {
     this.messagingService = new BrowserMessagingService();
     this.storageService = new BrowserStorageService();
+    this.requestBackground = new RequestBackground(this);
     this.platformUtilsService = new BrowserPlatformUtilsService(
       this.messagingService,
       this.storageService,
@@ -299,6 +300,7 @@ export default class MainBackground {
       this.policyService,
       this.sendService,
       this.logService,
+      this.requestBackground,
       async (expired: boolean) => await this.logout(expired)
     );
     this.eventService = new EventService(
@@ -345,16 +347,6 @@ export default class MainBackground {
       this.platformUtilsService,
       this.cryptoService
     );
-    this.notificationsService = new NotificationsService(
-      this.userService,
-      this.syncService,
-      this.appIdService,
-      this.apiService,
-      this.vaultTimeoutService,
-      this.environmentService,
-      () => this.logout(true),
-      this.logService
-    );
     this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
 
     this.systemService = new SystemService(
@@ -373,8 +365,17 @@ export default class MainBackground {
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ? opr.sidebarAction : (self as any).chrome?.sidebarAction;
 
-    // // Background
-    this.requestBackground = new RequestBackground(this);
+    this.notificationsService = new NotificationsService(
+      this.userService,
+      this.syncService,
+      this.appIdService,
+      this.apiService,
+      this.vaultTimeoutService,
+      this.environmentService,
+      () => this.logout(true),
+      this.logService,
+      this.storageService,
+    );
     this.runtimeBackground = new RuntimeBackground(
       this,
       this.autofillService,

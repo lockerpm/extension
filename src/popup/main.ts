@@ -23,8 +23,6 @@ import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import userAPI from '@/api/user';
@@ -562,8 +560,6 @@ Vue.mixin({
       }).then(async () => {
         try {
           await cystackPlatformAPI.ciphers_permanent_delete({ ids })
-          await this.$cipherService.delete(ids)
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           this.notify(this.$tc('data.notifications.delete_success', ids.length, { type: this.$tc('type.0', ids.length) }), 'success')
           callback()
         } catch (e) {
@@ -579,8 +575,6 @@ Vue.mixin({
       }).then(async () => {
         try {
           await cystackPlatformAPI.delete_folder(id)
-          await this.$folderService.delete(id)
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           this.notify(this.$tc('data.notifications.delete_success', 1, { type: this.$t('common.folder') }), 'success')
           callback()
         } catch (e) {
@@ -641,12 +635,7 @@ Vue.mixin({
       const data = new CipherRequest(cipherEnc)
       data.type = CipherType.OTP;
       data['collectionIds'] = []
-      const res = await cystackPlatformAPI.create_ciphers_vault(data)
-      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-      const userId = await this.$userService.getUserId();
-      const cipherData = new CipherData(cipherResponse, userId);
-      await this.$cipherService.upsert(cipherData);
-      this.$store.commit("UPDATE_SYNCED_CIPHERS");
+      await cystackPlatformAPI.create_ciphers_vault(data)
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();

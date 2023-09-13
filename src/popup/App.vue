@@ -82,11 +82,12 @@ export default Vue.extend({
         reconnectionDelay: 3000
       })
       this.ws1 = this.$socket
-      this.ws1.onmessage = message => {
+      this.ws1.onmessage = async (message: any) => {
         const data = JSON.parse(message.data)
         switch (data.event) {
         case 'sync':
-          // this.getSyncData()
+          await this.$syncService.syncWsData(data);
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           break
         default:
           break
