@@ -33,6 +33,8 @@ import { PolicyResponse } from '../models/response/policyResponse';
 import { ProfileResponse } from '../models/response/profileResponse';
 import { SendResponse } from '../models/response/sendResponse';
 
+import RequestBackground from '@/background/request.backgroud';
+
 const Keys = {
   lastSyncPrefix: 'lastSync_',
 };
@@ -45,7 +47,7 @@ export class SyncService implements SyncServiceAbstraction {
     private cipherService: CipherService, private cryptoService: CryptoService,
     private collectionService: CollectionService, private storageService: StorageService,
     private messagingService: MessagingService, private policyService: PolicyService,
-    private sendService: SendService, private logService: LogService,
+    private sendService: SendService, private logService: LogService, private request: RequestBackground,
     private logoutCallback: (expired: boolean) => Promise<void>) {
   }
 
@@ -387,5 +389,23 @@ export class SyncService implements SyncServiceAbstraction {
       ciphers[c.id] = new CipherData(c, userId);
     });
     return await this.cipherService.replaceSome(ciphers);
+  }
+
+  async syncWsData(message: any) {
+    if (message.type.includes('cipher')) {
+      if (message.type.includes('update')) {
+        const res = await this.request.sync_cipher(message.data.id);
+        await this.cipherService.upsert([res])
+      } else if (message.type.includes('delete')) {
+        await this.cipherService.delete(message.data.ids)
+      }
+    } else if (message.type.includes('folder')) {
+      if (message.type.includes('update')) {
+        const res = await this.request.sync_folder(message.data.id);
+        await this.folderService.upsert([res])
+      } else if (message.type.includes('delete')) {
+        await this.folderService.delete(message.data.ids)
+      }
+    }
   }
 }

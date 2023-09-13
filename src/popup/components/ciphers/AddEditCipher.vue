@@ -575,8 +575,6 @@ import { IdentityView } from "jslib-common/models/view/identityView";
 import { CardView } from "jslib-common/models/view/cardView";
 import { LoginUriView } from "jslib-common/models/view/loginUriView";
 import { LoginView } from "jslib-common/models/view/loginView";
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import PasswordGenerator from '@/popup/components/password/PasswordGenerator'
@@ -830,13 +828,7 @@ export default Vue.extend({
         data['score'] = this.passwordStrength.score
         data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
-        const res = await cystackPlatformAPI.create_ciphers_vault(data)
-        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-        const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId);
-        await this.$cipherService.upsert(cipherData);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-
+        await cystackPlatformAPI.create_ciphers_vault(data)
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()
           otpCipher.name = this.cipher.name
@@ -877,12 +869,7 @@ export default Vue.extend({
         data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
 
-        const res = await cystackPlatformAPI.update_cipher(this.cipher.id, data)
-        const cipherResponse = new CipherResponse(res)
-        const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId);
-        await this.$cipherService.upsert(cipherData);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        await cystackPlatformAPI.update_cipher(this.cipher.id, data)
 
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()

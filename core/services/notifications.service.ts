@@ -8,9 +8,11 @@ import { AppIdService } from '../abstractions/appId.service';
 import { EnvironmentService } from '../abstractions/environment.service';
 import { LogService } from '../abstractions/log.service';
 import { NotificationsService as NotificationsServiceAbstraction } from '../abstractions/notifications.service';
-import { SyncService } from '../abstractions/sync.service';
 import { UserService } from '../abstractions/user.service';
 import { VaultTimeoutService } from '../abstractions/vaultTimeout.service';
+import { StorageService } from '../abstractions/storage.service';
+
+import ENDPOINT from "@/config/endpoint";
 
 import {
   NotificationResponse,
@@ -26,11 +28,19 @@ export class NotificationsService implements NotificationsServiceAbstraction {
   private inited = false;
   private inactive = false;
   private reconnectTimer: any = null;
+  private ws = null;
 
-  constructor(private userService: UserService, private syncService: SyncService,
-    private appIdService: AppIdService, private apiService: ApiService,
-    private vaultTimeoutService: VaultTimeoutService, private environmentService: EnvironmentService,
-    private logoutCallback: () => Promise<void>, private logService: LogService) {
+  constructor(
+    private userService: UserService,
+    private syncService: any,
+    private appIdService: AppIdService,
+    private apiService: ApiService,
+    private vaultTimeoutService: VaultTimeoutService,
+    private environmentService: EnvironmentService,
+    private logoutCallback: () => Promise<void>,
+    private logService: LogService,
+    private storageService: StorageService,
+  ) {
     this.environmentService.urls.subscribe(() => {
       if (!this.inited) {
         return;
@@ -79,6 +89,12 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     // if (await this.isAuthedAndUnlocked()) {
     //   await this.reconnect(false);
     // }
+
+    if (await this.isAuthedAndUnlocked()) {
+      await this.connectWebSocket();
+    } else {
+      this.disconnectSocket();
+    }
   }
 
   async updateConnection(sync = false): Promise<void> {
@@ -212,5 +228,25 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  async connectWebSocket () {
+    const wsUrl = process.env.VUE_APP_WS_URL;
+    const token = await this.storageService.get('cs_token');
+    this.ws = new WebSocket(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`);
+
+    // Listen for messages
+    this.ws.addEventListener("message", async (event: any) => {
+      const message = JSON.parse(event.data);
+      if (message.event === 'sync') {
+        await this.syncService.syncWsData(message);
+      }
+    });
+  }
+
+  disconnectSocket () {
+    if (this.ws) {
+      this.ws.close()
+    }
   }
 }
