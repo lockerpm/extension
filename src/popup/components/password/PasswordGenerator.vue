@@ -204,13 +204,7 @@ export default {
         const cipherEnc = await this.$cipherService.encrypt(cipher)
         const data = new CipherRequest(cipherEnc)
         data['score'] = this.passwordStrength.score
-        const res = await cystackPlatformAPI.create_ciphers_vault(data)
-        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-        const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId);
-        await this.$cipherService.upsert(cipherData);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        
+        await cystackPlatformAPI.create_ciphers_vault(data)
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'success')
       } catch (e) {
         this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'warning')

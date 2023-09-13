@@ -19,6 +19,8 @@ export default {
 
   // cystack_platform
   CYSTACK_PLATFORM_SYNC: '/cystack_platform/pm/sync',
+  CYSTACK_PLATFORM_SYNC_CIPHER: '/cystack_platform/pm/sync/ciphers/:id',
+  CYSTACK_PLATFORM_SYNC_FOLDER: '/cystack_platform/pm/sync/folders/:id',
   CYSTACK_PLATFORM_SYNC_COUNT: '/cystack_platform/pm/sync/count',
 
   CYSTACK_PLATFORM_PAYMENTS_CARDS: '/cystack_platform/payments/cards',

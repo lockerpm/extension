@@ -51,8 +51,6 @@ import {CipherType} from "jslib-common/enums/cipherType";
 import Vnodes from "@/popup/components/Vnodes.vue";
 import { CipherView } from 'jslib-common/models/view/cipherView';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -84,13 +82,7 @@ export default Vue.extend(
         const newCipher = await this.$cipherService.encrypt(this.cipher);
         const data = new CipherRequest(newCipher)
         try {
-          const res = await cystackPlatformAPI.update_cipher(this.cipher.id, data)
-          const cipherResponse = new CipherResponse(res)
-          const userId = await this.$userService.getUserId();
-          const cipherData = new CipherData(cipherResponse, userId);
-          await this.$cipherService.upsert(cipherData);
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
-
+          await cystackPlatformAPI.update_cipher(this.cipher.id, data)
           this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         } catch (e) {
           if (e.response && e.response.data && e.response.data.code === '3003') {

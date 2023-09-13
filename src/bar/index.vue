@@ -33,8 +33,6 @@ import { LoginUriView } from 'jslib-common/models/view/loginUriView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
 import { Utils } from 'jslib-common/misc/utils';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
 
 export default Vue.extend({
   name: 'Bar',
@@ -90,12 +88,7 @@ export default Vue.extend({
       const cipher = await this.$cipherService.encrypt(model);
       const data = new CipherRequest(cipher)
       try {
-        const res = await cystackPlatformAPI.create_ciphers_vault(data);
-        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-        const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId);
-        await this.$cipherService.upsert(cipherData);
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        await cystackPlatformAPI.create_ciphers_vault(data);
         this.close()
         this.notificationAlert('password_added')
       } catch (e) {
@@ -115,13 +108,7 @@ export default Vue.extend({
         const newCipher = await this.$cipherService.encrypt(cipher);
         const data = new CipherRequest(newCipher)
         try {
-          const res = await cystackPlatformAPI.update_cipher(cipher.id, data)
-          const cipherResponse = new CipherResponse(res)
-          const userId = await this.$userService.getUserId();
-          const cipherData = new CipherData(cipherResponse, userId);
-          await this.$cipherService.upsert(cipherData);
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
-
+          await cystackPlatformAPI.update_cipher(cipher.id, data)
           this.close()
           this.notificationAlert('username_password_updated');
         } catch (e) {
