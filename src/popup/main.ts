@@ -106,9 +106,6 @@ Vue.mixin({
     enableAutofill() {
       return this.$store.state.enableAutofill
     },
-    syncCount() {
-      return this.$store.state.syncCount
-    }
   },
   destroyed() {
     self.clearTimeout(this.loadedTimeout);
@@ -250,7 +247,6 @@ Vue.mixin({
           })
           await this.$storageService.save('cs_token', res.access_token)
           await this.$store.dispatch("LoadCurrentUser");
-          await this.$store.dispatch("LoadSyncCount");
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
           await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
           await this.$cryptoService.setKey(decryptData.key)
@@ -280,15 +276,11 @@ Vue.mixin({
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
       const userId = await this.$userService.getUserId();
-      const syncCount = this.$store.state.syncCount;
-      const allRequests = [];
-      for (let i = 1; i <= Math.ceil(syncCount?.count.ciphers / this.pageSize); i += 1) {
-        allRequests.push(cystackPlatformAPI.sync({ paging: 1, page: i, size: this.pageSize }))
-      }
-      this.$messagingService.send('syncStarted')
-      await Promise.all(allRequests).then(async (r) => {
-        const allCiphers = r.map((res) => res.ciphers).flat();
-        const response = { ...r[0], ciphers: allCiphers }
+      await cystackPlatformAPI.sync({ paging: 0 }).then(async (response) => {
+        this.$messagingService.send('syncStarted')
+        if (response.count && response.count.ciphers) {
+          this.$store.commit('UPDATE_CIPHER_COUNT', response.count.ciphers)
+        }
         const res = new SyncResponse(response)
         await this.$syncService.syncProfile(res.profile)
         await this.$syncService.syncFolders(userId, res.folders);
