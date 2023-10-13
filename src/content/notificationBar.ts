@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let disabledAddLoginNotification = false;
   let disabledChangedPasswordNotification = false;
   let isSignUp = false
-  const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
   const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
   const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -58,9 +57,6 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function processMessages(msg: any, sendResponse: Function) {
     if (msg.command === 'openNotificationBar') {
-      if (inIframe) {
-        return;
-      }
       closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
       closeBar(true);
@@ -610,27 +606,21 @@ document.addEventListener('DOMContentLoaded', event => {
       default:
         break;
     }
-
-    const frame = document.getElementById('bit-notification-bar-iframe') as HTMLIFrameElement;
-    if (frame != null && frame.src.indexOf(barPage) >= 0) {
-      return;
-    }
-
     closeBar();
-    openBar(type, barPage);
+    setTimeout(() => {
+      openBar(type, barPage);
+    }, 500);
   }
 
   function openBar(type: string, barPage: string) {
     if (document.body == null) {
       return;
     }
-
     const barPageUrl: string = chrome.runtime.getURL(barPage);
-
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: ${type === 'add' ? '338' : '278'}px !important;
-      width: 450px;
+      width: 400px;
       border: 0;
       min-height: initial;
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
@@ -644,7 +634,7 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.id = 'bit-notification-bar';
     frameDiv.style.cssText = `
       height: ${type === 'add' ? '308' : '248'}px !important;
-      width: 450px;
+      width: 400px;
       top: 40px;
       right: 40px;
       padding: 0;
@@ -659,15 +649,11 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closeBar(explicitClose: boolean = false) {
-    const barEl = document.getElementById('bit-notification-bar');
-    if (barEl != null) {
-      barEl.parentElement.removeChild(barEl);
+    const iframeEls = document.querySelectorAll('#bit-notification-bar');
+    for (let i = 0; i < iframeEls.length; i++) {
+      iframeEls[i].parentElement.removeChild(iframeEls[i]);
     }
 
-    const spacerEl = document.getElementById('bit-notification-bar-spacer');
-    if (spacerEl) {
-      spacerEl.parentElement.removeChild(spacerEl);
-    }
     if (explicitClose) {
       sendPlatformMessage({
         command: 'bgCloseNotificationBar',
