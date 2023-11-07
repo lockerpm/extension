@@ -277,7 +277,7 @@ export default class MainBackground {
       this.policyService,
       async () => {
         if (this.notificationsService) {
-          this.notificationsService.updateConnection(false);
+          this.notificationsService.disconnectSocket();
         }
         await this.lock();
         if (this.systemService) {
