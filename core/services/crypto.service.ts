@@ -56,8 +56,8 @@ export class CryptoService implements CryptoServiceAbstraction {
     this.key = key;
     const masterKey = {
       ...key,
-      encKey: this.arrayBufferToBase64(key.encKey),
-      key: this.arrayBufferToBase64(key.key),
+      encKey: this.arrayBufferToBase64(key?.encKey),
+      key: this.arrayBufferToBase64(key?.key),
     }
     await this.storageService.save(Keys.masterKey, masterKey)
     await this.storeKey(key);

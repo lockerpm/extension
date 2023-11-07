@@ -83,7 +83,7 @@ export default class RuntimeBackground {
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
-        this.handleUnlocked(msg.command)
+        this.handleUnlocked()
         break;
       case "addToLockedVaultPendingNotifications":
         this.lockedVaultPendingNotifications.push(msg.data);
@@ -265,7 +265,7 @@ export default class RuntimeBackground {
     });
   }
 
-  async handleUnlocked(command: string) {
+  async handleUnlocked() {
     let item: LockedVaultPendingNotificationsItem;
     if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
       await BrowserApi.closeLoginTab();
