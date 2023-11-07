@@ -40,6 +40,7 @@ export default Vue.extend({
       if (newValue) {
         this.disconnectSocket()
       } else {
+        this.reconnectSocket()
         this.$store.dispatch('LoadTeams')
         this.$store.dispatch('LoadCurrentPlan')
       }
