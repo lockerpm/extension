@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import RuntimeBackground from '../background/runtime.background';
+import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { StorageService } from "jslib-common/abstractions/storage.service";
 
 import { v4 as uuidv4 } from 'uuid';
@@ -14,6 +15,7 @@ Vue.use(Vuex)
 
 const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+const vaultTimeoutService = JSLib.getBgService<VaultTimeoutService>('vaultTimeoutService')()
 
 const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
@@ -55,7 +57,7 @@ const asyncStore = async () => {
     storageService.get(USER_PW_KEY),
   ]).then(async ([accessToken, oldStore, storeUser, storeUserPw]) => {
     let user: any = storeUser
-    let userPw = storeUserPw
+    let userPw: any = storeUserPw
 
     if (accessToken && (!user || !user.email)) {
       await Promise.all([
@@ -63,7 +65,7 @@ const asyncStore = async () => {
         cystackPlatformAPI.users_me(),
       ]).then(([me, userMe]) => {
         user = me;
-        userPw = userMe
+        userPw = userMe;
       }).catch(() => {
         user = JSON.parse(JSON.stringify(defaultUser))
         userPw = { is_pwd_manager: false }
@@ -84,6 +86,11 @@ const asyncStore = async () => {
         ...oldStore,
       }
     }
+    
+    vaultTimeoutService.setVaultTimeoutOptions(
+      userPw.timeout,
+      userPw.timeout_action
+    );
 
     return new Vuex.Store({
       state: {
@@ -143,8 +150,13 @@ const asyncStore = async () => {
         UPDATE_USER (state, user) {
           state.user = user || JSON.parse(JSON.stringify(defaultUser))
         },
-        UPDATE_USER_PW (state, user) {
+        async UPDATE_USER_PW (state, user) {
           state.userPw = user
+          await storageService.save(USER_PW_KEY, user)
+          await vaultTimeoutService.setVaultTimeoutOptions(
+            user.timeout,
+            user.timeout_action
+          );
         },
         UPDATE_USER_INTERCOM (state, userIntercom) {
           state.userIntercom = userIntercom
@@ -250,10 +262,8 @@ const asyncStore = async () => {
         async LoadCurrentUserPw ({ commit }) {
           await cystackPlatformAPI.users_me().then(async res => {
             commit('UPDATE_USER_PW', res)
-            await storageService.save(USER_PW_KEY, res)
           }).catch(async () => {
             commit('UPDATE_USER_PW', {})
-            await storageService.save(USER_PW_KEY, {})
           });
         },
         async LoadCurrentIntercom ({ commit }) {

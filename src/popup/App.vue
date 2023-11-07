@@ -48,6 +48,7 @@ export default Vue.extend({
         this.$store.dispatch('LoadTeams')
         this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
+        this.$store.dispatch('LoadCurrentUserPw')
       }
     },
     $route: {
