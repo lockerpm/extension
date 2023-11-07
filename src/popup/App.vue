@@ -18,22 +18,17 @@ export default Vue.extend({
       ws1: null,
     }
   },
-  asyncComputed: {
-    locked: {
-      async get () {
-        return await this.$vaultTimeoutService.isLocked()
-      },
-      watch: []
-    },
-  },
   computed: {
     previousPath () {
       return this.$store.state.previousPath
     }
   },
   async created () {
-    const locked = await this.$vaultTimeoutService.isLocked();
-    if (locked) {
+    this.locked = await this.$vaultTimeoutService.isLocked();
+    setInterval(async () => {
+      this.locked = await this.$vaultTimeoutService.isLocked();
+    }, 1000)
+    if (this.locked) {
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
         this.reconnectDesktopAppSocket(undefined, true);
       }
@@ -46,7 +41,6 @@ export default Vue.extend({
         this.disconnectSocket()
       } else {
         this.$store.dispatch('LoadTeams')
-        this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
       }
     },
