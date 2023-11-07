@@ -231,7 +231,7 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked')
+          await this.$runtimeBackground.handleUnlocked('unlocked');
           await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
@@ -257,7 +257,7 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked')
+          await this.$runtimeBackground.handleUnlocked('unlocked');
           await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));

@@ -71,35 +71,35 @@ export default Vue.extend({
     }
   },
   methods: {
-    disconnectSocket () {
-      if (this.ws1) {
-        delete this.ws1.onmessage
-        this.ws1.close()
-      }
-    },
-    async reconnectSocket () {
-      const cs_store = await this.$storageService.get('cs_store')
-      const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
-      const token = await this.$storageService.get('cs_token')
-      this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
-        format: 'json',
-        reconnection: true,
-        reconnectionAttempts: 60,
-        reconnectionDelay: 3000
-      })
-      this.ws1 = this.$socket
-      this.ws1.onmessage = async (message: any) => {
-        const data = JSON.parse(message.data)
-        switch (data.event) {
-        case 'sync':
-          await this.$syncService.syncWsData(data);
-          this.$store.commit("UPDATE_SYNCED_CIPHERS");
-          break
-        default:
-          break
-        }
-      }
-    },
+    // disconnectSocket () {
+    //   if (this.ws1) {
+    //     delete this.ws1.onmessage
+    //     this.ws1.close()
+    //   }
+    // },
+    // async reconnectSocket () {
+    //   const cs_store = await this.$storageService.get('cs_store')
+    //   const wsUrl = cs_store?.baseWsUrl || process.env.VUE_APP_WS_URL  
+    //   const token = await this.$storageService.get('cs_token')
+    //   this.$connect(this.sanitizeUrl(`${wsUrl}${ENDPOINT.CYSTACK_PLATFORM_SYNC}?token=${token}`), {
+    //     format: 'json',
+    //     reconnection: true,
+    //     reconnectionAttempts: 60,
+    //     reconnectionDelay: 3000
+    //   })
+    //   this.ws1 = this.$socket
+    //   this.ws1.onmessage = async (message: any) => {
+    //     const data = JSON.parse(message.data)
+    //     switch (data.event) {
+    //     case 'sync':
+    //       await this.$syncService.syncWsData(data);
+    //       this.$store.commit("UPDATE_SYNCED_CIPHERS");
+    //       break
+    //     default:
+    //       break
+    //     }
+    //   }
+    // },
   }
 })
 </script>

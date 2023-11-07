@@ -278,7 +278,7 @@ export default class RuntimeBackground {
       }
     }
     await this.main.refreshBadgeAndMenu(false);
-    this.notificationsService.connectWebSocket();
+    await this.notificationsService.connectWebSocket();
     this.systemService.cancelProcessReload();
     if (item) {
       await BrowserApi.tabSendMessageData(

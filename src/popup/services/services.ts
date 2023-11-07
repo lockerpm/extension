@@ -19,6 +19,7 @@ import { StorageService } from 'jslib-common/abstractions/storage.service';
 import { SyncService } from 'jslib-common/abstractions/sync.service';
 import { UserService } from 'jslib-common/abstractions/user.service';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
+import { NotificationsService } from 'jslib-common/abstractions/notifications.service';
 
 import { ConsoleLogService } from '@/services/consoleLog.service';
 import { ConstantsService } from 'jslib-common/services/constants.service';
@@ -85,6 +86,7 @@ export default {
     Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
     Vue.prototype.$totpService = getBgService<TotpService>('totpService')();
     Vue.prototype.$runtimeBackground = getBgService<RuntimeBackground>('runtimeBackground')();
+    Vue.prototype.$notificationsService = getBgService<NotificationsService>('notificationsService')();
 
     if (!popupUtilsService.inPopup(self)) {
       self.document.body.classList.add('body-full');
