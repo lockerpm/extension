@@ -275,42 +275,9 @@ Vue.mixin({
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
-      const userId = await this.$userService.getUserId();
-      await cystackPlatformAPI.sync({ paging: 0 }).then(async (response) => {
-        this.$messagingService.send('syncStarted')
-        if (response.count && response.count.ciphers) {
-          this.$store.commit('UPDATE_CIPHER_COUNT', response.count.ciphers)
-        }
-        const res = new SyncResponse(response)
-        await this.$syncService.syncProfile(res.profile)
-        await this.$syncService.syncFolders(userId, res.folders);
-        await this.$syncService.syncCollections(res.collections);
-        await this.$syncService.syncSomeCiphers(userId, res.ciphers);
-        await this.$syncService.syncSends(userId, res.sends);
-        await this.$syncService.syncSettings(userId, res.domains);
-        await this.$syncService.syncPolicies(res.policies);
-        await this.$syncService.setLastSync(new Date());
-
-        const deletedIds = [];
-        const cipherIds = res.ciphers.map(c => c.id);
-        const storageRes = await this.$storageService.get(`ciphers_${userId}`);
-        for (const id in { ...storageRes }) {
-          if (!cipherIds.includes(id)) {
-            delete storageRes[id];
-            deletedIds.push(id);
-          }
-        }
-        await this.$storageService.save(`ciphers_${userId}`, storageRes);
-        this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        await this.$cipherService.getAllDecrypted()
-        this.$messagingService.send('syncCompleted', { successfully: true, trigger })
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false);
-      }).catch(() => {
-        this.$messagingService.send('syncCompleted', { successfully: false, trigger })
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false);
-      })
+      await this.$syncService.syncData(trigger);
+      this.$store.commit("UPDATE_SYNCED_CIPHERS");
+      this.$store.commit('UPDATE_SYNCING', false);
     },
     async getFolders() {
       return await this.$folderService.getAllDecrypted()

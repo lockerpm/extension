@@ -32,6 +32,7 @@ import {
 import { PolicyResponse } from '../models/response/policyResponse';
 import { ProfileResponse } from '../models/response/profileResponse';
 import { SendResponse } from '../models/response/sendResponse';
+import { SyncResponse } from 'jslib-common/models/response/syncResponse';
 
 import RequestBackground from '@/background/request.backgroud';
 
@@ -391,21 +392,59 @@ export class SyncService implements SyncServiceAbstraction {
     return await this.cipherService.replaceSome(ciphers);
   }
 
+  async syncData(trigger: boolean = false) {
+    const userId = await this.userService.getUserId();
+    await this.request.sync({ paging: 0 }).then(async (response) => {
+      this.messagingService.send('syncStarted')
+      const res = new SyncResponse(response)
+      await this.syncProfile(res.profile)
+      await this.syncFolders(userId, res.folders);
+      await this.syncCollections(res.collections);
+      await this.syncSomeCiphers(userId, res.ciphers);
+      await this.syncSends(userId, res.sends);
+      await this.syncSettings(userId, res.domains);
+      await this.syncPolicies(res.policies);
+      await this.setLastSync(new Date());
+
+      const deletedIds = [];
+      const cipherIds = res.ciphers.map(c => c.id);
+      const storageRes: any = await this.storageService.get(`ciphers_${userId}`);
+      for (const id in { ...storageRes }) {
+        if (!cipherIds.includes(id)) {
+          delete storageRes[id];
+          deletedIds.push(id);
+        }
+      }
+      await this.storageService.save(`ciphers_${userId}`, storageRes);
+      this.cipherService.csDeleteFromDecryptedCache(deletedIds);
+      await this.cipherService.getAllDecrypted()
+      this.messagingService.send('syncCompleted', { successfully: true, trigger })
+    }).catch(() => {
+      this.messagingService.send('syncCompleted', { successfully: false, trigger })
+    })
+  }
+
   async syncWsData(message: any) {
     if (message.type.includes('cipher')) {
-      if (message.type.includes('update')) {
+      if (message.type.includes('update') && message.data.id) {
         const res = await this.request.sync_cipher(message.data.id);
         await this.cipherService.upsert([res])
-      } else if (message.type.includes('delete')) {
+      } else if (message.type.includes('delete') && message.data.ids) {
         await this.cipherService.delete(message.data.ids)
+      } else {
+        await this.syncData();
       }
     } else if (message.type.includes('folder')) {
-      if (message.type.includes('update')) {
+      if (message.type.includes('update') && message.data.id) {
         const res = await this.request.sync_folder(message.data.id);
         await this.folderService.upsert([res])
-      } else if (message.type.includes('delete')) {
+      } else if (message.type.includes('delete') && message.data.ids) {
         await this.folderService.delete(message.data.ids)
+      } else {
+        await this.syncData();
       }
+    } else {
+      await this.syncData();
     }
   }
 }
