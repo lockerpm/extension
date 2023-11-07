@@ -561,6 +561,7 @@ export default class MainBackground {
   async lock() {
     const userId = await this.userService.getUserId()
     await Promise.all([
+      this.notificationsService.disconnectSocket(),
       this.passService.clearGeneratePassword(),
       this.cryptoService.clearKeys(),
       this.folderService.clear(userId),
@@ -582,6 +583,7 @@ export default class MainBackground {
     await this.passService.clearGeneratePassword();
 
     await Promise.all([
+      this.notificationsService.disconnectSocket(),
       this.eventService.clearEvents(),
       this.syncService.setLastSync(new Date(0)),
       this.tokenService.clearToken(),
@@ -607,7 +609,6 @@ export default class MainBackground {
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
 
-    this.notificationsService.updateConnection(false);
     this.systemService.startProcessReload();
     await this.systemService.clearPendingClipboard();
   }
