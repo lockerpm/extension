@@ -69,10 +69,6 @@ export default Vue.extend({
         this.loading = true;
         await cystackPlatformAPI.update_users_me(this.user);
         this.$store.commit("UPDATE_USER_PW", this.user);
-        this.$vaultTimeoutService.setVaultTimeoutOptions(
-          this.user.timeout,
-          this.user.timeout_action
-        );
         this.notify(
           this.$t("data.notifications.update_settings_success"),
           "success"

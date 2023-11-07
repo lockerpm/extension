@@ -39,15 +39,21 @@ export default Vue.extend({
       }
     }
   },
-
+  mounted () {
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.command === 'updateSyncedCiphers') {
+        setTimeout(() => {
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
+        }, 500);
+      }
+    });
+  },
   watch: {
     'locked' (newValue) {
-      if (newValue) {
-        this.disconnectSocket()
-      } else {
+      if (!newValue) {
         this.$store.dispatch('LoadTeams')
-        this.reconnectSocket()
         this.$store.dispatch('LoadCurrentPlan')
+        this.$store.dispatch('LoadCurrentUserPw')
       }
     },
     $route: {

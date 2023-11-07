@@ -111,7 +111,11 @@ export default class NotificationBackground {
                 return
               }
               // check is login page
-              if (passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
+              if (
+                passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
+                && !passwordFields.filter((f) => f.type === 'password')[0]?.value
+                && usernameFields.length <= 1
+              ) {
                 this.autofillFirstPage(sender.tab);
               }
 
@@ -242,8 +246,8 @@ export default class NotificationBackground {
   private async autofillFirstPage(tab: chrome.tabs.Tab) {
     try {
       if (this.cipherService && tab.url) {
-        const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
-        const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
+        const currentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
+        const loginCiphers = this.cipherService.sortCiphers(currentCiphers.filter(c => c.type === CipherType.Login))
         if (loginCiphers.length > 0) {
           BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
@@ -274,14 +278,12 @@ export default class NotificationBackground {
     if (loginInfo) {
       currentLoginInfo = loginInfo
     }
-    if (tab) {
-      this.doNotificationQueueCheck(tab, currentLoginInfo);
-      return;
-    }
-
-    const currentTab = await BrowserApi.getTabFromCurrentWindow();
-    if (currentTab) {
-      this.doNotificationQueueCheck(currentTab, currentLoginInfo);
+    if (currentLoginInfo) {
+      const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
+      const tabDomain = Utils.getDomain(tabInfo.url);
+      if (tabInfo && tabDomain === currentLoginInfo.domain) {
+        this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
+      }
     }
   }
 
@@ -290,14 +292,6 @@ export default class NotificationBackground {
       return;
     }
 
-    const tabDomain = Utils.getDomain(tab.url);
-    if (tabDomain == null) {
-      return;
-    }
-    loginInfo = {
-      ...loginInfo,
-      uri: tabDomain
-    }
     if (loginInfo.type === NotificationQueueMessageType.addLogin) {
       BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
         type: 'add',

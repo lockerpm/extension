@@ -41,6 +41,14 @@ export default class RequestBackground {
     });
   }
 
+  async sync(params = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC,
+      method: "get",
+      params
+    });
+  }
+
   async sync_cipher(id = '') {
     return await this.request({
       url: ENDPOINT.CYSTACK_PLATFORM_SYNC_CIPHER.replace(':id', id),

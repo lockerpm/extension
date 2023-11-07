@@ -109,7 +109,6 @@ export default Vue.extend({
         if(data.access_token){
           await this.$storageService.save('cs_token', data.access_token)
           await this.$store.dispatch("LoadCurrentUser");
-          await this.$store.dispatch("LoadSyncCount");
           cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
             this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
               preloginData: {

@@ -86,11 +86,11 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     // });
 
     // this.inited = true;
-    // if (await this.isAuthedAndUnlocked()) {
+    // if (await this.isAuthoredAndUnlocked()) {
     //   await this.reconnect(false);
     // }
 
-    if (await this.isAuthedAndUnlocked()) {
+    if (await this.isAuthoredAndUnlocked()) {
       await this.connectWebSocket();
     } else {
       this.disconnectSocket();
@@ -102,7 +102,7 @@ export class NotificationsService implements NotificationsServiceAbstraction {
       return;
     }
     try {
-      if (await this.isAuthedAndUnlocked()) {
+      if (await this.isAuthoredAndUnlocked()) {
         await this.reconnect(sync);
       } else {
         await this.signalrConnection.stop();
@@ -196,7 +196,7 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     if (this.connected || !this.inited || this.inactive) {
       return;
     }
-    const authedAndUnlocked = await this.isAuthedAndUnlocked();
+    const authedAndUnlocked = await this.isAuthoredAndUnlocked();
     if (!authedAndUnlocked) {
       return;
     }
@@ -216,7 +216,7 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     }
   }
 
-  private async isAuthedAndUnlocked() {
+  private async isAuthoredAndUnlocked() {
     if (await this.userService.isAuthenticated()) {
       const locked = await this.vaultTimeoutService.isLocked();
       return !locked;
@@ -240,6 +240,10 @@ export class NotificationsService implements NotificationsServiceAbstraction {
       const message = JSON.parse(event.data);
       if (message.event === 'sync') {
         await this.syncService.syncWsData(message);
+        chrome.runtime.sendMessage({
+          command: 'updateSyncedCiphers',
+          tab: null,
+        });
       }
     });
   }

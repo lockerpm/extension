@@ -24,8 +24,8 @@ export default class TabsBackground {
         return;
       }
       this.main.onReplacedRan = true;
-      await this.notificationBackground.checkNotificationQueue();
       await this.main.refreshBadgeAndMenu();
+      await this.notificationBackground.checkNotificationQueue();
     });
 
     chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
@@ -33,8 +33,8 @@ export default class TabsBackground {
         return;
       }
       this.main.onUpdatedRan = true;
-      await this.notificationBackground.checkNotificationQueue(tab);
       await this.main.refreshBadgeAndMenu();
+      await this.notificationBackground.checkNotificationQueue(tab);
     });
   }
 }

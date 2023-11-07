@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import RuntimeBackground from '../background/runtime.background';
+import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { StorageService } from "jslib-common/abstractions/storage.service";
 
 import { v4 as uuidv4 } from 'uuid';
@@ -14,12 +15,12 @@ Vue.use(Vuex)
 
 const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+const vaultTimeoutService = JSLib.getBgService<VaultTimeoutService>('vaultTimeoutService')()
 
 const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
 const USER_KEY = 'cs_user'
 const USER_PW_KEY = 'cs_user_pw'
-const SYNC_COUNT = 'cs_sync_count'
 
 const defaultUser = {
   email: null,
@@ -54,21 +55,17 @@ const asyncStore = async () => {
     storageService.get(STORAGE_KEY),
     storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
-    storageService.get(SYNC_COUNT),
-  ]).then(async ([accessToken, oldStore, storeUser, storeUserPw, count]) => {
+  ]).then(async ([accessToken, oldStore, storeUser, storeUserPw]) => {
     let user: any = storeUser
-    let userPw = storeUserPw
-    let syncCount = count
+    let userPw: any = storeUserPw
 
     if (accessToken && (!user || !user.email)) {
       await Promise.all([
         meAPI.me(),
         cystackPlatformAPI.users_me(),
-        cystackPlatformAPI.sync_count()
-      ]).then(([me, userMe, count]) => {
+      ]).then(([me, userMe]) => {
         user = me;
-        userPw = userMe
-        syncCount = count
+        userPw = userMe;
       }).catch(() => {
         user = JSON.parse(JSON.stringify(defaultUser))
         userPw = { is_pwd_manager: false }
@@ -76,7 +73,10 @@ const asyncStore = async () => {
       await Promise.all([
         await storageService.save(USER_KEY, user),
         await storageService.save(USER_PW_KEY, userPw),
-        await storageService.save(SYNC_COUNT, userPw),
+        vaultTimeoutService.setVaultTimeoutOptions(
+          userPw.timeout,
+          userPw.timeout_action
+        )
       ])
     }
 
@@ -94,7 +94,6 @@ const asyncStore = async () => {
     return new Vuex.Store({
       state: {
         init: false,
-        syncCount: syncCount,
         isLoggedIn: !!user?.email || !!oldStoreParsed?.preloginData?.email,
         user: {
           ...JSON.parse(JSON.stringify(user)),
@@ -150,11 +149,13 @@ const asyncStore = async () => {
         UPDATE_USER (state, user) {
           state.user = user || JSON.parse(JSON.stringify(defaultUser))
         },
-        UPDATE_SYNC_COUNT (state, count) {
-          state.syncCount = count
-        },
-        UPDATE_USER_PW (state, user) {
+        async UPDATE_USER_PW (state, user) {
           state.userPw = user
+          await storageService.save(USER_PW_KEY, user)
+          await vaultTimeoutService.setVaultTimeoutOptions(
+            user.timeout,
+            user.timeout_action
+          );
         },
         UPDATE_USER_INTERCOM (state, userIntercom) {
           state.userIntercom = userIntercom
@@ -245,16 +246,6 @@ const asyncStore = async () => {
             resolve(payload)
           })
         },
-        async LoadSyncCount ({ commit }) {
-          await cystackPlatformAPI.sync_count().then(async (response) => {
-            commit('UPDATE_SYNC_COUNT', response)
-            await storageService.save(SYNC_COUNT, response)
-          }).catch(async () => {
-            commit('UPDATE_SYNC_COUNT', null)
-            await storageService.save(SYNC_COUNT, null)
-          });
-          
-        },
         async LoadCurrentUser ({ commit }) {
           await meAPI.me().then(async (response) => {
             commit('UPDATE_IS_LOGGEDIN', true)
@@ -270,10 +261,8 @@ const asyncStore = async () => {
         async LoadCurrentUserPw ({ commit }) {
           await cystackPlatformAPI.users_me().then(async res => {
             commit('UPDATE_USER_PW', res)
-            await storageService.save(USER_PW_KEY, res)
           }).catch(async () => {
             commit('UPDATE_USER_PW', {})
-            await storageService.save(USER_PW_KEY, {})
           });
         },
         async LoadCurrentIntercom ({ commit }) {
