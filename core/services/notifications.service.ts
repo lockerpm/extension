@@ -240,10 +240,6 @@ export class NotificationsService implements NotificationsServiceAbstraction {
       const message = JSON.parse(event.data);
       if (message.event === 'sync') {
         await this.syncService.syncWsData(message);
-        chrome.runtime.sendMessage({
-          command: 'updateSyncedCiphers',
-          tab: null,
-        });
       }
     });
   }

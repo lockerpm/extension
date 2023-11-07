@@ -276,9 +276,6 @@ export default class MainBackground {
       this.tokenService,
       this.policyService,
       async () => {
-        if (this.notificationsService) {
-          this.notificationsService.disconnectSocket();
-        }
         await this.lock();
         if (this.systemService) {
           this.systemService.startProcessReload();
