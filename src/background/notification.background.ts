@@ -111,7 +111,11 @@ export default class NotificationBackground {
                 return
               }
               // check is login page
-              if (passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
+              if (
+                passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
+                && !passwordFields.filter((f) => f.type === 'password')[0]?.value
+                && usernameFields.length <= 1
+              ) {
                 this.autofillFirstPage(sender.tab);
               }
 

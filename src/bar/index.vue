@@ -79,8 +79,7 @@ export default Vue.extend({
       loginModel.username = this.data.username;
       loginModel.password = this.data.password;
       const model = new CipherView();
-      model.name = Utils.getHostname(this.data.uri);
-      model.name = model.name.replace(/^www\./, '');
+      model.name = this.data.uri
       model.type = CipherType.Login;
       model.login = loginModel;
       model.folderId = this.data.folderId
