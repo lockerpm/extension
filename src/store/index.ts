@@ -73,6 +73,10 @@ const asyncStore = async () => {
       await Promise.all([
         await storageService.save(USER_KEY, user),
         await storageService.save(USER_PW_KEY, userPw),
+        vaultTimeoutService.setVaultTimeoutOptions(
+          userPw.timeout,
+          userPw.timeout_action
+        )
       ])
     }
 
@@ -86,11 +90,6 @@ const asyncStore = async () => {
         ...oldStore,
       }
     }
-    
-    vaultTimeoutService.setVaultTimeoutOptions(
-      userPw.timeout,
-      userPw.timeout_action
-    );
 
     return new Vuex.Store({
       state: {
