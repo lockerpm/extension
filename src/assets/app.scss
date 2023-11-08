@@ -466,3 +466,11 @@ input:-webkit-autofill:active {
 .text-gray {
   color: #A2A3A7 !important;
 }
+
+.text-limited {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
