@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', event => {
     let barPage = 'popup.html#/bar';
     switch (type) {
       case 'add':
-        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.domain);
+        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri) + '&domain=' + encodeURIComponent(loginInfo.domain);;
         break;
       case 'change':
         barPage = barPage + '?id=' + encodeURIComponent(loginInfo.cipherId) + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
