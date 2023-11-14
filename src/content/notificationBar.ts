@@ -10,7 +10,11 @@ import {
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
 } from '@/config/constants'
+
+const documents = [];
+
 document.addEventListener('DOMContentLoaded', event => {
+  documents.push(document)
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains.includes(self.location.hostname)) {
     return;
@@ -682,7 +686,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closePopupIframe() {
-    let frameDiv = document?.getElementById('locker_popup-iframe-container');
+    const frameDiv = document?.getElementById('locker_popup-iframe-container');
     if (frameDiv) {
       frameDiv.remove();
     }
@@ -693,8 +697,7 @@ document.addEventListener('DOMContentLoaded', event => {
     if (document.body == null) {
       return;
     }
-    let frameDiv = document.getElementById('locker_popup-iframe-container');
-    let barPageUrl: string = chrome.runtime.getURL('popup.html');
+    const barPageUrl: string = chrome.runtime.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: 602px;
@@ -704,7 +707,7 @@ document.addEventListener('DOMContentLoaded', event => {
     `;
     iframe.id = 'popup-iframe';
     iframe.src = barPageUrl;
-    frameDiv = document.createElement('div');
+    const frameDiv = document.createElement('div');
     frameDiv.id = 'locker_popup-iframe-container';
     frameDiv.style.cssText = `
       height: 600px;
@@ -723,7 +726,6 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     });
     document.body.appendChild(frameDiv);
-
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

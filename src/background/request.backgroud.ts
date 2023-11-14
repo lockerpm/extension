@@ -26,10 +26,25 @@ export default class RequestBackground {
   }
 
   async sso_access_token(data: any) {
-    return this.request({
+    return await this.request({
       url: ENDPOINT.SSO_ACCESS_TOKEN,
       method: "post",
       data
+    });
+  }
+
+  async me() {
+    return await this.request({
+      url: ENDPOINT.ME,
+      method: "get",
+    });
+  }
+  
+  async users_me(params = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_USERS_ME,
+      method: "get",
+      params
     });
   }
 

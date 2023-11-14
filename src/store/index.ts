@@ -17,7 +17,6 @@ const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
 const vaultTimeoutService = JSLib.getBgService<VaultTimeoutService>('vaultTimeoutService')()
 
-const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
 const USER_KEY = 'cs_user'
 const USER_PW_KEY = 'cs_user_pw'
@@ -51,34 +50,12 @@ const defaultLoginInfo = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const asyncStore = async () => {
   return await Promise.all([
-    storageService.get(TOKEN_KEY),
     storageService.get(STORAGE_KEY),
     storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
-  ]).then(async ([accessToken, oldStore, storeUser, storeUserPw]) => {
-    let user: any = storeUser
-    let userPw: any = storeUserPw
-
-    if (accessToken && (!user || !user.email)) {
-      await Promise.all([
-        meAPI.me(),
-        cystackPlatformAPI.users_me(),
-      ]).then(([me, userMe]) => {
-        user = me;
-        userPw = userMe;
-      }).catch(() => {
-        user = JSON.parse(JSON.stringify(defaultUser))
-        userPw = { is_pwd_manager: false }
-      })
-      await Promise.all([
-        await storageService.save(USER_KEY, user),
-        await storageService.save(USER_PW_KEY, userPw),
-        vaultTimeoutService.setVaultTimeoutOptions(
-          userPw.timeout,
-          userPw.timeout_action
-        )
-      ])
-    }
+  ]).then(async ([oldStore, storeUser, storeUserPw]) => {
+    const user: any = storeUser || JSON.parse(JSON.stringify(defaultUser))
+    const userPw: any = storeUserPw || { is_pwd_manager: false }
 
     let oldStoreParsed = {
       language: 'en',

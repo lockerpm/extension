@@ -923,7 +923,7 @@ export default class MainBackground {
   }
 
   private async browserActionSetBadgeText(text: string, tabId: number) {
-    if (chrome.action && chrome.action.setBadgeText) {
+    if (chrome.action && chrome.action.setBadgeText && tabId) {
       await chrome.action.setBadgeText({
         text: text,
         tabId: tabId,
@@ -942,7 +942,7 @@ export default class MainBackground {
   }
 
   private async sidebarActionSetBadgeText(text: string, tabId: number) {
-    if (!this.sidebarAction) {
+    if (!this.sidebarAction || !tabId) {
       return;
     }
     if (this.sidebarAction.setBadgeText) {
