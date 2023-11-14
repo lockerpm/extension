@@ -59,7 +59,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         const vaultTimeout = await this.getVaultTimeout();
-        
         if (!vaultTimeout || vaultTimeout < 0) {
           const windows = await chrome?.windows?.getAll() || null
           if (!windows || !windows.length || windows.length === 0) {
@@ -74,7 +73,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         const vaultTimeoutSeconds = vaultTimeout * 60;
-        
         const diffSeconds = ((new Date()).getTime() - lastActive) / 1000;
 
         if (diffSeconds >= vaultTimeoutSeconds) {
