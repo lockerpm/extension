@@ -369,8 +369,8 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async hasKeyInMemory(): Promise<boolean> {
-    const masterKey = await this.storageService.get(Keys.masterKey);
-    return !!masterKey
+    const masterKey: any = await this.storageService.get(Keys.masterKey);
+    return !!(masterKey && masterKey.key && masterKey.encKey)
   }
 
   hasKeyStored(keySuffix: KeySuffixOptions): Promise<boolean> {

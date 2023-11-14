@@ -32,6 +32,8 @@ export default Vue.extend({
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
         this.reconnectDesktopAppSocket(undefined, true);
       }
+    } else {
+      await this.$store.dispatch("LoadCurrentUserPw");
     }
   },
 
