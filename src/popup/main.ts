@@ -156,7 +156,7 @@ Vue.mixin({
       })
     },
     async logout() {
-      await this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
+      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       try {
         await userAPI.logout();
       } catch (error) {

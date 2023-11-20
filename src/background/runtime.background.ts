@@ -135,6 +135,7 @@ export default class RuntimeBackground {
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
+          await this.main.onLogout();
           await this.storageService.save("cs_token", msg.token);
           this.request.sso_access_token({
             SERVICE_URL: "/sso",
@@ -144,6 +145,7 @@ export default class RuntimeBackground {
             const access_token = result ? result.access_token : "";
             await this.storageService.save("cs_token", access_token);
             this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
+            await this.main.onLock();
             await this.handleGetUserInfo();
             await this.handleOpenPopupIframe(3000)
           }).catch(() => {
@@ -166,7 +168,8 @@ export default class RuntimeBackground {
             baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
             baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
           })
-          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
+          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
+          await this.main.onLock();
           await this.handleGetUserInfo();
         }
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
