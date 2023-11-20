@@ -97,7 +97,6 @@ import { nanoid } from 'nanoid'
 export default class MainBackground {
   messagingService: MessagingServiceAbstraction;
   storageService: StorageServiceAbstraction;
-  secureStorageService: StorageServiceAbstraction;
   i18nService: I18nServiceAbstraction;
   platformUtilsService: PlatformUtilsServiceAbstraction;
   constantsService: ConstantsService;
@@ -182,7 +181,6 @@ export default class MainBackground {
         }
       }
     );
-    this.secureStorageService = new BrowserStorageService();
     this.i18nService = new I18nService(BrowserApi.getUILanguage());
     this.cryptoFunctionService = new WebCryptoFunctionService(
       self,
@@ -191,7 +189,6 @@ export default class MainBackground {
     this.logService = new ConsoleLogService(false);
     this.cryptoService = new BrowserCryptoService(
       this.storageService,
-      this.secureStorageService,
       this.cryptoFunctionService,
       this.platformUtilsService,
       this.logService
@@ -499,9 +496,6 @@ export default class MainBackground {
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();
-
-    this.onLogout = (expired: boolean) => this.logout(expired)
-    this.onLock = () => this.lock()
 
     this.onLogout = (expired: boolean) => this.logout(expired)
     this.onLock = () => this.lock()
