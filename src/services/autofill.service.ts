@@ -33,7 +33,7 @@ const UsernameFieldNames: string[] = [
   // German
   'benutzername', 'benutzer name', 'email adresse', 'e-mail adresse', 'benutzerid', 'benutzer id',
   // Vietnamese
-  'tên đăng nhập', 'tài khoản', 'số điện thoại', 'điện thoại'
+  'tên đăng nhập', 'tài khoản', 'số điện thoại', 'điện thoại', 'địa chỉ email'
 ];
 
 const FirstnameFieldNames: string[] = [
@@ -1135,8 +1135,14 @@ export default class AutofillService implements AutofillServiceInterface {
     return arr;
   }
 
-  private findUsernameField(pageDetails: AutofillPageDetails, passwordField: AutofillField, canBeHidden: boolean,
-                            canBeReadOnly: boolean, withoutForm: boolean, form?: any) {
+  private findUsernameField(
+    pageDetails: AutofillPageDetails,
+    passwordField: AutofillField,
+    canBeHidden: boolean,
+    canBeReadOnly: boolean,
+    withoutForm: boolean,
+    form?: any
+  ) {
     let usernameField: AutofillField = null;
     for (let i = 0; i < pageDetails.fields.length; i += 1) {
       const f = pageDetails.fields[i];
@@ -1170,10 +1176,8 @@ export default class AutofillService implements AutofillServiceInterface {
         (canBeHidden || f.viewable) &&
         (f.type === 'text' || f.type === 'email' || f.type === 'tel')
       ) {
-        if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
-          usernameField = f;
-          break;
-        }
+        usernameField = f;
+        break;
       }
     }
 
