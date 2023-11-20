@@ -1149,7 +1149,8 @@ export default class AutofillService implements AutofillServiceInterface {
           (canBeReadOnly || !f.readonly) &&
           (f.form === form.opid) &&
           (canBeHidden || f.viewable) &&
-          (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
+          (f.type === 'text' || f.type === 'email' || f.type === 'tel')
+        ) {
           if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
             usernameField = f;
             break;
@@ -1167,10 +1168,10 @@ export default class AutofillService implements AutofillServiceInterface {
         (canBeReadOnly || !f.readonly) &&
         (withoutForm || f.form === passwordField.form) &&
         (canBeHidden || f.viewable) &&
-        (f.type === 'text' || f.type === 'email' || f.type === 'tel')) {
-          usernameField = f;
+        (f.type === 'text' || f.type === 'email' || f.type === 'tel')
+      ) {
         if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
-          // We found an exact match. No need to keep looking.
+          usernameField = f;
           break;
         }
       }

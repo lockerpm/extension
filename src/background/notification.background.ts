@@ -114,7 +114,7 @@ export default class NotificationBackground {
               if (
                 passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
                 && !passwordFields.filter((f) => f.type === 'password')[0]?.value
-                && usernameFields.length <= 1
+                && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
               ) {
                 this.autofillFirstPage(sender.tab);
               }
