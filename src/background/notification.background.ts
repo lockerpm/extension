@@ -88,7 +88,9 @@ export default class NotificationBackground {
               for (const password of form.passwords) {
                 passwordFields.push(password)
               }
-              usernameFields.push(form.username)
+              if (form.username) {
+                usernameFields.push(form.username)
+              }
             }
             await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
               details: msg.details,
