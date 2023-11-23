@@ -5,9 +5,9 @@
   >
     <div class="flex items-start">
       <img src="@/assets/images/icons/icon_menu_logo.svg">
-      <div class="ml-2">
+      <div class="ml-2" :style="{ width: '300px' }">
         <p class="font-semibold text-limited" :title="data.uri">{{ data.uri }}</p>
-        <p>{{ data.id ? $t('bar.update_title') :  $t('bar.create_title') }}</p>
+        <p class="text-limited">{{ data.id ? $t('bar.update_title') :  $t('bar.create_title') }}</p>
       </div>
     </div>
     <div

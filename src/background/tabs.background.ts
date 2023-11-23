@@ -34,7 +34,13 @@ export default class TabsBackground {
       }
       this.main.onUpdatedRan = true;
       await this.main.refreshBadgeAndMenu();
-      await this.notificationBackground.checkNotificationQueue(tab);
+      setTimeout(async () => {
+        const tabInfo = await BrowserApi.getTabFromCurrentWindowId();
+        if (tabInfo) {
+          await this.main.collectPageDetailsForContentScript(tabInfo, 'notificationBar');
+          await this.notificationBackground.checkNotificationQueue(tabInfo);
+        }
+      }, 1000);
     });
   }
 }
