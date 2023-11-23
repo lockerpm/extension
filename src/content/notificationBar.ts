@@ -381,8 +381,8 @@ document.addEventListener('DOMContentLoaded', event => {
       if (matches.length > 0) {
         isSignUp = true;
       }
-      submitButton.removeEventListener('click', formSubmitted, false);
-      submitButton.addEventListener('click', formSubmitted, false);
+      submitButton.removeEventListener('click', (e) => formSubmitted(e, form), false);
+      submitButton.addEventListener('click', (e) => formSubmitted(e, form), false);
     }
   }
 
@@ -436,11 +436,11 @@ document.addEventListener('DOMContentLoaded', event => {
     return el;
   }
 
-  function formSubmitted(e: Event) {
+  function formSubmitted(e: Event, f?: HTMLFormElement) {
     closeAllInformMenu();
     let form: HTMLFormElement = null;
     if (e.type === 'click') {
-      form = (e.target as HTMLElement).closest('form');
+      form = f || (e.target as HTMLElement).closest('form');
       if (form == null) {
         const parentModal = (e.target as HTMLElement).closest('div.modal');
         if (parentModal != null) {
@@ -453,11 +453,9 @@ document.addEventListener('DOMContentLoaded', event => {
     } else {
       form = e.target as HTMLFormElement;
     }
-
     if (form == null || form.dataset.lockerProcessed === '1') {
       return;
     }
-
     for (let i = 0; i < formData.length; i++) {
       if (formData[i].formEl !== form) {
         continue;
@@ -529,47 +527,100 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
+  function isElementVisible(el: any) {
+    var theEl = el;
+    el = (el = el.ownerDocument) ? el.defaultView : {};
+
+    for (var elStyle: any; theEl && theEl !== document;) {
+      elStyle = el.getComputedStyle ? el.getComputedStyle(theEl, null) : theEl.style;
+      if (!elStyle) {
+        return true;
+      }
+
+      if ('none' === elStyle.display || 'hidden' == elStyle.visibility) {
+        return false;
+      }
+
+      // walk up
+      theEl = theEl.parentNode;
+    }
+
+    return theEl === document;
+  }
+
   function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
     if (wrappingEl == null) {
       return null;
     }
     const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-    let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
-      'button[type="submit"]') as HTMLElement;
+    let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], button[type="submit"]') as HTMLElement;
     if (submitButton == null && wrappingElIsForm) {
-      submitButton = wrappingEl.querySelector('button:not([type])');
-      if (submitButton != null) {
-        const buttonText = getButtonText(submitButton);
-        if (buttonText != null && cancelButtonNames.has(buttonText.trim().toLowerCase())) {
+      const typelessButton = wrappingEl.querySelector('button:not([type])') as HTMLElement;
+      if (!!typelessButton && isElementVisible(typelessButton)) {
+        const buttonText = getButtonText(typelessButton);
+        if (!!buttonText && buttonNames.has(buttonText.trim().toLowerCase())) {
+          submitButton = typelessButton;
+        }
+        if (!!buttonText && cancelButtonNames.has(buttonText.trim().toLowerCase())) {
           submitButton = null;
         }
       }
     }
     if (submitButton == null) {
-      const possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('a, span, button[type="button"], ' +
-        'input[type="button"], button:not([type])')) as HTMLElement[];
+      const possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
       let typelessButton: HTMLElement = null;
       possibleSubmitButtons.forEach(button => {
-        if (submitButton != null || button == null || button.tagName == null) {
+        if (!!submitButton || !button || !button.tagName) {
           return;
         }
         const buttonText = getButtonText(button);
-        if (buttonText != null) {
-          if (typelessButton != null && button.tagName.toLowerCase() === 'button' &&
-            button.getAttribute('type') == null &&
-            !cancelButtonNames.has(buttonText.trim().toLowerCase())) {
+        if (!!buttonText) {
+          if (
+            !!typelessButton
+            && button.tagName.toLowerCase() === 'button'
+            && button.getAttribute('type') == null
+            && !cancelButtonNames.has(buttonText.trim().toLowerCase())
+            && isElementVisible(button)
+          ) {
             typelessButton = button;
           } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
             submitButton = button;
           }
         }
       });
-      if (submitButton == null && typelessButton != null) {
+      if (!submitButton && !!typelessButton) {
         submitButton = typelessButton;
       }
     }
-    if (submitButton == null && wrappingElIsForm) {
-      // Maybe it's in a modal?
+    
+    if (submitButton == null) {
+      const possibleSubmitButtons = Array.from(document.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
+      let typelessButton: HTMLElement = null;
+      possibleSubmitButtons.forEach(button => {
+        if (!!submitButton || !button || !button.tagName) {
+          return;
+        }
+        const buttonText = getButtonText(button);
+        if (!!buttonText) {
+          if (
+            !!typelessButton
+            && button.tagName.toLowerCase() === 'button'
+            && button.getAttribute('type') == null
+            && !cancelButtonNames.has(buttonText.trim().toLowerCase())
+            && isElementVisible(button)
+          ) {
+            typelessButton = button;
+          } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
+            submitButton = button;
+          }
+        }
+      });
+      if (!submitButton && !!typelessButton) {
+        submitButton = typelessButton;
+      }
+    }
+
+    if (submitButton == null) {
       const parentModal = wrappingEl.closest('div.modal') as HTMLElement;
       if (parentModal != null) {
         const modalForms = parentModal.querySelectorAll('form');
@@ -578,6 +629,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       }
     }
+    
     return submitButton;
   }
 
