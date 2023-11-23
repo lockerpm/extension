@@ -1,6 +1,4 @@
 let isReading = false;
-document.addEventListener('DOMNodeInserted', event => {
-})
 document.addEventListener('DOMContentLoaded', event => {
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains.includes(self.location.hostname)) {
