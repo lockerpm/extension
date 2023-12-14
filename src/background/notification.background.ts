@@ -49,7 +49,7 @@ export default class NotificationBackground {
     private passwordRepromptService: PasswordRepromptService,
     private popupUtilsService: PopupUtilsService,
     private platformUtilsService: PlatformUtilsService
-  ) {}
+  ) { }
   async init() {
     if (chrome.runtime == null) {
       return;
@@ -83,7 +83,7 @@ export default class NotificationBackground {
             const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
             let passwordFields = [];
             let usernameFields = [];
-            
+
             for (const form of forms) {
               for (const password of form.passwords) {
                 passwordFields.push(password)
@@ -389,6 +389,7 @@ export default class NotificationBackground {
   }
 
   private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
+    console.log(11111, newPassword, username);
     await this.checkNotificationQueue(tab, {
       type: NotificationQueueMessageType.changePassword,
       cipherId: cipherId,

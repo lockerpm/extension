@@ -768,7 +768,6 @@ export default class MainBackground {
             await this.loadNoLoginsContextMenuOptions(this.i18nService.t('noMatchingLogins'));
           }
 
-          await this.sidebarActionSetBadgeText(theText, tabId);
           await this.browserActionSetBadgeText(theText, tabId);
         }, 1000);
         return;
@@ -787,7 +786,6 @@ export default class MainBackground {
     if (tabs) {
       tabs.forEach(tab => {
         if (tab.id) {
-          this.browserActionSetBadgeText('', tab.id);
           this.sidebarActionSetBadgeText('', tab.id);
         }
       });

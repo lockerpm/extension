@@ -14,7 +14,7 @@ const middleware = () => {
   router.beforeEach(async (to, from, next) => {
     NProgress.start()
     const store = await storePromise()
-    const isLocked = await vaultTimeoutService.isLocked()
+    const isLocked = await vaultTimeoutService.isLocked();
     if (to.meta?.isOver) {
       next();
     } else if (isFirst) {
@@ -23,9 +23,15 @@ const middleware = () => {
       const currentRouter = JSON.parse(currentRouterString)
       const allRouters = router.options.routes.map(o => o.children).flat();
       if (allRouters.find(r => currentRouter && r.name === currentRouter.name)) {
-        router.push(currentRouter).catch(() => ({}))
+        if (currentRouter.name == to.name) {
+          router.replace({ ...currentRouter }).catch(() => ({}))
+        } else {
+          router.push({ ...currentRouter }).catch(() => ({}))
+        }
+      } else if (to.name !== 'vault') {
+        router.push({ name: 'vault' }).catch(() => ({}))
       } else {
-        router.push({ name: 'vault'}).catch(() => ({}))
+        next()
       }
     } else if (isLocked) {
       if ((store.state.user.email && !!store.state.userPw) || store.state.preloginData?.email) {
@@ -39,13 +45,13 @@ const middleware = () => {
           }
         } else {
           router.push({ name: "lock" }).catch(() => ({}))
-        } 
+        }
       } else if (!['login', 'pwl-unlock', 'forgot-password'].includes(to.name)) {
         router.push({ name: "login" }).catch(() => ({}))
       } else {
         next();
       }
-    } else if (!isLocked && !to.meta?.isAuth) {
+    } else if (!isLocked && !to.meta?.isAuth && to.name !== "vault") {
       router.push({ name: "vault" }).catch(() => ({}))
     } else {
       next();
