@@ -44,7 +44,7 @@ export default class ContextMenusBackground {
   private async generatePasswordToClipboard() {
     const options = (await this.passwordGenerationService.getOptions())[0];
     const password = await this.passwordGenerationService.generatePassword(options);
-    this.platformUtilsService.copyToClipboard(password, { window: window });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerationService.addHistory(password);
   }
 
@@ -60,8 +60,8 @@ export default class ContextMenusBackground {
   private async cipherAction(info: any) {
     const id = info.menuItemId.split('_')[1];
     if (id === 'noop') {
-      if (chrome.browserAction && (chrome.browserAction as any).openPopup) {
-        (chrome.browserAction as any).openPopup();
+      if (chrome.action && (chrome.action as any).openPopup) {
+        (chrome.action as any).openPopup();
       }
       return;
     }
@@ -79,27 +79,25 @@ export default class ContextMenusBackground {
     if (info.parentMenuItemId === 'autofill') {
       await this.startAutofillPage(cipher);
     } else if (info.parentMenuItemId === 'copy-username') {
-      this.platformUtilsService.copyToClipboard(cipher.login.username, { window: window });
+      this.platformUtilsService.copyToClipboard(cipher.login.username, { window: self });
     } else if (info.parentMenuItemId === 'copy-password') {
-      this.platformUtilsService.copyToClipboard(cipher.login.password, { window: window });
-      this.eventService.collect(EventType.Cipher_ClientCopiedPassword, cipher.id);
+      this.platformUtilsService.copyToClipboard(cipher.login.password, { window: self });
     } else if (info.parentMenuItemId === 'copy-totp') {
       const totpValue = await this.totpService.getCode(cipher.login.totp);
-      this.platformUtilsService.copyToClipboard(totpValue, { window: window });
+      this.platformUtilsService.copyToClipboard(totpValue, { window: self });
     }
   }
 
   private async startAutofillPage(cipher: CipherView) {
-    this.main.loginToAutoFill = cipher;
     const tab = await BrowserApi.getTabFromCurrentWindow();
     if (tab == null) {
       return;
     }
-
     BrowserApi.tabSendMessage(tab, {
       command: 'collectPageDetails',
       tab: tab,
-      sender: 'contextMenu'
+      sender: 'autofillItem',
+      cipher: cipher
     });
   }
 }

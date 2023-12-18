@@ -115,7 +115,8 @@ export class SendService implements SendServiceAbstraction {
 
         const hasKey = await this.cryptoService.hasKey();
         if (!hasKey) {
-            throw new Error('No key.');
+          this.decryptedSendCache = []
+          return []
         }
 
         const decSends: SendView[] = [];

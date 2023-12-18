@@ -83,7 +83,7 @@ export default class RuntimeBackground {
     switch (msg.command) {
       case "loggedIn":
       case "unlocked":
-        this.handleUnlocked(msg.command)
+        this.handleUnlocked()
         break;
       case "addToLockedVaultPendingNotifications":
         this.lockedVaultPendingNotifications.push(msg.data);
@@ -135,6 +135,7 @@ export default class RuntimeBackground {
       case "cs-authResult":
         const token: any = await this.storageService.get("cs_token");
         if (!token) {
+          await this.main.onLogout();
           await this.storageService.save("cs_token", msg.token);
           this.request.sso_access_token({
             SERVICE_URL: "/sso",
@@ -143,7 +144,9 @@ export default class RuntimeBackground {
           }).then(async (result: any) => {
             const access_token = result ? result.access_token : "";
             await this.storageService.save("cs_token", access_token);
-            this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
+            this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
+            await this.main.onLock();
+            await this.handleGetUserInfo();
             await this.handleOpenPopupIframe(3000)
           }).catch(() => {
             this.storageService.save("cs_token", null);
@@ -160,20 +163,18 @@ export default class RuntimeBackground {
             }
           })
         } else {
-          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }))
           await this.updateStoreServiceInfo({
             preloginData: msg.data,
             baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
             baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
           })
+          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
+          await this.main.onLock();
+          await this.handleGetUserInfo();
         }
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
         await BrowserApi.updateCurrentTab(tab, this.currentLocation);
         await this.handleOpenPopupIframe(3000)
-        break;
-      case "cs-authCaptcha":
-        // await this.storageService.save('recaptcha_token', msg.token || '')
-        // await this.handleOpenPopupIframe(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
@@ -265,7 +266,7 @@ export default class RuntimeBackground {
     });
   }
 
-  async handleUnlocked(command: string) {
+  async handleUnlocked() {
     let item: LockedVaultPendingNotificationsItem;
     if (this.lockedVaultPendingNotifications.length > 0 || this.lockedVaultPendingInformMenu.length > 0) {
       await BrowserApi.closeLoginTab();
@@ -278,7 +279,7 @@ export default class RuntimeBackground {
       }
     }
     await this.main.refreshBadgeAndMenu(false);
-    this.notificationsService.updateConnection(command === "unlocked");
+    await this.notificationsService.connectWebSocket();
     this.systemService.cancelProcessReload();
     if (item) {
       await BrowserApi.tabSendMessageData(
@@ -300,5 +301,28 @@ export default class RuntimeBackground {
         tab: tab,
       });
     }, timeout);
+  }
+
+  async handleGetUserInfo() {
+    let user: any = null
+    let userPw: any = null
+    await Promise.all([
+      this.request.me(),
+      this.request.users_me(),
+    ]).then(([me, userMe]) => {
+      user = me;
+      userPw = userMe;
+    }).catch(() => {
+      user = null
+      userPw = null
+    })
+    await Promise.all([
+      await this.storageService.save('cs_user', user),
+      await this.storageService.save('cs_user_pw', userPw),
+      this.vaultTimeoutService.setVaultTimeoutOptions(
+        userPw.timeout,
+        userPw.timeout_action
+      )
+    ])
   }
 }

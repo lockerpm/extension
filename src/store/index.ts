@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import JSLib from "@/popup/services/services";
 import RuntimeBackground from '../background/runtime.background';
+import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { StorageService } from "jslib-common/abstractions/storage.service";
 
 import { v4 as uuidv4 } from 'uuid';
@@ -14,8 +15,8 @@ Vue.use(Vuex)
 
 const storageService = JSLib.getBgService<StorageService>('storageService')()
 const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackground')()
+const vaultTimeoutService = JSLib.getBgService<VaultTimeoutService>('vaultTimeoutService')()
 
-const TOKEN_KEY = 'cs_token'
 const STORAGE_KEY = 'cs_store'
 const USER_KEY = 'cs_user'
 const USER_PW_KEY = 'cs_user_pw'
@@ -49,28 +50,12 @@ const defaultLoginInfo = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const asyncStore = async () => {
   return await Promise.all([
-    storageService.get(TOKEN_KEY),
     storageService.get(STORAGE_KEY),
     storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
-  ]).then(async ([accessToken, oldStore, storeUser, storeUserPw]) => {
-    let user: any = storeUser
-    let userPw = storeUserPw
-
-    if (accessToken && (!user || !user.email)) {
-      await meAPI.me().then(async (response) => {
-        user = response
-      }).catch(async () => {
-        user = JSON.parse(JSON.stringify(defaultUser))
-      });
-      await cystackPlatformAPI.users_me().then(async response => {
-        userPw = response
-      }).catch(async () => {
-        userPw = { is_pwd_manager: false }
-      });
-      await storageService.save(USER_KEY, user)
-      await storageService.save(USER_PW_KEY, userPw)
-    }
+  ]).then(async ([oldStore, storeUser, storeUserPw]) => {
+    const user: any = storeUser || JSON.parse(JSON.stringify(defaultUser))
+    const userPw: any = storeUserPw || { is_pwd_manager: false }
 
     let oldStoreParsed = {
       language: 'en',
@@ -82,7 +67,6 @@ const asyncStore = async () => {
         ...oldStore,
       }
     }
-    
 
     return new Vuex.Store({
       state: {
@@ -109,7 +93,6 @@ const asyncStore = async () => {
         teams: [],
         currentTeam: {},
         currentPlan: {},
-        cipherCount: null,
         hideIcons: false,
         showFolders: true,
         enableAutofill:  true,
@@ -143,8 +126,13 @@ const asyncStore = async () => {
         UPDATE_USER (state, user) {
           state.user = user || JSON.parse(JSON.stringify(defaultUser))
         },
-        UPDATE_USER_PW (state, user) {
+        async UPDATE_USER_PW (state, user) {
           state.userPw = user
+          await storageService.save(USER_PW_KEY, user)
+          await vaultTimeoutService.setVaultTimeoutOptions(
+            user.timeout,
+            user.timeout_action
+          );
         },
         UPDATE_USER_INTERCOM (state, userIntercom) {
           state.userIntercom = userIntercom
@@ -178,9 +166,6 @@ const asyncStore = async () => {
         },
         UPDATE_CURRENT_PLAN (state, plan) {
           state.currentPlan = plan
-        },
-        UPDATE_CIPHER_COUNT (state, value) {
-          state.cipherCount = value
         },
         UPDATE_HIDE_ICONS(state, value) {
           state.hideIcons = value
@@ -253,10 +238,8 @@ const asyncStore = async () => {
         async LoadCurrentUserPw ({ commit }) {
           await cystackPlatformAPI.users_me().then(async res => {
             commit('UPDATE_USER_PW', res)
-            await storageService.save(USER_PW_KEY, res)
           }).catch(async () => {
             commit('UPDATE_USER_PW', {})
-            await storageService.save(USER_PW_KEY, {})
           });
         },
         async LoadCurrentIntercom ({ commit }) {

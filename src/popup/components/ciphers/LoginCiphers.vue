@@ -36,7 +36,7 @@
         </div>
       </li>
       <CipherRow
-        v-for="item in loginCiphers"
+        v-for="item in (loginCiphers || [])"
         :key="item.id"
         :item="item"
         @do-fill="$emit('do-fill', item)"
@@ -66,59 +66,50 @@ export default Vue.extend({
   data() {
     return {
       CipherType,
-      loginCiphers: [],
       url: "",
       loaded: false,
     };
   },
-  watch: {
-    "$store.state.syncedCiphersToggle": 'load',
-  },
-  mounted() {
-    this.load()
+  asyncComputed: {
+    loginCiphers: {
+      async get() {
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        if (tab != null) {
+          this.url = tab.url;
+        } else {
+          return [];
+        }
+        const otherTypes = [];
+        const dontShowCards = await new BrowserStorageService().get(
+          ConstantsService.dontShowCardsCurrentTab
+        );
+        const dontShowIdentities = await new BrowserStorageService().get(
+          ConstantsService.dontShowIdentitiesCurrentTab
+        );
+        if (!dontShowCards) {
+          otherTypes.push(CipherType.Card);
+        }
+        if (!dontShowIdentities) {
+          otherTypes.push(CipherType.Identity);
+        }
+
+        const ciphers = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
+          null,
+          tab,
+          otherTypes
+        )) || [];
+        this.loaded = true;
+        return this.$cipherService.sortCiphers(ciphers) || [];
+      },
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "searchText",
+      ],
+    }
   },
   methods: {
-    async load() {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab != null) {
-        this.url = tab.url;
-      } else {
-        this.loginCiphers = [];
-        return;
-      }
-      const otherTypes = [];
-      const dontShowCards = await new BrowserStorageService().get(
-        ConstantsService.dontShowCardsCurrentTab
-      );
-      const dontShowIdentities = await new BrowserStorageService().get(
-        ConstantsService.dontShowIdentitiesCurrentTab
-      );
-      if (!dontShowCards) {
-        otherTypes.push(CipherType.Card);
-      }
-      if (!dontShowIdentities) {
-        otherTypes.push(CipherType.Identity);
-      }
-
-      const ciphers = await this.$cipherService.getAllDecryptedForUrl(
-        this.url,
-        otherTypes.length > 0 ? otherTypes : null
-      ) || [];
-      this.loginCiphers = [];
-
-      ciphers.forEach((c) => {
-        switch (c.type) {
-        case CipherType.Login:
-          this.loginCiphers.push(c);
-          break;
-        default:
-          break;
-        }
-      });
-
-      this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers) || [];
-      this.loaded = true;
-    },
     goToAddItem () {
       this.$router.push({ name: "add-edit-cipher"}).catch(() => ({}));
     },

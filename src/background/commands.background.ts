@@ -41,9 +41,6 @@ export default class CommandsBackground {
       case 'open_popup':
         await this.main.openPopup();
         break;
-      case 'lock_vault':
-        await this.vaultTimeoutService.lock(true);
-        break;
       default:
         break;
     }
@@ -52,7 +49,7 @@ export default class CommandsBackground {
   private async generatePasswordToClipboard() {
     const options = (await this.passwordGenerationService.getOptions())[0];
     const password = await this.passwordGenerationService.generatePassword(options);
-    this.platformUtilsService.copyToClipboard(password, { window: window });
+    this.platformUtilsService.copyToClipboard(password, { window: self });
     this.passwordGenerationService.addHistory(password);
   }
 

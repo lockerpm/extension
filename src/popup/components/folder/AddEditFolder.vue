@@ -91,7 +91,8 @@ export default Vue.extend({
         this.callingAPI = true
         const folderEnc = await this.$folderService.encrypt(this.folder)
         const data = new FolderRequest(folderEnc)
-        const res = cystackPlatformAPI.create_folder(data)
+        const res = await cystackPlatformAPI.create_folder(data)
+
         this.$emit('done')
         this.$emit('created-folder', { id: res.id, name: this.folder.name })
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.folder') }), 'success')

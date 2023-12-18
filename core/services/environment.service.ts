@@ -46,13 +46,13 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
         if (this.baseUrl) {
             return this.baseUrl;
         }
-        return 'https://vault.locker.io';
+        return 'https://locker.io';
     }
 
     getSendUrl() {
-        return this.getWebVaultUrl() === 'https://vault.locker.io'
-            ? 'https://send.locker.io/#'
-            : this.getWebVaultUrl() + '/#/send/';
+        return this.getWebVaultUrl() === ''
+            ? ''
+            : this.getWebVaultUrl() + '';
     }
 
     getIconsUrl() {
@@ -88,7 +88,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/identity';
         }
 
-        return 'https://identity.locker.io';
+        return '';
     }
 
     getEventsUrl() {
@@ -100,7 +100,7 @@ export class EnvironmentService implements EnvironmentServiceAbstraction {
             return this.baseUrl + '/events';
         }
 
-        return 'https://events.locker.io';
+        return '';
     }
 
     async setUrlsFromStorage(): Promise<void> {

@@ -79,6 +79,7 @@ import { NativeMessagingBackground } from './nativeMessaging.background';
 import NotificationBackground from './notification.background';
 import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
+import WindowsBackground from './windows.background';
 import WebRequestBackground from './webRequest.background';
 import RequestBackground from './request.backgroud';
 
@@ -96,7 +97,6 @@ import { nanoid } from 'nanoid'
 export default class MainBackground {
   messagingService: MessagingServiceAbstraction;
   storageService: StorageServiceAbstraction;
-  secureStorageService: StorageServiceAbstraction;
   i18nService: I18nServiceAbstraction;
   platformUtilsService: PlatformUtilsServiceAbstraction;
   constantsService: ConstantsService;
@@ -146,6 +146,7 @@ export default class MainBackground {
   private notificationBackground: NotificationBackground;
   private runtimeBackground: RuntimeBackground;
   private tabsBackground: TabsBackground;
+  private windowsBackground: WindowsBackground;
   private webRequestBackground: WebRequestBackground;
   private requestBackground: RequestBackground;
 
@@ -158,6 +159,7 @@ export default class MainBackground {
   constructor() {
     this.messagingService = new BrowserMessagingService();
     this.storageService = new BrowserStorageService();
+    this.requestBackground = new RequestBackground(this);
     this.platformUtilsService = new BrowserPlatformUtilsService(
       this.messagingService,
       this.storageService,
@@ -179,7 +181,6 @@ export default class MainBackground {
         }
       }
     );
-    this.secureStorageService = new BrowserStorageService();
     this.i18nService = new I18nService(BrowserApi.getUILanguage());
     this.cryptoFunctionService = new WebCryptoFunctionService(
       self,
@@ -188,7 +189,6 @@ export default class MainBackground {
     this.logService = new ConsoleLogService(false);
     this.cryptoService = new BrowserCryptoService(
       this.storageService,
-      this.secureStorageService,
       this.cryptoFunctionService,
       this.platformUtilsService,
       this.logService
@@ -273,11 +273,7 @@ export default class MainBackground {
       this.tokenService,
       this.policyService,
       async () => {
-        if (this.notificationsService) {
-          this.notificationsService.updateConnection(false);
-        }
-        await this.setIcon();
-        await this.refreshBadgeAndMenu(true);
+        await this.lock();
         if (this.systemService) {
           this.systemService.startProcessReload();
           await this.systemService.clearPendingClipboard();
@@ -298,6 +294,7 @@ export default class MainBackground {
       this.policyService,
       this.sendService,
       this.logService,
+      this.requestBackground,
       async (expired: boolean) => await this.logout(expired)
     );
     this.eventService = new EventService(
@@ -344,16 +341,6 @@ export default class MainBackground {
       this.platformUtilsService,
       this.cryptoService
     );
-    this.notificationsService = new NotificationsService(
-      this.userService,
-      this.syncService,
-      this.appIdService,
-      this.apiService,
-      this.vaultTimeoutService,
-      this.environmentService,
-      () => this.logout(true),
-      this.logService
-    );
     this.popupUtilsService = new PopupUtilsService(this.platformUtilsService);
 
     this.systemService = new SystemService(
@@ -372,8 +359,17 @@ export default class MainBackground {
     this.isSafari = this.platformUtilsService.isSafari();
     this.sidebarAction = this.isSafari ? null : (typeof opr !== 'undefined') && opr.sidebarAction ? opr.sidebarAction : (self as any).chrome?.sidebarAction;
 
-    // // Background
-    this.requestBackground = new RequestBackground(this);
+    this.notificationsService = new NotificationsService(
+      this.userService,
+      this.syncService,
+      this.appIdService,
+      this.apiService,
+      this.vaultTimeoutService,
+      this.environmentService,
+      () => this.logout(true),
+      this.logService,
+      this.storageService,
+    );
     this.runtimeBackground = new RuntimeBackground(
       this,
       this.autofillService,
@@ -436,6 +432,10 @@ export default class MainBackground {
       this,
       this.notificationBackground
     );
+    this.windowsBackground = new WindowsBackground(
+      this,
+      this.vaultTimeoutService
+    )
     this.contextMenusBackground = new ContextMenusBackground(
       this,
       this.cipherService,
@@ -492,6 +492,7 @@ export default class MainBackground {
     await this.commandsBackground.init();
 
     await this.tabsBackground.init();
+    await this.windowsBackground.init();
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();
@@ -554,6 +555,7 @@ export default class MainBackground {
   async lock() {
     const userId = await this.userService.getUserId()
     await Promise.all([
+      this.notificationsService.disconnectSocket(),
       this.passService.clearGeneratePassword(),
       this.cryptoService.clearKeys(),
       this.folderService.clear(userId),
@@ -575,6 +577,7 @@ export default class MainBackground {
     await this.passService.clearGeneratePassword();
 
     await Promise.all([
+      this.notificationsService.disconnectSocket(),
       this.eventService.clearEvents(),
       this.syncService.setLastSync(new Date(0)),
       this.tokenService.clearToken(),
@@ -600,7 +603,6 @@ export default class MainBackground {
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
 
-    this.notificationsService.updateConnection(false);
     this.systemService.startProcessReload();
     await this.systemService.clearPendingClipboard();
   }
@@ -766,7 +768,6 @@ export default class MainBackground {
             await this.loadNoLoginsContextMenuOptions(this.i18nService.t('noMatchingLogins'));
           }
 
-          await this.sidebarActionSetBadgeText(theText, tabId);
           await this.browserActionSetBadgeText(theText, tabId);
         }, 1000);
         return;
@@ -785,7 +786,6 @@ export default class MainBackground {
     if (tabs) {
       tabs.forEach(tab => {
         if (tab.id) {
-          this.browserActionSetBadgeText('', tab.id);
           this.sidebarActionSetBadgeText('', tab.id);
         }
       });
@@ -915,7 +915,7 @@ export default class MainBackground {
   }
 
   private async browserActionSetBadgeText(text: string, tabId: number) {
-    if (chrome.action && chrome.action.setBadgeText) {
+    if (chrome.action && chrome.action.setBadgeText && tabId) {
       await chrome.action.setBadgeText({
         text: text,
         tabId: tabId,
@@ -934,7 +934,7 @@ export default class MainBackground {
   }
 
   private async sidebarActionSetBadgeText(text: string, tabId: number) {
-    if (!this.sidebarAction) {
+    if (!this.sidebarAction || !tabId) {
       return;
     }
     if (this.sidebarAction.setBadgeText) {

@@ -61,7 +61,6 @@ import Identity from '@/popup/components/auth/Identity.vue'
 import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import authAPI from '@/api/auth'
-import meAPI from '@/api/me'
 import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({

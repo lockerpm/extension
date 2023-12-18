@@ -26,7 +26,7 @@ export abstract class AuthService {
     logInApiKeyComplete: (clientId: string, clientSecret: string, twoFactorProvider: TwoFactorProviderType,
         twoFactorToken: string, remember?: boolean) => Promise<AuthResult>;
     logOut: (callback: Function) => void;
-    getSupportedTwoFactorProviders: (win: Window) => any[];
+    getSupportedTwoFactorProviders: (win: any) => any[];
     getDefaultTwoFactorProvider: (webAuthnSupported: boolean) => TwoFactorProviderType;
     makePreloginKey: (masterPassword: string, email: string) => Promise<SymmetricCryptoKey>;
     authingWithApiKey: () => boolean;

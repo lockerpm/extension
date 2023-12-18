@@ -21,8 +21,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
     biometricLocked: boolean = true;
     everBeenUnlocked: boolean = false;
 
-    private inited = false;
-
     constructor(private cipherService: CipherService, private folderService: FolderService,
         private collectionService: CollectionService, private cryptoService: CryptoService,
         protected platformUtilsService: PlatformUtilsService, private storageService: StorageService,
@@ -31,25 +29,17 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         private lockedCallback: () => Promise<void> = null, private loggedOutCallback: () => Promise<void> = null) {
     }
 
-    init(checkOnInterval: boolean) {
-        if (this.inited) {
-            return;
-        }
-
-        this.inited = true;
-        if (checkOnInterval) {
-            this.startCheck();
-        }
+    async init(checkOnInterval: boolean) {
+        this.startCheck();        
     }
 
     startCheck() {
         this.checkVaultTimeout();
-        setInterval(() => this.checkVaultTimeout(), 10 * 1000); // check every 10 seconds
+        setInterval(() => this.checkVaultTimeout(), 10000);
     }
 
     // Keys aren't stored for a device that is locked or logged out.
     async isLocked(): Promise<boolean> {
-        // Handle never lock startup situation
         if (await this.cryptoService.hasKeyStored('auto') && !this.everBeenUnlocked) {
             await this.cryptoService.getKey('auto');
         }
@@ -70,7 +60,11 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
         const vaultTimeout = await this.getVaultTimeout();
         if (!vaultTimeout || vaultTimeout < 0) {
-            return;
+          const windows = await chrome?.windows?.getAll() || null
+          if (!windows || !windows.length || windows.length === 0) {
+            await this.lock();
+          }
+          return;
         }
 
         const lastActive = await this.storageService.get<number>(ConstantsService.lastActiveKey);
@@ -79,35 +73,19 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
         }
 
         const vaultTimeoutSeconds = vaultTimeout * 60;
-        
         const diffSeconds = ((new Date()).getTime() - lastActive) / 1000;
 
         if (diffSeconds >= vaultTimeoutSeconds) {
             const timeoutAction = await this.storageService.get<string>(ConstantsService.vaultTimeoutActionKey);
-            timeoutAction === 'logOut' ? await this.logOut() : await this.lock(true);
+            timeoutAction === 'logOut' ? await this.logOut() : await this.lock();
         }
     }
 
-    async lock(allowSoftLock = false): Promise<void> {
-        const authed = await this.userService.isAuthenticated();
-        if (!authed) {
-            return;
-        }
-
+    async lock(): Promise<void> {
         this.biometricLocked = true;
         this.everBeenUnlocked = true;
-        await this.cryptoService.clearKey(false);
-        await this.cryptoService.clearOrgKeys(true);
-        await this.cryptoService.clearKeyPair(true);
-        await this.cryptoService.clearEncKey(true);
-
-        this.folderService.clearCache();
-        this.cipherService.clearCache();
-        this.collectionService.clearCache();
-        this.searchService.clearIndex();
-        this.messagingService.send('locked');
         if (this.lockedCallback != null) {
-            await this.lockedCallback();
+          await this.lockedCallback();
         }
     }
 
@@ -152,7 +130,6 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
             return timeout;
         }
-
         return vaultTimeout;
     }
 

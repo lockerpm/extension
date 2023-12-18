@@ -32,11 +32,16 @@ export default Vue.extend({
     }
   },
   async created () {
-    const locked = await this.$vaultTimeoutService.isLocked();
-    if (locked) {
+    this.locked = await this.$vaultTimeoutService.isLocked();
+    setInterval(async () => {
+      this.locked = await this.$vaultTimeoutService.isLocked();
+    }, 1000)
+    if (this.locked) {
       if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
         this.reconnectDesktopAppSocket(undefined, true);
       }
+    } else {
+      await this.$store.dispatch("LoadCurrentUserPw");
     }
   },
 
@@ -45,8 +50,8 @@ export default Vue.extend({
       if (newValue) {
         this.disconnectSocket()
       } else {
-        this.$store.dispatch('LoadTeams')
         this.reconnectSocket()
+        this.$store.dispatch('LoadTeams')
         this.$store.dispatch('LoadCurrentPlan')
       }
     },
@@ -82,11 +87,12 @@ export default Vue.extend({
         reconnectionDelay: 3000
       })
       this.ws1 = this.$socket
-      this.ws1.onmessage = message => {
+      this.ws1.onmessage = async (message: any) => {
         const data = JSON.parse(message.data)
         switch (data.event) {
         case 'sync':
-          this.getSyncData()
+          await this.$syncService.syncWsData(data);
+          this.$store.commit("UPDATE_SYNCED_CIPHERS");
           break
         default:
           break

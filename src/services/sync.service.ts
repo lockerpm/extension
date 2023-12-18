@@ -30,4 +30,5 @@ export abstract class SyncService {
   syncSends: (userId: string, response: SendResponse[]) => Promise<boolean>;
   syncSettings: (userId: string, response: DomainsResponse) => Promise<boolean>;
   syncPolicies: (response: PolicyResponse[]) => Promise<boolean>;
+  syncWsData: (message: any) => Promise<any>;
 }

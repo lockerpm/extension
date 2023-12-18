@@ -90,5 +90,5 @@ export default {
   sso_reset_password,
   sso_reset_password_token,
   sso_reset_password_verify_token,
-  sso_new_password
+  sso_new_password,
 };

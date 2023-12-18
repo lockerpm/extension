@@ -50,7 +50,8 @@ import Vue from 'vue'
 import {CipherType} from "jslib-common/enums/cipherType";
 import Vnodes from "@/popup/components/Vnodes.vue";
 import { CipherView } from 'jslib-common/models/view/cipherView';
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+
 import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default Vue.extend(

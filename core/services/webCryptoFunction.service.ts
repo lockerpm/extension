@@ -14,9 +14,9 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     private isIE: boolean;
     private isOldSafari: boolean;
 
-    constructor(private win: Window, private platformUtilsService: PlatformUtilsService) {
-        this.crypto = typeof win.crypto !== 'undefined' ? win.crypto : null;
-        this.subtle = (!!this.crypto && typeof win.crypto.subtle !== 'undefined') ? win.crypto.subtle : null;
+    constructor(private win: any, private platformUtilsService: PlatformUtilsService) {
+        this.crypto = win.crypto || null;
+        this.subtle = (!!this.crypto && win.crypto) ? win.crypto.subtle : null;
         this.isIE = platformUtilsService.isIE();
         const ua = win.navigator.userAgent;
         this.isOldSafari = platformUtilsService.isSafari() &&
@@ -195,32 +195,32 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     aesDecryptFastParameters(data: string, iv: string, mac: string, key: SymmetricCryptoKey):
         DecryptParameters<string> {
         const p = new DecryptParameters<string>();
-        if (key.meta != null) {
+        if (key.meta) {
             p.encKey = key.meta.encKeyByteString;
             p.macKey = key.meta.macKeyByteString;
         }
 
-        if (p.encKey == null) {
+        if (!p.encKey) {
             p.encKey = forge.util.decode64(key.encKeyB64);
         }
         p.data = forge.util.decode64(data);
         p.iv = forge.util.decode64(iv);
         p.macData = p.iv + p.data;
-        if (p.macKey == null && key.macKeyB64 != null) {
+        if (!p.macKey && key.macKeyB64) {
             p.macKey = forge.util.decode64(key.macKeyB64);
         }
-        if (mac != null) {
+        if (mac) {
             p.mac = forge.util.decode64(mac);
         }
 
         // cache byte string keys for later
-        if (key.meta == null) {
+        if (!key.meta) {
             key.meta = {};
         }
-        if (key.meta.encKeyByteString == null) {
+        if (!key.meta.encKeyByteString) {
             key.meta.encKeyByteString = p.encKey;
         }
-        if (p.macKey != null && key.meta.macKeyByteString == null) {
+        if (p.macKey && !key.meta.macKeyByteString) {
             key.meta.macKeyByteString = p.macKey;
         }
 

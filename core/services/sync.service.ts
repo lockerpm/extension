@@ -25,367 +25,426 @@ import { CollectionDetailsResponse } from '../models/response/collectionResponse
 import { DomainsResponse } from '../models/response/domainsResponse';
 import { FolderResponse } from '../models/response/folderResponse';
 import {
-    SyncCipherNotification,
-    SyncFolderNotification,
-    SyncSendNotification,
+  SyncCipherNotification,
+  SyncFolderNotification,
+  SyncSendNotification,
 } from '../models/response/notificationResponse';
 import { PolicyResponse } from '../models/response/policyResponse';
 import { ProfileResponse } from '../models/response/profileResponse';
 import { SendResponse } from '../models/response/sendResponse';
+import { SyncResponse } from 'jslib-common/models/response/syncResponse';
+
+import RequestBackground from '@/background/request.backgroud';
 
 const Keys = {
-    lastSyncPrefix: 'lastSync_',
+  lastSyncPrefix: 'lastSync_',
 };
 
 export class SyncService implements SyncServiceAbstraction {
-    syncInProgress: boolean = false;
+  syncInProgress: boolean = false;
 
-    constructor(private userService: UserService, private apiService: ApiService,
-        private settingsService: SettingsService, private folderService: FolderService,
-        private cipherService: CipherService, private cryptoService: CryptoService,
-        private collectionService: CollectionService, private storageService: StorageService,
-        private messagingService: MessagingService, private policyService: PolicyService,
-        private sendService: SendService, private logService: LogService,
-        private logoutCallback: (expired: boolean) => Promise<void>) {
+  constructor(private userService: UserService, private apiService: ApiService,
+    private settingsService: SettingsService, private folderService: FolderService,
+    private cipherService: CipherService, private cryptoService: CryptoService,
+    private collectionService: CollectionService, private storageService: StorageService,
+    private messagingService: MessagingService, private policyService: PolicyService,
+    private sendService: SendService, private logService: LogService, private request: RequestBackground,
+    private logoutCallback: (expired: boolean) => Promise<void>) {
+  }
+
+  async getLastSync(): Promise<Date> {
+    const userId = await this.userService.getUserId();
+    if (userId == null) {
+      return null;
     }
 
-    async getLastSync(): Promise<Date> {
-        const userId = await this.userService.getUserId();
-        if (userId == null) {
-            return null;
-        }
-
-        const lastSync = await this.storageService.get<any>(Keys.lastSyncPrefix + userId);
-        if (lastSync) {
-            return new Date(lastSync);
-        }
-
-        return null;
+    const lastSync = await this.storageService.get<any>(Keys.lastSyncPrefix + userId);
+    if (lastSync) {
+      return new Date(lastSync);
     }
 
-    async setLastSync(date: Date): Promise<any> {
-        const userId = await this.userService.getUserId();
-        if (userId == null) {
-            return;
-        }
+    return null;
+  }
 
-        await this.storageService.save(Keys.lastSyncPrefix + userId, date.toJSON());
+  async setLastSync(date: Date): Promise<any> {
+    const userId = await this.userService.getUserId();
+    if (userId == null) {
+      return;
     }
 
-    async fullSync(forceSync: boolean, allowThrowOnError = false): Promise<boolean> {
-        this.syncStarted();
-        const isAuthenticated = await this.userService.isAuthenticated();
-        if (!isAuthenticated) {
-            return this.syncCompleted(false);
-        }
+    await this.storageService.save(Keys.lastSyncPrefix + userId, date.toJSON());
+  }
 
-        const now = new Date();
-        let needsSync = false;
-        try {
-            needsSync = await this.needsSyncing(forceSync);
-        } catch (e) {
-            if (allowThrowOnError) {
-                throw e;
-            }
-        }
+  async fullSync(forceSync: boolean, allowThrowOnError = false): Promise<boolean> {
+    this.syncStarted();
+    const isAuthenticated = await this.userService.isAuthenticated();
+    if (!isAuthenticated) {
+      return this.syncCompleted(false);
+    }
 
-        if (!needsSync) {
-            await this.setLastSync(now);
-            return this.syncCompleted(false);
-        }
+    const now = new Date();
+    let needsSync = false;
+    try {
+      needsSync = await this.needsSyncing(forceSync);
+    } catch (e) {
+      if (allowThrowOnError) {
+        throw e;
+      }
+    }
 
-        const userId = await this.userService.getUserId();
-        try {
-            await this.apiService.refreshIdentityToken();
-            const response = await this.apiService.getSync();
+    if (!needsSync) {
+      await this.setLastSync(now);
+      return this.syncCompleted(false);
+    }
 
-            await this.syncProfile(response.profile);
-            await this.syncFolders(userId, response.folders);
-            await this.syncCollections(response.collections);
-            await this.syncCiphers(userId, response.ciphers);
-            await this.syncSends(userId, response.sends);
-            await this.syncSettings(userId, response.domains);
-            await this.syncPolicies(response.policies);
+    const userId = await this.userService.getUserId();
+    try {
+      await this.apiService.refreshIdentityToken();
+      const response = await this.apiService.getSync();
 
-            await this.setLastSync(now);
+      await this.syncProfile(response.profile);
+      await this.syncFolders(userId, response.folders);
+      await this.syncCollections(response.collections);
+      await this.syncSomeCiphers(userId, response.ciphers);
+      await this.syncCiphers(userId, response.ciphers);
+      await this.syncSends(userId, response.sends);
+      await this.syncSettings(userId, response.domains);
+      await this.syncPolicies(response.policies);
+
+      await this.setLastSync(now);
+      return this.syncCompleted(true);
+    } catch (e) {
+      if (allowThrowOnError) {
+        throw e;
+      } else {
+        return this.syncCompleted(false);
+      }
+    }
+  }
+
+  async syncUpsertFolder(notification: SyncFolderNotification, isEdit: boolean): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      try {
+        const localFolder = await this.folderService.get(notification.id);
+        if ((!isEdit && localFolder == null) ||
+          (isEdit && localFolder != null && localFolder.revisionDate < notification.revisionDate)) {
+          const remoteFolder = await this.apiService.getFolder(notification.id);
+          if (remoteFolder != null) {
+            const userId = await this.userService.getUserId();
+            await this.folderService.upsert(new FolderData(remoteFolder, userId));
+            this.messagingService.send('syncedUpsertedFolder', { folderId: notification.id });
             return this.syncCompleted(true);
-        } catch (e) {
-            if (allowThrowOnError) {
-                throw e;
+          }
+        }
+      } catch (e) {
+        this.logService.error(e);
+      }
+    }
+    return this.syncCompleted(false);
+  }
+
+  async syncDeleteFolder(notification: SyncFolderNotification): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      await this.folderService.delete(notification.id);
+      this.messagingService.send('syncedDeletedFolder', { folderId: notification.id });
+      this.syncCompleted(true);
+      return true;
+    }
+    return this.syncCompleted(false);
+  }
+
+  async syncUpsertCipher(notification: SyncCipherNotification, isEdit: boolean): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      try {
+        let shouldUpdate = true;
+        const localCipher = await this.cipherService.get(notification.id);
+        if (localCipher != null && localCipher.revisionDate >= notification.revisionDate) {
+          shouldUpdate = false;
+        }
+
+        let checkCollections = false;
+        if (shouldUpdate) {
+          if (isEdit) {
+            shouldUpdate = localCipher != null;
+            checkCollections = true;
+          } else {
+            if (notification.collectionIds == null || notification.organizationId == null) {
+              shouldUpdate = localCipher == null;
             } else {
-                return this.syncCompleted(false);
+              shouldUpdate = false;
+              checkCollections = true;
             }
+          }
         }
-    }
 
-    async syncUpsertFolder(notification: SyncFolderNotification, isEdit: boolean): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            try {
-                const localFolder = await this.folderService.get(notification.id);
-                if ((!isEdit && localFolder == null) ||
-                    (isEdit && localFolder != null && localFolder.revisionDate < notification.revisionDate)) {
-                    const remoteFolder = await this.apiService.getFolder(notification.id);
-                    if (remoteFolder != null) {
-                        const userId = await this.userService.getUserId();
-                        await this.folderService.upsert(new FolderData(remoteFolder, userId));
-                        this.messagingService.send('syncedUpsertedFolder', { folderId: notification.id });
-                        return this.syncCompleted(true);
-                    }
-                }
-            } catch (e) {
-                this.logService.error(e);
+        if (!shouldUpdate && checkCollections && notification.organizationId != null &&
+          notification.collectionIds != null && notification.collectionIds.length > 0) {
+          const collections = await this.collectionService.getAll();
+          if (collections != null) {
+            for (let i = 0; i < collections.length; i++) {
+              if (notification.collectionIds.indexOf(collections[i].id) > -1) {
+                shouldUpdate = true;
+                break;
+              }
             }
+          }
         }
-        return this.syncCompleted(false);
-    }
 
-    async syncDeleteFolder(notification: SyncFolderNotification): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            await this.folderService.delete(notification.id);
-            this.messagingService.send('syncedDeletedFolder', { folderId: notification.id });
-            this.syncCompleted(true);
-            return true;
-        }
-        return this.syncCompleted(false);
-    }
-
-    async syncUpsertCipher(notification: SyncCipherNotification, isEdit: boolean): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            try {
-                let shouldUpdate = true;
-                const localCipher = await this.cipherService.get(notification.id);
-                if (localCipher != null && localCipher.revisionDate >= notification.revisionDate) {
-                    shouldUpdate = false;
-                }
-
-                let checkCollections = false;
-                if (shouldUpdate) {
-                    if (isEdit) {
-                        shouldUpdate = localCipher != null;
-                        checkCollections = true;
-                    } else {
-                        if (notification.collectionIds == null || notification.organizationId == null) {
-                            shouldUpdate = localCipher == null;
-                        } else {
-                            shouldUpdate = false;
-                            checkCollections = true;
-                        }
-                    }
-                }
-
-                if (!shouldUpdate && checkCollections && notification.organizationId != null &&
-                    notification.collectionIds != null && notification.collectionIds.length > 0) {
-                    const collections = await this.collectionService.getAll();
-                    if (collections != null) {
-                        for (let i = 0; i < collections.length; i++) {
-                            if (notification.collectionIds.indexOf(collections[i].id) > -1) {
-                                shouldUpdate = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (shouldUpdate) {
-                    const remoteCipher = await this.apiService.getCipher(notification.id);
-                    if (remoteCipher != null) {
-                        const userId = await this.userService.getUserId();
-                        await this.cipherService.upsert(new CipherData(remoteCipher, userId));
-                        this.messagingService.send('syncedUpsertedCipher', { cipherId: notification.id });
-                        return this.syncCompleted(true);
-                    }
-                }
-            } catch (e) {
-                if (e != null && e.statusCode === 404 && isEdit) {
-                    await this.cipherService.delete(notification.id);
-                    this.messagingService.send('syncedDeletedCipher', { cipherId: notification.id });
-                    return this.syncCompleted(true);
-                }
-            }
-        }
-        return this.syncCompleted(false);
-    }
-
-    async syncDeleteCipher(notification: SyncCipherNotification): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            await this.cipherService.delete(notification.id);
-            this.messagingService.send('syncedDeletedCipher', { cipherId: notification.id });
+        if (shouldUpdate) {
+          const remoteCipher = await this.apiService.getCipher(notification.id);
+          if (remoteCipher != null) {
+            const userId = await this.userService.getUserId();
+            await this.cipherService.upsert(new CipherData(remoteCipher, userId));
+            this.messagingService.send('syncedUpsertedCipher', { cipherId: notification.id });
             return this.syncCompleted(true);
+          }
         }
-        return this.syncCompleted(false);
-    }
-
-    async syncUpsertSend(notification: SyncSendNotification, isEdit: boolean): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            try {
-                const localSend = await this.sendService.get(notification.id);
-                if ((!isEdit && localSend == null) ||
-                    (isEdit && localSend != null && localSend.revisionDate < notification.revisionDate)) {
-                    const remoteSend = await this.apiService.getSend(notification.id);
-                    if (remoteSend != null) {
-                        const userId = await this.userService.getUserId();
-                        await this.sendService.upsert(new SendData(remoteSend, userId));
-                        this.messagingService.send('syncedUpsertedSend', { sendId: notification.id });
-                        return this.syncCompleted(true);
-                    }
-                }
-            } catch (e) {
-                this.logService.error(e);
-            }
+      } catch (e) {
+        if (e != null && e.statusCode === 404 && isEdit) {
+          await this.cipherService.delete(notification.id);
+          this.messagingService.send('syncedDeletedCipher', { cipherId: notification.id });
+          return this.syncCompleted(true);
         }
-        return this.syncCompleted(false);
+      }
     }
+    return this.syncCompleted(false);
+  }
 
-    async syncDeleteSend(notification: SyncSendNotification): Promise<boolean> {
-        this.syncStarted();
-        if (await this.userService.isAuthenticated()) {
-            await this.sendService.delete(notification.id);
-            this.messagingService.send('syncedDeletedSend', { sendId: notification.id });
-            this.syncCompleted(true);
-            return true;
+  async syncDeleteCipher(notification: SyncCipherNotification): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      await this.cipherService.delete(notification.id);
+      this.messagingService.send('syncedDeletedCipher', { cipherId: notification.id });
+      return this.syncCompleted(true);
+    }
+    return this.syncCompleted(false);
+  }
+
+  async syncUpsertSend(notification: SyncSendNotification, isEdit: boolean): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      try {
+        const localSend = await this.sendService.get(notification.id);
+        if ((!isEdit && localSend == null) ||
+          (isEdit && localSend != null && localSend.revisionDate < notification.revisionDate)) {
+          const remoteSend = await this.apiService.getSend(notification.id);
+          if (remoteSend != null) {
+            const userId = await this.userService.getUserId();
+            await this.sendService.upsert(new SendData(remoteSend, userId));
+            this.messagingService.send('syncedUpsertedSend', { sendId: notification.id });
+            return this.syncCompleted(true);
+          }
         }
-        return this.syncCompleted(false);
+      } catch (e) {
+        this.logService.error(e);
+      }
+    }
+    return this.syncCompleted(false);
+  }
+
+  async syncDeleteSend(notification: SyncSendNotification): Promise<boolean> {
+    this.syncStarted();
+    if (await this.userService.isAuthenticated()) {
+      await this.sendService.delete(notification.id);
+      this.messagingService.send('syncedDeletedSend', { sendId: notification.id });
+      this.syncCompleted(true);
+      return true;
+    }
+    return this.syncCompleted(false);
+  }
+
+  // Helpers
+
+  private syncStarted() {
+    this.syncInProgress = true;
+    this.messagingService.send('syncStarted');
+  }
+
+  private syncCompleted(successfully: boolean): boolean {
+    this.syncInProgress = false;
+    return successfully;
+  }
+
+  private async needsSyncing(forceSync: boolean) {
+    if (forceSync) {
+      return true;
     }
 
-    // Helpers
-
-    private syncStarted() {
-        this.syncInProgress = true;
-        this.messagingService.send('syncStarted');
+    const lastSync = await this.getLastSync();
+    if (lastSync == null || lastSync.getTime() === 0) {
+      return true;
     }
 
-    private syncCompleted(successfully: boolean): boolean {
-        this.syncInProgress = false;
-        this.messagingService.send('syncCompleted', { successfully: successfully });
-        return successfully;
+    const response = await this.apiService.getAccountRevisionDate();
+    if (new Date(response) <= lastSync) {
+      return false;
+    }
+    return true;
+  }
+
+  private async syncProfile(response: ProfileResponse) {
+    const stamp = await this.userService.getSecurityStamp();
+    if (stamp != null && stamp !== response.securityStamp) {
+      if (this.logoutCallback != null) {
+        await this.logoutCallback(true);
+      }
+
+      throw new Error('Stamp has changed');
     }
 
-    private async needsSyncing(forceSync: boolean) {
-        if (forceSync) {
-            return true;
+    await this.cryptoService.setEncKey(response.key);
+    await this.cryptoService.setEncPrivateKey(response.privateKey);
+    await this.cryptoService.setProviderKeys(response.providers);
+    await this.cryptoService.setOrgKeys(response.organizations, response.providerOrganizations);
+    await this.userService.setSecurityStamp(response.securityStamp);
+    await this.userService.setEmailVerified(response.emailVerified);
+    await this.userService.setForcePasswordReset(response.forcePasswordReset);
+
+    const organizations: { [id: string]: OrganizationData; } = {};
+    response.organizations.forEach(o => {
+      organizations[o.id] = new OrganizationData(o);
+    });
+
+    const providers: { [id: string]: ProviderData; } = {};
+    response.providers.forEach(p => {
+      providers[p.id] = new ProviderData(p);
+    });
+
+    response.providerOrganizations.forEach(o => {
+      if (organizations[o.id] == null) {
+        organizations[o.id] = new OrganizationData(o);
+        organizations[o.id].isProviderUser = true;
+      }
+    });
+    return Promise.all([
+      this.userService.replaceOrganizations(organizations),
+      this.userService.replaceProviders(providers),
+    ]);
+  }
+
+  private async syncFolders(userId: string, response: FolderResponse[]) {
+    const folders: { [id: string]: FolderData; } = {};
+    response.forEach(f => {
+      folders[f.id] = new FolderData(f, userId);
+    });
+    return await this.folderService.replace(folders);
+  }
+
+  private async syncCollections(response: CollectionDetailsResponse[]) {
+    const collections: { [id: string]: CollectionData; } = {};
+    response.forEach(c => {
+      collections[c.id] = new CollectionData(c);
+    });
+    return await this.collectionService.replace(collections);
+  }
+
+  private async syncCiphers(userId: string, response: CipherResponse[]) {
+    const ciphers: { [id: string]: CipherData; } = {};
+    response.forEach(c => {
+      ciphers[c.id] = new CipherData(c, userId);
+    });
+    return await this.cipherService.replace(ciphers);
+  }
+
+  private async syncSends(userId: string, response: SendResponse[]) {
+    const sends: { [id: string]: SendData; } = {};
+    response.forEach(s => {
+      sends[s.id] = new SendData(s, userId);
+    });
+    return await this.sendService.replace(sends);
+  }
+
+  private async syncSettings(userId: string, response: DomainsResponse) {
+    let eqDomains: string[][] = [];
+    if (response != null && response.equivalentDomains != null) {
+      eqDomains = eqDomains.concat(response.equivalentDomains);
+    }
+
+    if (response != null && response.globalEquivalentDomains != null) {
+      response.globalEquivalentDomains.forEach(global => {
+        if (global.domains.length > 0) {
+          eqDomains.push(global.domains);
         }
+      });
+    }
 
-        const lastSync = await this.getLastSync();
-        if (lastSync == null || lastSync.getTime() === 0) {
-            return true;
+    return this.settingsService.setEquivalentDomains(eqDomains);
+  }
+
+  private async syncPolicies(response: PolicyResponse[]) {
+    const policies: { [id: string]: PolicyData; } = {};
+    if (response != null) {
+      response.forEach(p => {
+        policies[p.id] = new PolicyData(p);
+      });
+    }
+    return await this.policyService.replace(policies);
+  }
+
+  private async syncSomeCiphers(userId: string, response: CipherResponse[]) {
+    const ciphers: { [id: string]: CipherData; } = {};
+    response.forEach(c => {
+      ciphers[c.id] = new CipherData(c, userId);
+    });
+    return await this.cipherService.replaceSome(ciphers);
+  }
+
+  async syncData(trigger: boolean = false) {
+    const userId = await this.userService.getUserId();
+    await this.request.sync({ paging: 0 }).then(async (response) => {
+      this.messagingService.send('syncStarted')
+      const res = new SyncResponse(response)
+      await this.syncProfile(res.profile)
+      await this.syncFolders(userId, res.folders);
+      await this.syncCollections(res.collections);
+      await this.syncSomeCiphers(userId, res.ciphers);
+      await this.syncSends(userId, res.sends);
+      await this.syncSettings(userId, res.domains);
+      await this.syncPolicies(res.policies);
+      await this.setLastSync(new Date());
+
+      const deletedIds = [];
+      const cipherIds = res.ciphers.map(c => c.id);
+      const storageRes: any = await this.storageService.get(`ciphers_${userId}`);
+      for (const id in { ...storageRes }) {
+        if (!cipherIds.includes(id)) {
+          delete storageRes[id];
+          deletedIds.push(id);
         }
+      }
+      await this.storageService.save(`ciphers_${userId}`, storageRes);
+      this.cipherService.csDeleteFromDecryptedCache(deletedIds);
+      await this.cipherService.getAllDecrypted()
+      this.messagingService.send('syncCompleted', { successfully: true, trigger })
+    }).catch(() => {
+      this.messagingService.send('syncCompleted', { successfully: false, trigger })
+    })
+  }
 
-        const response = await this.apiService.getAccountRevisionDate();
-        if (new Date(response) <= lastSync) {
-            return false;
-        }
-        return true;
+  async syncWsData(message: any) {
+    if (message.type.includes('cipher')) {
+      if (message.type.includes('update') && message.data.id) {
+        const res = await this.request.sync_cipher(message.data.id);
+        await this.cipherService.upsert([res])
+      } else if (message.type.includes('delete') && message.data.ids) {
+        await this.cipherService.delete(message.data.ids)
+      } else {
+        await this.syncData();
+      }
+    } else if (message.type.includes('folder')) {
+      if (message.type.includes('update') && message.data.id) {
+        const res = await this.request.sync_folder(message.data.id);
+        await this.folderService.upsert([res])
+      } else if (message.type.includes('delete') && message.data.ids) {
+        await this.folderService.delete(message.data.ids)
+      } else {
+        await this.syncData();
+      }
+    } else {
+      await this.syncData();
     }
-
-    private async syncProfile(response: ProfileResponse) {
-        const stamp = await this.userService.getSecurityStamp();
-        if (stamp != null && stamp !== response.securityStamp) {
-            if (this.logoutCallback != null) {
-                await this.logoutCallback(true);
-            }
-
-            throw new Error('Stamp has changed');
-        }
-
-        await this.cryptoService.setEncKey(response.key);
-        await this.cryptoService.setEncPrivateKey(response.privateKey);
-        await this.cryptoService.setProviderKeys(response.providers);
-        await this.cryptoService.setOrgKeys(response.organizations, response.providerOrganizations);
-        await this.userService.setSecurityStamp(response.securityStamp);
-        await this.userService.setEmailVerified(response.emailVerified);
-        await this.userService.setForcePasswordReset(response.forcePasswordReset);
-
-        const organizations: { [id: string]: OrganizationData; } = {};
-        response.organizations.forEach(o => {
-            organizations[o.id] = new OrganizationData(o);
-        });
-
-        const providers: { [id: string]: ProviderData; } = {};
-        response.providers.forEach(p => {
-            providers[p.id] = new ProviderData(p);
-        });
-
-        response.providerOrganizations.forEach(o => {
-            if (organizations[o.id] == null) {
-                organizations[o.id] = new OrganizationData(o);
-                organizations[o.id].isProviderUser = true;
-            }
-        });
-        return Promise.all([
-            this.userService.replaceOrganizations(organizations),
-            this.userService.replaceProviders(providers),
-        ]);
-    }
-
-    private async syncFolders(userId: string, response: FolderResponse[]) {
-        const folders: { [id: string]: FolderData; } = {};
-        response.forEach(f => {
-            folders[f.id] = new FolderData(f, userId);
-        });
-        return await this.folderService.replace(folders);
-    }
-
-    private async syncCollections(response: CollectionDetailsResponse[]) {
-        const collections: { [id: string]: CollectionData; } = {};
-        response.forEach(c => {
-            collections[c.id] = new CollectionData(c);
-        });
-        return await this.collectionService.replace(collections);
-    }
-
-    private async syncCiphers(userId: string, response: CipherResponse[]) {
-        const ciphers: { [id: string]: CipherData; } = {};
-        response.forEach(c => {
-            ciphers[c.id] = new CipherData(c, userId);
-        });
-        return await this.cipherService.replace(ciphers);
-    }
-
-    private async syncSends(userId: string, response: SendResponse[]) {
-        const sends: { [id: string]: SendData; } = {};
-        response.forEach(s => {
-            sends[s.id] = new SendData(s, userId);
-        });
-        return await this.sendService.replace(sends);
-    }
-
-    private async syncSettings(userId: string, response: DomainsResponse) {
-        let eqDomains: string[][] = [];
-        if (response != null && response.equivalentDomains != null) {
-            eqDomains = eqDomains.concat(response.equivalentDomains);
-        }
-
-        if (response != null && response.globalEquivalentDomains != null) {
-            response.globalEquivalentDomains.forEach(global => {
-                if (global.domains.length > 0) {
-                    eqDomains.push(global.domains);
-                }
-            });
-        }
-
-        return this.settingsService.setEquivalentDomains(eqDomains);
-    }
-
-    private async syncPolicies(response: PolicyResponse[]) {
-        const policies: { [id: string]: PolicyData; } = {};
-        if (response != null) {
-            response.forEach(p => {
-                policies[p.id] = new PolicyData(p);
-            });
-        }
-        return await this.policyService.replace(policies);
-    }
-
-    private async syncSomeCiphers(userId: string, response: CipherResponse[]) {
-        const ciphers: { [id: string]: CipherData; } = {};
-        response.forEach(c => {
-            ciphers[c.id] = new CipherData(c, userId);
-        });
-        return await this.cipherService.replaceSome(ciphers);
-    }
+  }
 }
