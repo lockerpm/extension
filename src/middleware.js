@@ -34,6 +34,7 @@ const middleware = () => {
         next()
       }
     } else if (isLocked) {
+      console.log(store.state);
       if ((store.state.user.email && !!store.state.userPw) || store.state.preloginData?.email) {
         if (to.meta?.isLock) {
           const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')

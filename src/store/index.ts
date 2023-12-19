@@ -53,9 +53,9 @@ const asyncStore = async () => {
     storageService.get(STORAGE_KEY),
     storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
-  ]).then(async ([oldStore, storeUser, storeUserPw]) => {
-    const user: any = storeUser || JSON.parse(JSON.stringify(defaultUser))
-    const userPw: any = storeUserPw || { is_pwd_manager: false }
+  ]).then(async ([oldStore, storeUser, storeUserPw]: [any, any, any]) => {
+    const user: any = storeUser ? JSON.parse(storeUser) : JSON.parse(JSON.stringify(defaultUser))
+    const userPw: any = storeUserPw  ? JSON.parse(storeUserPw) : { is_pwd_manager: false }
 
     let oldStoreParsed = {
       language: 'en',
@@ -123,12 +123,13 @@ const asyncStore = async () => {
           }
           state.teams = []
         },
-        UPDATE_USER (state, user) {
+        async UPDATE_USER (state, user) {
           state.user = user || JSON.parse(JSON.stringify(defaultUser))
+          await storageService.save(USER_KEY, user ? JSON.stringify(user) : null)
         },
         async UPDATE_USER_PW (state, user) {
           state.userPw = user
-          await storageService.save(USER_PW_KEY, user)
+          await storageService.save(USER_PW_KEY, user ? JSON.stringify(user) : null)
           await vaultTimeoutService.setVaultTimeoutOptions(
             user.timeout,
             user.timeout_action
@@ -227,11 +228,9 @@ const asyncStore = async () => {
           await meAPI.me().then(async (response) => {
             commit('UPDATE_IS_LOGGEDIN', true)
             commit('UPDATE_USER', response)
-            await storageService.save(USER_KEY, response)
           }).catch(async () => {
             commit('UPDATE_IS_LOGGEDIN', false)
             commit('UPDATE_USER', null)
-            await storageService.save(USER_KEY, null)
           });
           
         },
