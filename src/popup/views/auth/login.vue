@@ -2,7 +2,7 @@
   <div class="w-full" style="padding-top: 3.5rem;">
     <div class="text-center">
       <img
-        src="@/assets/images/logo/logo_black.svg"
+        src="@/assets/images/logo/logo_black.png"
         alt=""
         class="h-[36px] mx-auto"
       >
@@ -47,15 +47,11 @@
       @back="() => updateLoginStep(2)"
       @get-access-token="getAccessToken"
     />
-    <LogInWith
-      v-if="loginInfo.login_step === 1"
-    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import LogInWith from '@/popup/components/auth/LogInWith.vue'
 import Form from '@/popup/components/auth/Form.vue'
 import Identity from '@/popup/components/auth/Identity.vue'
 import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
@@ -66,7 +62,6 @@ import cystackPlatformAPI from '@/api/cystack_platform'
 export default Vue.extend({
   name: 'Login',
   components: {
-    LogInWith,
     Form,
     Identity,
     VerifyOTP
