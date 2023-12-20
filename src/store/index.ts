@@ -54,8 +54,8 @@ const asyncStore = async () => {
     storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
   ]).then(async ([oldStore, storeUser, storeUserPw]: [any, any, any]) => {
-    const user: any = storeUser ? JSON.parse(storeUser) : JSON.parse(JSON.stringify(defaultUser))
-    const userPw: any = storeUserPw  ? JSON.parse(storeUserPw) : { is_pwd_manager: false }
+    const user: any = storeUser ? storeUser : JSON.parse(JSON.stringify(defaultUser))
+    const userPw: any = storeUserPw  ? storeUserPw : { is_pwd_manager: false }
 
     let oldStoreParsed = {
       language: 'en',
@@ -125,11 +125,11 @@ const asyncStore = async () => {
         },
         async UPDATE_USER (state, user) {
           state.user = user || JSON.parse(JSON.stringify(defaultUser))
-          await storageService.save(USER_KEY, user ? JSON.stringify(user) : null)
+          await storageService.save(USER_KEY, user ? JSON.parse(JSON.stringify(user)) : null)
         },
         async UPDATE_USER_PW (state, user) {
           state.userPw = user
-          await storageService.save(USER_PW_KEY, user ? JSON.stringify(user) : null)
+          await storageService.save(USER_PW_KEY, user ? JSON.parse(JSON.stringify(user)) : null)
           await vaultTimeoutService.setVaultTimeoutOptions(
             user.timeout,
             user.timeout_action
