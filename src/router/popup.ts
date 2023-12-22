@@ -19,42 +19,7 @@ const routes: Array<RouteConfig> = [
         name: "login",
         component: () =>
           import("../popup/views/auth/login.vue")
-      },
-      {
-        path: "forgot-password",
-        name: "forgot-password",
-        component: () =>
-          import("../popup/views/auth/forgot-password.vue")
-      },
-      {
-        path: "lock",
-        name: "lock",
-        meta: {
-          isLock: true
-        },
-        component: () =>
-          import("../popup/views/auth/lock.vue")
-      },
-      {
-        path: "pwl-unlock",
-        name: "pwl-unlock",
-        meta: {
-          isLock: true
-        },
-        component: () =>
-          import("../popup/views/auth/pwl-unlock.vue")
-      },
-      {
-        path: "set-master-password",
-        name: "set-master-password",
-        meta: {
-          isLock: true
-        },
-        component: () =>
-          import(
-            "../popup/views/auth/set-master-password.vue"
-          )
-      },
+      }
     ]
   },
   {

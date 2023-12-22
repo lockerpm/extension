@@ -33,13 +33,6 @@ export default class RequestBackground {
     });
   }
 
-  async me() {
-    return await this.request({
-      url: ENDPOINT.ME,
-      method: "get",
-    });
-  }
-  
   async users_me(params = {}) {
     return await this.request({
       url: ENDPOINT.CYSTACK_PLATFORM_USERS_ME,

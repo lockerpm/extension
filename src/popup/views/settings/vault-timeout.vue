@@ -19,7 +19,7 @@
           {{option.label}}
         </div>
         <div
-          v-if="user.timeout === option.value"
+          v-if="userPw && userPw.timeout === option.value"
           class="text-primary cursor-pointer"
           style="font-size: 8px; line-height: 8px; padding: 5px; border-radius: 50%; border: 1px solid green"
         >
@@ -46,7 +46,7 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 export default Vue.extend({
   data() {
     return {
-      user: {},
+      userPw: {},
       loading: false,
     };
   },
@@ -60,15 +60,15 @@ export default Vue.extend({
   },
   methods: {
     async getUser() {
-      const user = await cystackPlatformAPI.users_me();
-      this.user = { ...user };
+      const userPw = await cystackPlatformAPI.users_me();
+      this.userPw = { ...userPw };
     },
     async putUser(timeoutValue) {
-      this.user.timeout = timeoutValue
+      this.userPw.timeout = timeoutValue
       try {
         this.loading = true;
-        await cystackPlatformAPI.update_users_me(this.user);
-        this.$store.commit("UPDATE_USER_PW", this.user);
+        await cystackPlatformAPI.update_users_me(this.userPw);
+        this.$store.commit("UPDATE_USER_PW", this.userPw);
         this.notify(
           this.$t("data.notifications.update_settings_success"),
           "success"

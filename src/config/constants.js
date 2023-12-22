@@ -15,3 +15,7 @@ export const VAULT_TIMEOUTS = [
   { label: i18n.t("data.timeouts.twoWeeks"), value: 20160 },
   { label: i18n.t("data.timeouts.onRefresh"), value: -1 },
 ];
+export const CORE_JS_INFO = {
+  KDF: 0,
+  KDF_ITERATIONS: 100000
+}

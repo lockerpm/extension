@@ -1,15 +1,15 @@
 <template>
-  <div class="w-full" style="padding-top: 3.5rem;">
+  <div class="w-full" style="padding-top: 1.5rem;">
     <div class="text-center">
       <img
         src="@/assets/images/logo/logo_black.png"
         alt=""
-        class="h-[36px] mx-auto"
+        class="h-[100px] mx-auto"
       >
     </div>
     <div>
       <div
-        class="font-bold text-head-5 text-black-700 text-center mt-10">
+        class="font-bold text-head-5 text-black-700 text-center mt-4">
         {{$t('data.login.login')}}
       </div>
       <el-row type="flex" justify="space-between my-4 px-10" align="middle">
@@ -30,39 +30,42 @@
           <span class="flag flag-vn"></span>
         </div>
       </el-row>
+      <PreloginForm
+        v-if="loginInfo.login_step === 1"
+        @next="(data) => login(data)"
+      />
+      <Identity
+        v-else-if="loginInfo.login_step === 2"
+        @back="() => updateLoginStep(1)"
+        @next="() => updateLoginStep(3)"
+      />
+      <VerifyOTP
+        v-else-if="loginInfo.login_step === 3"
+        :otp-method="otpMethod"
+        @back="() => updateLoginStep(2)"
+        @next="(data) => loginByOtp(data)"
+      />
     </div>
-    <Form
-      v-if="loginInfo.login_step === 1"
-      @next="() => updateLoginStep(2)"
-      @get-access-token="getAccessToken"
-    />
-    <Identity
-      v-else-if="loginInfo.login_step === 2"
-      @back="() => updateLoginStep(1)"
-      @next="() => updateLoginStep(3)"
-    />
-    <VerifyOTP
-      v-else-if="loginInfo.login_step === 3"
-      :otp-method="otpMethod"
-      @back="() => updateLoginStep(2)"
-      @get-access-token="getAccessToken"
-    />
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import Vue from 'vue'
-import Form from '@/popup/components/auth/Form.vue'
+
+import PreloginForm from '@/popup/components/auth/PreloginForm.vue'
 import Identity from '@/popup/components/auth/Identity.vue'
 import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
-import authAPI from '@/api/auth'
 import cystackPlatformAPI from '@/api/cystack_platform'
+import commonAPI from '@/api/common'
+
+import { SymmetricCryptoKey } from 'jslib-common/models/domain/symmetricCryptoKey';
+import { Utils } from 'jslib-common/misc/utils';
 
 export default Vue.extend({
   name: 'Login',
   components: {
-    Form,
+    PreloginForm,
     Identity,
     VerifyOTP
   },
@@ -83,50 +86,79 @@ export default Vue.extend({
       return this.loginInfo.auth_info?.methods?.find((m) => m.type === this.loginInfo.identity)
     }
   },
-  async mounted() {
-    await this.$storageService.remove('cs_token')
-  },
   methods: {
     updateLoginStep (value) {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
         login_step: value
       })
     },
-    async getAccessToken(callback){
-      const payload = {
-        SERVICE_URL: "/sso",
-        SERVICE_SCOPE: "pwdmanager",
-        CLIENT: "browser"
-      }
+    async loginByOtp(data = {}) {
+      console.log(data);
+    },
+    async login(data = {}) {
+      this.$store.commit('UPDATE_CALLING_API', true)
+      await this.$passService.clearGeneratePassword()
+      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
+        this.$storageService.get("device_id"),
+        this.$storageService.get("hideIcons"),
+        this.$storageService.get("showFolders"),
+        this.$storageService.get("enableAutofill"),
+      ]);
+      this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
+      this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
+      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       try {
-        await authAPI.sso_last_active();
-        const data: any = await authAPI.sso_access_token(payload);
-        if(data.access_token){
-          await this.$storageService.save('cs_token', data.access_token)
-          await this.$store.dispatch("LoadCurrentUser");
-          cystackPlatformAPI.users_me_login_method().then(async (response: any) => {
-            this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-              preloginData: {
-                ...this.$store.state.user,
-                ...response,
-              }
-            })
-            if (response.login_method === 'passwordless' || response.require_passwordless) {
-              this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
-            } else {
-              await this.$store.dispatch("LoadCurrentUserPw");
-              this.$router.push({ name: 'lock' }).catch(() => ({}))
-            }
-            callback()
-          }).catch ((error) => {
-            callback()
-            this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
-          })
+        await this.$cryptoService.clearKeys();
+        let key = null;
+        let hashedPassword = null;
+        if (data.key && data.hashedPassword) {
+          key = new SymmetricCryptoKey(Utils.fromB64ToArray(data?.key).buffer)
+          hashedPassword = data.hashedPassword
+        } else {
+          key = await this.$cryptoService.makeKey(data.password, data.email, 0, 100000)
+          hashedPassword = await this.$cryptoService.hashPassword(data.password, key)
         }
-      } catch (error) {
-        callback()
-        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
+        const res = await cystackPlatformAPI.users_session({
+          email: data.email,
+          client_id: 'browser',
+          password: hashedPassword,
+          device_name: this.$platformUtilsService.getDeviceString(),
+          device_type: this.$platformUtilsService.getDevice(),
+          device_identifier: deviceId
+        })
+        if (res.is_factor2) {
+          this.updateLoginStep(2);
+        } else {
+          await this.$storageService.save('cs_token', res.access_token)
+          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
+          await this.$userService.setInformation(this.$tokenService.getUserId(), data.email, 0, 100000)
+          await this.$cryptoService.setKey(key)
+          await this.$cryptoService.setKeyHash(hashedPassword)
+          await this.$cryptoService.setEncKey(res.key)
+          await this.$cryptoService.setEncPrivateKey(res.private_key)
+  
+          if (this.$vaultTimeoutService != null) {
+            this.$vaultTimeoutService.biometricLocked = false
+          }
+          await this.$runtimeBackground.handleUnlocked('unlocked');
+          await this.getSyncData()
+          this.getExcludeDomains()
+          this.$router.push({ name: 'vault' }).catch(() => ({}));
+          this.$store.commit('UPDATE_CALLING_API', false);
+          if (data.sync_all_platforms) {
+            await commonAPI.service_login(this, {
+              password: data.password,
+              email: data.email,
+            });
+          }
+        }
+      } catch (e) {
+        this.notify(this.$t("errors.invalid_master_password"), "error");
+        this.$store.commit('UPDATE_CALLING_API', false)
       }
+      setTimeout(() => {
+        this.setupFillPage();
+      }, 1000);
     },
   }
 })

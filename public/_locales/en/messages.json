@@ -1,9 +1,9 @@
 {
   "appName": {
-    "message": "Locker"
+    "message": "VinCSS"
   },
   "extName": {
-    "message": "Locker - Password Manager",
+    "message": "VinCSS Locker",
     "description": "Extension name, MUST be less than 40 characters (Safari restriction)"
   },
   "extDesc": {

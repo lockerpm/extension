@@ -95,7 +95,10 @@ module.exports = {
     add_url: "Thêm tên miền hoặc đường dẫn",
     item: "Item",
     option: 'Lựa chọn',
-    otp: 'OTP'
+    otp: 'OTP',
+    continue: 'Tiếp tục',
+    app_name: 'VinCSS Locker',
+    successfully: "Thành công"
   },
   sort: {
     name_asc: 'Tên tăng dần',
@@ -799,5 +802,46 @@ module.exports = {
   bar: {
     create_title: "Locker có nên nhớ mật khẩu này cho bạn không?",
     update_title: "Bạn có muốn cập nhật mật khẩu này trong Locker không?"
-  }
+  },
+  passwordless: {
+    confirm_pairing: "Xác nhận ghép đôi",
+    pairing_required: "Cần phải ghép nối ứng dụng máy tính. Hãy xác nhận mã bên dưới trên ứng dụng máy tính.",
+    reset_code: "Lấy mã mới",
+    repair: "Sửa chữa",
+    open_desktop: "Vui lòng mở ứng dụng máy tính.",
+    install_desktop: "Vui lòng cài đặt ứng dụng máy tính.",
+    no_key_found: "Không tìm thấy khóa nào",
+    scan_fingerprint: "Quét vân tay của bạn",
+    enter_key_pin: "Nhập PIN của khóa bảo mật",
+    touch_key: "Chạm vào khóa bảo mật của bạn",
+    reload_devices: "Tải lại danh sách thiết bị",
+    choose_a_key: "Chọn một khóa để xác thực bạn",
+    new_password: "Nhập mật khẩu mới",
+    errors: {
+      "0000": "Lỗi không xác định",
+      "1000": "Lỗi API",
+      "1001": "Không thể tìm thấy API token",
+      "1002": "Đăng nhập không mật khẩu không được bật",
+      "2001": "Không thế kết nối với phương thức xác thực nhanh",
+      "2002": "Không thể tạo mã xác thực nhanh, khoá bí mật trả về rỗng",
+      "2003": "Mã PIN không hợp lệ",
+      "2004": "Không tìm thấy bên phụ thuộc",
+      "2005": "Không thể tìm thấy mã xác thực hợp lệ trong khoá này",
+      "2006": "Không thể tìm thấy mã xác thực yêu cầu trong khoá này",
+      "2007": "Không thể dùng quét vân tay, vui lòng sử dụng mã PIN",
+      "2008": "PIN validation failed to many times, key is blocked",
+      "2009": "Không thể xác thực vân tay",
+      "2011": "Hành động FIDO đã hết thời gian chờ",
+      "3001": "Khách hàng chưa được xác thực.",
+      "3002": "Không có khoá.",
+      "3003": "Không thể mã hoá dữ liệu",
+      "3004": "Không thể giải mã dữ liệu",
+      "3005": "Ứng dụng máy tính chưa được kết nối",
+      "3006": "Ứng dụng máy tính chưa được xác thực",
+      "4001": "Không tìm thấy khách hàng",
+      "4002": "Không thể gửi tin nhắn bảo mật",
+      "5001": "Chương trình chạy ngầm chưa được kết nối",
+      "5002": "Chương trình chạy ngầm không thể giải mã yêu cầu"
+    }
+  },
 }

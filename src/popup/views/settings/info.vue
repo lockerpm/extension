@@ -23,7 +23,6 @@ import { VAULT_TIMEOUTS } from '@/config/constants'
 export default Vue.extend({
   data() {
     return {
-      user: {},
       loading: false,
     };
   },

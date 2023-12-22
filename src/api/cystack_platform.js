@@ -446,6 +446,14 @@ async function update_users_me(data, params = {}) {
   });
 }
 
+async function users_prelogin(data = {}) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_USERS_PRELOGIN,
+    method: "post",
+    data
+  });
+}
+
 async function users_onpremise_prelogin(data = {}) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_USERS_ONPREMISE_PRELOGIN,
@@ -604,6 +612,7 @@ export default {
   users_me_delete,
   users_me_login_method,
   update_users_me,
+  users_prelogin,
   users_onpremise_prelogin,
   user_invitations,
   user_invitation,

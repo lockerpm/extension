@@ -69,7 +69,9 @@ module.exports = {
     item: "Item",
     option: 'Option',
     otp: 'OTP',
-    saved_otp: ''
+    continue: 'Continue',
+    app_name: 'VinCSS Locker',
+    successfully: "Successfully"
   },
   sort: {
     name_asc: 'Name Ascending',
@@ -730,6 +732,11 @@ module.exports = {
         title_required: 'Title is required!',
         secret_key_required: 'Secret key is required'
       }
+    },
+    sign_in: {
+      reset_password: "Please redirect to website {web} to replace the temporary password given",
+      require_pwl: "Passwordless login is required within your business. Please redirect to website {web} to set up passwordless.",
+      require_2fa: "Two-factor authentication (2FA) is required within your business. Please redirect to website {web} to set up 2FA."
     }
   },
   menu: {
@@ -755,5 +762,45 @@ module.exports = {
   bar: {
     create_title: "Should Locker remember this password for you?",
     update_title: "Do you want to update this password in Locker?"
-  }
+  },
+  passwordless: {
+    confirm_pairing: "Confirm pairing",
+    pairing_required: "Desktop app pairing is required. On the desktop app, confirm the code below.",
+    repair: "Repair",
+    open_desktop: "Desktop app connection is required. Please open Locker Desktop App",
+    install_desktop: "Desktop app installation is required. Please download and install Locker Desktop App",
+    no_key_found: "No key found",
+    scan_fingerprint: "Scan your fingerprint",
+    enter_key_pin: "Enter your security key PIN",
+    touch_key: "Touch your security key",
+    reload_devices: "Reload list devices",
+    choose_a_key: "Choose a key to verify yourself",
+    new_password: "Enter new Password",
+    errors: {
+      "0000": "Unspecified error",
+      "1000": "API error",
+      "1001": "API token not found",
+      "1002": "Passwordless is not enabled",
+      "2001": "Cannot connect to fido key",
+      "2002": "Cannot create credential, key return empty secret",
+      "2003": "Invalid PIN",
+      "2004": "Cannot find relying party",
+      "2005": "Cannot find any valid credential in this key",
+      "2006": "Cannot find the required credential in this key",
+      "2007": "Cannot use fingerprint, please use PIN instead",
+      "2008": "PIN validation failed to many times, key is blocked",
+      "2009": "Failed to verify fingerprint",
+      "2011": "FIDO action timed out",
+      "3001": "Client is not confirmed",
+      "3002": "No key",
+      "3003": "Cannot encrypt payload",
+      "3004": "Cannot decrypt response",
+      "3005": "Desktop is not paired",
+      "3006": "Desktop is not confirmed",
+      "4001": "Client not found",
+      "4002": "Cannot broadcast secure message",
+      "5001": "Background service is not connected",
+      "5002": "Background service failed to decrypt request"
+    }
+  },
 }

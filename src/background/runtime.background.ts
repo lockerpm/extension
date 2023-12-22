@@ -154,27 +154,6 @@ export default class RuntimeBackground {
         }
         break;
       case "sso-authResult":
-        if (msg.data.login_method === 'passwordless' || msg.data.require_passwordless) {
-          this.storageService.save('current_router', JSON.stringify({ name: 'pwl-unlock' }))
-          await this.updateStoreServiceInfo({
-            preloginData: msg.data,
-            user_info: {
-              email: msg.data.email
-            }
-          })
-        } else {
-          await this.updateStoreServiceInfo({
-            preloginData: msg.data,
-            baseApiUrl: msg.data.base_api ? `${msg.data.base_api}/v3` : null,
-            baseWsUrl: msg.data.base_ws ? `${msg.data.base_ws}/ws` : null,
-          })
-          this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
-          await this.main.onLock();
-          await this.handleGetUserInfo();
-        }
-        const tab: any = await BrowserApi.getTabFromCurrentWindow()
-        await BrowserApi.updateCurrentTab(tab, this.currentLocation);
-        await this.handleOpenPopupIframe(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
@@ -304,20 +283,15 @@ export default class RuntimeBackground {
   }
 
   async handleGetUserInfo() {
-    let user: any = null
     let userPw: any = null
     await Promise.all([
-      this.request.me(),
       this.request.users_me(),
-    ]).then(([me, userMe]) => {
-      user = me;
+    ]).then(([userMe]) => {
       userPw = userMe;
     }).catch(() => {
-      user = null
       userPw = null
     })
     await Promise.all([
-      await this.storageService.save('cs_user', user),
       await this.storageService.save('cs_user_pw', userPw),
       this.vaultTimeoutService.setVaultTimeoutOptions(
         userPw.timeout,

@@ -7,7 +7,6 @@ import { StorageService } from "jslib-common/abstractions/storage.service";
 
 import { v4 as uuidv4 } from 'uuid';
 
-import meAPI from '@/api/me';
 import cystackPlatformAPI from '@/api/cystack_platform';
 import notificationAPI from '@/api/notification';
 
@@ -18,28 +17,14 @@ const runtimeBackground = JSLib.getBgService<RuntimeBackground>('runtimeBackgrou
 const vaultTimeoutService = JSLib.getBgService<VaultTimeoutService>('vaultTimeoutService')()
 
 const STORAGE_KEY = 'cs_store'
-const USER_KEY = 'cs_user'
 const USER_PW_KEY = 'cs_user_pw'
-
-const defaultUser = {
-  email: null,
-  language: 'en',
-  full_name: '',
-  avatar: '',
-  organization: '',
-  phone: ''
-}
 
 const defaultLoginInfo = {
   login_step: 1,
   identity: 'mail',
   auth_info: null,
   user_info: null,
-  ws2: null,
   clientId: uuidv4(),
-  desktopAppInstalled: false,
-  desktopAppData: null,
-  preloginData: null,
   baseApiUrl: null,
   baseWsUrl: null,
   sending: false,
@@ -51,14 +36,12 @@ const defaultLoginInfo = {
 const asyncStore = async () => {
   return await Promise.all([
     storageService.get(STORAGE_KEY),
-    storageService.get(USER_KEY),
     storageService.get(USER_PW_KEY),
-  ]).then(async ([oldStore, storeUser, storeUserPw]) => {
-    const user: any = storeUser || JSON.parse(JSON.stringify(defaultUser))
-    const userPw: any = storeUserPw || { is_pwd_manager: false }
+  ]).then(async ([oldStore, storeUserPw]) => {
+    const userPw: any = storeUserPw || null
 
     let oldStoreParsed = {
-      language: 'en',
+      language: userPw?.language ||'en',
       ...JSON.parse(JSON.stringify(defaultLoginInfo)),
     }
     if (typeof oldStore === 'object') {
@@ -71,11 +54,8 @@ const asyncStore = async () => {
     return new Vuex.Store({
       state: {
         init: false,
-        isLoggedIn: !!user?.email || !!oldStoreParsed?.preloginData?.email,
-        user: {
-          ...JSON.parse(JSON.stringify(user)),
-          language: oldStoreParsed.language,
-        },
+        isLoggedIn: !!userPw?.email,
+        language: userPw?.language || 'en',
         userPw: JSON.parse(JSON.stringify(userPw)),
         notifications: {
           results: [],
@@ -97,24 +77,28 @@ const asyncStore = async () => {
         showFolders: true,
         enableAutofill:  true,
         callingAPI: false,
-        ...oldStoreParsed
+
+        // service
+        isConnected: false,
+        isDesktopConnected: false,
+        approveCode: null,
+        clientId: null,
+        clientType: null,
+        pairingConfirmed: false,
+        isTouch: false,
+        isFingerprint: false,
+
+        ...oldStoreParsed,
       },
       mutations: {
-        INIT_STORE (state, payload) {
-          state.isLoggedIn = payload.isLoggedIn || false
-          state.user = payload.user || JSON.parse(JSON.stringify(defaultUser)),
-          state.userPw = payload.userPw || {}
-        },
         SET_LANG (state, language) {
-          state.user.language = language
+          state.language = language
         },
         UPDATE_IS_LOGGEDIN (state, isLoggedIn) {
           state.isLoggedIn = isLoggedIn
         },
         CLEAR_ALL_DATA (state) {
-          state.user = JSON.parse(JSON.stringify(defaultUser)),
           state.userPw = null
-          state.preloginData = null
           state.isLoggedIn = false
           state.notifications = {
             results: [],
@@ -123,19 +107,13 @@ const asyncStore = async () => {
           }
           state.teams = []
         },
-        UPDATE_USER (state, user) {
-          state.user = user || JSON.parse(JSON.stringify(defaultUser))
-        },
-        async UPDATE_USER_PW (state, user) {
-          state.userPw = user
-          await storageService.save(USER_PW_KEY, user)
+        async UPDATE_USER_PW (state, userPw) {
+          state.userPw = userPw
+          await storageService.save(USER_PW_KEY, userPw)
           await vaultTimeoutService.setVaultTimeoutOptions(
-            user.timeout,
-            user.timeout_action
+            userPw.timeout,
+            userPw.timeout_action
           );
-        },
-        UPDATE_USER_INTERCOM (state, userIntercom) {
-          state.userIntercom = userIntercom
         },
         UPDATE_NOTIFICATION (state, payload) {
           state.notifications = payload
@@ -179,6 +157,30 @@ const asyncStore = async () => {
         UPDATE_CALLING_API(state, value) {
           state.callingAPI = value
         },
+        UPDATE_IS_CONNECTED (state, isConnected) {
+          state.isConnected = isConnected
+        },
+        UPDATE_IS_DESKTOP_CONNECTED (state, isDesktopConnected) {
+          state.isDesktopConnected = isDesktopConnected
+        },
+        UPDATE_APPROVE_CODE (state, approveCode) {
+          state.approveCode = approveCode
+        },
+        UPDATE_CLIENT_ID (state, clientId) {
+          state.clientId = clientId
+        },
+        UPDATE_CLIENT_TYPE (state, clientType) {
+          state.clientType = clientType
+        },
+        UPDATE_PAIRING_CONFIRMED (state, pairingConfirmed) {
+          state.pairingConfirmed = pairingConfirmed
+        },
+        UPDATE_IS_TOUCH (state, isTouch) {
+          state.isTouch = isTouch
+        },
+        UPDATE_IS_FINGERPRINT (state, isFingerprint) {
+          state.isFingerprint = isFingerprint
+        },
         async UPDATE_LOGIN_PAGE_INFO(state, info) {
           let keys = []
           const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
@@ -195,11 +197,7 @@ const asyncStore = async () => {
             identity: state.identity,
             auth_info: state.auth_info,
             user_info: state.user_info,
-            ws2: state.ws2,
             clientId: state.clientId,
-            desktopAppInstalled: state.desktopAppInstalled,
-            desktopAppData: state.desktopAppData,
-            preloginData: state.preloginData,
             baseApiUrl: state.baseApiUrl,
             baseWsUrl: state.baseWsUrl,
             sending: state.sending,
@@ -209,31 +207,8 @@ const asyncStore = async () => {
         },
       },
       actions: {
-        InitStore (context, payload) {
-          context.commit('INIT_STORE', payload)
-        },
         SetLang ({ commit, state }, payload) {
           commit('SET_LANG', payload)
-          return new Promise(resolve => {
-            if (state.isLoggedIn) {
-              const data = Object.assign({}, state.user)
-              data.language = payload
-              meAPI.update(data);
-            }
-            resolve(payload)
-          })
-        },
-        async LoadCurrentUser ({ commit }) {
-          await meAPI.me().then(async (response) => {
-            commit('UPDATE_IS_LOGGEDIN', true)
-            commit('UPDATE_USER', response)
-            await storageService.save(USER_KEY, response)
-          }).catch(async () => {
-            commit('UPDATE_IS_LOGGEDIN', false)
-            commit('UPDATE_USER', null)
-            await storageService.save(USER_KEY, null)
-          });
-          
         },
         async LoadCurrentUserPw ({ commit }) {
           await cystackPlatformAPI.users_me().then(async res => {
@@ -241,12 +216,6 @@ const asyncStore = async () => {
           }).catch(async () => {
             commit('UPDATE_USER_PW', {})
           });
-        },
-        async LoadCurrentIntercom ({ commit }) {
-          const res: any = await meAPI.me_intercom();
-          self.intercomSettings = res
-          commit('UPDATE_USER_INTERCOM', res)
-          Intercom('update')
         },
         async LoadNotification ({ commit }) {
           const res = await notificationAPI.get({ scope: 'cloud' });

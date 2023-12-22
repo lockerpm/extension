@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import Vue from 'vue'
 import ENDPOINT from '@/config/endpoint'
 
@@ -23,18 +23,51 @@ export default Vue.extend({
       return this.$store.state.previousPath
     }
   },
-  async created () {
+  async mounted () {
     this.locked = await this.$vaultTimeoutService.isLocked();
+    if (!this.locked) {
+      await this.$store.dispatch("LoadCurrentUserPw");
+    }
     setInterval(async () => {
       this.locked = await this.$vaultTimeoutService.isLocked();
     }, 1000)
-    if (this.locked) {
-      if (this.loginInfo.preloginData  && (this.loginInfo.preloginData.login_method === 'passwordless' || this.loginInfo.preloginData.require_passwordless)) {
-        this.reconnectDesktopAppSocket(undefined, true);
+    self.service.on('serviceReady', async () => {
+      this.$store.commit('UPDATE_IS_CONNECTED', true)
+      await self.service.resetSocket()
+    })
+    self.service.on('serviceConnected', () => {
+      this.$store.commit('UPDATE_IS_CONNECTED', true)
+    })
+    self.service.on('serviceDisconnected', () => {
+      this.$store.commit('UPDATE_IS_CONNECTED', false)
+    })
+    self.service.on('desktopConnected', () => {
+      this.$store.commit('UPDATE_IS_DESKTOP_CONNECTED', true)
+    })
+    self.service.on('desktopDisconnected', () => {
+      this.$store.commit('UPDATE_IS_DESKTOP_CONNECTED', false)
+    })
+    self.service.on('pairingConfirmation', (data) => {
+      this.$store.commit('UPDATE_APPROVE_CODE', data.approveCode)
+      this.$store.commit('UPDATE_CLIENT_ID', data.clientId)
+      this.$store.commit('UPDATE_CLIENT_TYPE', data.clientType)
+      this.$store.commit('UPDATE_PAIRING_CONFIRMED', false)
+    })
+    self.service.on('pairingConfirmed', () => {
+      this.$store.commit('UPDATE_PAIRING_CONFIRMED', true)
+    })
+    self.service.on('fidoRequestTouch', () => {
+      this.$store.commit('UPDATE_IS_TOUCH', true)
+    })
+    self.service.on('fidoRequestFingerprint', () => {
+      this.$store.commit('UPDATE_IS_FINGERPRINT', true)
+    })
+    self.service.on('userLogout', async (data) => {
+      const userPw = this.$store.state.userPw;
+      if (data.email === userPw?.email && userPw?.sync_all_platforms) {
+        this.logout();
       }
-    } else {
-      await this.$store.dispatch("LoadCurrentUserPw");
-    }
+    })
   },
 
   watch: {
@@ -79,7 +112,7 @@ export default Vue.extend({
         reconnectionDelay: 3000
       })
       this.ws1 = this.$socket
-      this.ws1.onmessage = async (message: any) => {
+      this.ws1.onmessage = async (message) => {
         const data = JSON.parse(message.data)
         switch (data.event) {
         case 'sync':

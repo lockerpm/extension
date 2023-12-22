@@ -17,7 +17,6 @@ import storePromise from '@/store'
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
 import { CipherType } from "jslib-common/enums/cipherType";
-import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
@@ -26,6 +25,7 @@ import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import userAPI from '@/api/user';
+import commonAPI from '@/api/common'
 
 
 Vue.config.productionTip = false;
@@ -50,6 +50,9 @@ import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
 import middleware from '../middleware';
+import { service } from './service'
+
+self.service = service
 
 Vue.mixin({
   data() {
@@ -77,19 +80,14 @@ Vue.mixin({
         identity: this.$store.state.identity,
         auth_info: this.$store.state.auth_info,
         user_info: this.$store.state.user_info,
-        ws2: this.$store.state.ws2,
         clientId: this.$store.state.clientId,
-        desktopAppInstalled: this.$store.state.desktopAppInstalled,
-        desktopAppData: this.$store.state.desktopAppData,
-        preloginData: this.$store.state.preloginData,
         sending: this.$store.state.sending,
         forgot_step: this.$store.state.forgot_step,
         forgot_token: this.$store.state.forgot_token
       }
     },
-    language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
-    currentUserPw() { return this.$store.state.userPw },
+    language() { return this.$store.state.userPw?.language },
+    currentUser() { return this.$store.state.userPw || {} },
     environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
     isAllPage() { return this.$route.name === 'vault' },
@@ -159,6 +157,9 @@ Vue.mixin({
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', null)
       try {
         await userAPI.logout();
+        if (this.currentUser?.sync_all_platforms) {
+          await commonAPI.service_logout();
+        }
       } catch (error) {
         //
       }
@@ -193,88 +194,9 @@ Vue.mixin({
         return ''
       }
     },
-    async login(isPwl = false, decryptData: any) {
-      this.$store.commit('UPDATE_CALLING_API', true)
-      await this.$passService.clearGeneratePassword()
-      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
-        this.$storageService.get("device_id"),
-        this.$storageService.get("hideIcons"),
-        this.$storageService.get("showFolders"),
-        this.$storageService.get("enableAutofill"),
-      ]);
-      this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
-      this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
-      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
-      try {
-        await this.$cryptoService.clearKeys();
-        if (!isPwl) {
-          const key = await this.$cryptoService.makeKey(this.masterPassword, this.currentUser.email, 0, 100000)
-          const hashedPassword = await this.$cryptoService.hashPassword(this.masterPassword, key)
-          const res = await cystackPlatformAPI.users_session({
-            client_id: 'browser',
-            password: hashedPassword,
-            email: this.currentUser.email,
-            device_name: this.$platformUtilsService.getDeviceString(),
-            device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceId
-          })
-          if (!this.$store.state.user?.email) {
-            await this.$storageService.save('cs_token', res.access_token)
-          }
-          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-          await this.$userService.setInformation(this.$tokenService.getUserId(), this.currentUser.email, 0, 100000)
-          await this.$cryptoService.setKey(key)
-          await this.$cryptoService.setKeyHash(hashedPassword)
-          await this.$cryptoService.setEncKey(res.key)
-          await this.$cryptoService.setEncPrivateKey(res.private_key)
-
-          if (this.$vaultTimeoutService != null) {
-            this.$vaultTimeoutService.biometricLocked = false
-          }
-          await this.$runtimeBackground.handleUnlocked('unlocked');
-          await this.getSyncData()
-          this.getExcludeDomains()
-          this.$router.push({ name: 'vault' }).catch(() => ({}));
-          this.$store.commit('UPDATE_CALLING_API', false)
-        } else {
-          const res = await cystackPlatformAPI.users_session({
-            client_id: 'browser',
-            password: decryptData.keyHash,
-            email: this.loginInfo.user_info.email,
-            device_name: this.$platformUtilsService.getDeviceString(),
-            device_type: this.$platformUtilsService.getDevice(),
-            device_identifier: deviceId
-          })
-          await this.$storageService.save('cs_token', res.access_token)
-          await this.$store.dispatch("LoadCurrentUser");
-          await this.$tokenService.setTokens(res.access_token, res.refresh_token)
-          await this.$userService.setInformation(this.$tokenService.getUserId(), this.loginInfo.user_info.email, 0, 100000)
-          await this.$cryptoService.setKey(decryptData.key)
-          await this.$cryptoService.setKeyHash(decryptData.keyHash)
-          await this.$cryptoService.setEncKey(res.key)
-          await this.$cryptoService.setEncPrivateKey(res.private_key)
-
-          if (this.$vaultTimeoutService != null) {
-            this.$vaultTimeoutService.biometricLocked = false
-          }
-          await this.$runtimeBackground.handleUnlocked('unlocked');
-          await this.getSyncData()
-          this.getExcludeDomains()
-          this.$router.push({ name: 'vault' }).catch(() => ({}));
-          this.$store.commit('UPDATE_CALLING_API', false)
-        }
-        const now = (new Date()).getTime()
-        this.$storageService.save('lastActive', now)
-      } catch (e) {
-        this.notify(this.$t("errors.invalid_master_password"), "error");
-        this.$store.commit('UPDATE_CALLING_API', false)
-      }
-      setTimeout(() => {
-        this.setupFillPage();
-      }, 1000);
-    },
     async getSyncData(trigger = false) {
-      this.$store.commit('UPDATE_SYNCING', true)
+      this.$store.commit('UPDATE_SYNCING', true);
+      await this.$store.dispatch('LoadCurrentUserPw')
       await this.$syncService.syncData(trigger);
       this.$store.commit("UPDATE_SYNCED_CIPHERS");
       this.$store.commit('UPDATE_SYNCING', false);
@@ -428,88 +350,6 @@ Vue.mixin({
         OTP += digits[Math.floor(Math.random() * 10)];
       }
       return OTP;
-    },
-    async reconnectDesktopAppSocket (email = this.loginInfo.preloginData.email || this.loginInfo.preloginData.name || this.currentUser.email, isCreatedApp = false) {
-      this.$connect(process.env.VUE_APP_DESKTOP_WS_URL, { format: 'json' })
-      this.$store.commit('UPDATE_LOGIN_PAGE_INFO', { ws2: this.$socket, sending: true })
-
-      setTimeout(async () => {
-        this.wsDesktopAppSendMessage(email);
-      }, 100)
-
-      this.loginInfo.ws2.onmessage = async (message) => {
-        let data = JSON.parse(message.data)
-        // Gen OTP
-        if (data.msgType === 3) {
-          data = {
-            ...data,
-            otp: this.generateOTP()
-          }
-        }
-        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          sending: false,
-          desktopAppData: {
-            ...this.loginInfo.desktopAppData,
-            ...data
-          },
-        })
-        if (data.msgType === 3) {
-          // Connect success and show OTP
-          if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
-          }
-        } else if (data.msgType === 4) {
-          // Unlock success
-          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-            baseApiUrl: this.loginInfo.preloginData.base_api ? `${this.loginInfo.preloginData.base_api}/v3` : null,
-            baseWsUrl: this.loginInfo.preloginData.base_ws ? `${this.loginInfo.preloginData.base_ws}/ws` : null,
-          })
-          setTimeout(async () => {
-            try {
-              const decryptData = await this.$cryptoService.decryptData(this.loginInfo.desktopAppData.otp, data.data);
-              this.login(true, decryptData);
-            } catch (error) {
-              this.notify(error?.response?.data?.message || this.$t('data.login.message.otp_invalid'), 'error')
-              this.reconnectDesktopAppSocket(this.loginInfo.preloginData.email || this.loginInfo.preloginData.name, true);
-            }
-          }, 1000);
-        } else if (data.msgType === 6) {
-          // Not Install Desktop App or Not Unlock
-          if (!isCreatedApp) {
-            this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
-          }
-        } else if (data.msgType === 7) {
-          // Desktop Lock
-          this.lock();
-        } else if (data.msgType === 9) {
-          // Desktop Logout
-          this.logout();
-        } 
-      }
-    },
-    async wsDesktopAppSendMessage(email = null) {
-      try {
-        const message = {
-          msgType: 1,
-          clientId: this.loginInfo?.clientId,
-          email
-        }
-        await this.loginInfo.ws2.sendObj(message)
-        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          desktopAppInstalled: true,
-        })
-        setTimeout(() => {
-          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-            sending: false
-          })
-        }, 10000);
-      } catch (error) {
-        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          desktopAppData: null,
-          desktopAppInstalled: false,
-          sending: false
-        })
-      }
     },
     async deleteCiphers (ids, callback = () => ({})) {
       this.$confirm(this.$tc('data.notifications.delete_selected_desc', ids.length), this.$t('common.warning'), {

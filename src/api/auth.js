@@ -2,20 +2,19 @@
 import request from "@/config/request";
 import ENDPOINT from "@/config/endpoint";
 
-async function sso_auth(data) {
-  return await request({
-    url: ENDPOINT.SSO_AUTH,
-    method: "post",
-    data
-  });
-}
-
 async function sso_auth_otp(data) {
   return await request({
     url: ENDPOINT.SSO_AUTH_OTP,
     method: "post",
     data
   });
+}
+
+async function get_factor2() {
+  return request({
+    url: ENDPOINT.SSO_ME_FACTOR2,
+    method: 'get',
+  })
 }
 
 async function sso_auth_otp_mail(data) {
@@ -81,8 +80,8 @@ function sso_new_password(data) {
 }
 
 export default {
-  sso_auth,
   sso_auth_otp,
+  get_factor2,
   sso_auth_otp_mail,
   sso_last_active,
   sso_access_token,
