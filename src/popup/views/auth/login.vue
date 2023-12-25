@@ -42,8 +42,9 @@
       <VerifyOTP
         v-else-if="loginInfo.login_step === 3"
         :otp-method="otpMethod"
+        :callingAPI="$store.state.callingAPI"
         @back="() => updateLoginStep(2)"
-        @next="(data) => loginByOtp(data)"
+        @login="(data) => login(data)"
       />
     </div>
   </div>
@@ -83,17 +84,15 @@ export default Vue.extend({
       return this.$t('data.login.enter_code')
     },
     otpMethod () {
-      return this.loginInfo.auth_info?.methods?.find((m) => m.type === this.loginInfo.identity)
+      return this.loginInfo.auth_info?.methods?.find((m) => m.method === this.loginInfo.identity)
     }
   },
   methods: {
     updateLoginStep (value) {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-        login_step: value
+        login_step: value,
+        auth_info: value === 1 ? {} : this.loginInfo.auth_info
       })
-    },
-    async loginByOtp(data = {}) {
-      console.log(data);
     },
     async login(data = {}) {
       this.$store.commit('UPDATE_CALLING_API', true)
@@ -118,16 +117,38 @@ export default Vue.extend({
           key = await this.$cryptoService.makeKey(data.password, data.email, 0, 100000)
           hashedPassword = await this.$cryptoService.hashPassword(data.password, key)
         }
-        const res = await cystackPlatformAPI.users_session({
-          email: data.email,
-          client_id: 'browser',
-          password: hashedPassword,
-          device_name: this.$platformUtilsService.getDeviceString(),
-          device_type: this.$platformUtilsService.getDevice(),
-          device_identifier: deviceId
-        })
+        let res = null;
+        if (data.otp) {
+          res = await cystackPlatformAPI.users_session_otp({
+            email: data.email,
+            client_id: 'browser',
+            password: hashedPassword,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceId,
+            method: data.method,
+            save_device: data.save_device || false,
+            otp: data.otp
+          })
+        } else {
+          res = await cystackPlatformAPI.users_session({
+            email: data.email,
+            client_id: 'browser',
+            password: hashedPassword,
+            device_name: this.$platformUtilsService.getDeviceString(),
+            device_type: this.$platformUtilsService.getDevice(),
+            device_identifier: deviceId
+          })
+        }
         if (res.is_factor2) {
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            auth_info: {
+              ...res,
+              payload: data
+            }
+          })
           this.updateLoginStep(2);
+          this.$store.commit('UPDATE_CALLING_API', false)
         } else {
           await this.$storageService.save('cs_token', res.access_token)
           await this.$tokenService.setTokens(res.access_token, res.refresh_token)
@@ -151,14 +172,14 @@ export default Vue.extend({
               email: data.email,
             });
           }
+          setTimeout(() => {
+            this.setupFillPage();
+          }, 1000);
         }
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
-      setTimeout(() => {
-        this.setupFillPage();
-      }, 1000);
     },
   }
 })

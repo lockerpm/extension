@@ -2,7 +2,6 @@ import router from './router/popup'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import JSLib from '@/popup/services/services'
-import storePromise from '@/store'
 const browserStorageService = JSLib.getBgService('storageService')()
 const vaultTimeoutService = JSLib.getBgService('vaultTimeoutService')()
 
@@ -13,7 +12,6 @@ const middleware = () => {
   NProgress.configure({ showSpinner: false })
   router.beforeEach(async (to, from, next) => {
     NProgress.start()
-    const store = await storePromise()
     const isLocked = await vaultTimeoutService.isLocked();
     if (to.meta?.isOver) {
       next();

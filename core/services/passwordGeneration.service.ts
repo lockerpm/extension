@@ -381,7 +381,7 @@ export class PasswordGenerationService implements PasswordGenerationServiceAbstr
     }
 
     passwordStrength(password: string, userInputs: string[] = []): zxcvbn.ZXCVBNResult {
-        if (password == null || password.length === 0) {
+        if (!password || password.length === 0) {
             return null;
         }
         let globalUserInputs = ['locker', 'loc', 'ker'];

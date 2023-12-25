@@ -1,15 +1,22 @@
 <template>
   <div class="w-full px-10 auth-form">
-    <el-form ref="form" :model="form" :rules="rules">
-      <el-form-item prop="username">
+    <el-form ref="form" :model="form" :rules="rules" @submit.native.prevent>
+      <el-form-item v-if="!userPw" prop="username">
         <el-input
           v-model="form.username"
           ref="username"
-          :disabled="callingAPI"
+          :disabled="callingAPI || !!userPw"
           :placeholder="$t('data.login.username_placeholder')"
           @input="() => { prelogin = null }"
+          @keyup.native.enter="() => handleLogin()"
         ></el-input>
       </el-form-item>
+      <div v-else class="flex items-center justify-center mb-4">
+        <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
+          <el-avatar :size="28" :src="userPw.avatar"></el-avatar>
+          <p class="ml-2">{{ userPw.email }}</p>
+        </div>
+      </div>
       <div v-if="prelogin">
         <div v-if="isResetPassword">
           <i18n path="data.sign_in.reset_password" tag="p">
@@ -93,7 +100,29 @@
       </el-button>
     </el-row>
     <div v-else class="mt-4 pb-4">
+      <div v-if="userPw.login_method === 'password'" class="grid lg:grid-cols-2 grid-cols-1 gap-2">
+        <div>
+          <el-button
+            class="w-full"
+            :disabled="callingAPI"
+            @click="() => handleLogout()"
+          >
+            {{ $t('common.logout') }}
+          </el-button>
+        </div>
+        <div>
+          <el-button
+            type="primary"
+            class="w-full"
+            :loading="callingAPI"
+            @click="() => handleLogin()"
+          >
+            {{ $t('master_password.unlock') }}
+          </el-button>
+        </div>
+      </div>
       <el-button
+        v-else
         class="w-full"
         @click="() => handleLogout()"
       >
@@ -128,7 +157,6 @@ export default Vue.extend({
     }
   },
   computed: {
-
     isConnected() { return this.$store.state.isConnected },
     userPw() {return this.$store.state.userPw},
     rules() {
@@ -160,7 +188,7 @@ export default Vue.extend({
     }
   },
   mounted() {
-    this.$nextTick(() => this.$refs.username.focus())
+    this.$nextTick(() => this.$refs?.username?.focus())
     this.loadData();
   },
   watch: {
@@ -237,7 +265,7 @@ export default Vue.extend({
               if (serviceUser?.email === response.email) {
                 await this.login(serviceUser)
               } else {
-                this.prelogin = response
+                this.prelogin = response;
               }
             } catch (error) {
               if (this.isConnected) {

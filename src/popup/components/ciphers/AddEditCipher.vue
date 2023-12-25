@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="add-edit-cipher">
+    <div v-if="!!cipher">
       <div class="text-left">
         <el-select
           v-if="!cipher.id"
@@ -474,7 +474,6 @@
           is-textarea
         />
 
-        <!-- CUSTOM FIELDS -->
         <div
           class="mt-4 mb-2 text-gray text-head-6 font-semibold"
         >
@@ -498,11 +497,11 @@
           @addFolder="addFolder(false)"
         />
 
-        <template v-if="ownershipOptions && ownershipOptions.length">
+        <template v-if="!!ownershipOptions && ownershipOptions.length">
           <InputSelectOrg
             :label="$t('common.ownership')"
             :initial-value="cipher.organizationId"
-            :options="ownershipOptions"
+            :options="ownershipOptions || []"
             :disabled="isDeleted || !!cipher.id"
             class="w-full"
             @change="(v) => {
@@ -599,6 +598,7 @@ import UpgrateToPremium from '@/popup/components/ciphers/UpgrateToPremium.vue'
 
 CipherType.CryptoAccount = 6
 CipherType.CryptoWallet = CipherType.CryptoBackup = 7
+
 export default Vue.extend({
   components: {
     PasswordGenerator,
@@ -608,17 +608,17 @@ export default Vue.extend({
     InputSelect,
     InputSelectFolder,
     InputSelectOrg,
-    AddEditFolder,
+    InputCustomFields,
     InputSelectCryptoWallet,
     InputSelectCryptoNetworks,
     InputSeedPhrase,
-    InputCustomFields,
+    PasswordOTP,
     UpgrateToPremium,
-    PasswordOTP
+    AddEditFolder,
   },
   props: {
     type: {
-      type: String,
+      type: Number,
       default: null
     },
     data: {
@@ -794,9 +794,9 @@ export default Vue.extend({
       return {}
     },
     ownershipOptions () {
-      const teams = this.teams.filter(e => ['owner', 'admin'].includes(e.role))
+      const teams = (this.teams || []).filter(e => ['owner', 'admin'].includes(e.role))
       if (teams.length) {
-        return [{ name: this.currentUser.email, organization_id: null }, ...teams]
+        return [{ name: this.currentUser?.email, organization_id: null }, ...teams]
       }
       return []
     }

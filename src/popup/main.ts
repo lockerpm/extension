@@ -79,7 +79,6 @@ Vue.mixin({
         login_step: this.$store.state.login_step,
         identity: this.$store.state.identity,
         auth_info: this.$store.state.auth_info,
-        user_info: this.$store.state.user_info,
         clientId: this.$store.state.clientId,
         sending: this.$store.state.sending,
         forgot_step: this.$store.state.forgot_step,
@@ -216,43 +215,9 @@ Vue.mixin({
     clipboardSuccessHandler() {
       this.notify(this.$t('common.copied'), 'success')
     },
-    getIconCipher(cipher, size = 70, defaultIcon = false) {
+    getIconCipher(cipher, size = 70) {
       switch (cipher.type) {
       case CipherType.Login:
-        if (
-          cipher.login &&
-            cipher.login.uris &&
-            cipher.login.uris.length &&
-            !this.hideIcons
-        ) {
-          try {
-            const domain = extractDomain(
-              cipher.login.uris[0]._uri || cipher.login.uris[0].uri
-            );
-            if (domain) {
-              return this.$createElement(
-                Avatar,
-                {
-                  props: {
-                    src: `${process.env.VUE_APP_LOGO_URL}${domain}?size=${size}`,
-                    size,
-                    alt: domain,
-                    shape: "square"
-                  }
-                },
-                [
-                  this.$createElement("img", {
-                    attrs: {
-                      src: require("@/assets/images/icons/icon_Login.svg")
-                    }
-                  })
-                ]
-              );
-            }
-          } catch (e) {
-            return this.getIconDefaultCipher("Login", size);
-          }
-        }
         return this.getIconDefaultCipher("Login", size);
       case CipherType.SecureNote:
         return this.getIconDefaultCipher("SecureNote", size);
@@ -263,35 +228,6 @@ Vue.mixin({
       case 6:
         return this.getIconDefaultCipher("CryptoAccount", size);
       case 7:
-        if (!defaultIcon) {
-          if (cipher.cryptoWallet && cipher.cryptoWallet.walletApp) {
-            try {
-              const selectedApp = WALLET_APP_LIST.find(
-                a => a.alias === cipher.cryptoWallet.walletApp.alias
-              );
-              return this.$createElement(
-                Avatar,
-                {
-                  props: {
-                    src: selectedApp.logo,
-                    size,
-                    alt: selectedApp.name,
-                    shape: "square"
-                  }
-                },
-                [
-                  this.$createElement("img", {
-                    attrs: {
-                      src: require("@/assets/images/icons/icon_CryptoWallet.svg")
-                    }
-                  })
-                ]
-              );
-            } catch (e) {
-              return this.getIconDefaultCipher("CryptoWallet", size);
-            }
-          }
-        }
         return this.getIconDefaultCipher("CryptoWallet", size);
       case "Shares":
         return this.getIconDefaultCipher("Shares", size);

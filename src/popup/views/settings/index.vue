@@ -29,9 +29,6 @@
                 >
                 <div>{{ item.email }}</div>
               </div>
-              <div v-else-if="item.info">
-                <img style="height: 24px" src="@/assets/images/logo/logo_black.svg">
-              </div>
               <div v-else class="setting-title font-semibold">
                 {{  item.name  }}
               </div>
@@ -138,12 +135,12 @@ export default Vue.extend({
     menu() {
       return [
         {
-          name: this.$t("common.plan"),
+          name: this.$t("data.profile_menu.account_settings"),
           items: [
             {
               key: accountInfoKey,
-              avatar: this.currentUser.avatar,
-              email: this.currentUser.email,
+              avatar: this.currentUser?.avatar,
+              email: this.currentUser?.email,
             },
           ],
         },
@@ -183,17 +180,8 @@ export default Vue.extend({
           name: this.$t("data.settings.help_feedback"),
           items: [
             {
-              externalUrl: "https://support.locker.io",
-              name: this.$t("data.settings.support_center"),
-            },
-            {
-              externalUrl: "https://zo8rr5fc706.typeform.com/to/OotlSyQ7",
-              name: this.$t("data.settings.feedback"),
-            },
-            {
-              routeName: "settings-info",
+              name: this.$t('data.settings.version'),
               desc: this.$t("data.settings.info_desc", {version: chrome.runtime.getManifest().version}),
-              info: true,
             }
           ],
         },

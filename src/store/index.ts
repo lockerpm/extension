@@ -23,7 +23,6 @@ const defaultLoginInfo = {
   login_step: 1,
   identity: 'mail',
   auth_info: null,
-  user_info: null,
   clientId: uuidv4(),
   baseApiUrl: null,
   baseWsUrl: null,
@@ -196,7 +195,6 @@ const asyncStore = async () => {
             login_step: state.login_step,
             identity: state.identity,
             auth_info: state.auth_info,
-            user_info: state.user_info,
             clientId: state.clientId,
             baseApiUrl: state.baseApiUrl,
             baseWsUrl: state.baseWsUrl,
@@ -223,7 +221,7 @@ const asyncStore = async () => {
           return res
         },
         async LoadTeams ({ commit }) {
-          const res = await cystackPlatformAPI.teams();
+          const res = await cystackPlatformAPI.teams({ paging: 0 });
           commit('UPDATE_TEAMS', res)
           return res
         },

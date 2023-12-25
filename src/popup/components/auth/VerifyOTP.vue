@@ -1,6 +1,6 @@
 <template>
   <div class="w-full px-10">
-    <el-form :model="form">
+    <el-form :model="form" @submit.native.prevent>
       <p class="mt-0">
         {{ loginInfo.identity === 'mail' ? $t('data.login.check_email',  { email: otpMethod.data }) : $t('data.login.use_authentication_app') }}
       </p>
@@ -46,15 +46,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import authAPI from '@/api/auth'
 
 export default Vue.extend({
   props: {
     otpMethod: Object,
+    callingAPI: Boolean
   },
   data () {
     return {
-      callingAPI: false,
       form: {
         otpCode: '',
         saveDevice: false,
@@ -62,54 +61,17 @@ export default Vue.extend({
     }
   },
   mounted() {
-    this.$nextTick(() => this.$refs.otp.focus())
+    this.$nextTick(() => this.$refs?.otp?.focus());
   },
   methods: {
     async verifyOtp () {
-      try {
-        this.callingAPI = true
-        if (this.$route.name === 'login') {
-          await this.authOtp();
-        } else {
-          await this.resetPassword();
-        }
-        this.callingAPI = false
-      } catch (error) {
-        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
-        this.callingAPI = false
+      const data = {
+        ...this.loginInfo?.auth_info?.payload,
+        method: this.otpMethod.method,
+        save_device: this.form.save_device,
+        otp: this.form.otpCode
       }
-    },
-    async authOtp () {
-      const res: any = await authAPI.sso_auth_otp({
-        ...this.loginInfo.user_info,
-        otp: this.form.otpCode,
-        method: this.loginInfo.identity,
-        save_device: this.form.saveDevice
-      })
-      try {
-        await this.$storageService.save('cs_token', res.token)
-        await this.$emit('get-access-token', res.token)
-      } catch (error) {
-        this.notify(error?.response?.data?.message || this.$t('common.system_error'), 'error')
-      }
-    },
-    async resetPassword () {
-      authAPI.sso_reset_password_token({
-        username: this.loginInfo.user_info.username,
-        account_recovery: this.loginInfo.user_info.username,
-        code: this.form.otpCode,
-        language: this.language,
-        method: this.loginInfo.identity
-      }).then((response) => {
-        this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          forgot_token: response
-        })
-        this.$emit('next')
-        this.callingAPI = false
-      }).catch((error) => {
-        this.notify(error?.response?.data?.message || error?.response?.data?.detail, 'error')
-        this.callingAPI = false
-      })
+      this.$emit('login', data)
     },
   }
 })

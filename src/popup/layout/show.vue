@@ -45,7 +45,7 @@ export default Vue.extend({
       return this.$route.name.includes('settings')
     },
     isAddEditCipher() {
-      return this.$route.name === 'add-edit-cipher'
+      return this.$route.name == 'add-edit-cipher'
     }
   },
   methods: {

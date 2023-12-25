@@ -135,17 +135,6 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/settings/vault-timeout.vue"
           )
-      },
-      {
-        path: "settings/info",
-        name: "settings-info",
-        meta: {
-          isAuth: true
-        },
-        component: () =>
-          import(
-            "../popup/views/settings/info.vue"
-          )
       }
     ]
   },

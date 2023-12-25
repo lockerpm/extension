@@ -81,7 +81,7 @@ export default {
   CYSTACK_PLATFORM_USERS_INVITATION_DETAIL: '/cystack_platform/pm/users/invitations/:id',
 
   CYSTACK_PLATFORM_USERS_SESSION: '/cystack_platform/pm/users/session',
-  CYSTACK_PLATFORM_USERS_SESSION_OTP: '/cystack_platform/pm/users/session',
+  CYSTACK_PLATFORM_USERS_SESSION_OTP: '/cystack_platform/pm/users/session/otp',
   CYSTACK_PLATFORM_USERS_SESSION_REVOKE_ALL: '/cystack_platform/pm/users/session/revoke_all',
 
   CYSTACK_PLATFORM_EMERGENCY_ACCESS: '/cystack_platform/pm/emergency_access',

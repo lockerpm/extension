@@ -133,25 +133,6 @@ export default class RuntimeBackground {
         }
         break;
       case "cs-authResult":
-        const token: any = await this.storageService.get("cs_token");
-        if (!token) {
-          await this.main.onLogout();
-          await this.storageService.save("cs_token", msg.token);
-          this.request.sso_access_token({
-            SERVICE_URL: "/sso",
-            SERVICE_SCOPE: "pwdmanager",
-            CLIENT: "browser"
-          }).then(async (result: any) => {
-            const access_token = result ? result.access_token : "";
-            await this.storageService.save("cs_token", access_token);
-            this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
-            await this.main.onLock();
-            await this.handleGetUserInfo();
-            await this.handleOpenPopupIframe(3000)
-          }).catch(() => {
-            this.storageService.save("cs_token", null);
-          });
-        }
         break;
       case "sso-authResult":
         break;
@@ -204,7 +185,7 @@ export default class RuntimeBackground {
       BrowserApi.tabSendMessageData(tab, 'closePopupIframe')
       let url = ''
       if (type === 'id-info') {
-        BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);
+        BrowserApi.createNewTab(`${process.env.VUE_APP_WEB_URL}/settings/account`, true, true);
       } else if (provider === 'sso') {
         this.currentLocation = tab.url
         BrowserApi.createNewTab(`${process.env.VUE_APP_ID_URL}/login/sso?client=extension`, true, true);

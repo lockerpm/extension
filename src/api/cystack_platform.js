@@ -494,6 +494,14 @@ async function users_session(data) {
   });
 }
 
+async function users_session_otp(data) {
+  return await request({
+    url: ENDPOINT.CYSTACK_PLATFORM_USERS_SESSION_OTP,
+    method: "post",
+    data
+  });
+}
+
 async function users_session_revoke_all(data) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_USERS_SESSION_REVOKE_ALL,
@@ -618,6 +626,7 @@ export default {
   user_invitation,
   update_user_invitation,
   users_session,
+  users_session_otp,
   users_session_revoke_all,
   emergency_access,
   invite_emergency_access,
