@@ -10,9 +10,15 @@
     <div>
       <div
         class="font-bold text-head-5 text-black-700 text-center mt-4">
-        {{$t('data.login.login')}}
+        {{ title }}
       </div>
-      <el-row type="flex" justify="space-between my-4 px-10" align="middle">
+      <div v-if="userPw" class="flex items-center justify-center mt-2 mb-4">
+        <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
+          <el-avatar :size="28" :src="userPw.avatar"></el-avatar>
+          <p class="ml-2">{{ userPw.email }}</p>
+        </div>
+      </div>
+      <el-row v-if="loginSubtitle" type="flex" justify="space-between my-4 px-10" align="middle">
         <div class="text-base font-medium">
           {{ loginSubtitle }}
         </div>
@@ -32,6 +38,7 @@
       </el-row>
       <PreloginForm
         v-if="loginInfo.login_step === 1"
+        :calling="$store.state.callingAPI"
         @next="(data) => login(data)"
       />
       <Identity
@@ -42,7 +49,7 @@
       <VerifyOTP
         v-else-if="loginInfo.login_step === 3"
         :otp-method="otpMethod"
-        :callingAPI="$store.state.callingAPI"
+        :calling="$store.state.callingAPI"
         @back="() => updateLoginStep(2)"
         @login="(data) => login(data)"
       />
@@ -74,8 +81,12 @@ export default Vue.extend({
     return {}
   },
   computed: {
+    userPw() { return this.$store.state.userPw },
     loginSubtitle() {
       if (this.loginInfo.login_step === 1) {
+        if (this.userPw) {
+          return null
+        }
         return this.$t('data.login.login_option')
       }
       if (this.loginInfo.login_step === 2) {
@@ -85,6 +96,12 @@ export default Vue.extend({
     },
     otpMethod () {
       return this.loginInfo.auth_info?.methods?.find((m) => m.method === this.loginInfo.identity)
+    },
+    title() {
+      if (this.userPw) {
+        return this.$t('master_password.unlock')
+      }
+      return this.$t('data.login.login')
     }
   },
   methods: {
@@ -172,6 +189,10 @@ export default Vue.extend({
               email: data.email,
             });
           }
+          this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
+            login_step: 1,
+            auth_info: {}
+          })
           setTimeout(() => {
             this.setupFillPage();
           }, 1000);

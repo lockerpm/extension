@@ -12,7 +12,7 @@
           v-model="form.otpCode"
           ref="otp"
           :placeholder="$t('data.login.enter_code')"
-          :disabled="callingAPI"
+          :disabled="calling"
           @keyup.native.enter="verifyOtp"
         ></el-input>
       </el-form-item>
@@ -22,7 +22,7 @@
       >
         <el-checkbox
           v-model="form.saveDevice"
-          :disabled="callingAPI"
+          :disabled="calling"
         >
           {{ $t('data.login.remember_device') }}
         </el-checkbox>
@@ -32,12 +32,12 @@
       <el-button
       type="text"
       icon="el-icon-back"
-      :disabled="callingAPI"
+      :disabled="calling"
       @click="$emit('back')"
     >{{ $t(`common.back`) }}</el-button>
       <el-button
       type="primary"
-      :loading="callingAPI"
+      :loading="calling"
       @click="verifyOtp"
     >{{ $t(`data.login.authenticate`) }}</el-button>
     </el-row>
@@ -50,7 +50,7 @@ import Vue from 'vue'
 export default Vue.extend({
   props: {
     otpMethod: Object,
-    callingAPI: Boolean
+    calling: Boolean
   },
   data () {
     return {

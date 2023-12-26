@@ -5,18 +5,12 @@
         <el-input
           v-model="form.username"
           ref="username"
-          :disabled="callingAPI || !!userPw"
+          :disabled="callingAPI || !!userPw || calling"
           :placeholder="$t('data.login.username_placeholder')"
           @input="() => { prelogin = null }"
           @keyup.native.enter="() => handleLogin()"
         ></el-input>
       </el-form-item>
-      <div v-else class="flex items-center justify-center mb-4">
-        <div class="rounded-[21px] flex items-center bg-black-250 p-1 mx-auto">
-          <el-avatar :size="28" :src="userPw.avatar"></el-avatar>
-          <p class="ml-2">{{ userPw.email }}</p>
-        </div>
-      </div>
       <div v-if="prelogin">
         <div v-if="isResetPassword">
           <i18n path="data.sign_in.reset_password" tag="p">
@@ -56,7 +50,7 @@
           />
           <PasswordlessForm
             v-else-if="prelogin.login_method === 'passwordless'"
-            :changing="callingAPI"
+            :changing="callingAPI || calling"
             :user-info="prelogin"
             @repair="() => isPair = true"
             @confirm="(password) => handleLogin(password)"
@@ -65,7 +59,7 @@
             v-else-if="prelogin.login_method === 'password'"
             prop="password"
           >
-            <el-input type="password" v-model="form.password" :disabled="callingAPI"
+            <el-input type="password" v-model="form.password" :disabled="callingAPI || calling"
               :placeholder="$t('data.login.password_placeholder')" @keyup.native.enter="() => handleLogin()">
             </el-input>
           </el-form-item>
@@ -77,7 +71,7 @@
         v-if="!prelogin"
         class="w-full"
         type="primary"
-        :loading="callingAPI"
+        :loading="callingAPI || calling"
         @click="() => handleLogin()"
       >
         {{ $t(`common.continue`) }}
@@ -86,13 +80,13 @@
         v-else-if="!isResetPassword && !isSetup2FA && prelogin.login_method === 'password'"
         class="w-full"
         type="primary"
-        :loading="callingAPI"
+        :loading="callingAPI || calling"
         @click="() => handleLogin()"
       >
         {{ $t(`data.login.sign_in`) }}
       </el-button>
       <el-button
-        v-else-if="!callingAPI"
+        v-else-if="!callingAPI || calling"
         class="w-full"
         @click="handleBack"
       >
@@ -103,21 +97,21 @@
       <div v-if="userPw.login_method === 'password'" class="grid lg:grid-cols-2 grid-cols-1 gap-2">
         <div>
           <el-button
+            type="primary"
             class="w-full"
-            :disabled="callingAPI"
-            @click="() => handleLogout()"
+            :loading="callingAPI || calling"
+            @click="() => handleLogin()"
           >
-            {{ $t('common.logout') }}
+            {{ $t('master_password.unlock') }}
           </el-button>
         </div>
         <div>
           <el-button
-            type="primary"
             class="w-full"
-            :loading="callingAPI"
-            @click="() => handleLogin()"
+            :disabled="callingAPI || calling"
+            @click="() => handleLogout()"
           >
-            {{ $t('master_password.unlock') }}
+            {{ $t('common.logout') }}
           </el-button>
         </div>
       </div>
@@ -143,6 +137,9 @@ export default Vue.extend({
   components: {
     PairingForm,
     PasswordlessForm
+  },
+  props: {
+    calling: Boolean
   },
   data() {
     return {

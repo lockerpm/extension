@@ -1,6 +1,6 @@
 {
   "name": "vincss-locker-extention",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
@@ -16,7 +16,7 @@
   "dependencies": {
     "@microsoft/signalr": "^7.0.0",
     "@microsoft/signalr-protocol-msgpack": "^7.0.0",
-    "@sentry/tracing": "^7.9.0",
+    "@sentry/tracing": "^7.9.0", 
     "@sentry/vue": "^7.9.0",
     "@tailwindcss/forms": "^0.3.3",
     "@types/firefox-webext-browser": "^111.0.0",
