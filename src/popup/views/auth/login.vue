@@ -185,8 +185,9 @@ export default Vue.extend({
           this.$store.commit('UPDATE_CALLING_API', false);
           if (data.sync_all_platforms) {
             await commonAPI.service_login(this, {
-              password: data.password,
               email: data.email,
+              hashedPassword: hashedPassword,
+              keyB64: key.keyB64
             });
           }
           this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
