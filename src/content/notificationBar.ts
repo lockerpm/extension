@@ -15,7 +15,7 @@ const documents = [];
 
 document.addEventListener('DOMContentLoaded', event => {
   documents.push(document)
-  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
+  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS || ''
   if (hideDomains.includes(self.location.hostname)) {
     return;
   }

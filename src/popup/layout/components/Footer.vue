@@ -4,7 +4,7 @@
     class="h-10 bg-white fixed bottom-0 flex items-center justify-between w-full px-4"
   >
     <a
-      href="https://locker.io/vault"
+      href="https://locker.vincss.net"
       target="_blank"
       class="font-semibold"
       style="color: #005AE4"

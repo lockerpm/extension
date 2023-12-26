@@ -22,7 +22,7 @@ async function service_login(that, data) {
     if (data.password) {
       const makeKey = await make_key(data.email, data.password)
       hashedPassword = await cryptoService.hashPassword(data.password, makeKey)
-      key = makeKey.keyB64
+      key = makeKey?.keyB64
     }
     await self.service.login({
       email: data.email,
