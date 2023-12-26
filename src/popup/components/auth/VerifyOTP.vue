@@ -68,7 +68,7 @@ export default Vue.extend({
       const data = {
         ...this.loginInfo?.auth_info?.payload,
         method: this.otpMethod.method,
-        save_device: this.form.save_device,
+        save_device: this.form.saveDevice,
         otp: this.form.otpCode
       }
       this.$emit('login', data)
