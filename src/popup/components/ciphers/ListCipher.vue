@@ -144,7 +144,7 @@ export default Vue.extend({
         filters.push((c) => c.type === this.type)
       }
       if (this.folder) {
-        filters.push((c) => c.folderId === this.folder.id)
+        filters.push((c) => c.collectionIds?.length > 0 ? c.collectionIds.includes(this.folder.id) : (c.folderId === this.folder.id))
       }
       return filters
     },

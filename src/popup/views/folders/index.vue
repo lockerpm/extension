@@ -74,7 +74,7 @@ export default Vue.extend({
         } catch (error) {
           results = []
         }
-        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => c.folderId === f.id)}));
+        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => f.isCollection ? c.collectionIds?.includes(f.id) : (c.folderId === f.id))}));
         results = orderBy(results, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         return results;
       },
