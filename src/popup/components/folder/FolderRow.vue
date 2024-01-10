@@ -6,7 +6,14 @@
   >
     <div class="menu-icon mr-4">
       <img
-        src="@/assets/images/icons/icon_folder.svg"
+        v-if="folder.isCollection"
+        src="@/assets/images/icons/folderSolidShare.svg"
+        alt=""
+        style="width: 32px; height: 32px;"
+      >
+      <img
+        v-else
+        src="@/assets/images/icons/folderSolid.svg"
         alt=""
         style="width: 32px; height: 32px;"
       >
@@ -29,6 +36,7 @@
       </div>
     </div>
     <div
+      v-if="canManageFolder(organizations, folder)"
       v-show="isHover"
       class="folder-item__right"
     >
@@ -70,6 +78,15 @@ export default Vue.extend({
     return {
       isHover: false
     }
+  },
+  asyncComputed: {
+    organizations: {
+      async get () {
+        const result = await this.$userService.getAllOrganizations()
+        return result
+      },
+      watch: ['$store.state.syncedCiphersToggle']
+    },
   },
   methods: {
     routerFolder (folder) {

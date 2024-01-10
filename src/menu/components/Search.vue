@@ -3,6 +3,7 @@
     class="flex items-center px-4 py-2 menu-filter"
   >
     <el-select
+      v-if="!isOTP"
       :value="fillType.value"
       class="mr-2"
       size="small"
@@ -27,7 +28,7 @@
   </div>
 </template>
 
-<script>
+<script lang="js">
 
 export default {
   props: {
@@ -38,6 +39,10 @@ export default {
     fillType: {
       type: Object,
       default: () => ({})
+    },
+    isOTP: {
+      type: Boolean,
+      default: false
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

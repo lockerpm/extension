@@ -68,7 +68,9 @@ export default Vue.extend({
           null
         )) || [];
         try {
-          results = await this.$folderService.getAllDecrypted() || [];
+          const folders = await this.$folderService.getAllDecrypted() || [];
+          const allCollections = await this.$collectionService.getAllDecrypted() || [];
+          results = [...folders, ...allCollections.map((c) => ({ ...c, isCollection: true }))]
         } catch (error) {
           results = []
         }
