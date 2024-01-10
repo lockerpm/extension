@@ -15,23 +15,17 @@ const middleware = () => {
     NProgress.start()
     const store = await storePromise()
     const isLocked = await vaultTimeoutService.isLocked();
+    const currentRouterString = await browserStorageService.get('current_router')
+    const currentRouter = JSON.parse(currentRouterString)
+    const allRouters = router.options.routes.map(o => o.children).flat();
+    const isRouter = allRouters.find(r => currentRouter && r.name === currentRouter.name);
     if (to.meta?.isOver) {
       next();
-    } else if (isFirst) {
-      isFirst = false
-      const currentRouterString = await browserStorageService.get('current_router')
-      const currentRouter = JSON.parse(currentRouterString)
-      const allRouters = router.options.routes.map(o => o.children).flat();
-      if (allRouters.find(r => currentRouter && r.name === currentRouter.name)) {
-        if (currentRouter.name == to.name) {
-          router.replace({ ...currentRouter }).catch(() => ({}))
-        } else {
-          router.push({ ...currentRouter }).catch(() => ({}))
-        }
-      } else if (to.name !== 'vault') {
-        router.push({ name: 'vault' }).catch(() => ({}))
+    } else if (isFirst && isRouter) {
+      if (currentRouter.name == to.name) {
+        router.replace({ ...currentRouter }).catch(() => ({}))
       } else {
-        next()
+        router.push({ ...currentRouter }).catch(() => ({}))
       }
     } else if (isLocked) {
       if ((store.state.user.email && !!store.state.userPw) || store.state.preloginData?.email) {
@@ -56,6 +50,7 @@ const middleware = () => {
     } else {
       next();
     }
+    isFirst = false
     NProgress.done()
   })
 }
