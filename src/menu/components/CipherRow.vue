@@ -3,18 +3,18 @@
     <li
       v-if="item.id"
       class="cipher-item"
-      @click.self="() => fillCipher(item, fillType.value === 0)"
+      @click.self="() => menuFillCipher(item, fillType.value === 0)"
     >
       <div
         class="text-[32px] mr-3 flex-shrink-0"
         :class="{'filter grayscale': item.isDeleted}"
-        @click="() => fillCipher(item, fillType.value === 0)"
+        @click="() => menuFillCipher(item, fillType.value === 0)"
       >
         <Vnodes :vnodes="getIconCipher(item, 32)" />
       </div>
       <div
         class="flex-grow overflow-hidden"
-        @click="() => fillCipher(item, fillType.value === 0)"
+        @click="() => menuFillCipher(item, fillType.value === 0)"
       >
         <div
           class="text-black font-semibold truncate"

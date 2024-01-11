@@ -541,13 +541,7 @@ Vue.mixin({
         }
       })
     },
-    async fillCipher(cipher, enableUpdate = false) {
-      if (cipher.id && enableUpdate) {
-        await cystackPlatformAPI.use_cipher(
-          cipher.id,
-          { use: true, favorite: cipher.favorite },
-        )
-      }
+    async fillCipher(cipher) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
@@ -555,6 +549,23 @@ Vue.mixin({
         sender: 'autofillItem',
         cipher: cipher
       });
+    },
+    async menuFillCipher(cipher, enableUpdate = false) {
+      if (cipher.id && enableUpdate) {
+        await cystackPlatformAPI.use_cipher(
+          cipher.id,
+          { use: true, favorite: cipher.favorite },
+        )
+      }
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: 'collectPageDetails',
+          tab: tab,
+          sender: 'autofillItem',
+          cipher: cipher
+        });
+      }
       this.closeMenu()
     },
     async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {

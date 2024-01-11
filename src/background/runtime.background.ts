@@ -184,6 +184,18 @@ export default class RuntimeBackground {
       case "cs-logout":
         this.main.onLogout();
         break;
+      case 'collectPageDetails':
+        console.log(22222, msg);
+        const cTab = await BrowserApi.getTabFromCurrentWindow();
+        if (cTab) {
+          BrowserApi.tabSendMessage(cTab, {
+            command: msg.command,
+            tab: tab,
+            sender: msg.sender,
+            cipher: msg.cipher
+          });
+        }
+        break;
       default:
         break;
     }
