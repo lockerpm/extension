@@ -389,7 +389,6 @@ export default class NotificationBackground {
   }
 
   private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
-    console.log(11111, newPassword, username);
     await this.checkNotificationQueue(tab, {
       type: NotificationQueueMessageType.changePassword,
       cipherId: cipherId,

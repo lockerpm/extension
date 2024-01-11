@@ -401,14 +401,14 @@ Vue.mixin({
       if (team.id) {
         return [0, 1].includes(team.type);
       }
-      return true
+      return !item.organizationId
     },
     canManageFolder(teams, item) {
       const team = this.getTeam(teams, item.organizationId)
       if (team.organization_id) {
         return ['owner', 'admin'].includes(team.role)
       }
-      return true
+      return !item.organizationId
     },
     openNewTab(link) {
       if (!link.match(/^https?:\/\//i)) {
