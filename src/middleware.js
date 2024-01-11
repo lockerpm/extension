@@ -3,7 +3,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import JSLib from '@/popup/services/services'
 import storePromise from '@/store'
-const browserStorageService = JSLib.getBgService('storageService')()
+const storageService = JSLib.getBgService('storageService')()
 const vaultTimeoutService = JSLib.getBgService('vaultTimeoutService')()
 
 let isFirst = true
@@ -15,7 +15,7 @@ const middleware = () => {
     NProgress.start()
     const store = await storePromise()
     const isLocked = await vaultTimeoutService.isLocked();
-    const currentRouterString = await browserStorageService.get('current_router')
+    const currentRouterString = await storageService.get('current_router')
     const currentRouter = JSON.parse(currentRouterString)
     const allRouters = router.options.routes.map(o => o.children).flat();
     const isRouter = allRouters.find(r => currentRouter && r.name === currentRouter.name);

@@ -14,7 +14,7 @@
         v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes.filter((t) => t.value !== CipherType.OTP)"
         :fill-type="currentFillType"
-        :is-OTP="isOTP"
+        :is-otp="isOTP"
         @change="(v) => fillType = v"
       />
       <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked && !isOTP}">
