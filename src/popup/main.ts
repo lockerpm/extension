@@ -544,7 +544,16 @@ Vue.mixin({
         }
       })
     },
-    async fillCipher(cipher, enableUpdate = false) {
+    async fillCipher(cipher) {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillItem',
+        cipher: cipher
+      });
+    },
+    async menuFillCipher(cipher, enableUpdate = false) {
       if (cipher.id && enableUpdate) {
         await cystackPlatformAPI.use_cipher(
           cipher.id,
@@ -601,13 +610,11 @@ Vue.mixin({
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "collectPageDetails",
-          tab: tab,
-          sender: 'notificationBar',
-        });
-      }
+      BrowserApi.tabSendMessage(tab, {
+        command: "collectPageDetails",
+        tab: tab,
+        sender: 'notificationBar',
+      });
     },
     async closeMenu() {
       setTimeout(async () => {
@@ -617,13 +624,11 @@ Vue.mixin({
     },
     async scanQRCode(isPasswordOTP = false) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "firstScanQRCode",
-          tab: tab,
-          isPasswordOTP: isPasswordOTP
-        });  
-      }
+      BrowserApi.tabSendMessage(tab, {
+        command: "firstScanQRCode",
+        tab: tab,
+        isPasswordOTP: isPasswordOTP
+      });  
     }
   }
 })

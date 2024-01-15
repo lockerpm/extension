@@ -55,9 +55,7 @@ export default Vue.extend({
   methods: {
     async close() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
-      }
+      BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
     },
     async handleSave() {
       this.$refs.barForm.$refs.form.validate(async (valid) => {
@@ -138,7 +136,7 @@ export default Vue.extend({
     },
     async excludeDomain() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      await this.addExcludeDomain(tab.url);
+      await this.addExcludeDomain(tab?.url || this.$route.query.url);
       this.close()
     },
     async notificationAlert(type) {

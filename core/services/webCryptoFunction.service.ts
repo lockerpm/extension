@@ -124,7 +124,6 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
             name: 'HMAC',
             hash: { name: this.toWebCryptoAlgorithm(algorithm) },
         };
-
         const impKey = await this.subtle.importKey('raw', key, signingAlgorithm, false, ['sign']);
         return await this.subtle.sign(signingAlgorithm, impKey, value);
     }

@@ -31,11 +31,14 @@ export class BrowserApi {
   }
 
   static async tabsQuery(options: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab[]> {
-    return new Promise(resolve => {
-      chrome.tabs?.query(options, (tabs: any[]) => {
-        resolve(tabs);
-      });
-    });
+    if (chrome.tabs) {
+      return new Promise(resolve => {
+        chrome.tabs?.query(options, (tabs: any[]) => {
+          resolve(tabs);
+        });
+      }) || [];
+    }
+    return []
   }
 
   static async tabsQueryFirst(options: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab> | null {
@@ -61,6 +64,7 @@ export class BrowserApi {
 
   static async tabSendMessage(tab: chrome.tabs.Tab, obj: any, options: chrome.tabs.MessageSendOptions = null): Promise<any> {
     if (!tab || !tab.id) {
+      chrome.runtime.sendMessage(obj)
       return;
     }
 

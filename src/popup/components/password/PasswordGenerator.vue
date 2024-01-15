@@ -122,8 +122,6 @@ import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
@@ -216,7 +214,11 @@ export default {
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async handleUsePassword () {
-      this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
+      if (this.isOver) {
+        this.menuFillCipher({ type: CipherType.Login,  login: { password: this.password } })
+      } else {
+        this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })
+      }
     }
   }
 }

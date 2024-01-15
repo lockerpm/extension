@@ -14,10 +14,10 @@
         v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes.filter((t) => t.value !== CipherType.OTP)"
         :fill-type="currentFillType"
-        :is-OTP="isOTP"
+        :is-otp="isOTP"
         @change="(v) => fillType = v"
       />
-      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked && !isOTP}">
+      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked}">
         <PasswordGenerator
           v-if="tab === 1 && !isOTP"
           is-over
@@ -101,9 +101,7 @@ export default Vue.extend({
           name: this.$t('menu.generate_password'),
           disabled: this.isOTP,
           onclick: async () => {
-            if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
-            }
+            BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
             this.tab = 1
           }
         },
@@ -111,9 +109,7 @@ export default Vue.extend({
           value: 2,
           name: this.$t('menu.fill_something_else'),
           onclick: async () => {
-            if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
-            }
+            BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
             this.tab = 2
           }
         },
@@ -124,9 +120,7 @@ export default Vue.extend({
           divided: true,
           disabled: this.isLocked,
           onclick: async () => {
-            if (this.browserTab) {
-              this.addExcludeDomain(this.browserTab.url, () => ({}), false)
-            }
+            this.addExcludeDomain(this.browserTab.url, () => ({}), false)
           }
         },
       ]
