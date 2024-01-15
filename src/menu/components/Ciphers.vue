@@ -71,14 +71,13 @@ export default Vue.extend({
         let result = []
         if (this.fillType.value === 0) {
           const tab = await BrowserApi.getTabFromCurrentWindow();
-          console.log(chrome);
           const ciphers = (await this.$searchService.searchCiphers(
             this.searchText,
             [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
             null,
             {
-              url: tab?.url || ''
-            },
+              url: tab ? tab.url : this.$route.query.url
+            }
           )) || [];
           result = this.$cipherService.sortCiphers(ciphers) || [];
         } else {

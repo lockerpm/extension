@@ -304,10 +304,11 @@ export class CipherService implements CipherServiceAbstraction {
 
     const promises: any[] = [];
     const ciphers = await this.getAll() || [];
+
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)));
     });
-
+    
     await Promise.all(promises);
     decCiphers.sort(this.getLocaleSortingFunction());
     this.decryptedCipherCache = decCiphers;
@@ -331,7 +332,8 @@ export class CipherService implements CipherServiceAbstraction {
   }
 
   async getAllDecryptedForUrl(
-    url: string, includeOtherTypes?: CipherType[],
+    url: string,
+    includeOtherTypes?: CipherType[],
     defaultMatch: UriMatchType = null
   ): Promise<CipherView[]> {
     if (!url && !includeOtherTypes) {
@@ -339,22 +341,24 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     const domain = Utils.getDomain(url);
-    const eqDomainsPromise = !domain ? Promise.resolve([]) :
-      this.settingsService.getEquivalentDomains().then((eqDomains: any[][]) => {
-        let matches: any[] = [];
-        (eqDomains || []).forEach(eqDomain => {
-          if (eqDomain.length && eqDomain.indexOf(domain) >= 0) {
-            matches = matches.concat(eqDomain);
+    const eqDomainsPromise = !domain
+      ? Promise.resolve([])
+      : this.settingsService.getEquivalentDomains()
+        .then((eqDomains: any[][]) => {
+          let matches: any[] = [];
+          (eqDomains || []).forEach((eqDomain: any) => {
+            if (eqDomain.length && eqDomain.includes(domain)) {
+              matches = matches.concat(eqDomain);
+            }
+          });
+
+          if (!matches.length) {
+            matches.push(domain);
           }
+          return matches;
+        }).catch((error) => {
+          return [];
         });
-
-        if (!matches.length) {
-          matches.push(domain);
-        }
-
-        return matches;
-      });
-
     const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted()]);
     const matchingDomains = result[0];
     const ciphers = result[1] || [];

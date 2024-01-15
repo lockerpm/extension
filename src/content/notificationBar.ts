@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', event => {
       defaultType = CipherType.OTP
     }
     const barPageUrl: string = chrome.runtime.getURL(
-      "popup.html#/menu" + `?tab=${defaultTab}&type=${defaultType}`
+      "popup.html#/menu" + `?tab=${defaultTab}&type=${defaultType}&url=${self.location.href}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', event => {
     if (document.body == null) {
       return;
     }
-    const barPageUrl: string = chrome.runtime.getURL(barPage);
+    const barPageUrl: string = `${chrome.runtime.getURL(barPage)}?url=${self.location.href}`;
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: ${type === 'add' ? '338' : '278'}px !important;

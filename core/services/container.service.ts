@@ -10,9 +10,7 @@ export class ContainerService {
     }
 
     attachToGlobal(global: any) {
-        if (!global.lockerContainerService) {
-            global.lockerContainerService = this;
-        }
+      global.lockerContainerService = this;
     }
 
     getCryptoService(): CryptoService {

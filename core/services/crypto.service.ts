@@ -140,6 +140,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const masterKey: any = await this.storageService.get(Keys.masterKey);
+    
     if (masterKey) {
       this.key = {
         ...masterKey,
@@ -220,16 +221,18 @@ export class CryptoService implements CryptoServiceAbstraction {
     if (!key) {
       return null;
     }
+    
     let decEncKey: ArrayBuffer;
     const encKeyCipher = new EncString(encKey);
+    
     if (encKeyCipher.encryptionType === EncryptionType.AesCbc256_B64) {
       decEncKey = await this.decryptToBytes(encKeyCipher, key);
+
     } else if (encKeyCipher.encryptionType === EncryptionType.AesCbc256_HmacSha256_B64) {
       const newKey = await this.stretchKey(key);
       decEncKey = await this.decryptToBytes(encKeyCipher, newKey);
     } else {
       decEncKey = null
-      throw new Error('Unsupported encKey type.');
     }
 
     if (!decEncKey) {
@@ -640,6 +643,9 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async decryptToBytes(encString: EncString, key?: SymmetricCryptoKey): Promise<ArrayBuffer> {
+    if (!key) {
+      return null;
+    }
     const iv = Utils.fromB64ToArray(encString.iv).buffer;
     const data = Utils.fromB64ToArray(encString.data).buffer;
     const mac = encString.mac ? Utils.fromB64ToArray(encString.mac).buffer : null;

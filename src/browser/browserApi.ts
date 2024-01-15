@@ -36,7 +36,7 @@ export class BrowserApi {
         chrome.tabs?.query(options, (tabs: any[]) => {
           resolve(tabs);
         });
-      });
+      }) || [];
     }
     return []
   }

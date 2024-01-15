@@ -101,9 +101,7 @@ export default Vue.extend({
           name: this.$t('menu.generate_password'),
           disabled: this.isOTP,
           onclick: async () => {
-            if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
-            }
+            BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
             this.tab = 1
           }
         },
@@ -111,9 +109,7 @@ export default Vue.extend({
           value: 2,
           name: this.$t('menu.fill_something_else'),
           onclick: async () => {
-            if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
-            }
+            BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
             this.tab = 2
           }
         },
@@ -124,9 +120,7 @@ export default Vue.extend({
           divided: true,
           disabled: this.isLocked,
           onclick: async () => {
-            if (this.browserTab) {
-              this.addExcludeDomain(this.browserTab.url, () => ({}), false)
-            }
+            this.addExcludeDomain(this.browserTab.url, () => ({}), false)
           }
         },
       ]

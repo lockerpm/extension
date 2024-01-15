@@ -561,14 +561,12 @@ Vue.mixin({
         )
       }
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: 'collectPageDetails',
-          tab: tab,
-          sender: 'autofillItem',
-          cipher: cipher
-        });
-      }
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillItem',
+        cipher: cipher
+      });
       this.closeMenu()
     },
     async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
@@ -612,13 +610,11 @@ Vue.mixin({
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "collectPageDetails",
-          tab: tab,
-          sender: 'notificationBar',
-        });
-      }
+      BrowserApi.tabSendMessage(tab, {
+        command: "collectPageDetails",
+        tab: tab,
+        sender: 'notificationBar',
+      });
     },
     async closeMenu() {
       setTimeout(async () => {
@@ -628,13 +624,11 @@ Vue.mixin({
     },
     async scanQRCode(isPasswordOTP = false) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab) {
-        BrowserApi.tabSendMessage(tab, {
-          command: "firstScanQRCode",
-          tab: tab,
-          isPasswordOTP: isPasswordOTP
-        });  
-      }
+      BrowserApi.tabSendMessage(tab, {
+        command: "firstScanQRCode",
+        tab: tab,
+        isPasswordOTP: isPasswordOTP
+      });  
     }
   }
 })
