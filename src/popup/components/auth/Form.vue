@@ -109,11 +109,10 @@ export default Vue.extend({
       }
       authAPI.sso_auth(payload).then(async (response: any) => {
         this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
-          auth_info: response,
-          user_info: payload
+          auth_info: { ...response },
+          user_info: { ...payload }
         })
         if (response.is_factor2) {
-          // this.$runtimeBackground.authAccessToken('captcha')
           this.$emit('next');
         } else {
           try {

@@ -182,30 +182,27 @@ const asyncStore = async () => {
         },
         async UPDATE_LOGIN_PAGE_INFO(state, info) {
           let keys = []
-          const defaultData = info || JSON.parse(JSON.stringify(defaultLoginInfo))
-          if (info) {
-            keys = Object.keys(defaultData)
-          } else {
-            keys = Object.keys(defaultData)
-          }
+          const defaultData = JSON.parse(JSON.stringify(info || defaultLoginInfo))
+          keys = Object.keys(defaultData)
           keys.forEach((key) => {
-            state[key] = defaultData[key]
+            state[key] = JSON.parse(JSON.stringify(defaultData[key]))
           });
+          const storeData = JSON.parse(JSON.stringify(state))
           await runtimeBackground.updateStoreServiceInfo({
-            login_step: state.login_step,
-            identity: state.identity,
-            auth_info: state.auth_info,
-            user_info: state.user_info,
-            ws2: state.ws2,
-            clientId: state.clientId,
-            desktopAppInstalled: state.desktopAppInstalled,
-            desktopAppData: state.desktopAppData,
-            preloginData: state.preloginData,
-            baseApiUrl: state.baseApiUrl,
-            baseWsUrl: state.baseWsUrl,
-            sending: state.sending,
-            forgot_step: state.forgot_step,
-            forgot_token: state.forgot_token
+            login_step: storeData.login_step,
+            identity: storeData.identity,
+            auth_info: storeData.auth_info,
+            user_info: storeData.user_info,
+            ws2: storeData.ws2,
+            clientId: storeData.clientId,
+            desktopAppInstalled: storeData.desktopAppInstalled,
+            desktopAppData: storeData.desktopAppData,
+            preloginData: storeData.preloginData,
+            baseApiUrl: storeData.baseApiUrl,
+            baseWsUrl: storeData.baseWsUrl,
+            sending: storeData.sending,
+            forgot_step: storeData.forgot_step,
+            forgot_token: storeData.forgot_token
           })
         },
       },

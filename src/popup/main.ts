@@ -88,7 +88,7 @@ Vue.mixin({
       }
     },
     language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
+    currentUser() { return this.$store.state.user && this.$store.state.user.email ? this.$store.state.user : (this.$store.state.preloginData || {}) },
     currentUserPw() { return this.$store.state.userPw },
     environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
@@ -269,7 +269,8 @@ Vue.mixin({
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
       } catch (e) {
-        this.notify(this.$t("errors.invalid_master_password"), "error");
+        const message = e && e.response && e.response.data ? e.response.data.message : ''
+        this.notify(message || this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
       setTimeout(() => {

@@ -266,7 +266,8 @@ export class CryptoService implements CryptoServiceAbstraction {
       return null;
     }
 
-    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), null);
+    const encKey = await this.getEncKey();
+    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), encKey);
     return this.privateKey;
   }
 
@@ -300,7 +301,6 @@ export class CryptoService implements CryptoServiceAbstraction {
       if (!encOrgKeys.hasOwnProperty(orgId)) {
         continue;
       }
-
       const decValue = await this.rsaDecrypt(encOrgKeys[orgId]);
       orgKeys.set(orgId, new SymmetricCryptoKey(decValue));
       setKey = true;
@@ -621,7 +621,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const data = Utils.fromB64ToArray(encPieces[0]).buffer;
-    const privateKey = privateKeyValue ?? await this.getPrivateKey();
+    const privateKey = privateKeyValue || await this.getPrivateKey();
     if (!privateKey) {
       throw new Error('No private key.');
     }
@@ -638,7 +638,6 @@ export class CryptoService implements CryptoServiceAbstraction {
       default:
         throw new Error('encType unavailable.');
     }
-
     return this.cryptoFunctionService.rsaDecrypt(data, privateKey, alg);
   }
 
