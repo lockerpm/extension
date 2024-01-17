@@ -2,9 +2,12 @@ import { StorageService } from 'jslib-common/abstractions/storage.service';
 
 export default class BrowserStorageService implements StorageService {
     private chromeStorageApi: any;
+    private chromeSessionStorageApi: any;
 
     constructor() {
-        this.chromeStorageApi = chrome.storage.local;
+        const storage: any = chrome.storage;
+        this.chromeStorageApi = storage.local;
+        this.chromeSessionStorageApi = storage.session;
     }
 
     async get<T>(key: string): Promise<T> {
@@ -52,4 +55,38 @@ export default class BrowserStorageService implements StorageService {
             });
         });
     }
+
+    async sessionGet<T>(key: string): Promise<T> {
+      return new Promise(resolve => {
+          this.chromeSessionStorageApi.get(key, (obj: any) => {
+              if (obj != null && obj[key] != null) {
+                  resolve(obj[key] as T);
+                  return;
+              }
+              resolve(null);
+          });
+      });
+  }
+
+  async sessionSave(key: string, obj: any): Promise<any> {
+    if (obj == null) {
+        // Fix safari not liking null in set
+        return new Promise<void>(resolve => {
+            this.chromeSessionStorageApi.remove(key, () => {
+                resolve();
+            });
+        });
+    }
+
+    if (obj instanceof Set) {
+        obj = Array.from(obj);
+    }
+
+    const keyedObj = { [key]: obj };
+    return new Promise<void>(resolve => {
+        this.chromeSessionStorageApi.set(keyedObj, () => {
+            resolve();
+        });
+    });
+}
 }
