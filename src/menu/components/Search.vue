@@ -3,7 +3,7 @@
     class="flex items-center px-4 py-2 menu-filter"
   >
     <el-select
-      v-if="!isOTP"
+      v-if="!isOtp"
       :value="fillType.value"
       class="mr-2"
       size="small"
@@ -40,7 +40,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    isOTP: {
+    isOtp: {
       type: Boolean,
       default: false
     }

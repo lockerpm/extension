@@ -796,7 +796,7 @@ export default Vue.extend({
     ownershipOptions () {
       const teams = this.teams.filter(e => ['owner', 'admin'].includes(e.role))
       if (teams.length) {
-        return [{ name: this.currentUser.email, organization_id: null }, ...teams]
+        return [{ name: this.currentUser?.email, organization_id: null }, ...teams]
       }
       return []
     }

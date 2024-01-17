@@ -41,7 +41,7 @@
       class="folder-item__right"
     >
       <el-dropdown
-        trigger="hover"
+        trigger="click"
       >
         <i class="el-icon-more"></i>
         <el-dropdown-menu
