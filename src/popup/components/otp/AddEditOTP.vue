@@ -116,11 +116,7 @@ export default Vue.extend({
     async createOTP () {
       try {
         this.callingAPI = true;
-<<<<<<< HEAD
-        await this.createAuthenticator(this.form)
-=======
         await this.createAuthenticator(this.form);
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t(`type.${CipherType.OTP}`, 1) }), 'success')
         this.visible = false
       } catch (e) {
@@ -155,15 +151,8 @@ export default Vue.extend({
         data['collectionIds'] = []
         cipher.type = type_
 
-<<<<<<< HEAD
-        await cystackPlatformAPI.update_cipher(cipher.id, {
-          ...data,
-          collectionIds: []
-        })
-=======
         await cystackPlatformAPI.update_cipher(cipher.id, data)
 
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t(`${CipherType[this.otp.type]}`, 1) }), 'success')
         this.visible = false
       } catch (e) {

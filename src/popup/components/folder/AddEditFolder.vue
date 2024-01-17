@@ -84,7 +84,6 @@ export default Vue.extend({
         await this.putFolder()
       } else {
         await this.postFolder()
-<<<<<<< HEAD
       }
     },
     async postFolder() {
@@ -92,44 +91,6 @@ export default Vue.extend({
         this.callingAPI = true
         const folderEnc = await this.$folderService.encrypt(this.folder)
         const data = new FolderRequest(folderEnc)
-        const res = cystackPlatformAPI.create_folder(data)
-        this.$emit('done')
-        this.$emit('created-folder', { id: res.id, name: this.folder.name })
-        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$t('common.folder') }), 'success')
-        this.visible = false
-      } catch (e) {
-        this.errors = (e.response && e.response.data && e.response.data.details) || {}
-        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$t('common.folder') }), 'warning')
-      } finally {
-        this.callingAPI = false
-      }
-    },
-    async putFolder() {
-      if (this.folder.name == this.item.name) {
-        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.folder') }), 'success')
-        this.visible = false
-        return
-      }
-=======
-      }
-    },
-    async postFolder() {
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
-      try {
-        this.callingAPI = true
-        const folderEnc = await this.$folderService.encrypt(this.folder)
-        const data = new FolderRequest(folderEnc)
-<<<<<<< HEAD
-        await cystackPlatformAPI.update_folder(this.folder.id, data)
-        this.$emit('done')
-        this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$t('common.folder') }), 'success')
-        this.visible = false
-      } catch (e) {
-        this.errors = (e.response && e.response.data && e.response.data.details) || {}
-        this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$t('common.folder') }), 'warning')
-      } finally {
-        this.callingAPI = false
-=======
         const res = await cystackPlatformAPI.create_folder(data)
 
         this.$emit('done')
@@ -162,7 +123,6 @@ export default Vue.extend({
         this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$t('common.folder') }), 'warning')
       } finally {
         this.callingAPI = false
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
       }
     }
   }

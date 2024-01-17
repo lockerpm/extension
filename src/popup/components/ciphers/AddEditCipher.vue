@@ -828,24 +828,12 @@ export default Vue.extend({
         data['score'] = this.passwordStrength.score
         data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
-<<<<<<< HEAD
-        await cystackPlatformAPI.create_ciphers_vault({
-          ...data,
-          score: this.passwordStrength.score,
-          collectionIds: this.cipher.collectionIds,
-        })
-=======
         await cystackPlatformAPI.create_ciphers_vault(data)
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()
           otpCipher.name = this.cipher.name
           otpCipher.secretKey = this.cipher.login.totp
-<<<<<<< HEAD
-          await this.createAuthenticator(otpCipher)
-=======
           await this.createAuthenticator(otpCipher);
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         }
         this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {
@@ -880,26 +868,14 @@ export default Vue.extend({
         data['score'] = this.passwordStrength.score
         data['collectionIds'] = this.cipher.collectionIds
         this.cipher.type = type_
-<<<<<<< HEAD
-        await cystackPlatformAPI.update_cipher(this.cipher.id, {
-          ...data,
-          score: this.passwordStrength.score,
-          collectionIds: this.cipher.collectionIds,
-        })
-=======
 
         await cystackPlatformAPI.update_cipher(this.cipher.id, data)
 
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         if (this.isCreateAuthenticator && this.cipher.login.totp) {
           const otpCipher = new CipherView()
           otpCipher.name = this.cipher.name
           otpCipher.secretKey = this.cipher.login.totp
-<<<<<<< HEAD
-          await this.createAuthenticator(otpCipher)
-=======
           await this.createAuthenticator(otpCipher);
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         }
         this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
         if (this.$route.params?.folder?.id) {

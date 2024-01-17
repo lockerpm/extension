@@ -13,11 +13,7 @@
         class="otp-item__right"
       >
         <el-dropdown
-<<<<<<< HEAD
-          trigger="hover"
-=======
           trigger="click"
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         >
           <div class="icon flex items-center justify-center">
             <i class="el-icon-more"></i>

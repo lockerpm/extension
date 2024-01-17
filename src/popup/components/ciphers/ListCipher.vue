@@ -18,11 +18,7 @@
       />
       <ul class="list-ciphers">
         <cipher-row
-<<<<<<< HEAD
-          v-for="item in (ciphers || [])"
-=======
           v-for="item in (pagingCiphers || [])"
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
           :key="item.id"
           :item="item"
           :folder="folder"
@@ -68,40 +64,11 @@ export default Vue.extend({
       CipherType,
       orderField: "revisionDate",
       orderDirection: "desc",
-<<<<<<< HEAD
-      loading: false
-    };
-  },
-  computed: {
-    orderString() {
-      return `${this.orderField}_${this.orderDirection}`;
-    },
-    shouldRenderNoCipher() {
-      if (this.ciphers) {
-        return !this.ciphers.length;
-      }
-      return false
-    },
-    cipherFilters() {
-      const filters = []
-      if (this.type == CipherType.CryptoBackup) {
-        filters.push((c) => c.type ===  CipherType.CryptoAccount || c.type === CipherType.CryptoWallet)
-      } else {
-        filters.push((c) => c.type === this.type)
-      }
-      if (this.folder) {
-        filters.push((c) => c.folderId === this.folder.id)
-      }
-      return filters
-    }
-  },
-=======
       loading: false,
       pageSize: 10,
       size: 10
     };
   },
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
   asyncComputed: {
     ciphers: {
       async get() {
@@ -158,8 +125,6 @@ export default Vue.extend({
         "folder"
       ],
     }
-<<<<<<< HEAD
-=======
   },
   computed: {
     orderString() {
@@ -189,7 +154,6 @@ export default Vue.extend({
       }
       return []
     },
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
   },
   watch: {
     type: 'typeChanged'
@@ -216,8 +180,6 @@ export default Vue.extend({
         name: "add-edit-cipher",
         params: { type: this.type || CipherType.Login, folder: this.folder },
       });
-<<<<<<< HEAD
-=======
     },
     typeChanged() {
       const mainBody = document.querySelector('.main-body')
@@ -227,7 +189,6 @@ export default Vue.extend({
       setTimeout(() => {
         this.size = this.pageSize
       }, 1000);
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
     }
   },
 });
