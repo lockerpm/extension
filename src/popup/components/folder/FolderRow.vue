@@ -37,13 +37,17 @@
     </div>
     <div
       v-if="canManageFolder(organizations, folder)"
-      v-show="isHover"
-      class="folder-item__right"
+      class="folder-item__right col-actions"
     >
       <el-dropdown
         trigger="click"
+        :hide-on-click="false"
       >
-        <i class="el-icon-more"></i>
+        <button
+          class="btn btn-icon btn-xs hover:text-primary"
+        >
+          <i class="el-icon-more"></i>
+        </button>
         <el-dropdown-menu
           slot="dropdown"
         >
