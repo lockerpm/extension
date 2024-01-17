@@ -265,6 +265,8 @@ Vue.mixin({
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
+        this.$storageService.sessionSave('lastActive', now)
+
       } catch (e) {
         const message = e && e.response && e.response.data ? e.response.data.message : ''
         this.notify(message || this.$t("errors.invalid_master_password"), "error");

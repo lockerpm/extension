@@ -3,6 +3,8 @@ export abstract class StorageService {
     has: (key: string, options?: StorageServiceOptions) => Promise<boolean>;
     save: (key: string, obj: any, options?: StorageServiceOptions) => Promise<any>;
     remove: (key: string, options?: StorageServiceOptions) => Promise<any>;
+    sessionGet: <T>(key: string, options?: StorageServiceOptions) => Promise<T>;
+    sessionSave: (key: string, obj: any, options?: StorageServiceOptions) => Promise<any>;
 }
 
 export interface StorageServiceOptions {
