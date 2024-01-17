@@ -122,11 +122,6 @@ import PasswordStrength from './PasswordStrength'
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
-<<<<<<< HEAD
-=======
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
->>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
 
 import cystackPlatformAPI from '@/api/cystack_platform';
 
