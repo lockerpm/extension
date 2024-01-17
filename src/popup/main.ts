@@ -22,10 +22,11 @@ import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
 import { SecureNote } from 'jslib-common/models/domain/secureNote';
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest'
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 
 import cystackPlatformAPI from '@/api/cystack_platform'
-import userAPI from '@/api/user'
+import userAPI from '@/api/user';
+
 
 Vue.config.productionTip = false;
 
@@ -58,6 +59,7 @@ Vue.mixin({
       loadedTimeout: null,
       pageDetails: null,
       selectedCipher: null,
+      pageSize: 150,
 
       folders: [],
       strategies: [
@@ -86,7 +88,7 @@ Vue.mixin({
       }
     },
     language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
+    currentUser() { return this.$store.state.user && this.$store.state.user.email ? this.$store.state.user : (this.$store.state.preloginData || {}) },
     currentUserPw() { return this.$store.state.userPw },
     environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
@@ -95,9 +97,6 @@ Vue.mixin({
     teams() { return this.$store.state.teams || [] },
     currentOrg() { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
     currentPlan() { return this.$store.state.currentPlan },
-    cipherCount() {
-      return this.$store.state.cipherCount
-    },
     hideIcons() {
       return this.$store.state.hideIcons
     },
@@ -106,7 +105,10 @@ Vue.mixin({
     },
     enableAutofill() {
       return this.$store.state.enableAutofill
-    }
+    },
+  },
+  destroyed() {
+    self.clearTimeout(this.loadedTimeout);
   },
   destroyed() {
     self.clearTimeout(this.loadedTimeout);
@@ -232,8 +234,8 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.getSyncData()
+          await this.$runtimeBackground.handleUnlocked('unlocked');
+          await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
@@ -258,16 +260,19 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked')
-          this.getSyncData()
+          await this.$runtimeBackground.handleUnlocked('unlocked');
+          await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
           this.$store.commit('UPDATE_CALLING_API', false)
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
+        this.$storageService.sessionSave('lastActive', now)
+
       } catch (e) {
-        this.notify(this.$t("errors.invalid_master_password"), "error");
+        const message = e && e.response && e.response.data ? e.response.data.message : ''
+        this.notify(message || this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
       setTimeout(() => {
@@ -276,58 +281,9 @@ Vue.mixin({
     },
     async getSyncData(trigger = false) {
       this.$store.commit('UPDATE_SYNCING', true)
-      const pageSize = 100
-      try {
-        let page = 1
-        let allCiphers = []
-        const userId = await this.$userService.getUserId()
-        this.$messagingService.send('syncStarted')
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          let res = await cystackPlatformAPI.sync({
-            paging: 1,
-            size: pageSize,
-            page
-          })
-          if (res.count && res.count.ciphers) {
-            this.$store.commit('UPDATE_CIPHER_COUNT', res.count.ciphers)
-          }
-          res = new SyncResponse(res)
-          allCiphers = allCiphers.concat(res.ciphers)
-          await this.$syncService.syncProfile(res.profile)
-          await this.$syncService.syncFolders(userId, res.folders);
-          await this.$syncService.syncCollections(res.collections);
-          await this.$syncService.syncSomeCiphers(userId, res.ciphers);
-          await this.$syncService.syncSends(userId, res.sends);
-          await this.$syncService.syncSettings(userId, res.domains);
-          await this.$syncService.syncPolicies(res.policies);
-          await this.$syncService.setLastSync(new Date());
-          if (page * pageSize >= this.cipherCount) {
-            break
-          }
-          page += 1
-        }
-
-        const deletedIds = [];
-        const cipherIds = allCiphers.map(c => c.id);
-        const storageRes = await this.$storageService.get(`ciphers_${userId}`);
-        for (const id in { ...storageRes }) {
-          if (!cipherIds.includes(id)) {
-            delete storageRes[id];
-            deletedIds.push(id);
-          }
-        }
-        await this.$storageService.save(`ciphers_${userId}`, storageRes);
-        this.$cipherService.csDeleteFromDecryptedCache(deletedIds);
-        await this.$cipherService.getAllDecrypted()
-        this.$messagingService.send('syncCompleted', { successfully: true, trigger })
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false);
-      } catch (e) {
-        this.$messagingService.send('syncCompleted', { successfully: false, trigger })
-        this.$store.commit("UPDATE_SYNCED_CIPHERS");
-        this.$store.commit('UPDATE_SYNCING', false);
-      }
+      await this.$syncService.syncData(trigger);
+      this.$store.commit("UPDATE_SYNCED_CIPHERS");
+      this.$store.commit('UPDATE_SYNCING', false);
     },
     async getFolders() {
       return await this.$folderService.getAllDecrypted()
@@ -448,14 +404,14 @@ Vue.mixin({
       if (team.id) {
         return [0, 1].includes(team.type);
       }
-      return true
+      return !item.organizationId
     },
     canManageFolder(teams, item) {
       const team = this.getTeam(teams, item.organizationId)
       if (team.organization_id) {
         return ['owner', 'admin'].includes(team.role)
       }
-      return true
+      return !item.organizationId
     },
     openNewTab(link) {
       if (!link.match(/^https?:\/\//i)) {
@@ -643,10 +599,8 @@ Vue.mixin({
       const cipherEnc = await this.$cipherService.encrypt(cipher)
       const data = new CipherRequest(cipherEnc)
       data.type = CipherType.OTP;
-      await cystackPlatformAPI.create_ciphers_vault({
-        ...data,
-        collectionIds: [],
-      })
+      data['collectionIds'] = []
+      await cystackPlatformAPI.create_ciphers_vault(data)
     },
     async setupFillPage() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
@@ -693,7 +647,7 @@ Vue.filter('filterString', function (value) {
 })
 
 storePromise().then((store) => {
-  middleware(store)
+  middleware()
   store.commit('SET_LANG', store.state.language)
   i18n.locale = store.state.language
   new Vue({

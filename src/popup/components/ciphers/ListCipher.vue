@@ -18,7 +18,11 @@
       />
       <ul class="list-ciphers">
         <cipher-row
+<<<<<<< HEAD
           v-for="item in (ciphers || [])"
+=======
+          v-for="item in (pagingCiphers || [])"
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
           :key="item.id"
           :item="item"
           :folder="folder"
@@ -64,6 +68,7 @@ export default Vue.extend({
       CipherType,
       orderField: "revisionDate",
       orderDirection: "desc",
+<<<<<<< HEAD
       loading: false
     };
   },
@@ -90,6 +95,13 @@ export default Vue.extend({
       return filters
     }
   },
+=======
+      loading: false,
+      pageSize: 10,
+      size: 10
+    };
+  },
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
   asyncComputed: {
     ciphers: {
       async get() {
@@ -146,6 +158,53 @@ export default Vue.extend({
         "folder"
       ],
     }
+<<<<<<< HEAD
+=======
+  },
+  computed: {
+    orderString() {
+      return `${this.orderField}_${this.orderDirection}`;
+    },
+    shouldRenderNoCipher() {
+      if (this.ciphers) {
+        return !this.ciphers.length;
+      }
+      return false
+    },
+    cipherFilters() {
+      const filters = []
+      if (this.type == CipherType.CryptoBackup) {
+        filters.push((c) => c.type ===  CipherType.CryptoAccount || c.type === CipherType.CryptoWallet)
+      } else {
+        filters.push((c) => c.type === this.type)
+      }
+      if (this.folder) {
+        filters.push((c) => c.collectionIds?.length > 0 ? c.collectionIds.includes(this.folder.id) : (c.folderId === this.folder.id))
+      }
+      return filters
+    },
+    pagingCiphers() {
+      if (this.ciphers) {
+        return this.ciphers.slice(0, this.size)
+      }
+      return []
+    },
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
+  },
+  watch: {
+    type: 'typeChanged'
+  },
+  mounted () {
+    const mainBody = document.querySelector('.main-body')
+    if (mainBody) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this
+      mainBody.addEventListener('scrollend', () => {
+        if (self.ciphers && self.ciphers.length > self.size) {
+          self.size = self.pageSize + self.size
+        }
+      })
+    }
   },
   methods: {
     changeSort(sortValue) {
@@ -157,6 +216,18 @@ export default Vue.extend({
         name: "add-edit-cipher",
         params: { type: this.type || CipherType.Login, folder: this.folder },
       });
+<<<<<<< HEAD
+=======
+    },
+    typeChanged() {
+      const mainBody = document.querySelector('.main-body')
+      if (mainBody) {
+        mainBody.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+      setTimeout(() => {
+        this.size = this.pageSize
+      }, 1000);
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
     }
   },
 });

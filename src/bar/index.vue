@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full">
+  <div class="h-full w-full">
     <BarHeader
       :data="data"
       @close="close"
@@ -31,7 +31,6 @@ import { BrowserApi } from "@/browser/browserApi";
 import { LoginView } from 'jslib-common/models/view/loginView';
 import { LoginUriView } from 'jslib-common/models/view/loginUriView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
-import { Utils } from 'jslib-common/misc/utils';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 import { CipherData } from 'jslib-common/models/data/cipherData';
@@ -81,8 +80,7 @@ export default Vue.extend({
       loginModel.username = this.data.username;
       loginModel.password = this.data.password;
       const model = new CipherView();
-      model.name = Utils.getHostname(this.data.uri);
-      model.name = model.name.replace(/^www\./, '');
+      model.name = this.data.domain
       model.type = CipherType.Login;
       model.login = loginModel;
       model.folderId = this.data.folderId
@@ -91,10 +89,16 @@ export default Vue.extend({
       const data = new CipherRequest(cipher)
       try {
         const res = await cystackPlatformAPI.create_ciphers_vault(data);
-        const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
+        const now = new Date().toISOString()
+        const cipherResponse = new CipherResponse({
+          ...data,
+          id: res ? res.id : '',
+          revisionDate: now,
+          collectionIds: []
+        })
         const userId = await this.$userService.getUserId();
         const cipherData = new CipherData(cipherResponse, userId)
-        this.$cipherService.upsert(cipherData)
+        await this.$cipherService.upsert(cipherData);
         this.close()
         this.notificationAlert('password_added')
       } catch (e) {
@@ -114,8 +118,13 @@ export default Vue.extend({
         const newCipher = await this.$cipherService.encrypt(cipher);
         const data = new CipherRequest(newCipher)
         try {
-          const res = await cystackPlatformAPI.update_cipher(cipher.id, data)
-          const cipherResponse = new CipherResponse(res)
+          await cystackPlatformAPI.update_cipher(cipher.id, data);
+          const now = new Date().toISOString()
+          const cipherResponse = new CipherResponse({
+            ...data,
+            id: cipher.id,
+            revisionDate: now,
+          })
           const userId = await this.$userService.getUserId();
           const cipherData = new CipherData(cipherResponse, userId);
           await this.$cipherService.upsert(cipherData);

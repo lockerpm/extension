@@ -36,7 +36,11 @@
         </div>
       </li>
       <CipherRow
+<<<<<<< HEAD
         v-for="item in loginCiphers"
+=======
+        v-for="item in (loginCiphers || [])"
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         :key="item.id"
         :item="item"
         @do-fill="$emit('do-fill', item)"
@@ -66,11 +70,15 @@ export default Vue.extend({
   data() {
     return {
       CipherType,
+<<<<<<< HEAD
       loginCiphers: [],
+=======
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
       url: "",
       loaded: false,
     };
   },
+<<<<<<< HEAD
   watch: {
     "$store.state.syncedCiphersToggle": 'load',
   },
@@ -119,6 +127,48 @@ export default Vue.extend({
       this.loginCiphers = this.$cipherService.sortCiphers(this.loginCiphers) || [];
       this.loaded = true;
     },
+=======
+  asyncComputed: {
+    loginCiphers: {
+      async get() {
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        if (tab != null) {
+          this.url = tab.url;
+        } else {
+          return [];
+        }
+        const otherTypes = [];
+        const dontShowCards = await new BrowserStorageService().get(
+          ConstantsService.dontShowCardsCurrentTab
+        );
+        const dontShowIdentities = await new BrowserStorageService().get(
+          ConstantsService.dontShowIdentitiesCurrentTab
+        );
+        if (!dontShowCards) {
+          otherTypes.push(CipherType.Card);
+        }
+        if (!dontShowIdentities) {
+          otherTypes.push(CipherType.Identity);
+        }
+
+        const ciphers = (await this.$searchService.searchCiphers(
+          this.searchText,
+          [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
+          null,
+          tab,
+          otherTypes
+        )) || [];
+        this.loaded = true;
+        return this.$cipherService.sortCiphers(ciphers) || [];
+      },
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "searchText",
+      ],
+    }
+  },
+  methods: {
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
     goToAddItem () {
       this.$router.push({ name: "add-edit-cipher"}).catch(() => ({}));
     },

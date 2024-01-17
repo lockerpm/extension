@@ -49,7 +49,7 @@ export default class NotificationBackground {
     private passwordRepromptService: PasswordRepromptService,
     private popupUtilsService: PopupUtilsService,
     private platformUtilsService: PlatformUtilsService
-  ) {}
+  ) { }
   async init() {
     if (chrome.runtime == null) {
       return;
@@ -83,12 +83,14 @@ export default class NotificationBackground {
             const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
             let passwordFields = [];
             let usernameFields = [];
-            
+
             for (const form of forms) {
               for (const password of form.passwords) {
                 passwordFields.push(password)
               }
-              usernameFields.push(form.username)
+              if (form.username) {
+                usernameFields.push(form.username)
+              }
             }
             await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
               details: msg.details,
@@ -111,7 +113,11 @@ export default class NotificationBackground {
                 return
               }
               // check is login page
-              if (passwordFields.filter((f) => f.type === 'password').length === 1 && !passwordFields.filter((f) => f.type === 'password')[0].value) {
+              if (
+                passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
+                && !passwordFields.filter((f) => f.type === 'password')[0]?.value
+                && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
+              ) {
                 this.autofillFirstPage(sender.tab);
               }
 
@@ -242,8 +248,8 @@ export default class NotificationBackground {
   private async autofillFirstPage(tab: chrome.tabs.Tab) {
     try {
       if (this.cipherService && tab.url) {
-        const currrentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
-        const loginCiphers = this.cipherService.sortCiphers(currrentCiphers.filter(c => c.type === CipherType.Login))
+        const currentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
+        const loginCiphers = this.cipherService.sortCiphers(currentCiphers.filter(c => c.type === CipherType.Login))
         if (loginCiphers.length > 0) {
           BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
@@ -274,14 +280,12 @@ export default class NotificationBackground {
     if (loginInfo) {
       currentLoginInfo = loginInfo
     }
-    if (tab) {
-      this.doNotificationQueueCheck(tab, currentLoginInfo);
-      return;
-    }
-
-    const currentTab = await BrowserApi.getTabFromCurrentWindow();
-    if (currentTab) {
-      this.doNotificationQueueCheck(currentTab, currentLoginInfo);
+    if (currentLoginInfo) {
+      const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
+      const tabDomain = Utils.getDomain(tabInfo.url);
+      if (tabInfo && tabDomain === currentLoginInfo.domain) {
+        this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
+      }
     }
   }
 
@@ -290,14 +294,6 @@ export default class NotificationBackground {
       return;
     }
 
-    const tabDomain = Utils.getDomain(tab.url);
-    if (tabDomain == null) {
-      return;
-    }
-    loginInfo = {
-      ...loginInfo,
-      uri: tabDomain
-    }
     if (loginInfo.type === NotificationQueueMessageType.addLogin) {
       BrowserApi.tabSendMessageData(tab, 'openNotificationBar', {
         type: 'add',
@@ -420,11 +416,11 @@ export default class NotificationBackground {
       const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
       const userId = await this.userService.getUserId();
       const cipherData = new CipherData(cipherResponse, userId)
-      this.cipherService.upsert(cipherData)
-      this.notificationAlert('otp_added')
+      this.cipherService.upsert(cipherData);
+      this.notificationAlert('otp_added');
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
-        this.notificationAlert('otp_limited')
+        this.notificationAlert('otp_limited');
       }
     }
   }

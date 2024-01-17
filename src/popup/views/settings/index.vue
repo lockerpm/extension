@@ -142,8 +142,8 @@ export default Vue.extend({
           items: [
             {
               key: accountInfoKey,
-              avatar: this.currentUser.avatar,
-              email: this.currentUser.email,
+              avatar: this.currentUser?.avatar,
+              email: this.currentUser?.email,
             },
           ],
         },

@@ -47,17 +47,18 @@ export class CryptoService implements CryptoServiceAbstraction {
   private orgKeys: Map<string, SymmetricCryptoKey>;
   private providerKeys: Map<string, SymmetricCryptoKey>;
 
-  constructor(private storageService: StorageService, protected secureStorageService: StorageService,
-    private cryptoFunctionService: CryptoFunctionService, protected platformUtilService: PlatformUtilsService,
-    protected logService: LogService) {
-  }
+  constructor(private storageService: StorageService,
+    private cryptoFunctionService: CryptoFunctionService,
+    protected platformUtilService: PlatformUtilsService,
+    protected logService: LogService
+  ) {}
 
   async setKey(key: SymmetricCryptoKey): Promise<any> {
     this.key = key;
     const masterKey = {
       ...key,
-      encKey: this.arrayBufferToBase64(key.encKey),
-      key: this.arrayBufferToBase64(key.key),
+      encKey: this.arrayBufferToBase64(key?.encKey),
+      key: this.arrayBufferToBase64(key?.key),
     }
     await this.storageService.save(Keys.masterKey, masterKey)
     await this.storeKey(key);
@@ -138,7 +139,7 @@ export class CryptoService implements CryptoServiceAbstraction {
       return this.key;
     }
 
-    const masterKey: any = await this.storageService.get(Keys.masterKey)
+    const masterKey: any = await this.storageService.get(Keys.masterKey);
     if (masterKey) {
       this.key = {
         ...masterKey,
@@ -161,11 +162,10 @@ export class CryptoService implements CryptoServiceAbstraction {
     const key = await this.retrieveKeyFromStorage(keySuffix);
     if (key) {
       const symmetricKey = new SymmetricCryptoKey(Utils.fromB64ToArray(key).buffer);
-      // if (!(await this.validateKey(symmetricKey))) {
-      //   this.logService.warning('Wrong key, throwing away stored key');
-      //   this.secureStorageService.remove(Keys.key, { keySuffix: keySuffix });
-      //   return null;
-      // }
+      if (!(await this.validateKey(symmetricKey))) {
+        this.storageService.remove(Keys.key, { keySuffix: keySuffix });
+        return null;
+      }
       return symmetricKey;
     }
     return null;
@@ -263,7 +263,8 @@ export class CryptoService implements CryptoServiceAbstraction {
       return null;
     }
 
-    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), null);
+    const encKey = await this.getEncKey();
+    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), encKey);
     return this.privateKey;
   }
 
@@ -297,7 +298,6 @@ export class CryptoService implements CryptoServiceAbstraction {
       if (!encOrgKeys.hasOwnProperty(orgId)) {
         continue;
       }
-
       const decValue = await this.rsaDecrypt(encOrgKeys[orgId]);
       orgKeys.set(orgId, new SymmetricCryptoKey(decValue));
       setKey = true;
@@ -370,12 +370,12 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async hasKeyInMemory(): Promise<boolean> {
-    const masterKey = await this.storageService.get(Keys.masterKey);
-    return !!masterKey
+    const masterKey: any = await this.storageService.get(Keys.masterKey);
+    return !!(masterKey && masterKey.key && masterKey.encKey)
   }
 
   hasKeyStored(keySuffix: KeySuffixOptions): Promise<boolean> {
-    return this.secureStorageService.has(Keys.key, { keySuffix: keySuffix });
+    return this.storageService.has(Keys.key, { keySuffix: keySuffix });
   }
 
   async hasEncKey(): Promise<boolean> {
@@ -385,8 +385,8 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   async clearKey(clearSecretStorage: boolean = true): Promise<any> {
     this.key = this.legacyEtmKey = null;
-    await this.storageService.remove(Keys.masterKey)
-    await this.secureStorageService.remove(Keys.key);
+    await this.storageService.remove(Keys.masterKey, null)
+    await this.storageService.remove(Keys.key, null);
     if (clearSecretStorage) {
       this.clearStoredKey('auto');
       this.clearStoredKey('biometric');
@@ -394,7 +394,7 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   async clearStoredKey(keySuffix: KeySuffixOptions) {
-    await this.secureStorageService.remove(Keys.key, { keySuffix: keySuffix });
+    await this.storageService.remove(Keys.key, { keySuffix: keySuffix });
   }
 
   clearKeyHash(): Promise<any> {
@@ -451,7 +451,6 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   async toggleKey(): Promise<any> {
     const key = await this.getKey();
-
     await this.setKey(key);
   }
 
@@ -619,7 +618,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const data = Utils.fromB64ToArray(encPieces[0]).buffer;
-    const privateKey = privateKeyValue ?? await this.getPrivateKey();
+    const privateKey = privateKeyValue || await this.getPrivateKey();
     if (!privateKey) {
       throw new Error('No private key.');
     }
@@ -636,7 +635,6 @@ export class CryptoService implements CryptoServiceAbstraction {
       default:
         throw new Error('encType unavailable.');
     }
-
     return this.cryptoFunctionService.rsaDecrypt(data, privateKey, alg);
   }
 
@@ -751,9 +749,9 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   protected async storeKey(key: SymmetricCryptoKey) {
     if (await this.shouldStoreKey('auto') || await this.shouldStoreKey('biometric')) {
-      this.secureStorageService.save(Keys.key, key.keyB64);
+      this.storageService.save(Keys.key, key.keyB64);
     } else {
-      this.secureStorageService.remove(Keys.key);
+      this.storageService.remove(Keys.key);
     }
   }
 
@@ -770,7 +768,7 @@ export class CryptoService implements CryptoServiceAbstraction {
   }
 
   protected retrieveKeyFromStorage(keySuffix: KeySuffixOptions) {
-    return this.secureStorageService.get<string>(Keys.key, { keySuffix: keySuffix });
+    return this.storageService.get<string>(Keys.key, { keySuffix: keySuffix });
   }
 
   private async aesEncrypt(data: ArrayBuffer, key: SymmetricCryptoKey): Promise<EncryptedObject> {

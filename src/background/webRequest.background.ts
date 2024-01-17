@@ -11,7 +11,7 @@ export default class WebRequestBackground {
 
     constructor(platformUtilsService: PlatformUtilsService, private cipherService: CipherService,
         private vaultTimeoutService: VaultTimeoutService) {
-        this.webRequest = (window as any).chrome.webRequest;
+        this.webRequest = (self as any).chrome.webRequest;
         this.isFirefox = platformUtilsService.isFirefox();
     }
 

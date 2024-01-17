@@ -380,7 +380,7 @@ export class PasswordGenerationService implements PasswordGenerationServiceAbstr
         return await this.storageService.remove(Keys.history);
     }
 
-    passwordStrength(password: string, userInputs: string[] = null): zxcvbn.ZXCVBNResult {
+    passwordStrength(password: string, userInputs: string[] = []): zxcvbn.ZXCVBNResult {
         if (password == null || password.length === 0) {
             return null;
         }

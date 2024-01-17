@@ -6,7 +6,7 @@ export class WebAuthnIFrame {
     private connectorLink: HTMLAnchorElement;
     private parseFunction = this.parseMessage.bind(this);
 
-    constructor(private win: Window, private webVaultUrl: string, private webAuthnNewTab: boolean,
+    constructor(private win: any, private webVaultUrl: string, private webAuthnNewTab: boolean,
         private platformUtilsService: PlatformUtilsService, private i18nService: I18nService,
         private successCallback: Function, private errorCallback: Function, private infoCallback: Function) {
         this.connectorLink = win.document.createElement('a');

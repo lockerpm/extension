@@ -1,12 +1,29 @@
 stages:
   - security_check
 
-scan:
-  stage: security_check
-  script:
-    - cystack-deployer
-  tags:
-    - cs_home
-  only:
-    - dev
-    - tags
+ stages:
+   - build
+
+#  build:
+#    environment:
+#      name: production
+#    stage: build
+#    script:
+#      - cystack-deployer
+#    tags:
+#      - cs_bot
+#    only:
+#      - production
+#      - tags
+
+#  build_staging:
+#    environment:
+#      name: staging
+#    stage: build
+#    script:
+#      - cystack-deployer
+#    tags:
+#      - cs_bot
+#    only:
+#      - staging
+#      - tags

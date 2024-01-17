@@ -10,7 +10,7 @@
   >
     <div class="text-center">
       <p class="mb-6">
-        <b>{{ $t('common.upgrade_des') }}</b>
+        <b>{{ $t('common.upgrade') }}</b>
       </p>
       <img
         class="w-full"

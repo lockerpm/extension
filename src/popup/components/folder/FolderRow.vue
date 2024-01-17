@@ -6,7 +6,18 @@
   >
     <div class="menu-icon mr-4">
       <img
+<<<<<<< HEAD
         src="@/assets/images/icons/icon_folder.svg"
+=======
+        v-if="folder.isCollection"
+        src="@/assets/images/icons/folderSolidShare.svg"
+        alt=""
+        style="width: 32px; height: 32px;"
+      >
+      <img
+        v-else
+        src="@/assets/images/icons/folderSolid.svg"
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
         alt=""
         style="width: 32px; height: 32px;"
       >
@@ -29,11 +40,19 @@
       </div>
     </div>
     <div
+<<<<<<< HEAD
+=======
+      v-if="canManageFolder(organizations, folder)"
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
       v-show="isHover"
       class="folder-item__right"
     >
       <el-dropdown
+<<<<<<< HEAD
         trigger="hover"
+=======
+        trigger="click"
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
       >
         <i class="el-icon-more"></i>
         <el-dropdown-menu
@@ -71,6 +90,18 @@ export default Vue.extend({
       isHover: false
     }
   },
+<<<<<<< HEAD
+=======
+  asyncComputed: {
+    organizations: {
+      async get () {
+        const result = await this.$userService.getAllOrganizations()
+        return result
+      },
+      watch: ['$store.state.syncedCiphersToggle']
+    },
+  },
+>>>>>>> 14b511eab4334eebb6d6a34cf90b8ee7415766df
   methods: {
     routerFolder (folder) {
       this.$router.push({

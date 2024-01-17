@@ -23,18 +23,21 @@ export default class TabsBackground {
       if (this.main.onReplacedRan) {
         return;
       }
-      this.main.onReplacedRan = true;
-      await this.notificationBackground.checkNotificationQueue();
       await this.main.refreshBadgeAndMenu();
+      await this.notificationBackground.checkNotificationQueue();
+      this.main.onReplacedRan = true;
     });
 
     chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
       if (this.main.onUpdatedRan) {
         return;
       }
+      if (tab) {
+        const tabInfo = await BrowserApi.getTabFromCurrentWindowId();
+        await this.main.collectPageDetailsForContentScript(tabInfo, 'notificationBar');
+        await this.notificationBackground.checkNotificationQueue(tabInfo);
+      }
       this.main.onUpdatedRan = true;
-      await this.notificationBackground.checkNotificationQueue(tab);
-      await this.main.refreshBadgeAndMenu();
     });
   }
 }

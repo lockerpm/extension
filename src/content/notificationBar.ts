@@ -11,7 +11,10 @@ import {
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
 } from '@/config/constants'
 
+const documents = [];
+
 document.addEventListener('DOMContentLoaded', event => {
+  documents.push(document)
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains.includes(self.location.hostname)) {
     return;
@@ -26,7 +29,6 @@ document.addEventListener('DOMContentLoaded', event => {
   let disabledAddLoginNotification = false;
   let disabledChangedPasswordNotification = false;
   let isSignUp = false
-  const inIframe = !self || self.self !== self.top;
   const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
   const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
   const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -59,9 +61,6 @@ document.addEventListener('DOMContentLoaded', event => {
 
   function processMessages(msg: any, sendResponse: Function) {
     if (msg.command === 'openNotificationBar') {
-      if (inIframe) {
-        return;
-      }
       closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
     } else if (msg.command === 'closeNotificationBar') {
       closeBar(true);
@@ -70,15 +69,19 @@ document.addEventListener('DOMContentLoaded', event => {
       chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
         if (autofillObj && autofillObj.enableAutofill === false) return;
         for (let i = 0; i < msg.data.passwordFields.length; i++) {
-          try {
-            setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-          } catch (error) {
+          if (msg.data.passwordFields[i]) {
+            try {
+              setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+            } catch (error) {
+            }
           }
         }
         for (let i = 0; i < msg.data.usernameFields.length; i++) {
-          try {
-            setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-          } catch (error) {
+          if (msg.data.usernameFields[i]) {
+            try {
+              setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+            } catch (error) {
+            }
           }
         }
         for (let i = 0; i < msg.data.forms.length; i++) {
@@ -231,21 +234,9 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function setFillLogo(el, type = 'password', isLocked = false, isOver = false) {
-    let inputEl = null
-    const element = document.getElementById(el.htmlID)
-    if (element) {
-      inputEl = element
-    } else {
-      const elements : any = document.getElementsByClassName(el.htmlClass)
-      for (let i = 0; i < elements.length; i++) {
-        if (elements[i].id === el.htmlID && !elements[i].disabled) {
-          inputEl = elements[i]
-          break
-        }
-      }
-    }
+    const inputEl : any = document.querySelector(`[locker-id="${el.lockerId}"]`)
     if (inputEl && getComputedStyle(inputEl).display !== 'none') {
-      closeInformMenu(inputEl)
+      closeInformMenu(el)
       const elPosition = inputEl.getBoundingClientRect();      
       let relativeContainer = inputEl.parentElement
       if (relativeContainer) {
@@ -255,7 +246,7 @@ document.addEventListener('DOMContentLoaded', event => {
         const containerPosition = relativeContainer.getBoundingClientRect();
         removeFillLogo(el)
         const logo = document.createElement("span");
-        logo.id = 'cs-logo-' + (el.htmlID || el.htmlName);
+        logo.id = 'cs-logo-' + el.lockerId;
         logo.style.cssText = `
           position: absolute;
           height: 19px;
@@ -266,7 +257,7 @@ document.addEventListener('DOMContentLoaded', event => {
           cursor: pointer;
         `;
         document.addEventListener('click', (e: any) => {
-          const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+          const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.lockerId}`);
           if (logo.contains(e.target)) {
             if (!menuEl) {
               openInformMenu(inputEl, type, isOver);
@@ -297,26 +288,20 @@ document.addEventListener('DOMContentLoaded', event => {
           const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAMAAABFjsb+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABIFBMVEVirVYAAABirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVZirVb///+8vCC1AAAAXnRSTlMAABVEc5/B2urx8vDo17+eckITBJj0/fORAgi6+tb3swW5+VHesWPV+9JI3fZLx7XZUk1OvsBPwnHGSga0zYrOrZus50XclFv8jVMQtq8NKswmLcMoHqMbCmpkMKgrHCXsWAAAAAFiS0dEX3PRUS0AAAAHdElNRQflDBcJLw3hH93pAAAA1klEQVQY02NgYGJmYWVj5+Dk4ubh5eMXEBRiYBAWERWLQwAxcQlJBilpCEdGVg7CkFdgkFKM41ACMjmUVSBiqiAxOTX1OA1NFS1tJDEdXT19A0M2XRQxIz5jEyNTdDEzLGJGmGLmFpZWfEhi1jY6VrY63Hb2VlAxB2EGBkcxJx4g09nFFSLmxsDA4O4BZnJ6ckD84wUU8/aJQwa+fkAxBv8AJCHLQAYwCAqGC5mEgAQYgTg0TANiFn84WIQRJBgRCbLUIEoKJAQSAwkyRMdwhMWC9TEyAgDPwE6YM2fCkQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0yM1QwOTo0NzowOCswMDowMBHsN8QAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMjNUMDk6NDc6MDgrMDA6MDBgsY94AAAAAElFTkSuQmCC'
           logo.style.backgroundImage = `url('${image}')`;
         }
-        return {
-          logo,
-          inputEl,
-          type
-        };
       }
       return null
     }
-    return null
   }
 
-  function closeInformMenu(inputEl: any) {
-    const menuEl = document.getElementById(`cs-inform-menu-iframe-${inputEl.id}`);
+  function closeInformMenu(el: any) {
+    const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.lockerId}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
     }
   }
 
-  function removeFillLogo(inputEl: any) {
-    const fillLogo = document.getElementById('cs-logo-' + (inputEl.htmlID || inputEl.htmlName));
+  function removeFillLogo(el: any) {
+    const fillLogo = document.getElementById('cs-logo-' + el.lockerId);
     if (fillLogo) {
       fillLogo.parentElement.removeChild(fillLogo);
     }
@@ -331,14 +316,14 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
-  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
+  function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {    
     if (!document.body) {
       return;
     }
     closeAllInformMenu()
     const elPosition = inputEl.getBoundingClientRect();
     const iframeClass = 'cs-inform-menu-iframe';
-    const iframeId = `cs-inform-menu-iframe-${inputEl.id}`
+    const iframeId = `cs-inform-menu-iframe-${inputEl.getAttribute('locker-id')}`
     let defaultType = 0, defaultTab = 2
     if (isSignUp && type === 'password') {
       defaultTab = 1
@@ -397,8 +382,8 @@ document.addEventListener('DOMContentLoaded', event => {
       if (matches.length > 0) {
         isSignUp = true;
       }
-      submitButton.removeEventListener('click', formSubmitted, false);
-      submitButton.addEventListener('click', formSubmitted, false);
+      submitButton.removeEventListener('click', (e) => formSubmitted(e, form), false);
+      submitButton.addEventListener('click', (e) => formSubmitted(e, form), false);
     }
   }
 
@@ -452,11 +437,11 @@ document.addEventListener('DOMContentLoaded', event => {
     return el;
   }
 
-  function formSubmitted(e: Event) {
+  function formSubmitted(e: Event, f?: HTMLFormElement) {
     closeAllInformMenu();
     let form: HTMLFormElement = null;
     if (e.type === 'click') {
-      form = (e.target as HTMLElement).closest('form');
+      form = f || (e.target as HTMLElement).closest('form');
       if (form == null) {
         const parentModal = (e.target as HTMLElement).closest('div.modal');
         if (parentModal != null) {
@@ -469,11 +454,9 @@ document.addEventListener('DOMContentLoaded', event => {
     } else {
       form = e.target as HTMLFormElement;
     }
-
     if (form == null || form.dataset.lockerProcessed === '1') {
       return;
     }
-
     for (let i = 0; i < formData.length; i++) {
       if (formData[i].formEl !== form) {
         continue;
@@ -545,47 +528,100 @@ document.addEventListener('DOMContentLoaded', event => {
     }
   }
 
+  function isElementVisible(el: any) {
+    var theEl = el;
+    el = (el = el.ownerDocument) ? el.defaultView : {};
+
+    for (var elStyle: any; theEl && theEl !== document;) {
+      elStyle = el.getComputedStyle ? el.getComputedStyle(theEl, null) : theEl.style;
+      if (!elStyle) {
+        return true;
+      }
+
+      if ('none' === elStyle.display || 'hidden' == elStyle.visibility) {
+        return false;
+      }
+
+      // walk up
+      theEl = theEl.parentNode;
+    }
+
+    return theEl === document;
+  }
+
   function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
     if (wrappingEl == null) {
       return null;
     }
     const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-    let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], ' +
-      'button[type="submit"]') as HTMLElement;
+    let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], button[type="submit"]') as HTMLElement;
     if (submitButton == null && wrappingElIsForm) {
-      submitButton = wrappingEl.querySelector('button:not([type])');
-      if (submitButton != null) {
-        const buttonText = getButtonText(submitButton);
-        if (buttonText != null && cancelButtonNames.has(buttonText.trim().toLowerCase())) {
+      const typelessButton = wrappingEl.querySelector('button:not([type])') as HTMLElement;
+      if (!!typelessButton && isElementVisible(typelessButton)) {
+        const buttonText = getButtonText(typelessButton);
+        if (!!buttonText && buttonNames.has(buttonText.trim().toLowerCase())) {
+          submitButton = typelessButton;
+        }
+        if (!!buttonText && cancelButtonNames.has(buttonText.trim().toLowerCase())) {
           submitButton = null;
         }
       }
     }
     if (submitButton == null) {
-      const possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('a, span, button[type="button"], ' +
-        'input[type="button"], button:not([type])')) as HTMLElement[];
+      const possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
       let typelessButton: HTMLElement = null;
       possibleSubmitButtons.forEach(button => {
-        if (submitButton != null || button == null || button.tagName == null) {
+        if (!!submitButton || !button || !button.tagName) {
           return;
         }
         const buttonText = getButtonText(button);
-        if (buttonText != null) {
-          if (typelessButton != null && button.tagName.toLowerCase() === 'button' &&
-            button.getAttribute('type') == null &&
-            !cancelButtonNames.has(buttonText.trim().toLowerCase())) {
+        if (!!buttonText) {
+          if (
+            !!typelessButton
+            && button.tagName.toLowerCase() === 'button'
+            && button.getAttribute('type') == null
+            && !cancelButtonNames.has(buttonText.trim().toLowerCase())
+            && isElementVisible(button)
+          ) {
             typelessButton = button;
           } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
             submitButton = button;
           }
         }
       });
-      if (submitButton == null && typelessButton != null) {
+      if (!submitButton && !!typelessButton) {
         submitButton = typelessButton;
       }
     }
-    if (submitButton == null && wrappingElIsForm) {
-      // Maybe it's in a modal?
+    
+    if (submitButton == null) {
+      const possibleSubmitButtons = Array.from(document.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
+      let typelessButton: HTMLElement = null;
+      possibleSubmitButtons.forEach(button => {
+        if (!!submitButton || !button || !button.tagName) {
+          return;
+        }
+        const buttonText = getButtonText(button);
+        if (!!buttonText) {
+          if (
+            !!typelessButton
+            && button.tagName.toLowerCase() === 'button'
+            && button.getAttribute('type') == null
+            && !cancelButtonNames.has(buttonText.trim().toLowerCase())
+            && isElementVisible(button)
+          ) {
+            typelessButton = button;
+          } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
+            submitButton = button;
+          }
+        }
+      });
+      if (!submitButton && !!typelessButton) {
+        submitButton = typelessButton;
+      }
+    }
+
+    if (submitButton == null) {
       const parentModal = wrappingEl.closest('div.modal') as HTMLElement;
       if (parentModal != null) {
         const modalForms = parentModal.querySelectorAll('form');
@@ -594,6 +630,7 @@ document.addEventListener('DOMContentLoaded', event => {
         }
       }
     }
+    
     return submitButton;
   }
 
@@ -618,7 +655,7 @@ document.addEventListener('DOMContentLoaded', event => {
     let barPage = 'popup.html#/bar';
     switch (type) {
       case 'add':
-        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri);
+        barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri) + '&domain=' + encodeURIComponent(loginInfo.domain);;
         break;
       case 'change':
         barPage = barPage + '?id=' + encodeURIComponent(loginInfo.cipherId) + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
@@ -626,27 +663,21 @@ document.addEventListener('DOMContentLoaded', event => {
       default:
         break;
     }
-
-    const frame = document.getElementById('bit-notification-bar-iframe') as HTMLIFrameElement;
-    if (frame != null && frame.src.indexOf(barPage) >= 0) {
-      return;
-    }
-
     closeBar();
-    openBar(type, barPage);
+    setTimeout(() => {
+      openBar(type, barPage);
+    }, 500);
   }
 
   function openBar(type: string, barPage: string) {
     if (document.body == null) {
       return;
     }
-
     const barPageUrl: string = chrome.runtime.getURL(barPage);
-
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: ${type === 'add' ? '338' : '278'}px !important;
-      width: 450px;
+      width: 400px;
       border: 0;
       min-height: initial;
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
@@ -660,7 +691,7 @@ document.addEventListener('DOMContentLoaded', event => {
     frameDiv.id = 'bit-notification-bar';
     frameDiv.style.cssText = `
       height: ${type === 'add' ? '308' : '248'}px !important;
-      width: 450px;
+      width: 400px;
       top: 40px;
       right: 40px;
       padding: 0;
@@ -675,15 +706,11 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closeBar(explicitClose: boolean = false) {
-    const barEl = document.getElementById('bit-notification-bar');
-    if (barEl != null) {
-      barEl.parentElement.removeChild(barEl);
+    const iframeEls = document.querySelectorAll('#bit-notification-bar');
+    for (let i = 0; i < iframeEls.length; i++) {
+      iframeEls[i].parentElement.removeChild(iframeEls[i]);
     }
 
-    const spacerEl = document.getElementById('bit-notification-bar-spacer');
-    if (spacerEl) {
-      spacerEl.parentElement.removeChild(spacerEl);
-    }
     if (explicitClose) {
       sendPlatformMessage({
         command: 'bgCloseNotificationBar',
@@ -712,7 +739,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closePopupIframe() {
-    let frameDiv = document?.getElementById('locker_popup-iframe-container');
+    const frameDiv = document?.getElementById('locker_popup-iframe-container');
     if (frameDiv) {
       frameDiv.remove();
     }
@@ -723,8 +750,7 @@ document.addEventListener('DOMContentLoaded', event => {
     if (document.body == null) {
       return;
     }
-    let frameDiv = document.getElementById('locker_popup-iframe-container');
-    let barPageUrl: string = chrome.runtime.getURL('popup.html');
+    const barPageUrl: string = chrome.runtime.getURL('popup.html');
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       height: 602px;
@@ -734,7 +760,7 @@ document.addEventListener('DOMContentLoaded', event => {
     `;
     iframe.id = 'popup-iframe';
     iframe.src = barPageUrl;
-    frameDiv = document.createElement('div');
+    const frameDiv = document.createElement('div');
     frameDiv.id = 'locker_popup-iframe-container';
     frameDiv.style.cssText = `
       height: 600px;
@@ -753,7 +779,6 @@ document.addEventListener('DOMContentLoaded', event => {
       }
     });
     document.body.appendChild(frameDiv);
-
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 });

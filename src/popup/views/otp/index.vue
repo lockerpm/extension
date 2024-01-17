@@ -1,8 +1,7 @@
 <template>
   <div v-loading="$store.state.syncing">
     <ListOTP
-      v-if="!addEditOTP"
-      @edit-otp="editOTP"
+      @add-edit="addEditOTP"
     />
     <AddEditOTP
       key="otp"
@@ -27,7 +26,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    editOTP (otp) {
+    addEditOTP (otp) {
       this.$refs.addEditOTP?.openDialog(otp)
     },
   }

@@ -5,7 +5,7 @@ export abstract class IFrameComponent {
     private connectorLink: HTMLAnchorElement;
     private parseFunction = this.parseMessage.bind(this);
 
-    constructor(private win: Window, protected webVaultUrl: string, private path: string, private iframeId: string,
+    constructor(private win: any, protected webVaultUrl: string, private path: string, private iframeId: string,
         public successCallback?: (message: string) => any,
         public errorCallback?: (message: string) => any, public infoCallback?: (message: string) => any) {
         this.connectorLink = win.document.createElement('a');

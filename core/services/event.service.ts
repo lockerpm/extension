@@ -20,15 +20,15 @@ export class EventService implements EventServiceAbstraction {
         private userService: UserService, private cipherService: CipherService,
         private logService: LogService) { }
 
-    init(checkOnInterval: boolean) {
+    async init(checkOnInterval: boolean) {
         if (this.inited) {
             return;
         }
 
         this.inited = true;
         if (checkOnInterval) {
-            this.uploadEvents();
-            setInterval(() => this.uploadEvents(), 60 * 1000); // check every 60 seconds
+            await this.uploadEvents();
+            setInterval(async () => await this.uploadEvents(), 60 * 1000); // check every 60 seconds
         }
     }
 

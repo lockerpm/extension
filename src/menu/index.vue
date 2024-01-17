@@ -11,12 +11,13 @@
       style="height: calc(100% - 56px)"
     >
       <MenuSearch
-        v-if="tab === 2 && !isLocked && !isOTP"
+        v-if="tab === 2 && !isLocked"
         :fill-types="fillTypes.filter((t) => t.value !== CipherType.OTP)"
         :fill-type="currentFillType"
+        :is-otp="isOTP"
         @change="(v) => fillType = v"
       />
-      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked && !isOTP}">
+      <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked}">
         <PasswordGenerator
           v-if="tab === 1 && !isOTP"
           is-over

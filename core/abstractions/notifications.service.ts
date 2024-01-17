@@ -3,4 +3,6 @@ export abstract class NotificationsService {
     updateConnection: (sync?: boolean) => Promise<void>;
     reconnectFromActivity: () => Promise<void>;
     disconnectFromInactivity: () => Promise<void>;
+    connectWebSocket: () => Promise<void>;
+    disconnectSocket: () => void
 }

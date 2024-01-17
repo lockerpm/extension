@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', event => {
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.command === 'collectPageDetails') {
       const pageDetailsObj = JSON.parse(collect(document));
-      if (pageDetailsObj.url === msg.tab.url) {
+      const domain = new URL(msg.tab.url)
+      if (pageDetailsObj.url.includes(domain.hostname)) {
         chrome.runtime.sendMessage({
           command: 'collectPageDetailsResponse',
           tab: msg.tab,
@@ -473,8 +474,10 @@ function collect(document, undefined) {
 
     // get all the form fields
     var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+      const lockerId = `locker-id-${elIndex}`
+      el.setAttribute("locker-id", lockerId);
       if (!el.id) {
-        el.id = `locker-id-${elIndex}`;
+        el.id = lockerId;
       }
       var field = {},
         opId = '__' + elIndex,
@@ -485,6 +488,7 @@ function collect(document, undefined) {
       theDoc.elementsByOPID[opId] = el;
       el.opid = opId;
       field.opid = opId;
+      field.lockerId = lockerId;
       field.elementNumber = elIndex;
       addProp(field, 'maxLength', Math.min(elMaxLen, 999), 999);
       field.visible = isElementVisible(el);
@@ -782,7 +786,7 @@ function collect(document, undefined) {
     // START MODIFICATION
     var els = [];
     try {
-      var elsList = theDoc.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="reset"])' +
+      const elsList = theDoc.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="reset"])' +
         ':not([type="button"]):not([type="image"]):not([type="file"]):not([data-bwignore]), select, ' +
         'span[data-bwautofill]');
       els = Array.prototype.slice.call(elsList);
@@ -1019,7 +1023,8 @@ function fill(document, fillScript, undefined) {
 
   // click on an element
   function clickElement(el) {
-    const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.id}`);
+    const lockerId = el.getAttribute('locker-id')
+    const menuEl = document.getElementById(`cs-inform-menu-iframe-${lockerId}`);
     if (menuEl) {
       menuEl.parentElement.removeChild(menuEl);
     }

@@ -749,7 +749,7 @@ module.exports = {
       vault: 'Kho',
       generate: 'Tạo Mật khẩu',
       otp: 'OTP',
-      generator: 'Tạo Mật khẩu',
+      generator: 'Tạo MK',
       settings: 'Cài đặt',
       search: 'Tìm trong kho',
       open_web_app: 'Mở phiên bản web',

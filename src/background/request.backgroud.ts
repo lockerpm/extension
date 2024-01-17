@@ -26,10 +26,25 @@ export default class RequestBackground {
   }
 
   async sso_access_token(data: any) {
-    return this.request({
+    return await this.request({
       url: ENDPOINT.SSO_ACCESS_TOKEN,
       method: "post",
       data
+    });
+  }
+
+  async me() {
+    return await this.request({
+      url: ENDPOINT.ME,
+      method: "get",
+    });
+  }
+  
+  async users_me(params = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_USERS_ME,
+      method: "get",
+      params
     });
   }
 
@@ -38,6 +53,28 @@ export default class RequestBackground {
       url: ENDPOINT.CYSTACK_PLATFORM_CIPHERS_VAULTS,
       method: "post",
       data
+    });
+  }
+
+  async sync(params = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC,
+      method: "get",
+      params
+    });
+  }
+
+  async sync_cipher(id = '') {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC_CIPHER.replace(':id', id),
+      method: "get",
+    });
+  }
+
+  async sync_folder(id = '') {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_SYNC_FOLDER.replace(':id', id),
+      method: "get",
     });
   }
 }

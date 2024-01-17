@@ -52,7 +52,7 @@ export class BrowserApi {
       command: command,
     };
 
-    if (data != null) {
+    if (data) {
       obj.data = data;
     }
 
@@ -99,10 +99,7 @@ export class BrowserApi {
 
   static messageListener(name: string, callback: (message: any, sender: chrome.runtime.MessageSender, response: any) => void) {
     chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, response: any) => {
-      setTimeout(function () {
-        callback(msg, sender, response);
-      }, 1);
-      return true;
+      callback(msg, sender, response);
     });
   }
 
@@ -119,7 +116,7 @@ export class BrowserApi {
     chrome.tabs?.update(tabId, { active: true, highlighted: true });
   }
 
-  static closePopup(win: Window) {
+  static closePopup(win: any) {
     if (BrowserApi.isWebExtensionsApi && BrowserApi.isFirefoxOnAndroid) {
       // Reactivating the active tab dismisses the popup tab. The promise final
       // condition is only called if the popup wasn't already dismissed (future proofing).
@@ -130,9 +127,9 @@ export class BrowserApi {
     }
   }
 
-  static downloadFile(win: Window, blobData: any, blobOptions: any, fileName: string) {
+  static downloadFile(win: any, blobData: any, blobOptions: any, fileName: string) {
     if (BrowserApi.isSafariApi) {
-      const type = blobOptions != null ? blobOptions.type : null;
+      const type = blobOptions ? blobOptions.type : null;
       let data: string = null;
       if (type === 'text/plain' && typeof (blobData) === 'string') {
         data = blobData;
@@ -167,8 +164,8 @@ export class BrowserApi {
     return chrome.i18n.getUILanguage();
   }
 
-  static reloadExtension(win: Window) {
-    if (win != null) {
+  static reloadExtension(win: any) {
+    if (win) {
       return win.location.reload();
     } else {
       return chrome.runtime.reload();
@@ -177,13 +174,12 @@ export class BrowserApi {
 
   static reloadOpenWindows() {
     if (chrome.extension.getViews) {
-      const views = chrome.extension.getViews() as Window[];
-      views.filter(w => w.location.href != null).forEach(w => {
+      const views = chrome.extension.getViews() as any[];
+      views.filter(w => !!w.location.href).forEach(w => {
         w.location.reload();
       });
     }
-    return window.location.reload()
-
+    this.reloadExtension(null)
   }
 
   static connectNative(application: string): browser.runtime.Port | chrome.runtime.Port {
