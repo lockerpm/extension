@@ -4,26 +4,26 @@ stages:
  stages:
    - build
 
-#  build:
-#    environment:
-#      name: production
-#    stage: build
-#    script:
-#      - cystack-deployer
-#    tags:
-#      - cs_bot
-#    only:
-#      - production
-#      - tags
+ build:
+   environment:
+     name: production
+   stage: build
+   script:
+     - cystack-deployer
+   tags:
+     - cs_bot
+   only:
+     - main
+     - tags
 
-#  build_staging:
-#    environment:
-#      name: staging
-#    stage: build
-#    script:
-#      - cystack-deployer
-#    tags:
-#      - cs_bot
-#    only:
-#      - staging
-#      - tags
+ build_staging:
+   environment:
+     name: staging
+   stage: build
+   script:
+     - cystack-deployer
+   tags:
+     - cs_bot
+   only:
+     - staging
+     - tags
