@@ -1,5 +1,5 @@
 # locker-extension
-
+ 
 ## Project setup
 ```
 npm install
