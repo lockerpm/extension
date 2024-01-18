@@ -41,6 +41,7 @@ export default {
         sender: 'autofillOTP',
         cipher: this.item
       });
+      this.closeMenu();
     }
   }
 }

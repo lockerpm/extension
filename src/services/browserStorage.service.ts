@@ -58,7 +58,7 @@ export default class BrowserStorageService implements StorageService {
 
     async sessionGet<T>(key: string): Promise<T> {
       return new Promise(resolve => {
-          this.chromeSessionStorageApi.get(key, (obj: any) => {
+          this.chromeSessionStorageApi?.get(key, (obj: any) => {
               if (obj != null && obj[key] != null) {
                   resolve(obj[key] as T);
                   return;
@@ -72,7 +72,7 @@ export default class BrowserStorageService implements StorageService {
     if (obj == null) {
         // Fix safari not liking null in set
         return new Promise<void>(resolve => {
-            this.chromeSessionStorageApi.remove(key, () => {
+            this.chromeSessionStorageApi?.remove(key, () => {
                 resolve();
             });
         });
@@ -84,7 +84,7 @@ export default class BrowserStorageService implements StorageService {
 
     const keyedObj = { [key]: obj };
     return new Promise<void>(resolve => {
-        this.chromeSessionStorageApi.set(keyedObj, () => {
+        this.chromeSessionStorageApi?.set(keyedObj, () => {
             resolve();
         });
     });
