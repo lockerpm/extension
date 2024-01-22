@@ -13,23 +13,18 @@ const middleware = () => {
   router.beforeEach(async (to, from, next) => {
     NProgress.start()
     const isLocked = await vaultTimeoutService.isLocked();
+    const currentRouterString = await browserStorageService.get('current_router')
+    const currentRouter = JSON.parse(currentRouterString)
+    const allRouters = router.options.routes.map(o => o.children).flat();
+    const isRouter = allRouters.find(r => currentRouter && r.name === currentRouter.name)
     if (to.meta?.isOver) {
       next();
-    } else if (isFirst) {
+    } else if (isFirst && !!isRouter) {
       isFirst = false
-      const currentRouterString = await browserStorageService.get('current_router')
-      const currentRouter = JSON.parse(currentRouterString)
-      const allRouters = router.options.routes.map(o => o.children).flat();
-      if (allRouters.find(r => currentRouter && r.name === currentRouter.name)) {
-        if (currentRouter.name == to.name) {
-          router.replace({ ...currentRouter }).catch(() => ({}))
-        } else {
-          router.push({ ...currentRouter }).catch(() => ({}))
-        }
-      } else if (to.name !== 'vault') {
-        router.push({ name: 'vault' }).catch(() => ({}))
+      if (currentRouter.name == to.name) {
+        router.replace({ ...currentRouter }).catch(() => ({}))
       } else {
-        next()
+        router.push({ ...currentRouter }).catch(() => ({}))
       }
     } else if (isLocked) {
       if (!['login'].includes(to.name)) {

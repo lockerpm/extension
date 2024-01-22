@@ -66,6 +66,7 @@ import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import commonAPI from '@/api/common'
+import ssoAPI from '@/api/ssp'
 
 import { SymmetricCryptoKey } from 'jslib-common/models/domain/symmetricCryptoKey';
 import { Utils } from 'jslib-common/misc/utils';
@@ -78,7 +79,11 @@ export default Vue.extend({
     VerifyOTP
   },
   data () {
-    return {}
+    return {
+      checking: false,
+      existed: false,
+      ssoConfig: null
+    }
   },
   computed: {
     userPw() { return this.$store.state.userPw },
@@ -111,6 +116,19 @@ export default Vue.extend({
         auth_info: value === 1 ? {} : this.loginInfo.auth_info
       })
     },
+    async checkExist() {
+      this.checking = true;
+      const response = await ssoAPI.check_exists();
+      this.existed = response?.existed
+      if (response?.existed) {
+        const ssoConfig = response.sso_configuration;
+        this.ssoConfig = ssoConfig;
+        // Redirect to web
+      } else {
+        this.checking = false;
+      }
+    },
+
     async login(data = {}) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
