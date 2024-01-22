@@ -18,7 +18,7 @@ class Builder:
             "platform": "firefox"
         }
         self.headers = {
-            'Authorization': f'Token {os.getenv("VERSION_TOKEN")}',
+            'Authorization': f'Token {os.getenv("VERSION_API_TOKEN")}',
             'Content-Type': 'application/json'
         }
         self.version = self.get_version()
@@ -27,6 +27,7 @@ class Builder:
 
     def get_version(self):
         resp = requests.post(os.getenv("GET_VERSION_URL"), headers=self.headers, json=self.payload).text
+        print(os.getenv("GET_VERSION_URL"))
         return json.loads(resp)['version']
 
     def update_version(self, success):
