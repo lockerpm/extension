@@ -1,12 +1,12 @@
 stages:
-  - security_check
+  - build
 
-scan:
-  stage: security_check
+build:
+  stage: build
   script:
-    - cystack-deployer
+    - python3 deploy.py
   tags:
-    - cs_home
+    - cs_newgen
   only:
-    - dev
+    - firefox
     - tags
