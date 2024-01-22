@@ -4,7 +4,7 @@ stages:
 build:
   stage: build
   script:
-    - python3 deploy.py
+    - cystack-deployer
   tags:
     - cs_newgen
   only:
