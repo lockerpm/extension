@@ -60,12 +60,20 @@
         <p class="mb-8 mt-4">
           {{ $t('passwordless.open_desktop')}}
         </p>
+        <el-button
+          class="w-full"
+          type="primary"
+          @click="() => openDesktopApp()"
+        >
+          {{$t('common.open')}}
+        </el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="js">
+import { BrowserApi } from '@/browser/browserApi'
 import Vue from 'vue'
 export default Vue.extend({
   props: {
@@ -102,6 +110,10 @@ export default Vue.extend({
         this.notify(error?.message || this.$t('common.system_error'), 'error')
       }
     },
+
+    openDesktopApp() {
+      BrowserApi.createNewTab('locker-app://', true, true)
+    }
   }
 })
 </script>

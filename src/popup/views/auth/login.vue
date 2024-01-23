@@ -38,7 +38,8 @@
       </el-row>
       <PreloginForm
         v-if="loginInfo.login_step === 1"
-        :calling="$store.state.callingAPI"
+        :calling="$store.state.callingAPI || checking"
+        :sso-config="ssoConfig"
         @next="(data) => login(data)"
       />
       <Identity
@@ -66,7 +67,7 @@ import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import commonAPI from '@/api/common'
-import ssoAPI from '@/api/ssp'
+import ssoAPI from '@/api/sso'
 
 import { SymmetricCryptoKey } from 'jslib-common/models/domain/symmetricCryptoKey';
 import { Utils } from 'jslib-common/misc/utils';
@@ -81,7 +82,6 @@ export default Vue.extend({
   data () {
     return {
       checking: false,
-      existed: false,
       ssoConfig: null
     }
   },
@@ -109,6 +109,9 @@ export default Vue.extend({
       return this.$t('data.login.login')
     }
   },
+  beforeMount() {
+    this.checkExist();
+  },
   methods: {
     updateLoginStep (value) {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
@@ -119,16 +122,14 @@ export default Vue.extend({
     async checkExist() {
       this.checking = true;
       const response = await ssoAPI.check_exists();
-      this.existed = response?.existed
       if (response?.existed) {
-        const ssoConfig = response.sso_configuration;
+        const ssoConfig = response.sso_configuration?.sso_provider_options || null;
         this.ssoConfig = ssoConfig;
-        // Redirect to web
       } else {
-        this.checking = false;
+        this.ssoConfig = null;
       }
+      this.checking = false;
     },
-
     async login(data = {}) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
@@ -216,6 +217,7 @@ export default Vue.extend({
             this.setupFillPage();
           }, 1000);
         }
+        await this.$storageService.remove('sso_email');
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
