@@ -62,7 +62,7 @@ class Builder:
                 time.sleep(10)
             header['Content-Type'] = 'application/json'
             requests.post(f"https://addons.mozilla.org/api/v5/addons/addon/{os.getenv('FIREFOX_ADDON_ID')}/versions/",
-                          headers=headers, json={ "upload": uuid })
+                          headers=header, json={ "upload": uuid })
             return self.update_version(True)
         else:
             return self.update_version(False)
