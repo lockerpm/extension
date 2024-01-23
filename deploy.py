@@ -23,7 +23,6 @@ class Builder:
 
     def get_version(self):
         resp = requests.post(os.getenv("GET_VERSION_URL"), headers=self.headers, json=self.payload).text
-        print(os.getenv("GET_VERSION_URL"))
         return json.loads(resp)['version']
 
     def update_version(self, success):
@@ -53,6 +52,7 @@ class Builder:
             files = {'file': open(f'artifacts/{self.local_file}', 'rb'),
                      'channel': 'listed'}
             resp = requests.post("https://addons.mozilla.org/api/v5/addons/upload/", headers=header, files=files)
+            print(resp.text)
             uuid = json.loads(resp.text)['uuid']
             while True:
                 resp = requests.get(f"https://addons.mozilla.org/api/v5/addons/upload/{uuid}/")
