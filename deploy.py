@@ -52,13 +52,16 @@ class Builder:
             files = {'upload': open(f'artifacts/{self.local_file}', 'rb')}
             resp = requests.post("https://addons.mozilla.org/api/v5/addons/upload/", headers=header, files=files,
                                  data={'channel': 'listed'})
-            print(resp.text)
+
             uuid = json.loads(resp.text)['uuid']
             while True:
-                resp = requests.get(f"https://addons.mozilla.org/api/v5/addons/upload/{uuid}/")
-                valid = json.loads(resp.text)['valid']
-                if valid:
-                    break
+                resp = requests.get(f"https://addons.mozilla.org/api/v5/addons/upload/{uuid}/", headers=header)
+                try:
+                    valid = json.loads(resp.text)['valid']
+                    if valid:
+                        break
+                except KeyError:
+                    pass
                 time.sleep(10)
             header['Content-Type'] = 'application/json'
             requests.post(f"https://addons.mozilla.org/api/v5/addons/addon/{os.getenv('FIREFOX_ADDON_ID')}/versions/",
