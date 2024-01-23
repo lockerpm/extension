@@ -49,9 +49,9 @@ class Builder:
             header = {
                 'Authorization': f'JWT {self.gen_jwt()}'
             }
-            files = {'upload': open(f'artifacts/{self.local_file}', 'rb'),
-                     'channel': 'listed'}
-            resp = requests.post("https://addons.mozilla.org/api/v5/addons/upload/", headers=header, files=files)
+            files = {'upload': open(f'artifacts/{self.local_file}', 'rb')}
+            resp = requests.post("https://addons.mozilla.org/api/v5/addons/upload/", headers=header, files=files,
+                                 data={'channel': 'listed'})
             print(resp.text)
             uuid = json.loads(resp.text)['uuid']
             while True:
