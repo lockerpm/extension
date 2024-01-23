@@ -32,6 +32,6 @@ ARG FIREFOX_JWT_SECRET
 
 ARG UPDATE_VERSION_URL
 
-RUN pip install pyjwt
+RUN pip install pyjwt requests
 
 RUN python3 deploy.py
