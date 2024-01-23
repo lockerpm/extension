@@ -1,7 +1,7 @@
 let isReading = false;
 document.addEventListener('DOMContentLoaded', event => {
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
-  if (hideDomains.includes(self.location.hostname)) {
+  if (hideDomains && hideDomains.includes(self.location.hostname)) {
     return;
   }
   chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
