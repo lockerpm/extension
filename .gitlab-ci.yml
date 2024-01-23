@@ -1,7 +1,7 @@
 stages:
   - build
 
-build:
+build_firefox:
   stage: build
   script:
     - cystack-deployer
