@@ -49,7 +49,7 @@ class Builder:
             header = {
                 'Authorization': f'JWT {self.gen_jwt()}'
             }
-            files = {'file': open(f'artifacts/{self.local_file}', 'rb'),
+            files = {'upload': open(f'artifacts/{self.local_file}', 'rb'),
                      'channel': 'listed'}
             resp = requests.post("https://addons.mozilla.org/api/v5/addons/upload/", headers=header, files=files)
             print(resp.text)
