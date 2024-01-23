@@ -1,12 +1,12 @@
 stages:
-  - security_check
+  - build
 
-scan:
-  stage: security_check
+build_firefox:
+  stage: build
   script:
     - cystack-deployer
   tags:
-    - cs_home
+    - cs_newgen
   only:
-    - dev
+    - firefox
     - tags
