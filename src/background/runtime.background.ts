@@ -132,9 +132,10 @@ export default class RuntimeBackground {
             break;
         }
         break;
-      case "cs-authResult":
-        break;
       case "sso-authResult":
+        if (msg.email) {
+          await this.storageService.save('sso_email', msg.email);
+        }
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {

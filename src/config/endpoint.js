@@ -15,6 +15,9 @@ export default {
   SSO_RESET_PASSWORD_TOKEN: '/sso/users/reset_password/token',
 
 
+  SSO_CONFIGURATION_CHECK_EXISTS: '/sso_configuration/check_exists',
+  SSO_CONFIGURATION_GET_USER: '/sso_configuration/get_user',
+
   LOGOUT: '/users/logout',
 
   RESOURCES_COUNTRIES: '/resources/countries',

@@ -1,127 +1,137 @@
 <template>
   <div class="w-full px-10 auth-form">
-    <el-form ref="form" :model="form" :rules="rules" @submit.native.prevent>
-      <el-form-item v-if="!userPw" prop="username">
-        <el-input
-          v-model="form.username"
-          ref="username"
-          :disabled="callingAPI || !!userPw || calling"
-          :placeholder="$t('data.login.username_placeholder')"
-          @input="() => { prelogin = null }"
-          @keyup.native.enter="() => handleLogin()"
-        ></el-input>
-      </el-form-item>
-      <div v-if="prelogin">
-        <div v-if="isResetPassword">
-          <i18n path="data.sign_in.reset_password" tag="p">
-            <template v-slot:web>
-              <a
-                href="javascript:;"
-                @click="() => openNewTab(`${webUrl}/authentication?email=${form.username}`)"
-              >VinCSS Locker</a>
-            </template>
-          </i18n>
+    <el-button
+      v-if="ssoConfig && !storeEmail && !userPw"
+      class="w-full"
+      type="primary"
+      @click="() => redirectToAuthSSO()"
+    >
+      {{ $t(`data.login.single_sign_on`) }}
+    </el-button>
+    <div v-else>
+      <el-form ref="form" :model="form" :rules="rules" @submit.native.prevent>
+        <el-form-item v-if="!userPw" prop="username">
+          <el-input
+            v-model="form.username"
+            ref="username"
+            :disabled="callingAPI || !!userPw || calling || !!storeEmail"
+            :placeholder="$t('data.login.username_placeholder')"
+            @input="() => { prelogin = null }"
+            @keyup.native.enter="() => handleLogin()"
+          ></el-input>
+        </el-form-item>
+        <div v-if="prelogin">
+          <div v-if="isResetPassword">
+            <i18n path="data.sign_in.reset_password" tag="p">
+              <template v-slot:web>
+                <a
+                  href="javascript:;"
+                  @click="() => openNewTab(`${webUrl}/authentication?email=${form.username}`)"
+                >VinCSS Locker</a>
+              </template>
+            </i18n>
+          </div>
+          <div v-else-if="isSetupPasswordless">
+            <i18n path="data.sign_in.require_pwl" tag="p">
+              <template v-slot:web>
+                <a
+                  href="javascript:;"
+                  @click="() => openNewTab(`${webUrl}/authentication?email=${form.username}`)"
+                >VinCSS Locker</a>
+              </template>
+            </i18n>
+          </div>
+          <div v-else-if="isSetup2FA">
+            <i18n path="data.sign_in.require_2fa" tag="p">
+              <template v-slot:web>
+                <a
+                  href="javascript:;"
+                  @click="() => openNewTab(`${webUrl}/setup-2fa?email=${form.username}`)"
+                >VinCSS Locker</a>
+              </template>
+            </i18n>
+          </div>
+          <div v-else>
+            <PairingForm
+              v-if="isPair"
+              :user-info="prelogin"
+              @confirm="handlePairConfirm"
+            />
+            <PasswordlessForm
+              v-else-if="prelogin.login_method === 'passwordless'"
+              :changing="callingAPI || calling"
+              :user-info="prelogin"
+              @repair="() => isPair = true"
+              @confirm="(password) => handleLogin(password)"
+            />
+            <el-form-item
+              v-else-if="prelogin.login_method === 'password'"
+              prop="password"
+            >
+              <el-input type="password" v-model="form.password" :disabled="callingAPI || calling"
+                :placeholder="$t('data.login.password_placeholder')" @keyup.native.enter="() => handleLogin()">
+              </el-input>
+            </el-form-item>
+          </div>
         </div>
-        <div v-else-if="isSetupPasswordles">
-          <i18n path="data.sign_in.require_pwl" tag="p">
-            <template v-slot:web>
-              <a
-                href="javascript:;"
-                @click="() => openNewTab(`${webUrl}/authentication?email=${form.username}`)"
-              >VinCSS Locker</a>
-            </template>
-          </i18n>
+      </el-form>
+      <el-row v-if="!userPw && !isPair" type="flex" align="middle" justify="space-between" class="mt-4 pb-4">
+        <el-button
+          v-if="!prelogin"
+          class="w-full"
+          type="primary"
+          :loading="callingAPI || calling"
+          @click="() => handleLogin()"
+        >
+          {{ $t(`common.continue`) }}
+        </el-button>
+        <el-button
+          v-else-if="!isResetPassword && !isSetup2FA && prelogin.login_method === 'password'"
+          class="w-full"
+          type="primary"
+          :loading="callingAPI || calling"
+          @click="() => handleLogin()"
+        >
+          {{ $t(`data.login.sign_in`) }}
+        </el-button>
+        <el-button
+          v-else-if="!callingAPI || calling"
+          class="w-full"
+          @click="handleBack"
+        >
+          {{ $t(`common.back`) }}
+        </el-button>
+      </el-row>
+      <div v-else-if="!isPair" class="mt-4 pb-4">
+        <div v-if="userPw.login_method === 'password'" class="grid lg:grid-cols-2 grid-cols-1 gap-2">
+          <div>
+            <el-button
+              type="primary"
+              class="w-full"
+              :loading="callingAPI || calling"
+              @click="() => handleLogin()"
+            >
+              {{ $t('master_password.unlock') }}
+            </el-button>
+          </div>
+          <div>
+            <el-button
+              class="w-full"
+              :disabled="callingAPI || calling"
+              @click="() => handleLogout()"
+            >
+              {{ $t('common.logout') }}
+            </el-button>
+          </div>
         </div>
-        <div v-else-if="isSetup2FA">
-          <i18n path="data.sign_in.require_2fa" tag="p">
-            <template v-slot:web>
-              <a
-                href="javascript:;"
-                @click="() => openNewTab(`${webUrl}/setup-2fa?email=${form.username}`)"
-              >VinCSS Locker</a>
-            </template>
-          </i18n>
-        </div>
-        <div v-else>
-          <PairingForm
-            v-if="isPair"
-            :user-info="prelogin"
-            @confirm="handlePairConfirm"
-          />
-          <PasswordlessForm
-            v-else-if="prelogin.login_method === 'passwordless'"
-            :changing="callingAPI || calling"
-            :user-info="prelogin"
-            @repair="() => isPair = true"
-            @confirm="(password) => handleLogin(password)"
-          />
-          <el-form-item
-            v-else-if="prelogin.login_method === 'password'"
-            prop="password"
-          >
-            <el-input type="password" v-model="form.password" :disabled="callingAPI || calling"
-              :placeholder="$t('data.login.password_placeholder')" @keyup.native.enter="() => handleLogin()">
-            </el-input>
-          </el-form-item>
-        </div>
+        <el-button
+          v-else
+          class="w-full"
+          @click="() => handleLogout()"
+        >
+          {{ $t(`common.logout`) }}
+        </el-button>
       </div>
-    </el-form>
-    <el-row v-if="!userPw" type="flex" align="middle" justify="space-between" class="mt-4 pb-4">
-      <el-button
-        v-if="!prelogin"
-        class="w-full"
-        type="primary"
-        :loading="callingAPI || calling"
-        @click="() => handleLogin()"
-      >
-        {{ $t(`common.continue`) }}
-      </el-button>
-      <el-button
-        v-else-if="!isResetPassword && !isSetup2FA && prelogin.login_method === 'password'"
-        class="w-full"
-        type="primary"
-        :loading="callingAPI || calling"
-        @click="() => handleLogin()"
-      >
-        {{ $t(`data.login.sign_in`) }}
-      </el-button>
-      <el-button
-        v-else-if="!callingAPI || calling"
-        class="w-full"
-        @click="handleBack"
-      >
-        {{ $t(`common.back`) }}
-      </el-button>
-    </el-row>
-    <div v-else class="mt-4 pb-4">
-      <div v-if="userPw.login_method === 'password'" class="grid lg:grid-cols-2 grid-cols-1 gap-2">
-        <div>
-          <el-button
-            type="primary"
-            class="w-full"
-            :loading="callingAPI || calling"
-            @click="() => handleLogin()"
-          >
-            {{ $t('master_password.unlock') }}
-          </el-button>
-        </div>
-        <div>
-          <el-button
-            class="w-full"
-            :disabled="callingAPI || calling"
-            @click="() => handleLogout()"
-          >
-            {{ $t('common.logout') }}
-          </el-button>
-        </div>
-      </div>
-      <el-button
-        v-else
-        class="w-full"
-        @click="() => handleLogout()"
-      >
-        {{ $t(`common.logout`) }}
-      </el-button>
     </div>
   </div>
 </template>
@@ -130,7 +140,7 @@
 import Vue from 'vue'
 import PairingForm from '../forms/Pairing.vue'
 import PasswordlessForm from '../forms/Passwordless.vue'
-
+import { BrowserApi } from '@/browser/browserApi'
 import cystackPlatformAPI from '@/api/cystack_platform'
 
 export default Vue.extend({
@@ -139,11 +149,13 @@ export default Vue.extend({
     PasswordlessForm
   },
   props: {
-    calling: Boolean
+    calling: Boolean,
+    ssoConfig: Object
   },
   data() {
     return {
       webUrl: process.env.VUE_APP_WEB_URL,
+      storeEmail: null,
       callingAPI: false,
       prelogin: null,
       isPair: false,
@@ -177,7 +189,7 @@ export default Vue.extend({
     isResetPassword () {
       return this.prelogin && !this.prelogin.is_password_changed
     },
-    isSetupPasswordles () {
+    isSetupPasswordless () {
       return this.prelogin && this.prelogin.require_passwordless && this.prelogin.login_method === 'password'
     },
     isSetup2FA () {
@@ -208,10 +220,17 @@ export default Vue.extend({
         sync_all_platforms: this.prelogin.sync_all_platforms
       })
     },
-    loadData() {
+    async loadData() {
       if (this.userPw?.email) {
         this.form.username = this.userPw?.email;
         this.handlePrelogin();
+      } else {
+        const ssoEmail = await this.$storageService.get('sso_email');
+        if (ssoEmail) {
+          this.storeEmail = ssoEmail;
+          this.form.username = ssoEmail;
+          this.handlePrelogin();
+        }
       }
     },
     async handleLogin(pwl = null) {
@@ -290,6 +309,9 @@ export default Vue.extend({
         password: ''
       }
     },
+    redirectToAuthSSO () {
+      BrowserApi.createNewTab(`${this.webUrl}/sign-in?client_id=browser`)
+    }
   }
 })
 </script>

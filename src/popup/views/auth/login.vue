@@ -38,7 +38,8 @@
       </el-row>
       <PreloginForm
         v-if="loginInfo.login_step === 1"
-        :calling="$store.state.callingAPI"
+        :calling="$store.state.callingAPI || checking"
+        :sso-config="ssoConfig"
         @next="(data) => login(data)"
       />
       <Identity
@@ -66,6 +67,7 @@ import VerifyOTP from '@/popup/components/auth/VerifyOTP.vue'
 
 import cystackPlatformAPI from '@/api/cystack_platform'
 import commonAPI from '@/api/common'
+import ssoAPI from '@/api/sso'
 
 import { SymmetricCryptoKey } from 'jslib-common/models/domain/symmetricCryptoKey';
 import { Utils } from 'jslib-common/misc/utils';
@@ -78,7 +80,10 @@ export default Vue.extend({
     VerifyOTP
   },
   data () {
-    return {}
+    return {
+      checking: false,
+      ssoConfig: null
+    }
   },
   computed: {
     userPw() { return this.$store.state.userPw },
@@ -104,12 +109,26 @@ export default Vue.extend({
       return this.$t('data.login.login')
     }
   },
+  beforeMount() {
+    this.checkExist();
+  },
   methods: {
     updateLoginStep (value) {
       this.$store.commit('UPDATE_LOGIN_PAGE_INFO', {
         login_step: value,
         auth_info: value === 1 ? {} : this.loginInfo.auth_info
       })
+    },
+    async checkExist() {
+      this.checking = true;
+      const response = await ssoAPI.check_exists();
+      if (response?.existed) {
+        const ssoConfig = response.sso_configuration?.sso_provider_options || null;
+        this.ssoConfig = ssoConfig;
+      } else {
+        this.ssoConfig = null;
+      }
+      this.checking = false;
     },
     async login(data = {}) {
       this.$store.commit('UPDATE_CALLING_API', true)
@@ -198,6 +217,7 @@ export default Vue.extend({
             this.setupFillPage();
           }, 1000);
         }
+        await this.$storageService.remove('sso_email');
       } catch (e) {
         this.notify(this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)

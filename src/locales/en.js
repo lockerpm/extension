@@ -58,6 +58,7 @@ module.exports = {
     dr: 'Dr',
     next: 'Next',
     download: 'Download Desktop App',
+    open: 'Open Desktop App',
     system_error: 'An error occurred, please try again later!',
     upgrade_now: 'Upgrade now',
     submit: "Submit",
@@ -671,6 +672,7 @@ module.exports = {
       password_placeholder: 'Password',
       new_password_placeholder: 'New password',
       confirm_new_password_placeholder: 'Confirm new password',
+      single_sign_on: "Single Sign-On",
       alert: {
         th1: 'Your email doesn’t belong to any enterprise. Please try again with another one',
         th2: 'Your account is set up with Passwordless Login. Please log in on Desktop app first to continue using Extension',

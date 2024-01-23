@@ -114,8 +114,8 @@
   },
   "externally_connectable": {
     "matches": [
-      "https://*.demo.cystack.net:3011/*",
-      "https://*.locker.io/*"
+      "https://locker.vincss.net/*",
+      "https://demo.locker.io:3002/*"
     ]
   },
   "sidebar_action": {
