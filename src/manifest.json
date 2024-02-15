@@ -130,10 +130,5 @@
       },
       "description": "Execute sidebar action"
     }
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "locker-extention-pro@cystack.net"
-    }
   }
 }

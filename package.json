@@ -1,6 +1,6 @@
 {
   "name": "locker-extention",
-  "version": "2.0.1",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "style": "tailwindcss build -i ./src/assets/tailwind.css -o ./src/assets/buildtw.css --watch",
