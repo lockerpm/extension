@@ -4,7 +4,7 @@
       <p class="mb-3">
         {{ $t('menu.unlock_your_vault') }}
       </p>
-      <el-button type="primary" plain size="small" @click="openPopupIframe">
+      <el-button type="primary" plain size="small" @click="openPopupWindow">
         {{ $t('menu.unlock_now') }}
       </el-button>
     </div>
@@ -12,7 +12,7 @@
       <p class="mb-3">
         {{ $t('menu.log_in_to_autofill') }}
       </p>
-      <el-button type="primary" plain size="small" @click="openPopupIframe">
+      <el-button type="primary" plain size="small" @click="openPopupWindow">
         {{ $t('menu.login_now') }}
       </el-button>
     </div>
@@ -32,8 +32,8 @@ export default Vue.extend(
       }
     },
     methods: {
-      async openPopupIframe() {
-        await this.$runtimeBackground.handleOpenPopupIframe()
+      async openPopupWindow() {
+        await this.$runtimeBackground.handleOpenPopupWindow()
         this.closeMenu()
       }
     }

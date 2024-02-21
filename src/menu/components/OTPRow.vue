@@ -15,8 +15,9 @@
 </template>
 
 <script>
+import ShowOTP from '@/popup/components/otp/ShowOTP.vue';
 import { BrowserApi } from "@/browser/browserApi";
-import ShowOTP from '@/popup/components/otp/ShowOTP.vue'
+
 export default {
   components: { ShowOTP },
   props: {

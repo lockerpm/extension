@@ -772,6 +772,8 @@ export default class MainBackground {
         }, 1000);
         return;
       } catch { }
+    } else {
+      await this.browserActionSetBadgeText('', tabId);
     }
     await this.loadMenuAndUpdateBadgeForNoAccessState(contextMenuEnabled);
   }

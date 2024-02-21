@@ -5,7 +5,6 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Layout from '@/popup/layout/index.vue'
 import AuthLayout from '@/popup/layout/auth.vue'
 import ShowLayout from '@/popup/layout/show.vue'
-import OtherLayout from '@/popup/layout/other.vue'
 
 Vue.use(VueRouter)
 
@@ -182,40 +181,6 @@ const routes: Array<RouteConfig> = [
             "../popup/views/settings/info.vue"
           )
       }
-    ]
-  },
-  {
-    path: "/menu",
-    component: OtherLayout,
-    children: [
-      {
-        path: "",
-        name: "menu",
-        meta: {
-          isOver: true
-        },
-        component: () =>
-          import(
-            "../menu/index.vue"
-          )
-      },
-    ]
-  },
-  {
-    path: "/bar",
-    component: OtherLayout,
-    children: [
-      {
-        path: "",
-        name: "bar",
-        meta: {
-          isOver: true
-        },
-        component: () =>
-          import(
-            "../bar/index.vue"
-          )
-      },
     ]
   },
 ];

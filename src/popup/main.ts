@@ -17,7 +17,6 @@ import storePromise from '@/store'
 import i18n from '@/locales/i18n'
 import JSLib from '@/popup/services/services'
 import { CipherType } from "jslib-common/enums/cipherType";
-import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
@@ -39,28 +38,21 @@ Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
 
-import '@fortawesome/fontawesome-free/css/all.min.css'
-import '@/assets/buildtw.css'
-import '@/assets/tailwind.css'
-import '@/assets/app.scss'
-import '@/assets/flags/flags.css'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import middleware from '../middleware';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '@/assets/css/index.scss';
+import '@/assets/css/app.scss';
+
+import middleware from './middleware';
 
 Vue.mixin({
   data() {
     return {
-      totpCode: "",
-      totpTimeout: null,
-      loadedTimeout: null,
-      pageDetails: null,
-      selectedCipher: null,
       pageSize: 150,
-
       folders: [],
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
@@ -89,10 +81,7 @@ Vue.mixin({
     },
     language() { return this.$store.state.user.language },
     currentUser() { return this.$store.state.user && this.$store.state.user.email ? this.$store.state.user : (this.$store.state.preloginData || {}) },
-    currentUserPw() { return this.$store.state.userPw },
-    environment() { return this.$store.state.environment },
     isLoggedIn() { return this.$store.state.isLoggedIn },
-    isAllPage() { return this.$route.name === 'vault' },
     searchText() { return this.$store.state.searchText },
     teams() { return this.$store.state.teams || [] },
     currentOrg() { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
@@ -106,9 +95,6 @@ Vue.mixin({
     enableAutofill() {
       return this.$store.state.enableAutofill
     },
-  },
-  destroyed() {
-    self.clearTimeout(this.loadedTimeout);
   },
   methods: {
     changeLang(value) {
@@ -183,15 +169,6 @@ Vue.mixin({
         duration,
         dangerouslyUseHTMLString: html
       })
-    },
-    async genKey(masterPassword, email) {
-      try {
-        const key = await this.$cryptoService.makeKey(masterPassword, email, 0, 100000)
-        const hashedPassword = await this.$cryptoService.hashPassword(masterPassword, key)
-        return hashedPassword
-      } catch (e) {
-        return ''
-      }
     },
     async login(isPwl = false, decryptData: any) {
       this.$store.commit('UPDATE_CALLING_API', true)

@@ -45,7 +45,7 @@
             {{ $t('data.tools.copy_password') }}
           </el-button>
         </div>
-        <div v-if="$route.name === 'add-edit-cipher'" class="mt-2">
+        <div class="mt-2">
           <el-button
             type="primary"
             class="w-full"
@@ -53,16 +53,6 @@
             @click="formUsePassword"
           >
             {{ $t('menu.use_this_password') }}
-          </el-button>
-        </div>
-        <div v-else class="mt-2">
-          <el-button
-            class="w-full"
-            type="primary"
-            plain
-            @click="savePassword"
-          >
-            {{ $t('data.tools.save_with_locker') }}
           </el-button>
         </div>
       </div>
@@ -120,10 +110,7 @@
 <script>
 import PasswordStrength from '@/components/PasswordStrength.vue'
 import { BrowserApi } from "@/browser/browserApi";
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
-
-import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
@@ -151,9 +138,9 @@ export default {
   computed: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
-      if (this.password) {
-        return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
-      }
+      // if (this.password) {
+      //   return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
+      // }
       return {}
     }
   },
@@ -164,29 +151,25 @@ export default {
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async regenerate (isReload = false) {
-      const oldGeneratePassword = await this.$passService.getGeneratePassword()
-      if (isReload && oldGeneratePassword) {
-        this.password = oldGeneratePassword.password
-        this.options = JSON.parse(oldGeneratePassword.options)
-      } else {
-        if (!this.options.lowercase && !this.options.uppercase && !this.options.number && !this.options.special) {
-          this.options.lowercase = true
-        }
-        this.password = await this.$passwordGenerationService.generatePassword(this.options)
-        const tab = await BrowserApi.getTabFromCurrentWindow();
-        await this.$passService.setInformation(this.password, this.options, tab)
-      }
+      // const oldGeneratePassword = await this.$passService.getGeneratePassword()
+      // if (isReload && oldGeneratePassword) {
+      //   this.password = oldGeneratePassword.password
+      //   this.options = JSON.parse(oldGeneratePassword.options)
+      // } else {
+      //   if (!this.options.lowercase && !this.options.uppercase && !this.options.number && !this.options.special) {
+      //     this.options.lowercase = true
+      //   }
+      //   this.password = await this.$passwordGenerationService.generatePassword(this.options)
+      //   const tab = await BrowserApi.getTabFromCurrentWindow();
+      //   await this.$passService.setInformation(this.password, this.options, tab)
+      // }
     },
+
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async formUsePassword () {
       this.$emit('fill-password', this.password)
       this.$emit('toggle', false)
     },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async savePassword () {
-      this.$router.replace({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
-    },
-
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async handleUsePassword () {
       this.fillCipher({ type: CipherType.Login,  login: { password: this.password } })

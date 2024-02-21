@@ -152,7 +152,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     keySuffix = keySuffix || 'auto';
     const symmetricKey = await this.getKeyFromStorage(keySuffix);
     if (symmetricKey) {
-      this.setKey(symmetricKey);
+      await this.setKey(symmetricKey);
       return symmetricKey;
     }
     return null;
@@ -749,7 +749,7 @@ export class CryptoService implements CryptoServiceAbstraction {
 
   protected async storeKey(key: SymmetricCryptoKey) {
     if (await this.shouldStoreKey('auto') || await this.shouldStoreKey('biometric')) {
-      this.storageService.save(Keys.key, key.keyB64);
+      this.storageService.save(Keys.key, key?.keyB64);
     } else {
       this.storageService.remove(Keys.key);
     }

@@ -49,8 +49,8 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     async checkVaultTimeout(): Promise<void> {
         // "is logged out check" - similar to isLocked, below
-        const authed = await this.userService.isAuthenticated();
-        if (!authed) {
+        const authenticated = await this.userService.isAuthenticated();
+        if (!authenticated) {
             return;
         }
 

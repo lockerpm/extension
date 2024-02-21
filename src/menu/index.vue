@@ -45,8 +45,8 @@ import MenuSearch from './components/Search.vue';
 import MenuCiphers from './components/Ciphers.vue';
 import MenuLocked from './components/Locked.vue';
 import MenuExcluded from './components/Excluded.vue';
+import PasswordGenerator from './components/Generator.vue'
 
-import PasswordGenerator from '@/popup/components/password/PasswordGenerator.vue'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
 
@@ -65,32 +65,9 @@ export default Vue.extend({
       CipherType,
       tab: Number(this.$route.query?.tab || 2),
       fillType: Number(this.$route.query?.type || 0),
-      browserTab: null
-    }
-  },
-  asyncComputed: {
-    savedDomains: {
-      async get () {
-        return await this.$storageService.get('neverDomains') || {}
-      },
-      watch: [
-        '$store.state.syncedExcludeDomains'
-      ]
-    },
-    excluded: {
-      async get () {
-        const currentUrlTab = await BrowserApi.getTabFromCurrentWindow();
-        return await this.$cipherService.getIncludedDomainByUrl(currentUrlTab.url)
-      },
-      watch: [
-        '$store.state.syncedExcludeDomains'
-      ]
-    },
-    isLocked: {
-      async get () {
-        return await this.$vaultTimeoutService.isLocked()
-      },
-      watch: []
+      browserTab: null,
+      excluded: false,
+      isLocked: false,
     }
   },
   computed: {
@@ -120,7 +97,7 @@ export default Vue.extend({
         {
           value: 3,
           name: this.$t('menu.turn_off'),
-          class: 'text-danger',
+          class: this.isLocked ? '' : 'text-danger',
           divided: true,
           disabled: this.isLocked,
           onclick: async () => {
@@ -176,6 +153,7 @@ export default Vue.extend({
     },
   },
   async mounted() {
+    console.log(111, chrome);
     this.browserTab = await BrowserApi.getTabFromCurrentWindow();
   },
   methods: {

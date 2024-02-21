@@ -13,7 +13,10 @@ import {
 
 const documents = [];
 
+// Check iframes
+
 document.addEventListener('DOMContentLoaded', event => {
+  console.log(document.baseURI, 123, window.location, window.frameElement, event.target)
   documents.push(document)
   const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
   if (hideDomains && hideDomains.includes(self.location.hostname)) {
@@ -95,10 +98,10 @@ document.addEventListener('DOMContentLoaded', event => {
       })
     } else if (msg.command === "closeInformMenu") {
       closeAllInformMenu()
-    } else if (msg.command === 'openPopupIframe') {
-      openPopupIframe()
-    } else if (msg.command === 'closePopupIframe') {
-      closePopupIframe()
+    } else if (msg.command === 'openPopupWindow') {
+      openPopupWindow()
+    } else if (msg.command === 'closePopupWindow') {
+      closePopupWindow()
     } else if (msg.command === 'resizeMenuInfo') {
       const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
       if (menuEls && menuEls.length > 0) {
@@ -246,16 +249,8 @@ document.addEventListener('DOMContentLoaded', event => {
         const containerPosition = relativeContainer.getBoundingClientRect();
         removeFillLogo(el)
         const logo = document.createElement("span");
+        logo.className = 'cs-menu-icon';
         logo.id = 'cs-logo-' + el.lockerId;
-        logo.style.cssText = `
-          position: absolute;
-          height: 19px;
-          width: 19px;
-          background-position: center;
-          background-size: contain;
-          z-index: 1000 !important;
-          cursor: pointer;
-        `;
         document.addEventListener('click', (e: any) => {
           const menuEl = document.getElementById(`cs-inform-menu-iframe-${el.lockerId}`);
           if (logo.contains(e.target)) {
@@ -270,7 +265,7 @@ document.addEventListener('DOMContentLoaded', event => {
             }
           }
         })
-        inputEl.parentNode.insertBefore(logo, inputEl.nextElementSibling);
+        document.body.append(logo);
         if (isOver) {
           logo.style.right = `-28px`;
           logo.style.top = `20px`;
@@ -331,7 +326,7 @@ document.addEventListener('DOMContentLoaded', event => {
       defaultType = CipherType.OTP
     }
     const barPageUrl: string = chrome.runtime.getURL(
-      "popup.html#/menu" + `?tab=${defaultTab}&type=${defaultType}`
+      "menu.html" + `?tab=${defaultTab}&type=${defaultType}`
     );
     const iframe = document.createElement("iframe");
     iframe.id = iframeId;
@@ -339,31 +334,8 @@ document.addEventListener('DOMContentLoaded', event => {
     iframe.style.cssText = `
       top: ${!isOver ? (getOffsetTop(inputEl) + elPosition.height + 10) : (getOffsetTop(inputEl) + elPosition.height / 2 + 18)}px;
       left: ${!isOver ? getOffsetLeft(inputEl) : (getOffsetLeft(inputEl) + inputEl.offsetWidth + 10) }px;
-      position: absolute;
       height: ${ defaultTab === 1 ? 428 : 300}px;
-      min-width: 300px;
       width: ${elPosition.width}px !important;
-      border: 0;
-      min-height: initial;
-      padding: 0;
-      z-index: 2147483647; visibility: visible;
-      box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px;
-      z-index: 2147483647 !important;
-      display: block !important;
-      visibility: visible !important;
-      clip-path: none !important;
-      clip: auto !important;
-      mask: none !important;
-      filter: none !important;
-      pointer-events: auto !important;
-      resize: none !important;
-      border-width: 0px;
-      border-style: initial;
-      border-color: initial;
-      border-image: initial;
-      border-radius: 4px;
-      margin: 0px !important;
-      padding: 0px !important;
     `;
     iframe.src = barPageUrl;
     document.body.appendChild(iframe);
@@ -651,7 +623,7 @@ document.addEventListener('DOMContentLoaded', event => {
   }
 
   function closeExistingAndOpenBar(type: string, loginInfo: any) {
-    let barPage = 'popup.html#/bar';
+    let barPage = 'bar.html';
     switch (type) {
       case 'add':
         barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri) + '&domain=' + encodeURIComponent(loginInfo.domain);;
@@ -674,38 +646,19 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     const barPageUrl: string = chrome.runtime.getURL(barPage);
     const iframe = document.createElement('iframe');
+    iframe.className = 'cs-notification-bar-iframe';
     iframe.style.cssText = `
       height: ${type === 'add' ? '338' : '278'}px !important;
-      width: 400px;
-      border: 0;
-      min-height: initial;
-      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
-      border-radius: 4px;
     `;
-    iframe.id = 'bit-notification-bar-iframe';
+    iframe.id = '';
     iframe.src = barPageUrl;
-
-    const frameDiv = document.createElement('div');
-    frameDiv.setAttribute('aria-live', 'polite');
-    frameDiv.id = 'bit-notification-bar';
-    frameDiv.style.cssText = `
-      height: ${type === 'add' ? '308' : '248'}px !important;
-      width: 400px;
-      top: 40px;
-      right: 40px;
-      padding: 0;
-      position: fixed;
-      z-index: 2147483647;
-      visibility: visible;
-    `
-    frameDiv.appendChild(iframe);
-    document.body.appendChild(frameDiv);
+    document.body.appendChild(iframe);
 
     (iframe.contentWindow.location as any) = barPageUrl;
   }
 
   function closeBar(explicitClose: boolean = false) {
-    const iframeEls = document.querySelectorAll('#bit-notification-bar');
+    const iframeEls = document.querySelectorAll('.cs-notification-bar-iframe');
     for (let i = 0; i < iframeEls.length; i++) {
       iframeEls[i].parentElement.removeChild(iframeEls[i]);
     }
@@ -737,47 +690,10 @@ document.addEventListener('DOMContentLoaded', event => {
     return offsetLeft;
   }
 
-  function closePopupIframe() {
-    const frameDiv = document?.getElementById('locker_popup-iframe-container');
-    if (frameDiv) {
-      frameDiv.remove();
-    }
+  function closePopupWindow() {
   }
 
-  function openPopupIframe() {
-    closePopupIframe()
-    if (document.body == null) {
-      return;
-    }
-    const barPageUrl: string = chrome.runtime.getURL('popup.html');
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = `
-      height: 602px;
-      width: 402px;
-      border: 1px solid rgb(189 190 190);
-      background-color: white
-    `;
-    iframe.id = 'popup-iframe';
-    iframe.src = barPageUrl;
-    const frameDiv = document.createElement('div');
-    frameDiv.id = 'locker_popup-iframe-container';
-    frameDiv.style.cssText = `
-      height: 600px;
-      width: 402px;
-      top: 40px;
-      right: 40px;
-      position: fixed;
-      z-index: 2147483647;
-      visibility: visible;
-    `;
-    frameDiv.appendChild(iframe);
-    document.addEventListener('click', function (e: any) {
-      if (frameDiv.contains(e.target)) {
-      } else {
-        closePopupIframe();
-      }
-    });
-    document.body.appendChild(frameDiv);
-    (iframe.contentWindow.location as any) = barPageUrl;
+  function openPopupWindow() {
+    closePopupWindow()
   }
 });

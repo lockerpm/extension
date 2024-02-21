@@ -83,8 +83,6 @@ const asyncStore = async () => {
           count: 0
         },
         userIntercom: {},
-        isDev: 'dev',
-        environment: 'dev',
         loading: false,
         syncedCiphersToggle: false,
         syncedExcludeDomains: false,
@@ -139,9 +137,6 @@ const asyncStore = async () => {
         },
         UPDATE_NOTIFICATION (state, payload) {
           state.notifications = payload
-        },
-        UPDATE_DEV (state, value) {
-          state.environment = value
         },
         UPDATE_LOADING (state, loading) {
           state.loading = loading

@@ -1,4 +1,4 @@
-import router from './router/popup'
+import router from '../router/popup'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import JSLib from '@/popup/services/services'
@@ -19,9 +19,7 @@ const middleware = () => {
     const currentRouter = JSON.parse(currentRouterString)
     const allRouters = router.options.routes.map(o => o.children).flat();
     const isRouter = allRouters.find(r => currentRouter && r.name === currentRouter.name);
-    if (to.meta?.isOver) {
-      next();
-    } else if (isFirst && isRouter) {
+    if (isFirst && isRouter) {
       if (currentRouter.name == to.name) {
         router.replace({ ...currentRouter }).catch(() => ({}))
       } else {
