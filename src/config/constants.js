@@ -15,3 +15,21 @@ export const VAULT_TIMEOUTS = [
   { label: i18n.t("data.timeouts.twoWeeks"), value: 20160 },
   { label: i18n.t("data.timeouts.onRefresh"), value: -1 },
 ];
+
+export const EVENTS = {
+  CHANGE: "change",
+  INPUT: "input",
+  KEYDOWN: "keydown",
+  KEYPRESS: "keypress",
+  KEYUP: "keyup",
+  BLUR: "blur",
+  CLICK: "click",
+  FOCUS: "focus",
+  SCROLL: "scroll",
+  RESIZE: "resize",
+  DOMCONTENTLOADED: "DOMContentLoaded",
+  LOAD: "load",
+  MESSAGE: "message",
+  VISIBILITYCHANGE: "visibilitychange",
+  FOCUSOUT: "focusout",
+};

@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disabled */
-
-import { BrowserApi } from '@/browser/browserApi';
 
 import { AuditService } from 'jslib-common/abstractions/audit.service';
 import { CipherService } from 'jslib-common/abstractions/cipher.service';
@@ -26,15 +26,15 @@ import { ConstantsService } from 'jslib-common/services/constants.service';
 import { SearchService } from 'jslib-common/services/search.service';
 import { StateService } from 'jslib-common/services/state.service';
 
-import { PopupSearchService } from './popup-search.service';
-import { PopupUtilsService } from './popup-utils.service';
+import { PopupSearchService } from './services/popup-search.service';
+import { PopupUtilsService } from './services/popup-utils.service';
 import { ImportService } from "jslib-common/abstractions/import.service";
 import { BroadcasterService } from 'jslib-common/services/broadcaster.service';
 import { TotpService } from 'jslib-common/abstractions/totp.service';
 
 import AutofillService from '@/services/autofill.service';
-import MainBackground from '../../background/main.background';
-import RuntimeBackground from '../../background/runtime.background';
+import MainBackground from './background/main.background';
+import RuntimeBackground from './background/runtime.background';
 
 let lockerMain = chrome['lockerMain'];
 function getBgService<T>(service: string) {
@@ -56,7 +56,8 @@ const searchService = new PopupSearchService(getBgService<SearchService>('search
   getBgService<I18nService>('i18nService')());
 
 export default {
-  async install(Vue, options) {
+  getBgService,
+  async install(Vue) {
     const platformUtilsService = getBgService<PlatformUtilsService>('platformUtilsService')()
     const i18nService = getBgService<I18nService>('i18nService')()
     const storageService = getBgService<StorageService>('storageService')()
@@ -114,5 +115,4 @@ export default {
     self.document.documentElement.classList.add('locale_' + i18nService.translationLocale);
     self.document.documentElement.classList.add('theme_' + theme);
   },
-  getBgService
 }

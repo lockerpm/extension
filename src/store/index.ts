@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import JSLib from "@/popup/services/services";
+import JSLib from "@/services";
 import RuntimeBackground from '../background/runtime.background';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { StorageService } from "jslib-common/abstractions/storage.service";

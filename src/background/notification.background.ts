@@ -16,7 +16,7 @@ import { PasswordRepromptService } from 'jslib-common/abstractions/passwordRepro
 import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.service';
 
 import { BrowserApi } from '../browser/browserApi';
-import { PopupUtilsService } from '../popup/services/popup-utils.service';
+import { PopupUtilsService } from '../services/popup-utils.service';
 
 import MainBackground from './main.background';
 import Requestground from './request.backgroud';

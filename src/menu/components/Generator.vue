@@ -138,9 +138,9 @@ export default {
   computed: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     passwordStrength () {
-      // if (this.password) {
-      //   return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
-      // }
+      if (this.password) {
+        return this.$passwordGenerationService.passwordStrength(this.password, ['cystack']) || {}
+      }
       return {}
     }
   },
@@ -151,18 +151,18 @@ export default {
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async regenerate (isReload = false) {
-      // const oldGeneratePassword = await this.$passService.getGeneratePassword()
-      // if (isReload && oldGeneratePassword) {
-      //   this.password = oldGeneratePassword.password
-      //   this.options = JSON.parse(oldGeneratePassword.options)
-      // } else {
-      //   if (!this.options.lowercase && !this.options.uppercase && !this.options.number && !this.options.special) {
-      //     this.options.lowercase = true
-      //   }
-      //   this.password = await this.$passwordGenerationService.generatePassword(this.options)
-      //   const tab = await BrowserApi.getTabFromCurrentWindow();
-      //   await this.$passService.setInformation(this.password, this.options, tab)
-      // }
+      const oldGeneratePassword = await this.$passService.getGeneratePassword()
+      if (isReload && oldGeneratePassword) {
+        this.password = oldGeneratePassword.password
+        this.options = JSON.parse(oldGeneratePassword.options)
+      } else {
+        if (!this.options.lowercase && !this.options.uppercase && !this.options.number && !this.options.special) {
+          this.options.lowercase = true
+        }
+        this.password = await this.$passwordGenerationService.generatePassword(this.options)
+        const tab = await BrowserApi.getTabFromCurrentWindow();
+        await this.$passService.setInformation(this.password, this.options, tab)
+      }
     },
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { handleResponseErrorMessage } from "./response";
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 const browserStorageService = JSLib.getBgService('storageService')()
 
 const service = axios.create({

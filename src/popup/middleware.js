@@ -1,7 +1,7 @@
 import router from '../router/popup'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 import storePromise from '@/store'
 const storageService = JSLib.getBgService('storageService')()
 const vaultTimeoutService = JSLib.getBgService('vaultTimeoutService')()

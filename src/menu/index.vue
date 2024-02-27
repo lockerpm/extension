@@ -70,6 +70,12 @@ export default Vue.extend({
       isLocked: false,
     }
   },
+  async created () {
+    this.isLocked = await this.$vaultTimeoutService.isLocked();
+    setInterval(async () => {
+      this.isLocked = await this.$vaultTimeoutService.isLocked();
+    }, 5000)
+  },
   computed: {
     tabs() {
       return [
@@ -153,7 +159,6 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    console.log(111, chrome);
     this.browserTab = await BrowserApi.getTabFromCurrentWindow();
   },
   methods: {

@@ -13,6 +13,7 @@ import store from '@/store/menu'
 
 import i18n from '@/locales/i18n'
 
+import JSLib from '@/services'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
@@ -20,11 +21,13 @@ import { BrowserApi } from "@/browser/browserApi";
 Vue.config.productionTip = false;
 
 Vue.use(AsyncComputed)
+Vue.use(JSLib)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
+import cystackPlatformAPI from '@/api/cystack_platform'
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '@/assets/css/index.scss'
@@ -33,8 +36,18 @@ import '@/assets/css/menu.scss'
 Vue.mixin({
   data() {
     return {
-      pageSize: 150,
+      pageSize: 150
     };
+  },
+  asyncComputed: {
+    isLoggedIn: {
+      async get() {
+        const userPw = await this.$storageService.get('cs_user_pw')
+        return !!userPw && userPw.email
+      },
+      watch: [
+      ],
+    }
   },
   methods: {
     notify(message, type, html = false, duration = 8000) {
@@ -47,11 +60,11 @@ Vue.mixin({
       })
     },
     async getExcludeDomains() {
-      // await cystackPlatformAPI.exclude_domains().then(response => {
-      //   this.$cipherService.saveNeverDomains(response.results)
-      // }).catch(() => {
-      //   this.$cipherService.saveNeverDomains([])
-      // })
+      await cystackPlatformAPI.exclude_domains().then(response => {
+        this.$cipherService.saveNeverDomains(response.results)
+      }).catch(() => {
+        this.$cipherService.saveNeverDomains([])
+      })
     },
     getIconCipher(cipher, size = 70, defaultIcon = false) {
       switch (cipher.type) {
@@ -150,46 +163,46 @@ Vue.mixin({
       })
     },
     async fillCipher(cipher, enableUpdate = false) {
-      // if (cipher.id && enableUpdate) {
-      //   await cystackPlatformAPI.use_cipher(
-      //     cipher.id,
-      //     { use: true, favorite: cipher.favorite },
-      //   )
-      // }
-      // const tab = await BrowserApi.getTabFromCurrentWindow();
-      // BrowserApi.tabSendMessage(tab, {
-      //   command: 'collectPageDetails',
-      //   tab: tab,
-      //   sender: 'autofillItem',
-      //   cipher: cipher
-      // });
-      // this.closeMenu()
+      if (cipher.id && enableUpdate) {
+        await cystackPlatformAPI.use_cipher(
+          cipher.id,
+          { use: true, favorite: cipher.favorite },
+        )
+      }
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      BrowserApi.tabSendMessage(tab, {
+        command: 'collectPageDetails',
+        tab: tab,
+        sender: 'autofillItem',
+        cipher: cipher
+      });
+      this.closeMenu()
     },
     async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
-      // try {
-      //   await cystackPlatformAPI.add_exclude_domain({ domain: url })
-      //   await this.getExcludeDomains();
-      //   callback()
-      //   if (isNotification) {
-      //     this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
-      //   }
-      // } catch (e) {
-      //   if (isNotification) {
-      //     this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
-      //   }
-      // }
+      try {
+        await cystackPlatformAPI.add_exclude_domain({ domain: url })
+        await this.getExcludeDomains();
+        callback()
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
+        }
+      } catch (e) {
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
+        }
+      }
     },
     async removeDomain(domain: any, isNotification = true) {
-      // cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
-      //   await this.getExcludeDomains()
-      //   if (isNotification) {
-      //     this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
-      //   }
-      // }).catch(() => {
-      //   if (isNotification) {
-      //     this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
-      //   }
-      // })
+      cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
+        await this.getExcludeDomains()
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.deleted_excluded_domain'), 'success')
+        }
+      }).catch(() => {
+        if (isNotification) {
+          this.notify(this.$tc('data.notifications.cannot_deleted_excluded_domain'), 'error')
+        }
+      })
     },
     async closeMenu() {
       setTimeout(async () => {

@@ -36,6 +36,8 @@ export const toCryptoWalletData = (str: string) => {
       ...parsed
     }
   } catch (e) {
+    //
   }
   return res
 }
+

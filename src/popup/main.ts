@@ -15,7 +15,7 @@ import router from '@/router/popup'
 import storePromise from '@/store'
 
 import i18n from '@/locales/i18n'
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";

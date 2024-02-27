@@ -68,40 +68,40 @@ export default Vue.extend({
       return []
     },
   },
-  // asyncComputed: {
-  //   ciphers: {
-  //     async get() {
-  //       let result = []
-  //       if (this.fillType.value === 0) {
-  //         const tab = await BrowserApi.getTabFromCurrentWindow();
-  //         if (!tab) {
-  //           result = []
-  //         } else {
-  //           const ciphers = (await this.$searchService.searchCiphers(
-  //             this.searchText,
-  //             [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
-  //             null,
-  //             tab,
-  //           )) || [];
-  //           result = this.$cipherService.sortCiphers(ciphers) || [];
-  //         }
-  //       } else {
-  //         result =
-  //           (await this.$searchService.searchCiphers(
-  //             this.searchText,
-  //             [(c) => c.type === this.fillType.value, (c) => !c.isDeleted],
-  //             null
-  //           )) || [];
-  //       }
-  //       return result
-  //     },
-  //     watch: [
-  //       "$store.state.syncedCiphersToggle",
-  //       "searchText",
-  //       "fillType",
-  //     ],
-  //   }
-  // },
+  asyncComputed: {
+    ciphers: {
+      async get() {
+        let result = []
+        if (this.fillType.value === 0) {
+          const tab = await BrowserApi.getTabFromCurrentWindow();
+          if (!tab) {
+            result = []
+          } else {
+            const ciphers = (await this.$searchService.searchCiphers(
+              this.searchText,
+              [(c) => c.type === CipherType.Login, (c) => !c.isDeleted],
+              null,
+              tab,
+            )) || [];
+            result = this.$cipherService.sortCiphers(ciphers) || [];
+          }
+        } else {
+          result =
+            (await this.$searchService.searchCiphers(
+              this.searchText,
+              [(c) => c.type === this.fillType.value, (c) => !c.isDeleted],
+              null
+            )) || [];
+        }
+        return result
+      },
+      watch: [
+        "$store.state.syncedCiphersToggle",
+        "searchText",
+        "fillType",
+      ],
+    }
+  },
   watch: {
     fillType: 'typeChanged'
   },
