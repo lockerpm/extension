@@ -20,7 +20,7 @@ service.interceptors.request.use(async (config) => {
 
   config.headers["Content-Type"] = "application/json";
   config.headers["Authorization"] = `Bearer ${accessToken}`;
-  config.headers['device-id'] = deviceId
+  config.headers['device-id'] = deviceId;
   return config;
 },
 (error) => {

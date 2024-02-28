@@ -521,13 +521,7 @@ Vue.mixin({
         }
       })
     },
-    async fillCipher(cipher, enableUpdate = false) {
-      if (cipher.id && enableUpdate) {
-        await cystackPlatformAPI.use_cipher(
-          cipher.id,
-          { use: true, favorite: cipher.favorite },
-        )
-      }
+    async fillCipher(cipher) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
@@ -596,7 +590,7 @@ Vue.mixin({
       const tab = await BrowserApi.getTabFromCurrentWindow();
       if (tab) {
         BrowserApi.tabSendMessage(tab, {
-          command: "firstScanQRCode",
+          command: "scanQRCodeInit",
           tab: tab,
           isPasswordOTP: isPasswordOTP
         });  

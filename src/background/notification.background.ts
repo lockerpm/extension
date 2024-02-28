@@ -62,12 +62,6 @@ export default class NotificationBackground {
 
   async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
     switch (msg.command) {
-      case 'unlockCompleted':
-        if (msg.data.target !== 'notification.background') {
-          return;
-        }
-        await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
-        break;
       case 'bgCloseNotificationBar':
         currentLoginInfo = null;
         break;

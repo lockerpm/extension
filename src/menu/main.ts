@@ -27,7 +27,7 @@ Vue.use(Element, { locale })
 
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
-import cystackPlatformAPI from '@/api/cystack_platform'
+import cystackPlatformAPI from '@/api/cystack_platform';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '@/assets/css/index.scss'

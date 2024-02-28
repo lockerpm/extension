@@ -2,6 +2,7 @@ type AutofillMenuIframeExtensionMessage = {
   command: string;
   styles?: Partial<CSSStyleDeclaration>;
   theme?: string;
+  initData?: any
 };
 
 type AutofillMenuIframeWindowMessageHandlers = {

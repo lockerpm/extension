@@ -63,14 +63,16 @@ export default Vue.extend({
   data () {
     return {
       CipherType,
-      tab: Number(this.$route.query?.tab || 2),
-      fillType: Number(this.$route.query?.type || 0),
+      tab: 2,
+      fillType: 0,
       browserTab: null,
       excluded: false,
       isLocked: false,
     }
   },
   async created () {
+    this.tab = this.$store.state.initData.tab;
+    this.fillType = this.$store.state.initData.type;
     this.isLocked = await this.$vaultTimeoutService.isLocked();
     setInterval(async () => {
       this.isLocked = await this.$vaultTimeoutService.isLocked();

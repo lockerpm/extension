@@ -1,4 +1,5 @@
 import AutofillMenuIframeElement from "@/content/menu";
+
 const defaultStyles = {
   position: 'absolute',
   minWidth: "300px",
@@ -20,7 +21,8 @@ const defaultStyles = {
   margin: "0px",
   opacity: "1",
 }
-class AutofillMenuListIframe extends AutofillMenuIframeElement {
+
+export class AutofillMenuListIframe extends AutofillMenuIframeElement {
   constructor(
   ) {
     super(
@@ -31,5 +33,3 @@ class AutofillMenuListIframe extends AutofillMenuIframeElement {
     );
   }
 }
-
-export default AutofillMenuListIframe

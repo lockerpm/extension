@@ -207,6 +207,9 @@ class AutofillMenuIframeService implements AutofillMenuIframeServiceInterface {
 
 
   private initAutofillMenuList(message: AutofillMenuIframeExtensionMessage) {
+    if (message?.initData) {
+      this.updateElementStyles(this.iframe, message?.initData.styles)
+    }
     this.iframe.contentWindow?.postMessage(message, "*");
   }
 

@@ -3,8 +3,11 @@ import "lit/polyfill-support.js";
 import AddLoginRuntimeMessage from 'src/background/models/addLoginRuntimeMessage';
 import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRuntimeMessage';
 import { generateRandomCustomElementName, setElementStyles } from '@/utils';
-import { CipherType } from 'jslib-common/enums/cipherType';
-import AutofillMenuListIframe from './menuIframe';
+import {
+  AutofillMenuListIframe,
+} from './menuIframe';
+
+import { CipherType } from "jslib-common/enums/cipherType";
 
 import {
   OBSERVE_IGNORED_ELEMENTS,
@@ -17,7 +20,6 @@ import {
 
 const documents = [];
 
-const menuElTagName = generateRandomCustomElementName();
 const menuIconTagName = generateRandomCustomElementName();
 
 let currentMessage: any = null
@@ -40,8 +42,7 @@ const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAIN
 let menuElement: HTMLElement;
 let menuIconElement: HTMLElement;
 
-let menuElementActive: false;
-let menuIconElementActive: false;
+let selectedInput: any;
 
 const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
   all: "initial",
@@ -176,41 +177,33 @@ function watchForms(forms: any[]) {
   });
 }
 
-function initMenuIcon(inputEl, type = 'password', isLocked = false, isOver = false) {
-  if (!menuIconElement) {
-    const logo = document.createElement("img");
-    let imageUrl = chrome.runtime.getURL('icons/48.png')
-    if (isLocked) {
-      imageUrl = chrome.runtime.getURL('icons/locked.png')
-    }
-    logo.src = imageUrl;
-    logo.className = 'cs-menu-icon';
-    logo.addEventListener('click', (event: any) => {
-      openInformMenu(inputEl, type, isOver)
-    })
-    menuIconElement = globalThis.document.createElement(menuIconTagName);
-    menuIconElement.appendChild(logo)
+function initMenuIcon(inputEl: HTMLElement, type = 'password', isLocked = false, isOver = false) {
+  removeFillLogo();
+  const logo = document.createElement("img");
+  let imageUrl = chrome.runtime.getURL('icons/48.png')
+  if (isLocked) {
+    imageUrl = chrome.runtime.getURL('icons/locked.png')
   }
+  logo.src = imageUrl;
+  logo.className = 'cs-menu-icon';
+  logo.addEventListener('click', (event: any) => {
+    openInformMenu(inputEl, type)
+  })
+  menuIconElement = globalThis.document.createElement(menuIconTagName);
+  menuIconElement.appendChild(logo)
   const menuIconPositionStyles = getMenuIconPosition(inputEl)
   updateCustomElementDefaultStyles(menuIconElement, menuIconPositionStyles);
-  if (!document.querySelector(menuElTagName)) {
-    setTimeout(() => {
-      globalThis.document.body.appendChild(menuIconElement);
-    }, 60)
-  }
+  globalThis.document.body.appendChild(menuIconElement);
+  setTimeout(() => {
+    selectedInput = inputEl;
+  }, 200)
 }
 
 function setFillLogo(el: any, type = 'password', isLocked = false, isOver = false) {
   const inputEl : any = document.querySelector(`[locker-id="${el.lockerId}"]`)
   if (inputEl && getComputedStyle(inputEl).display !== 'none') {
     inputEl.addEventListener("focus", (event) => {
-      console.log(event);
-      setTimeout(() => {
-        initMenuIcon(inputEl, type, isLocked, isOver)
-      }, 60)
-    });
-    inputEl.addEventListener("focusout", (event) => {
-      // console.log(event);
+      initMenuIcon(inputEl, type, isLocked, isOver)
     });
   }
 }
@@ -219,22 +212,39 @@ function removeFillLogo() {
   if (menuIconElement && menuIconElement.parentElement) {
     menuIconElement.parentElement.removeChild(menuIconElement);
   }
+  selectedInput = null;
+  menuIconElement = null;
+  closeInformMenu();
 }
 
-function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
+function openInformMenu(inputEl: any, type: string = 'password') {
+  if (selectedInput?.id === inputEl.id && menuElement) {
+    return;
+  }
   closeInformMenu();
-  if (!menuElement) {
-    globalThis.customElements?.define(menuElTagName, AutofillMenuListIframe);
-    menuElement = globalThis.document.createElement(menuElTagName);
+  const { width } = inputEl.getBoundingClientRect();
+  const initData = {
+    type: 0,
+    tab: 2,
+    styles: {
+      height: '300px',
+      width: `${width}px`
+    }
   }
-  let defaultType = 0, defaultTab = 2
   if (isSignUp && type === 'password') {
-    defaultTab = 1
+    initData.tab = 1;
+    initData.styles.height = '428px'
   } else if (type === 'otp') {
-    defaultTab = 2
-    defaultType = CipherType.OTP
+    initData.type = CipherType.OTP;
+    initData.tab = 2;
   }
-  
+  sendPlatformMessage({
+    command: 'initInformMenu',
+    data: initData
+  });
+  const menuElTagName = generateRandomCustomElementName();
+  globalThis.customElements?.define(menuElTagName, AutofillMenuListIframe);
+  menuElement = globalThis.document.createElement(menuElTagName);
   const menuPositionStyles = getMenuPosition(inputEl)
   updateCustomElementDefaultStyles(menuElement, menuPositionStyles);
   globalThis.document.body.appendChild(menuElement);
@@ -244,6 +254,7 @@ function closeInformMenu() {
   if (menuElement && menuElement.parentElement) {
     menuElement.parentElement.removeChild(menuElement);
   }
+  menuElement = null;
 }
 
 function listen(form: HTMLFormElement) {
@@ -574,26 +585,6 @@ function closeBar(explicitClose: boolean = false) {
   }
 }
 
-function getOffsetTop(elem) {
-  var offsetLeft = 0;
-  do {
-    if (!isNaN(elem.offsetTop)) {
-      offsetLeft += elem.offsetTop;
-    }
-  } while ((elem = elem.offsetParent));
-  return offsetLeft;
-}
-
-function getOffsetLeft(elem) {
-  var offsetLeft = 0;
-  do {
-    if (!isNaN(elem.offsetLeft)) {
-      offsetLeft += elem.offsetLeft;
-    }
-  } while ((elem = elem.offsetParent));
-  return offsetLeft;
-}
-
 function closePopupWindow() {
 }
 
@@ -647,7 +638,7 @@ function getMenuIconPosition(inputEl: HTMLElement, isOver: Boolean = false) {
   }
   return {
     top: `${top + (height - 20) / 2}px`,
-    left: `${left + width - 20}px`,
+    left: `${left + width - 30}px`,
   };
 }
 
@@ -684,40 +675,52 @@ function handleOverlayElementMutationObserverUpdate (mutationRecord: MutationRec
   }
 };
 
-function processMessages(msg: any, sendResponse: Function) {
+function resizeMenuInfo(msg: any) {
+  const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
+    if (menuEls && menuEls.length > 0) {
+      for (let i = 0; i < menuEls.length; i += 1) {
+        menuEls[i].style.setProperty('height', `${msg.data.height}px`, '');
+      };
+    }
+}
+
+async function checkingAutofill(msg: any) {
+  watchForms(msg.data.forms);
+  const autofillObj = await chrome.storage.local.get('enableAutofill');
+  if (autofillObj && autofillObj.enableAutofill === false) return;
+  for (let i = 0; i < msg.data.passwordFields.length; i++) {
+    if (msg.data.passwordFields[i]) {
+      try {
+        setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+      } catch (error) {
+      }
+    }
+  }
+  for (let i = 0; i < msg.data.usernameFields.length; i++) {
+    if (msg.data.usernameFields[i]) {
+      try {
+        setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+      } catch (error) {
+      }
+    }
+  }
+  for (let i = 0; i < msg.data.forms.length; i++) {
+    const form = msg.data.forms[i];
+    if (form.otps?.length === 1) {
+      setFillLogo(form.otps[0], "otp", msg.data.isLocked)
+    } else if (form.otps.length === 6) {
+      setFillLogo(form.otps[5], "otp", msg.data.isLocked, true)
+    }
+  }
+}
+
+async function processMessages(msg: any, sendResponse: Function) {
   if (msg.command === 'openNotificationBar') {
     closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
   } else if (msg.command === 'closeNotificationBar') {
     closeBar(true);
   } else if (msg.command === 'notificationBarPageDetails') {
-    watchForms(msg.data.forms);
-    chrome.storage.local.get('enableAutofill', (autofillObj: any) => {
-      if (autofillObj && autofillObj.enableAutofill === false) return;
-      for (let i = 0; i < msg.data.passwordFields.length; i++) {
-        if (msg.data.passwordFields[i]) {
-          try {
-            setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
-          } catch (error) {
-          }
-        }
-      }
-      for (let i = 0; i < msg.data.usernameFields.length; i++) {
-        if (msg.data.usernameFields[i]) {
-          try {
-            setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
-          } catch (error) {
-          }
-        }
-      }
-      for (let i = 0; i < msg.data.forms.length; i++) {
-        const form = msg.data.forms[i];
-        if (form.otps?.length === 1) {
-          setFillLogo(form.otps[0], "otp", msg.data.isLocked)
-        } else if (form.otps.length === 6) {
-          setFillLogo(form.otps[5], "otp", msg.data.isLocked, true)
-        }
-      }
-    })
+    await checkingAutofill(msg)
   } else if (msg.command === "closeInformMenu") {
     closeInformMenu()
   } else if (msg.command === 'openPopupWindow') {
@@ -725,16 +728,23 @@ function processMessages(msg: any, sendResponse: Function) {
   } else if (msg.command === 'closePopupWindow') {
     closePopupWindow()
   } else if (msg.command === 'resizeMenuInfo') {
-    const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
-    if (menuEls && menuEls.length > 0) {
-      for (let i = 0; i < menuEls.length; i += 1) {
-        menuEls[i].style.setProperty('height', `${msg.data.height}px`, '');
-      };
-    }
+    resizeMenuInfo(msg)
   }
   sendResponse();
   return true;
 }
+
+document.addEventListener('click', (event: any) => {
+  if (menuElement && menuIconElement && selectedInput) {
+    if (!menuElement.contains(event.target) && !menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
+      removeFillLogo();
+    }
+  } else if (menuIconElement && selectedInput) {
+    if (!menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
+      removeFillLogo();
+    }
+  }
+})
 
 // Check iframes
 document.addEventListener('DOMContentLoaded', event => {
@@ -743,16 +753,16 @@ document.addEventListener('DOMContentLoaded', event => {
   if (hideDomains && hideDomains.includes(self.location.hostname)) {
     return;
   }
+});
 
-  chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-    disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-    chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-      disabledChangedPasswordNotification = disChangedObj != null &&
-        disChangedObj.disableChangedPasswordNotification === true;
-      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-        collectIfNeededWithTimeout();
-      }
-    });
+chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+  disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+  chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+    disabledChangedPasswordNotification = disChangedObj != null &&
+      disChangedObj.disableChangedPasswordNotification === true;
+    if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+      collectIfNeededWithTimeout();
+    }
   });
 });
 

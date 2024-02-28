@@ -120,10 +120,7 @@
 <script>
 import PasswordStrength from '@/components/PasswordStrength.vue'
 import { BrowserApi } from "@/browser/browserApi";
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
-
-import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },

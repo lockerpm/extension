@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { CipherType } from 'jslib-common/enums/cipherType';
 
 Vue.use(Vuex)
 
@@ -8,6 +9,10 @@ const store = new Vuex.Store({
   state: {
     language: 'en',
     searchText: '',
+    initData: {
+      tab: 2,
+      type: CipherType.Login,
+    }
   },
   mutations: {
     SET_LANG (state, language) {
@@ -15,6 +20,9 @@ const store = new Vuex.Store({
     },
     UPDATE_SEARCH (state, value) {
       state.searchText = value
+    },
+    UPDATE_INIT_DATA (state, value) {
+      state.initData = value
     },
   },
   actions: {

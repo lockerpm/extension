@@ -4,143 +4,146 @@ document.addEventListener('DOMContentLoaded', event => {
   if (hideDomains && hideDomains.includes(self.location.hostname)) {
     return;
   }
-  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.command === 'collectPageDetails') {
-      const pageDetailsObj = JSON.parse(collect(document));
-      const domain = new URL(msg.tab.url)
-      if (pageDetailsObj.url.includes(domain.hostname)) {
-        chrome.runtime.sendMessage({
-          command: 'collectPageDetailsResponse',
-          tab: msg.tab,
-          details: pageDetailsObj,
-          sender: msg.sender,
-          cipher: msg.cipher
-        });
-      }
-    } else if (msg.command === 'fillForm') {
-      fill(document, msg.fillScript);
-    } else if (msg.command === 'fillOTPForm') {
-      for (let index = 0; index < msg.forms.length; index++) {
-        const form = msg.forms[index];
-        if (form.otps.length === 1) {
-          const otpInput = document.getElementById(form.otps[0].htmlID)
-          if (otpInput) {
-            fillTheElement(otpInput, msg.totp, true, true)
-          }
-        } else if (form.otps.length === 6) {
-          form.otps.forEach((o, index) => {
-            const otpInput = document.getElementById(o.htmlID)
-            if (otpInput) {
-              fillTheElement(otpInput, msg.totp[index] || null, true, true)
-            }
-          })
+})
+
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+  if (msg.command === 'collectPageDetails') {
+    const pageDetailsObj = JSON.parse(collect(document));
+    const domain = new URL(msg.tab.url)
+    if (pageDetailsObj.url.includes(domain.hostname)) {
+      chrome.runtime.sendMessage({
+        command: 'collectPageDetailsResponse',
+        tab: msg.tab,
+        details: pageDetailsObj,
+        sender: msg.sender,
+        cipher: msg.cipher
+      });
+    }
+  } else if (msg.command === 'fillForm') {
+    fill(document, msg.fillScript);
+  } else if (msg.command === 'fillOTPForm') {
+    for (let index = 0; index < msg.forms.length; index++) {
+      const form = msg.forms[index];
+      if (form.otps.length === 1) {
+        const otpInput = document.getElementById(form.otps[0].htmlID)
+        if (otpInput) {
+          fillTheElement(otpInput, msg.totp, true, true)
         }
+      } else if (form.otps.length === 6) {
+        form.otps.forEach((o, index) => {
+          const otpInput = document.getElementById(o.htmlID)
+          if (otpInput) {
+            fillTheElement(otpInput, msg.totp[index] || null, true, true)
+          }
+        })
       }
-    } else if (msg.command === 'firstScanQRCode') {
-      scanQRCode(document, msg.tab, msg.isPasswordOTP);
-    } else if (msg.command === 'capturedImage') {
-      readAndAddQRCode(document, msg);
-    } else if (msg.command === 'addedOTP') {
-      isReading = false;
-      const actions = document.querySelector('locker-select-wrapper');
+    }
+  } else if (msg.command === 'scanQRCodeInit') {
+    scanQRCodeInit(document, msg.tab, msg.isPasswordOTP);
+  } else if (msg.command === 'capturedImage') {
+    readAndAddQRCode(document, msg);
+  } else if (msg.command === 'addedOTP') {
+    isReading = false;
+    const actions = document.querySelector('locker-select-wrapper');
+    if (actions) {
       if (msg.sender === 'removeLockerWrapper') {
         actions.remove();
       } else {
         actions.style.visibility = 'inherit';
       }
-    } else if (msg.command === 'alert') {
-      switch (msg.type) {
-        case 'username_password_updated':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Cập nhật thành công."
-              : "Username and Password are updated!"
-          );
-          break;
-        case 'username_password_update_error':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Lỗi! Không thể cập nhật không."
-              : "Error! Can't update Username and Password."
-          );
-          break;
-        case 'otp_limited':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Đã đạt đến số lượng tối đa cho mã OTP. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
-              : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
-          );
-          break;
-        case 'otp_added':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Thêm mới thành công."
-              : "QR code OTP added!"
-          );
-          break;
-        case 'password_otp_added':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "OTP đã được thêm cho Mật Khẩu."
-              : "QR code OTP added to Password"
-          );
-          break
-        case 'password_limited':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
-              : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
-          );
-        case 'password_added':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Thêm mới thành công."
-              : "Username and Password are added!"
-          );
-          break;
-        case 'password_add_error':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Lỗi! Không thể thêm mới tài khoản."
-              : "Error! Can't add Username and Password."
-          );
-          break;
-        case 'qr_invalid':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa."
-              : "QR code is invalid! Please try again."
-          );
-          break;
-        case 'qr_existed':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Mã QR đã tồn tại! Vui lòng quét mã QR khác."
-              : "QR code is existed! Please try scan QR code other."
-          );
-          break;
-        case 'capture_not_active':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Sự kiện chụp ảnh của trình duyệt không hoạt đông!. Không thể đọc mã QR"
-              : "Capture visible tab is not active! Cannot read QR code."
-          );
-          break;
-        case 'autofill_error':
-          self.alert(
-            self.navigator.language === "vi"
-              ? "Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin."
-              : "Unable to auto-fill the selected item on this page. Copy and paste the information instead."
-          );
-          break;
-        default:
-          break;
-      }
     }
-    sendResponse();
-    return true;
-  });  
-})
+  } else if (msg.command === 'alert') {
+    switch (msg.type) {
+      case 'username_password_updated':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Cập nhật thành công."
+            : "Username and Password are updated!"
+        );
+        break;
+      case 'username_password_update_error':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Lỗi! Không thể cập nhật không."
+            : "Error! Can't update Username and Password."
+        );
+        break;
+      case 'otp_limited':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Đã đạt đến số lượng tối đa cho mã OTP. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
+            : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
+        );
+        break;
+      case 'otp_added':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Thêm mới thành công."
+            : "QR code OTP added!"
+        );
+        break;
+      case 'password_otp_added':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "OTP đã được thêm cho Mật Khẩu."
+            : "QR code OTP added to Password"
+        );
+        break
+      case 'password_limited':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Đã đạt đến số lượng tối đa cho Mật Khẩu. Vui lòng xóa các mục trong Thùng rác (nếu có) hoặc nâng cấp lên bản Premium để tiếp tục."
+            : "You has reached the storage limit for Password. Please check your Trash and delete unused items or upgrade to Premium Plan to continue."
+        );
+      case 'password_added':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Thêm mới thành công."
+            : "Username and Password are added!"
+        );
+        break;
+      case 'password_add_error':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Lỗi! Không thể thêm mới tài khoản."
+            : "Error! Can't add Username and Password."
+        );
+        break;
+      case 'qr_invalid':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Mã QR không đúng định dạng. Hãy thử lại lần nữa."
+            : "QR code is invalid! Please try again."
+        );
+        break;
+      case 'qr_existed':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Mã QR đã tồn tại! Vui lòng quét mã QR khác."
+            : "QR code is existed! Please try scan QR code other."
+        );
+        break;
+      case 'capture_not_active':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Sự kiện chụp ảnh của trình duyệt không hoạt đông!. Không thể đọc mã QR"
+            : "Capture visible tab is not active! Cannot read QR code."
+        );
+        break;
+      case 'autofill_error':
+        self.alert(
+          self.navigator.language === "vi"
+            ? "Không thể tự động điền mục đã chọn trên trang này. Hãy sao chép và dán thông tin."
+            : "Unable to auto-fill the selected item on this page. Copy and paste the information instead."
+        );
+        break;
+      default:
+        break;
+    }
+  }
+  sendResponse();
+  return true;
+});
 
 // normalize the event based on API support
 function normalizeEvent(el, eventName) {
@@ -241,7 +244,7 @@ function doAllFillOperations(el, animateTheFilling, afterValSetFunc) {
   if (canSeeElementToStyle(el, animateTheFilling)) {
     el.classList.add('com-locker-browser-animated-fill');
     setTimeout(function () {
-      if (el) {
+      if (el && el.classList) {
         el.classList.remove('com-locker-browser-animated-fill');
       }
     }, 200);
@@ -1090,7 +1093,7 @@ function fill(document, fillScript, undefined) {
   doFill(fillScript);
 }
 
-function scanQRCode(document, tab, isPasswordOTP) {
+function scanQRCodeInit(document, tab, isPasswordOTP) {
   const docHeight = self.innerHeight;
   const docWidth = self.innerWidth;
   let isMove = false;
@@ -1221,7 +1224,9 @@ function scanQRCode(document, tab, isPasswordOTP) {
         `
     cancelButton.addEventListener('click', () => {
       isReading = false;
-      document.querySelector('locker-select-wrapper').remove();
+      if (document.querySelector('locker-select-wrapper')) {
+        document.querySelector('locker-select-wrapper').remove();
+      }
     })
     wrapperActions.appendChild(cancelButton);
 

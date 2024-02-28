@@ -9,6 +9,7 @@ export default class MenuBackground {
   private readonly openViewVaultItemPopout = () => {};
   private readonly openAddEditVaultItemPopout = () => {};
   private menuPort: chrome.runtime.Port;
+  private initData: any;
   constructor(
     private cipherService: CipherService,
   ) {}
@@ -18,6 +19,7 @@ export default class MenuBackground {
 
   private setupExtensionMessageListeners() {
     BrowserApi.messageListener("menu.background", this.handleExtensionMessage);
+    chrome.runtime.onMessageExternal.addListener(this.handleExtensionMessage);
     BrowserApi.addListener(chrome.runtime.onConnect, this.handlePortOnConnect);
   }
 
@@ -27,6 +29,9 @@ export default class MenuBackground {
     sendResponse: (response?: any) => void,
   ) => {
     // Check message
+    if (message.command === 'initInformMenu') {
+      this.initData = message.data
+    }
     return true;
   };
 
@@ -44,6 +49,7 @@ export default class MenuBackground {
     port.postMessage({
       command: 'initAutofillMenuList',
       isConnected: isMenuPort,
+      initData: this.initData
     });
   };
 

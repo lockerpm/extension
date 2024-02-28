@@ -22,7 +22,8 @@ export default Vue.extend({
     self.addEventListener('message', (event: any) => {
       if (event.target?.location.href === self.location.href) {
         if (event.data.isConnected) {
-          this.isPortConnected = true
+          this.isPortConnected = true;
+          this.$store.commit('UPDATE_INIT_DATA', event.data.initData)
         }
       }
     })

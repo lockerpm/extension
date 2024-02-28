@@ -281,13 +281,6 @@ export default class RuntimeBackground {
     await this.main.refreshBadgeAndMenu(false);
     await this.notificationsService.connectWebSocket();
     this.systemService.cancelProcessReload();
-    if (item) {
-      await BrowserApi.tabSendMessageData(
-        item.commandToRetry.sender.tab,
-        "unlockCompleted",
-        item
-      );
-    }
   }
 
   async handleOpenPopupWindow(timeout = 0) {
