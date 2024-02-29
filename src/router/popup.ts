@@ -180,6 +180,17 @@ const routes: Array<RouteConfig> = [
           import(
             "../popup/views/settings/info.vue"
           )
+      },
+      {
+        path: "settings/enable-autofill",
+        name: "settings-enable-autofill",
+        meta: {
+          isAuth: true
+        },
+        component: () =>
+          import(
+            "../popup/views/settings/enable-autofill.vue"
+          )
       }
     ]
   },

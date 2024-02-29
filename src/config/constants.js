@@ -16,6 +16,18 @@ export const VAULT_TIMEOUTS = [
   { label: i18n.t("data.timeouts.onRefresh"), value: -1 },
 ];
 
+export const AUTOFILL_MENU_OPTIONS = [
+  { label: i18n.t("data.settings.menu_off"), value: 'off' },
+  { label: i18n.t("data.settings.menu_field_selected"), value: 'field_selected' },
+  { label: i18n.t("data.settings.menu_icon_selected"), value: 'icon_selected' },
+];
+
+export const AUTOFILL_OPTIONS = [
+  { label: i18n.t("data.settings.never_autofill"), value: 'off' },
+  { label: i18n.t("data.settings.autofill_page"), value: 'autofill_page' },
+  { label: i18n.t("data.settings.autofill_page_iframes"), value: 'autofill_page_iframes' },
+];
+
 export const EVENTS = {
   CHANGE: "change",
   INPUT: "input",

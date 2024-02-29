@@ -43,6 +43,7 @@ let menuElement: HTMLElement;
 let menuIconElement: HTMLElement;
 
 let selectedInput: any;
+let showMenuOption: any;
 
 const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
   all: "initial",
@@ -54,6 +55,73 @@ const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
 let menuElementsMutationObserver: MutationObserver = new MutationObserver(
   handleOverlayElementMutationObserverUpdate,
 );;
+
+document.addEventListener('click', (event: any) => {
+  if (menuElement && menuIconElement && selectedInput) {
+    if (!menuElement.contains(event.target) && !menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
+      removeFillLogo();
+    }
+  } else if (menuIconElement && selectedInput) {
+    if (!menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
+      removeFillLogo();
+    }
+  }
+})
+
+document.addEventListener('DOMContentLoaded', event => {
+  documents.push(document)
+  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
+  if (hideDomains && hideDomains.includes(self.location.hostname)) {
+    return;
+  }
+});
+
+chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+  disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+  chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+    disabledChangedPasswordNotification = disChangedObj != null &&
+      disChangedObj.disableChangedPasswordNotification === true;
+    if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+      collectIfNeededWithTimeout();
+    }
+  });
+});
+
+chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+  if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+    return;
+  }
+  currentMessage = msg;
+  processMessages(msg, sendResponse);
+});
+
+async function processMessages(msg: any, sendResponse: Function) {
+  if (msg.command === 'openNotificationBar') {
+    closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
+  } else if (msg.command === 'closeNotificationBar') {
+    closeBar(true);
+  } else if (msg.command === 'notificationBarPageDetails') {
+    await checkingAutofill(msg)
+  } else if (msg.command === "closeInformMenu") {
+    closeInformMenu()
+  } else if (msg.command === 'openPopupWindow') {
+    openPopupWindow()
+  } else if (msg.command === 'closePopupWindow') {
+    closePopupWindow()
+  } else if (msg.command === 'resizeInformMenu') {
+    resizeInformMenu(msg)
+  } else if (msg.command === 'updateCipher') {
+    sendPlatformMessage(msg)
+  } else if (msg.command === 'useCipher') {
+    sendPlatformMessage(msg)
+  } else if (msg.command === 'addExcludeDomain') {
+    sendPlatformMessage(msg)
+  } else if (msg.command === 'removeExcludeDomain') {
+    sendPlatformMessage(msg)
+  }
+  sendResponse();
+  return true;
+}
 
 function observeDom() {
   const bodies = document.querySelectorAll('body');
@@ -187,11 +255,11 @@ function initMenuIcon(inputEl: HTMLElement, type = 'password', isLocked = false,
   logo.src = imageUrl;
   logo.className = 'cs-menu-icon';
   logo.addEventListener('click', (event: any) => {
-    openInformMenu(inputEl, type)
+    openInformMenu(inputEl, type, isOver)
   })
   menuIconElement = globalThis.document.createElement(menuIconTagName);
   menuIconElement.appendChild(logo)
-  const menuIconPositionStyles = getMenuIconPosition(inputEl)
+  const menuIconPositionStyles = getMenuIconPosition(inputEl, isOver)
   updateCustomElementDefaultStyles(menuIconElement, menuIconPositionStyles);
   globalThis.document.body.appendChild(menuIconElement);
   setTimeout(() => {
@@ -201,9 +269,19 @@ function initMenuIcon(inputEl: HTMLElement, type = 'password', isLocked = false,
 
 function setFillLogo(el: any, type = 'password', isLocked = false, isOver = false) {
   const inputEl : any = document.querySelector(`[locker-id="${el.lockerId}"]`)
+  const activeElement = document.activeElement;
+  if (activeElement && inputEl && activeElement.id == inputEl.id) {
+    initMenuIcon(inputEl, type, isLocked, isOver)
+    if (showMenuOption === 'field_selected') {
+      openInformMenu(inputEl, type, isOver)
+    }
+  }
   if (inputEl && getComputedStyle(inputEl).display !== 'none') {
     inputEl.addEventListener("focus", (event) => {
-      initMenuIcon(inputEl, type, isLocked, isOver)
+      initMenuIcon(inputEl, type, isLocked, isOver);
+      if (showMenuOption === 'field_selected') {
+        openInformMenu(inputEl, type, isOver)
+      }
     });
   }
 }
@@ -217,7 +295,7 @@ function removeFillLogo() {
   closeInformMenu();
 }
 
-function openInformMenu(inputEl: any, type: string = 'password') {
+function openInformMenu(inputEl: any, type: string = 'password', isOver: Boolean = false) {
   if (selectedInput?.id === inputEl.id && menuElement) {
     return;
   }
@@ -245,7 +323,7 @@ function openInformMenu(inputEl: any, type: string = 'password') {
   const menuElTagName = generateRandomCustomElementName();
   globalThis.customElements?.define(menuElTagName, AutofillMenuListIframe);
   menuElement = globalThis.document.createElement(menuElTagName);
-  const menuPositionStyles = getMenuPosition(inputEl)
+  const menuPositionStyles = getMenuPosition(inputEl, isOver)
   updateCustomElementDefaultStyles(menuElement, menuPositionStyles);
   globalThis.document.body.appendChild(menuElement);
 }
@@ -675,19 +753,25 @@ function handleOverlayElementMutationObserverUpdate (mutationRecord: MutationRec
   }
 };
 
-function resizeMenuInfo(msg: any) {
-  const menuEls: any = document.getElementsByClassName('cs-inform-menu-iframe');
-    if (menuEls && menuEls.length > 0) {
-      for (let i = 0; i < menuEls.length; i += 1) {
-        menuEls[i].style.setProperty('height', `${msg.data.height}px`, '');
-      };
+function resizeInformMenu(msg: any) {
+  sendPlatformMessage({
+    command: 'resizeInformMenu',
+    data: {
+      styles: {
+        height: msg.data.height,
+      }
     }
+  });
 }
 
 async function checkingAutofill(msg: any) {
   watchForms(msg.data.forms);
-  const autofillObj = await chrome.storage.local.get('enableAutofill');
-  if (autofillObj && autofillObj.enableAutofill === false) return;
+  const showMenuOptionStorage = await chrome.storage.local.get('showMenuOption');
+  showMenuOption = showMenuOptionStorage.showMenuOption;
+  if (showMenuOption === 'off') {
+    return
+  }
+
   for (let i = 0; i < msg.data.passwordFields.length; i++) {
     if (msg.data.passwordFields[i]) {
       try {
@@ -714,62 +798,5 @@ async function checkingAutofill(msg: any) {
   }
 }
 
-async function processMessages(msg: any, sendResponse: Function) {
-  if (msg.command === 'openNotificationBar') {
-    closeExistingAndOpenBar(msg.data.type, msg.data.loginInfo);
-  } else if (msg.command === 'closeNotificationBar') {
-    closeBar(true);
-  } else if (msg.command === 'notificationBarPageDetails') {
-    await checkingAutofill(msg)
-  } else if (msg.command === "closeInformMenu") {
-    closeInformMenu()
-  } else if (msg.command === 'openPopupWindow') {
-    openPopupWindow()
-  } else if (msg.command === 'closePopupWindow') {
-    closePopupWindow()
-  } else if (msg.command === 'resizeMenuInfo') {
-    resizeMenuInfo(msg)
-  }
-  sendResponse();
-  return true;
-}
 
-document.addEventListener('click', (event: any) => {
-  if (menuElement && menuIconElement && selectedInput) {
-    if (!menuElement.contains(event.target) && !menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
-      removeFillLogo();
-    }
-  } else if (menuIconElement && selectedInput) {
-    if (!menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
-      removeFillLogo();
-    }
-  }
-})
 
-// Check iframes
-document.addEventListener('DOMContentLoaded', event => {
-  documents.push(document)
-  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
-  if (hideDomains && hideDomains.includes(self.location.hostname)) {
-    return;
-  }
-});
-
-chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-  disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-  chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-    disabledChangedPasswordNotification = disChangedObj != null &&
-      disChangedObj.disableChangedPasswordNotification === true;
-    if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-      collectIfNeededWithTimeout();
-    }
-  });
-});
-
-chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
-  if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
-    return;
-  }
-  currentMessage = msg;
-  processMessages(msg, sendResponse);
-});

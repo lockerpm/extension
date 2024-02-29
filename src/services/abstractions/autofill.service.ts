@@ -1,7 +1,7 @@
 import AutofillPageDetails from '../../models/autofillPageDetails';
 
 export abstract class AutofillService {
-    getFormsWithPasswordFields: (pageDetails: AutofillPageDetails) => any[];
+    getFormsFields: (pageDetails: AutofillPageDetails) => any[];
     getPasswordsFields: (pageDetails: AutofillPageDetails) => any[];
     getNewPasswordsFields: (pageDetails: AutofillPageDetails) => any[];
     getCardForms: (pageDetails: AutofillPageDetails) => any[];

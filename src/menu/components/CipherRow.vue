@@ -36,7 +36,7 @@
           class="btn-icon"
           :title="item.favorite ? $t('data.ciphers.markNotFavorite') : $t('data.ciphers.markFavorite')"
           type="text"
-          @click="() => putCipher()"
+          @click="() => $emit('put-cipher')"
         >
           <img :src="require(`@/assets/images/icons/${item.favorite ? 'icon_unpin' : 'icon_pin'}.svg`)" alt="">
         </el-button>
@@ -48,11 +48,9 @@
 <script>
 import Vue from 'vue'
 import Vnodes from "@/popup/components/Vnodes.vue";
-import cystackPlatformAPI from "@/api/cystack_platform";
 
 import { CipherType } from "jslib-common/enums/cipherType";
 import { CipherView } from 'jslib-common/models/view/cipherView';
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 
 export default Vue.extend(
   {
@@ -77,21 +75,7 @@ export default Vue.extend(
       }
     },
     methods: {
-      async putCipher () {
-        this.cipher.favorite = !this.cipher.favorite
-        const newCipher = await this.$cipherService.encrypt(this.cipher);
-        const data = new CipherRequest(newCipher)
-        try {
-          await cystackPlatformAPI.update_cipher(this.cipher.id, data)
-          this.notify(this.$tc('data.notifications.update_success', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'success')
-        } catch (e) {
-          if (e.response && e.response.data && e.response.data.code === '3003') {
-            this.notify(this.$t('errors.3003'), 'error')
-          } else {
-            this.notify(this.$tc('data.notifications.update_failed', 1, { type: this.$tc(`type.${this.cipher.type}`, 1) }), 'warning') 
-          }
-        }
-      },
+      
     }
   }
 )

@@ -33,15 +33,14 @@ export default {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async fillOTP () {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (tab == null) {
-        return;
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: 'collectPageDetails',
+          tab: tab,
+          sender: 'autofillOTP',
+          cipher: this.item
+        });
       }
-      BrowserApi.tabSendMessage(tab, {
-        command: 'collectPageDetails',
-        tab: tab,
-        sender: 'autofillOTP',
-        cipher: this.item
-      });
       this.closeMenu();
     }
   }

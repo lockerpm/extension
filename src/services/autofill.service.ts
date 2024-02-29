@@ -22,16 +22,46 @@ import AutofillScript from '../models/autofillScript';
 
 import { BrowserApi } from '../browser/browserApi';
 
+const UsernameFieldNames: string[] = AutoFillConstants.UsernameFieldNames;
+const ExcludedAutofillTypes: string[] = AutoFillConstants.ExcludedAutofillTypes;
+const PasswordFieldExcludeList: string[] = AutoFillConstants.PasswordFieldExcludeList;
+
 const CardAttributes: string[] = CreditCardAutoFillConstants.CardAttributes;
 const CardAttributesExtended: string[] = CreditCardAutoFillConstants.CardAttributesExtended;
-const IdentityAttributes: string[] = IdentityAutoFillConstants.IdentityAttributes;
-const UsernameFieldNames: string[] = AutoFillConstants.UsernameFieldNames;
-const FirstnameFieldNames: string[] = IdentityAutoFillConstants.FirstnameFieldNames;
-const LastnameFieldNames: string[] = IdentityAutoFillConstants.LastnameFieldNames;
-const ExcludedAutofillTypes: string[] = AutoFillConstants.ExcludedAutofillTypes;
 const MonthAbbr = CreditCardAutoFillConstants.MonthAbbr;
 const YearAbbrShort = CreditCardAutoFillConstants.YearAbbrShort;
 const YearAbbrLong = CreditCardAutoFillConstants.YearAbbrLong;
+const CardHolderFieldNames: string[] = CreditCardAutoFillConstants.CardHolderFieldNames;
+const CardHolderFieldNameValues: string[] = CreditCardAutoFillConstants.CardHolderFieldNameValues;
+const CardNumberFieldNames: string[] = CreditCardAutoFillConstants.CardNumberFieldNames;
+const CardNumberFieldNameValues: string[] = CreditCardAutoFillConstants.CardNumberFieldNameValues;
+const CardExpiryFieldNames: string[] = CreditCardAutoFillConstants.CardExpiryFieldNames;
+const CardExpiryFieldNameValues: string[] = CreditCardAutoFillConstants.CardExpiryFieldNameValues;
+const ExpiryMonthFieldNames: string[] = CreditCardAutoFillConstants.ExpiryMonthFieldNames;
+const ExpiryYearFieldNames: string[] = CreditCardAutoFillConstants.ExpiryYearFieldNames;
+const CVVFieldNames: string[] = CreditCardAutoFillConstants.CVVFieldNames;
+const CardBrandFieldNames: string[] = CreditCardAutoFillConstants.CardBrandFieldNames;
+
+const IdentityAttributes: string[] = IdentityAutoFillConstants.IdentityAttributes;
+const FullNameFieldNames: string[] = IdentityAutoFillConstants.FullNameFieldNames;
+const FullNameFieldNameValues: string[] = IdentityAutoFillConstants.FullNameFieldNameValues;
+const FirstnameFieldNames: string[] = IdentityAutoFillConstants.FirstnameFieldNames;
+const MiddlenameFieldNames: string[] = IdentityAutoFillConstants.MiddlenameFieldNames;
+const EmailFieldNames: string[] = IdentityAutoFillConstants.EmailFieldNames;
+const AddressFieldNames: string[] = IdentityAutoFillConstants.AddressFieldNames;
+const AddressFieldNameValues: string[] = IdentityAutoFillConstants.AddressFieldNameValues;
+const Address1FieldNames: string[] = IdentityAutoFillConstants.Address1FieldNames;
+const Address2FieldNames: string[] = IdentityAutoFillConstants.Address2FieldNames;
+const Address3FieldNames: string[] = IdentityAutoFillConstants.Address3FieldNames;
+const LastnameFieldNames: string[] = IdentityAutoFillConstants.LastnameFieldNames;
+const PostalCodeFieldNames: string[] = IdentityAutoFillConstants.PostalCodeFieldNames;
+const CityFieldNames: string[] = IdentityAutoFillConstants.CityFieldNames;
+const StateFieldNames: string[] = IdentityAutoFillConstants.StateFieldNames;
+const CountryFieldNames: string[] = IdentityAutoFillConstants.CountryFieldNames;
+const PhoneFieldNames: string[] = IdentityAutoFillConstants.PhoneFieldNames;
+const CompanyFieldNames: string[] = IdentityAutoFillConstants.CompanyFieldNames;
+const UserNameFieldNames: string[] = IdentityAutoFillConstants.UserNameFieldNames;
+const TitleFieldNames: string[] = IdentityAutoFillConstants.TitleFieldNames;
 const IsoCountries: { [id: string]: string; } = IdentityAutoFillConstants.IsoCountries;
 const IsoStates: { [id: string]: string; } = IdentityAutoFillConstants.IsoStates;
 const IsoProvinces: { [id: string]: string; } = IdentityAutoFillConstants.IsoProvinces;
@@ -46,8 +76,7 @@ export default class AutofillService implements AutofillServiceInterface {
   getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
     return this.loadPasswordFields(pageDetails, true, true, false, true);
   }
-  getFormsWithPasswordFields(pageDetails: AutofillPageDetails): any[] {
-    console.log(100, pageDetails);
+  getFormsFields(pageDetails: AutofillPageDetails): any[] {
     const formData: any[] = [];
 
     const passwordFields = this.loadPasswordFields(pageDetails, true, true, false, false);
@@ -110,51 +139,43 @@ export default class AutofillService implements AutofillServiceInterface {
               continue;
             }
 
-            if (this.isFieldMatch(f[attr],
-              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
-              ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
+            if (this.isFieldMatch(
+              f[attr],
+              CardHolderFieldNames,
+              CardHolderFieldNameValues
+            )) {
               cardholderName = f;
               break;
-            } else if (this.isFieldMatch(f[attr],
-              ['cc-number', 'cc-num', 'card-number', 'card-num', 'number', 'cc', 'cc-no', 'card-no',
-                'credit-card', 'numero-carte', 'carte', 'carte-credit', 'num-carte', 'cb-num'],
-              ['cc-number', 'cc-num', 'card-number', 'card-num', 'cc-no', 'card-no', 'numero-carte',
-                'num-carte', 'cb-num'])) {
+            } else if (this.isFieldMatch(
+              f[attr],
+              CardNumberFieldNames,
+              CardNumberFieldNameValues
+            )) {
               number = f;
               break;
-            } else if (this.isFieldMatch(f[attr],
-              ['cc-exp', 'card-exp', 'cc-expiration', 'card-expiration', 'cc-ex', 'card-ex',
-                'card-expire', 'card-expiry', 'validite', 'expiration', 'expiry', 'mm-yy',
-                'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date', 'payment-card-expiration',
-                'payment-cc-date'],
-              ['mm-yy', 'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date',
-                'payment-card-expiration'])) {
+            } else if (this.isFieldMatch(
+              f[attr],
+              CardExpiryFieldNames,
+              CardExpiryFieldNameValues
+            )) {
               exp = f;
               break;
-            } else if (this.isFieldMatch(f[attr],
-              ['exp-month', 'cc-exp-month', 'cc-month', 'card-month', 'cc-mo', 'card-mo', 'exp-mo',
-                'card-exp-mo', 'cc-exp-mo', 'card-expiration-month', 'expiration-month',
-                'cc-mm', 'cc-m', 'card-mm', 'card-m', 'card-exp-mm', 'cc-exp-mm', 'exp-mm', 'exp-m',
-                'expire-month', 'expire-mo', 'expiry-month', 'expiry-mo', 'card-expire-month',
-                'card-expire-mo', 'card-expiry-month', 'card-expiry-mo', 'mois-validite',
-                'mois-expiration', 'm-validite', 'm-expiration', 'expiry-date-field-month',
-                'expiration-date-month', 'expiration-date-mm', 'exp-mon', 'validity-mo',
-                'exp-date-mo', 'cb-date-mois', 'date-m'])) {
+            } else if (this.isFieldMatch(
+              f[attr],
+              ExpiryMonthFieldNames
+            )) {
               expMonth = f;
               break;
-            } else if (this.isFieldMatch(f[attr],
-              ['exp-year', 'cc-exp-year', 'cc-year', 'card-year', 'cc-yr', 'card-yr', 'exp-yr',
-                'card-exp-yr', 'cc-exp-yr', 'card-expiration-year', 'expiration-year',
-                'cc-yy', 'cc-y', 'card-yy', 'card-y', 'card-exp-yy', 'cc-exp-yy', 'exp-yy', 'exp-y',
-                'cc-yyyy', 'card-yyyy', 'card-exp-yyyy', 'cc-exp-yyyy', 'expire-year', 'expire-yr',
-                'expiry-year', 'expiry-yr', 'card-expire-year', 'card-expire-yr', 'card-expiry-year',
-                'card-expiry-yr', 'an-validite', 'an-expiration', 'annee-validite',
-                'annee-expiration', 'expiry-date-field-year', 'expiration-date-year', 'cb-date-ann',
-                'expiration-date-yy', 'expiration-date-yyyy', 'validity-year', 'exp-date-year', 'date-y'])) {
+            } else if (this.isFieldMatch(
+              f[attr],
+              ExpiryYearFieldNames
+            )) {
               expYear = f;
               break;
-            } else if (this.isFieldMatch(f[attr],
-              ['cc-type', 'card-type', 'card-brand', 'cc-brand', 'cb-type'])) {
+            } else if (this.isFieldMatch(
+              f[attr],
+              CardBrandFieldNames
+            )) {
               brand = f;
               break;
             }
@@ -434,59 +455,49 @@ export default class AutofillService implements AutofillServiceInterface {
           continue;
         }
 
-        // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
-        // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
-        if (!fillFields.cardholderName && this.isFieldMatch(f[attr],
-          ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'name', 'nom'],
-          ['cc-name', 'card-name', 'cardholder-name', 'cardholder', 'tbName'])) {
+        if (!fillFields.cardholderName && this.isFieldMatch(
+          f[attr],
+          CardHolderFieldNames,
+          CardHolderFieldNameValues
+        )) {
           fillFields.cardholderName = f;
           break;
-        } else if (!fillFields.number && this.isFieldMatch(f[attr],
-          ['cc-number', 'cc-num', 'card-number', 'card-num', 'number', 'cc', 'cc-no', 'card-no',
-            'credit-card', 'numero-carte', 'carte', 'carte-credit', 'num-carte', 'cb-num'],
-          ['cc-number', 'cc-num', 'card-number', 'card-num', 'cc-no', 'card-no', 'numero-carte',
-            'num-carte', 'cb-num'])) {
+        } else if (!fillFields.number && this.isFieldMatch(
+          f[attr],
+          CardNumberFieldNames,
+          CardNumberFieldNameValues
+        )) {
           fillFields.number = f;
           break;
-        } else if (!fillFields.exp && this.isFieldMatch(f[attr],
-          ['cc-exp', 'card-exp', 'cc-expiration', 'card-expiration', 'cc-ex', 'card-ex',
-            'card-expire', 'card-expiry', 'validite', 'expiration', 'expiry', 'mm-yy',
-            'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date', 'payment-card-expiration',
-            'payment-cc-date'],
-          ['mm-yy', 'mm-yyyy', 'yy-mm', 'yyyy-mm', 'expiration-date',
-            'payment-card-expiration'])) {
+        } else if (!fillFields.exp && this.isFieldMatch(
+          f[attr],
+          CardExpiryFieldNames,
+          CardExpiryFieldNameValues
+        )) {
           fillFields.exp = f;
           break;
-        } else if (!fillFields.expMonth && this.isFieldMatch(f[attr],
-          ['exp-month', 'cc-exp-month', 'cc-month', 'card-month', 'cc-mo', 'card-mo', 'exp-mo',
-            'card-exp-mo', 'cc-exp-mo', 'card-expiration-month', 'expiration-month',
-            'cc-mm', 'cc-m', 'card-mm', 'card-m', 'card-exp-mm', 'cc-exp-mm', 'exp-mm', 'exp-m',
-            'expire-month', 'expire-mo', 'expiry-month', 'expiry-mo', 'card-expire-month',
-            'card-expire-mo', 'card-expiry-month', 'card-expiry-mo', 'mois-validite',
-            'mois-expiration', 'm-validite', 'm-expiration', 'expiry-date-field-month',
-            'expiration-date-month', 'expiration-date-mm', 'exp-mon', 'validity-mo',
-            'exp-date-mo', 'cb-date-mois', 'date-m'])) {
+        } else if (!fillFields.expMonth && this.isFieldMatch(
+          f[attr],
+          ExpiryMonthFieldNames
+        )) {
           fillFields.expMonth = f;
           break;
-        } else if (!fillFields.expYear && this.isFieldMatch(f[attr],
-          ['exp-year', 'cc-exp-year', 'cc-year', 'card-year', 'cc-yr', 'card-yr', 'exp-yr',
-            'card-exp-yr', 'cc-exp-yr', 'card-expiration-year', 'expiration-year',
-            'cc-yy', 'cc-y', 'card-yy', 'card-y', 'card-exp-yy', 'cc-exp-yy', 'exp-yy', 'exp-y',
-            'cc-yyyy', 'card-yyyy', 'card-exp-yyyy', 'cc-exp-yyyy', 'expire-year', 'expire-yr',
-            'expiry-year', 'expiry-yr', 'card-expire-year', 'card-expire-yr', 'card-expiry-year',
-            'card-expiry-yr', 'an-validite', 'an-expiration', 'annee-validite',
-            'annee-expiration', 'expiry-date-field-year', 'expiration-date-year', 'cb-date-ann',
-            'expiration-date-yy', 'expiration-date-yyyy', 'validity-year', 'exp-date-year', 'date-y'])) {
+        } else if (!fillFields.expYear && this.isFieldMatch(
+          f[attr],
+          ExpiryYearFieldNames
+        )) {
           fillFields.expYear = f;
           break;
-        } else if (!fillFields.code && this.isFieldMatch(f[attr],
-          ['cvv', 'cvc', 'cvv2', 'cc-csc', 'cc-cvv', 'card-csc', 'card-cvv', 'cvd', 'cid', 'cvc2',
-            'cnv', 'cvn2', 'cc-code', 'card-code', 'code-securite', 'security-code', 'crypto',
-            'card-verif', 'verification-code', 'csc', 'ccv'])) {
+        } else if (!fillFields.code && this.isFieldMatch(
+          f[attr],
+          CVVFieldNames
+        )) {
           fillFields.code = f;
           break;
-        } else if (!fillFields.brand && this.isFieldMatch(f[attr],
-          ['cc-type', 'card-type', 'card-brand', 'cc-brand', 'cb-type'])) {
+        } else if (!fillFields.brand && this.isFieldMatch(
+          f[attr],
+          CardBrandFieldNames
+        )) {
           fillFields.brand = f;
           break;
         }
@@ -669,78 +680,108 @@ export default class AutofillService implements AutofillServiceInterface {
           continue;
         }
 
-        // ref https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
-        // ref https://developers.google.com/web/fundamentals/design-and-ux/input/forms/
-        if (!fillFields.name && this.isFieldMatch(f[attr],
-          ['name', 'full-name', 'your-name'], ['full-name', 'your-name'])) {
+        if (!fillFields.name && this.isFieldMatch(
+          f[attr],
+          FullNameFieldNames,
+          FullNameFieldNameValues
+        )) {
           fillFields.name = f;
           break;
-        } else if (!fillFields.firstName && this.isFieldMatch(f[attr],
-          FirstnameFieldNames)) {
+        } else if (!fillFields.firstName && this.isFieldMatch(
+          f[attr],
+          FirstnameFieldNames
+        )) {
           fillFields.firstName = f;
           break;
-        } else if (!fillFields.middleName && this.isFieldMatch(f[attr],
-          ['m-name', 'middle-name', 'additional-name', 'middle-initial', 'middle-n', 'middle-i'])) {
+        } else if (!fillFields.middleName && this.isFieldMatch(
+          f[attr],
+          MiddlenameFieldNames
+        )) {
           fillFields.middleName = f;
           break;
-        } else if (!fillFields.lastName && this.isFieldMatch(f[attr],
-          LastnameFieldNames)) {
+        } else if (!fillFields.lastName && this.isFieldMatch(
+          f[attr],
+          LastnameFieldNames
+        )) {
           fillFields.lastName = f;
           break;
-        } else if (!fillFields.title && this.isFieldMatch(f[attr],
-          ['honorific-prefix', 'prefix', 'title'])) {
+        } else if (!fillFields.title && this.isFieldMatch(
+          f[attr],
+          TitleFieldNames
+        )) {
           fillFields.title = f;
           break;
-        } else if (!fillFields.email && this.isFieldMatch(f[attr],
-          ['e-mail', 'email-address'])) {
+        } else if (!fillFields.email && this.isFieldMatch(
+          f[attr],
+          EmailFieldNames
+        )) {
           fillFields.email = f;
           break;
-        } else if (!fillFields.address && this.isFieldMatch(f[attr],
-          ['address', 'street-address', 'addr', 'street', 'mailing-addr', 'billing-addr',
-            'mail-addr', 'bill-addr'], ['mailing-addr', 'billing-addr', 'mail-addr', 'bill-addr'])) {
+        } else if (!fillFields.address && this.isFieldMatch(
+          f[attr],
+          AddressFieldNames,
+          AddressFieldNameValues
+        )) {
           fillFields.address = f;
           break;
-        } else if (!fillFields.address1 && this.isFieldMatch(f[attr],
-          ['address-1', 'address-line-1', 'addr-1', 'street-1'])) {
+        } else if (!fillFields.address1 && this.isFieldMatch(
+          f[attr],
+          Address1FieldNames
+        )) {
           fillFields.address1 = f;
           break;
-        } else if (!fillFields.address2 && this.isFieldMatch(f[attr],
-          ['address-2', 'address-line-2', 'addr-2', 'street-2'])) {
+        } else if (!fillFields.address2 && this.isFieldMatch(
+          f[attr],
+          Address2FieldNames
+        )) {
           fillFields.address2 = f;
           break;
-        } else if (!fillFields.address3 && this.isFieldMatch(f[attr],
-          ['address-3', 'address-line-3', 'addr-3', 'street-3'])) {
+        } else if (!fillFields.address3 && this.isFieldMatch(
+          f[attr],
+          Address3FieldNames
+        )) {
           fillFields.address3 = f;
           break;
-        } else if (!fillFields.postalCode && this.isFieldMatch(f[attr],
-          ['postal', 'zip', 'zip2', 'zip-code', 'postal-code', 'post-code', 'address-zip',
-            'address-postal', 'address-code', 'address-postal-code', 'address-zip-code'])) {
+        } else if (!fillFields.postalCode && this.isFieldMatch(
+          f[attr],
+          PostalCodeFieldNames
+        )) {
           fillFields.postalCode = f;
           break;
-        } else if (!fillFields.city && this.isFieldMatch(f[attr],
-          ['city', 'town', 'address-level-2', 'address-city', 'address-town'])) {
+        } else if (!fillFields.city && this.isFieldMatch(
+          f[attr],
+          CityFieldNames
+        )) {
           fillFields.city = f;
           break;
-        } else if (!fillFields.state && this.isFieldMatch(f[attr],
-          ['state', 'province', 'provence', 'address-level-1', 'address-state',
-            'address-province'])) {
+        } else if (!fillFields.state && this.isFieldMatch(
+          f[attr],
+          StateFieldNames
+        )) {
           fillFields.state = f;
           break;
-        } else if (!fillFields.country && this.isFieldMatch(f[attr],
-          ['country', 'country-code', 'country-name', 'address-country', 'address-country-name',
-            'address-country-code'])) {
+        } else if (!fillFields.country && this.isFieldMatch(
+          f[attr],
+          CountryFieldNames
+        )) {
           fillFields.country = f;
           break;
-        } else if (!fillFields.phone && this.isFieldMatch(f[attr],
-          ['phone', 'mobile', 'mobile-phone', 'tel', 'telephone', 'phone-number'])) {
+        } else if (!fillFields.phone && this.isFieldMatch(
+          f[attr],
+          PhoneFieldNames
+        )) {
           fillFields.phone = f;
           break;
-        } else if (!fillFields.username && this.isFieldMatch(f[attr],
-          ['user-name', 'user-id', 'screen-name'])) {
+        } else if (!fillFields.username && this.isFieldMatch(
+          f[attr],
+          UserNameFieldNames
+        )) {
           fillFields.username = f;
           break;
-        } else if (!fillFields.company && this.isFieldMatch(f[attr],
-          ['company', 'company-name', 'organization', 'organization-name'])) {
+        } else if (!fillFields.company && this.isFieldMatch(
+          f[attr],
+          CompanyFieldNames
+        )) {
           fillFields.company = f;
           break;
         }
@@ -949,7 +990,7 @@ export default class AutofillService implements AutofillServiceInterface {
           return false;
         }
 
-        const ignoreList = ['onetimepassword', 'captcha', 'findanything'];
+        const ignoreList = PasswordFieldExcludeList;
         if (ignoreList.some(i => cleanedValue.indexOf(i) > -1)) {
           return false;
         }

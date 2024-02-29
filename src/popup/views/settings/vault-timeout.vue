@@ -46,7 +46,9 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 export default Vue.extend({
   data() {
     return {
-      user: {},
+      user: {
+        timeout: 0
+      },
       loading: false,
     };
   },

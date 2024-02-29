@@ -93,7 +93,6 @@ const asyncStore = async () => {
         currentPlan: {},
         hideIcons: false,
         showFolders: true,
-        enableAutofill:  true,
         callingAPI: false,
         ...oldStoreParsed
       },
@@ -167,9 +166,6 @@ const asyncStore = async () => {
         },
         UPDATE_SHOW_FOLDERS(state, value) {
           state.showFolders = value
-        },
-        UPDATE_ENABLE_AUTOFILL(state, value) {
-          state.enableAutofill = value
         },
         UPDATE_CALLING_API(state, value) {
           state.callingAPI = value

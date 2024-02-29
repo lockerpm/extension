@@ -92,9 +92,6 @@ Vue.mixin({
     showFolders() {
       return this.$store.state.showFolders
     },
-    enableAutofill() {
-      return this.$store.state.enableAutofill
-    },
   },
   methods: {
     changeLang(value) {
@@ -173,15 +170,13 @@ Vue.mixin({
     async login(isPwl = false, decryptData: any) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
-      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
+      const [deviceId, hideIcons, showFolders] = await Promise.all([
         this.$storageService.get("device_id"),
         this.$storageService.get("hideIcons"),
         this.$storageService.get("showFolders"),
-        this.$storageService.get("enableAutofill"),
       ]);
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
-      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       try {
         await this.$cryptoService.clearKeys();
         if (!isPwl) {
@@ -545,7 +540,7 @@ Vue.mixin({
         }
       }
     },
-    async removeDomain(domain: any, isNotification = true) {
+    async removeExcludeDomain(domain: any, isNotification = true) {
       cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
         await this.getExcludeDomains()
         if (isNotification) {

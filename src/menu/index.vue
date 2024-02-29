@@ -33,7 +33,7 @@
     </div>
     <MenuExcluded
       v-else
-      @turnOn="() => removeDomain(excluded, false)"
+      @turnOn="() => removeExcludeDomain(excluded, false)"
     />
   </div>
 </template>
@@ -49,6 +49,7 @@ import PasswordGenerator from './components/Generator.vue'
 
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
+import { Utils } from 'jslib-common/misc/utils';
 
 export default Vue.extend({
   name: 'Menu',
@@ -70,14 +71,6 @@ export default Vue.extend({
       isLocked: false,
     }
   },
-  async created () {
-    this.tab = this.$store.state.initData.tab;
-    this.fillType = this.$store.state.initData.type;
-    this.isLocked = await this.$vaultTimeoutService.isLocked();
-    setInterval(async () => {
-      this.isLocked = await this.$vaultTimeoutService.isLocked();
-    }, 5000)
-  },
   computed: {
     tabs() {
       return [
@@ -87,7 +80,7 @@ export default Vue.extend({
           disabled: this.isOTP,
           onclick: async () => {
             if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `428px` })
             }
             this.tab = 1
           }
@@ -97,7 +90,7 @@ export default Vue.extend({
           name: this.$t('menu.fill_something_else'),
           onclick: async () => {
             if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `300px` })
             }
             this.tab = 2
           }
@@ -110,7 +103,7 @@ export default Vue.extend({
           disabled: this.isLocked,
           onclick: async () => {
             if (this.browserTab) {
-              this.addExcludeDomain(this.browserTab.url, () => ({}), false)
+              this.addExcludeDomain(Utils.getDomain(this.browserTab.url), () => ({}), false)
             }
           }
         },
@@ -160,10 +153,25 @@ export default Vue.extend({
       return this.currentFillType.value === CipherType.OTP
     },
   },
+  async created () {
+    this.tab = this.$store.state.initData.tab;
+    this.fillType = this.$store.state.initData.type;
+    this.isLocked = await this.$vaultTimeoutService.isLocked();
+    setInterval(async () => {
+      this.isLocked = await this.$vaultTimeoutService.isLocked();
+    }, 5000)
+  },
   async mounted() {
     this.browserTab = await BrowserApi.getTabFromCurrentWindow();
+    await this.checkingExcludedDomain();
   },
   methods: {
+    async checkingExcludedDomain() {
+      const url = this.browserTab.url;
+      const domain = Utils.getDomain(url);
+      const neverDomains = await this.$storageService.get('neverDomains') || [];
+      this.excluded = neverDomains.find((d) => d.domain == domain);
+    }
   }
 })
 </script>

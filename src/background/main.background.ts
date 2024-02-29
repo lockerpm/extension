@@ -81,7 +81,7 @@ import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
 import WindowsBackground from './windows.background';
 import WebRequestBackground from './webRequest.background';
-import RequestBackground from './request.backgroud';
+import RequestBackground from './request.background';
 import MenuBackground from './menu.background';
 
 import { PopupUtilsService } from '../services/popup-utils.service';
@@ -477,7 +477,8 @@ export default class MainBackground {
       this.logService
     );
     this.menuBackgroud = new MenuBackground(
-      this.cipherService
+      this.cipherService,
+      this.requestBackground
     )
   }
 

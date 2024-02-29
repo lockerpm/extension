@@ -23,7 +23,7 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
-import RequestBackground from './request.backgroud';
+import RequestBackground from './request.background';
 
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
