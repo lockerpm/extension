@@ -34,7 +34,7 @@ module.exports = {
         },
         contentScripts: {
           entries: {
-            'content/autofill': 'src/content/autofill.js',
+            'content/autofill': 'src/content/autofill.ts',
             'content/autofiller': 'src/content/autofiller.ts',
             'content/notificationBar': 'src/content/notificationBar.ts',
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',

@@ -1,4 +1,4 @@
-import AutofillMenuIframeService from "../services/menu.service";
+import AutofillMenuIframeService from "../../services/menu.service";
 
 class AutofillMenuIframeElement extends HTMLElement {
   constructor(

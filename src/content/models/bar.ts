@@ -1,4 +1,4 @@
-import AutoSaveBarService from "../services/bar.service";
+import AutoSaveBarService from "../../services/bar.service";
 
 class AutoSaveBarIframeElement extends HTMLElement {
   constructor(

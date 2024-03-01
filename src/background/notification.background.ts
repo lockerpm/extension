@@ -122,21 +122,33 @@ export default class NotificationBackground {
         usernameFields.push(form.username)
       }
     }
+    const autofillOptionData = await chrome.storage.local.get('autofillOption');
+    const checkIframe = !autofillOptionData.autofillOption || autofillOptionData.autofillOption == 'autofill_page';
+
     await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
       details: msg.details,
       forms: forms,
       passwordFields: passwordFields,
       usernameFields: usernameFields,
-      isLocked: await this.vaultTimeoutService.isLocked()
+      isLocked: await this.vaultTimeoutService.isLocked(),
+      checkIframe: checkIframe
     });
 
-    await this.handleAutofillOnPageLoad(sender, forms, passwordFields, usernameFields)
+    if (autofillOptionData.autofillOption !== 'off') {
+      await this.handleAutofillOnPageLoad(sender, forms, passwordFields, usernameFields, checkIframe)
+    }
+
     this.main.refreshBadgeAndMenu()
   }
 
-  private async handleAutofillOnPageLoad(sender: chrome.runtime.MessageSender, forms: any[], passwordFields: any[], usernameFields: any[]) {
-    const autofillOptionData = await chrome.storage.local.get('autofillOption')
-    if (autofillOptionData.autofillOption === 'off') return;
+  private async handleAutofillOnPageLoad(
+    sender: chrome.runtime.MessageSender,
+    forms: any[],
+    passwordFields: any[],
+    usernameFields: any[],
+    checkIframe: any
+  ) {
+
     const tab = await BrowserApi.getTabFromCurrentWindow();
     if (!tab || !tab.url) {
       return;
@@ -155,12 +167,12 @@ export default class NotificationBackground {
       && !passwordFields.filter((f) => f.type === 'password')[0]?.value
       && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
     ) {
-      this.autofillOnPageLoad(sender.tab);
+      this.autofillOnPageLoad(sender.tab, checkIframe);
     }
 
     // check is otp page
     if (forms.find((f) => f.otps.length > 0)) {
-      this.autofillOTPOnPageLoad(sender.tab);
+      this.autofillOTPOnPageLoad(sender.tab, checkIframe);
     }
   }
 
@@ -181,6 +193,8 @@ export default class NotificationBackground {
         cipher: msg.cipher,
         pageDetails: [pageDetailsObj],
         fillNewPassword: true,
+        isIframe: msg.isIframe,
+        checkIframe: msg.checkIframe
       });
       if (totpPromise) {
         this.storageService.save('login_totp_cipher', msg.cipher)
@@ -276,7 +290,7 @@ export default class NotificationBackground {
     });
   }
 
-  private async autofillOnPageLoad(tab: chrome.tabs.Tab) {
+  private async autofillOnPageLoad(tab: chrome.tabs.Tab, checkIframe = false) {
     try {
       if (this.cipherService && tab.url) {
         const currentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
@@ -286,7 +300,8 @@ export default class NotificationBackground {
             command: 'collectPageDetails',
             tab: tab,
             sender: 'autofillItem',
-            cipher: loginCiphers[0]
+            cipher: loginCiphers[0],
+            checkIframe: checkIframe 
           });
         }
       }
@@ -294,14 +309,15 @@ export default class NotificationBackground {
     }
   }
 
-  private async autofillOTPOnPageLoad(tab: chrome.tabs.Tab) {
+  private async autofillOTPOnPageLoad(tab: chrome.tabs.Tab, checkIframe = false) {
     const loginTOTPCipher: any = await this.storageService.get('login_totp_cipher') || null
     if (loginTOTPCipher && loginTOTPCipher.login?.totp) {
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
         tab: tab,
         sender: 'autofillOTP',
-        cipher: loginTOTPCipher
+        cipher: loginTOTPCipher,
+        checkIframe: checkIframe
       });
     }
     await this.storageService.remove('login_totp_cipher')
@@ -311,9 +327,9 @@ export default class NotificationBackground {
     if (loginInfo) {
       currentLoginInfo = loginInfo
     }
-    if (currentLoginInfo) {
-      const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
-      const tabDomain = Utils.getDomain(tabInfo.url);
+    const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
+    const tabDomain = Utils.getDomain(tabInfo.url);
+    if (currentLoginInfo && currentLoginInfo.domain == tabDomain) {
       if (tabInfo && tabDomain === currentLoginInfo.domain) {
         this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
       }

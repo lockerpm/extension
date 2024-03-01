@@ -1,4 +1,8 @@
 let isReading = false;
+let isDomLoaded = false;
+let isIframe: Boolean = self.location.ancestorOrigins.length > 0;
+let isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
+
 const checkRadioTrueOps = {
   'true': true,
   y: true,
@@ -7,23 +11,50 @@ const checkRadioTrueOps = {
   '✓': true
 }
 
-function collectPageDetailsResponse(msg) {
+document.addEventListener('DOMContentLoaded', (e) => {
+  if (!isDomLoaded) {
+    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+      if (msg.command === 'collectPageDetails') {
+        collectPageDetailsResponse(msg)
+      } else if (msg.command === 'fillForm') {
+        fill(document, msg.fillScript);
+      } else if (msg.command === 'fillOTPForm') {
+        fillOTPForm(msg)
+      } else if (msg.command === 'scanQRCodeInit') {
+        scanQRCodeInit(document, msg.tab, msg.isPasswordOTP);
+      } else if (msg.command === 'capturedImage') {
+        readAndAddQRCode(document, msg);
+      } else if (msg.command === 'addedOTP') {
+        addedOTP(msg)
+      } else if (msg.command === 'alert') {
+        alertMessage(msg)
+      }
+      sendResponse();
+      return true;
+    });
+  }
+  isDomLoaded = true;
+})
+
+function collectPageDetailsResponse(msg: any) {
   const pageDetailsObj = JSON.parse(collect(document));
-    const domain = new URL(msg.tab.url)
-    if (pageDetailsObj.url.includes(domain.hostname)) {
-      chrome.runtime.sendMessage({
-        command: 'collectPageDetailsResponse',
-        tab: msg.tab,
-        details: pageDetailsObj,
-        sender: msg.sender,
-        cipher: msg.cipher
-      });
-    }
+  const domain: URL = new URL(msg.tab.url)
+  if (pageDetailsObj.url.includes(domain.hostname)) {
+    chrome.runtime.sendMessage({
+      command: 'collectPageDetailsResponse',
+      tab: msg.tab,
+      details: pageDetailsObj,
+      sender: msg.sender,
+      cipher: msg.cipher,
+      isIframe: isIframe,
+      checkIframe: msg.checkIframe
+    });
+  }
 }
 
-function fillOTPForm(msg) {
+function fillOTPForm(msg: any) {
   for (let index = 0; index < msg.forms.length; index++) {
-    const form = msg.forms[index];
+    const form: any = msg.forms[index];
     if (form.otps.length === 1) {
       const otpInput = document.getElementById(form.otps[0].htmlID)
       if (otpInput) {
@@ -40,9 +71,9 @@ function fillOTPForm(msg) {
   }
 }
 
-function addedOTP(msg) {
+function addedOTP(msg: any) {
   isReading = false;
-  const actions = document.querySelector('locker-select-wrapper');
+  const actions: any = document.querySelector('locker-select-wrapper');
   if (actions) {
     if (msg.sender === 'removeLockerWrapper') {
       actions.remove();
@@ -52,7 +83,7 @@ function addedOTP(msg) {
   }
 }
 
-function alertMessage(msg) {
+function alertMessage(msg: any) {
   switch (msg.type) {
     case 'username_password_updated':
       self.alert(
@@ -178,8 +209,8 @@ function alertMessage(msg) {
 }
 
 // normalize the event based on API support
-function normalizeEvent(el, eventName) {
-  let ev;
+function normalizeEvent(el: any, eventName: string) {
+  let ev: any;
   if ('KeyboardEvent' in self) {
     ev = new self.KeyboardEvent(eventName, {
       bubbles: true,
@@ -200,7 +231,7 @@ function normalizeEvent(el, eventName) {
 }
 
 // focus an element and optionally re-set its value after focusing
-function doFocusElement(el, setValue) {
+function doFocusElement(el: any, setValue: Boolean) {
   if (setValue) {
     const existingValue = el.value;
     el.focus();
@@ -211,7 +242,7 @@ function doFocusElement(el, setValue) {
 }
 
 // set value of the given element
-function setValueForElement(el, setValue = false) {
+function setValueForElement(el: any, setValue: Boolean = false) {
   const valueToSet = el.value;
   doFocusElement(el, setValue);
   el.dispatchEvent(normalizeEvent(el, 'keydown'));
@@ -221,8 +252,8 @@ function setValueForElement(el, setValue = false) {
 }
 
 // can we see the element to apply some styling?
-function canSeeElementToStyle(el, animateTheFilling) {
-  let currentEl;
+function canSeeElementToStyle(el: any, animateTheFilling: any) {
+  let currentEl: any;
   if (currentEl == animateTheFilling) {
     a: {
       currentEl = el;
@@ -250,7 +281,7 @@ function canSeeElementToStyle(el, animateTheFilling) {
 }
 
 // set value of the given element by using events
-function setValueForElementByEvent(el) {
+function setValueForElementByEvent(el: any) {
   const valueToSet = el.value,
     ev1 = el.ownerDocument.createEvent('HTMLEvents'),
     ev2 = el.ownerDocument.createEvent('HTMLEvents');
@@ -267,7 +298,7 @@ function setValueForElementByEvent(el) {
 }
 
 // do all the full operations needed
-function doAllFillOperations(el, animateTheFilling, afterValSetFunc) {
+function doAllFillOperations(el: any, animateTheFilling: any, afterValSetFunc: any) {
   setValueForElement(el);
   afterValSetFunc(el);
   setValueForElementByEvent(el);
@@ -285,14 +316,14 @@ function doAllFillOperations(el, animateTheFilling, afterValSetFunc) {
 }
 
 // fill an element
-function fillTheElement(el, op, animateTheFilling, markTheFilling) {
-  let shouldCheck;
+function fillTheElement(el: any, op: any, animateTheFilling: any, markTheFilling: any) {
+  let shouldCheck: Boolean;
   if (el && null !== op && void 0 !== op && !(el.disabled || el.a || el.readOnly)) {
     switch (markTheFilling && el.form && !el.form.opfilled && (el.form.opfilled = true),
     el.type ? el.type.toLowerCase() : null) {
       case 'checkbox':
         shouldCheck = op && 1 <= op.length && checkRadioTrueOps.hasOwnProperty(op.toLowerCase()) && true === checkRadioTrueOps[op.toLowerCase()];
-        el.checked === shouldCheck || doAllFillOperations(el, animateTheFilling, function (theEl) {
+        el.checked === shouldCheck || doAllFillOperations(el, animateTheFilling, function (theEl: any) {
           theEl.checked = shouldCheck;
         });
         break;
@@ -313,22 +344,21 @@ function fillTheElement(el, op, animateTheFilling, markTheFilling) {
   }
 }
 
-function collect(document, undefined) {
+function collect(document: any, undefined?: any) {
   // START MODIFICATION
-  var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
   // END MODIFICATION
   document.elementsByOPID = {};
-  document.addEventListener('input', function (inputevent) {
-    inputevent.a !== false &&
-      inputevent.target.tagName.toLowerCase() === 'input' &&
-      (inputevent.target.dataset['com.locker.browser.userEdited'] = 'yes');
+  document.addEventListener('input', function (inputEvent: any) {
+    inputEvent.a !== false &&
+      inputEvent.target.tagName.toLowerCase() === 'input' &&
+      (inputEvent.target.dataset['com.locker.browser.userEdited'] = 'yes');
   }, true);
 
   function getPageDetails(theDoc, oneShotId) {
     // start helpers
     // get the value of a dom element's attribute
     function getElementAttrValue(el, attrName) {
-      var attrVal = el[attrName];
+      let attrVal = el[attrName];
       if ('string' == typeof attrVal) {
         return attrVal;
       }
@@ -366,11 +396,10 @@ function collect(document, undefined) {
         return null;
       }
 
-      var options = Array.prototype.slice.call(el.options).map(function (option) {
-        var optionText = option.text ?
+      const options = Array.prototype.slice.call(el.options).map(function (option: any) {
+        const optionText = option.text ?
           toLowerString(option.text).replace(/\\s/gm, '').replace(/[~`!@$%^&*()\\-_+=:;'\"\\[\\]|\\\\,<.>\\?]/gm, '') :
           null;
-
         return [optionText ? optionText : null, option.value];
       })
 
@@ -381,7 +410,7 @@ function collect(document, undefined) {
 
     // get the top label
     function getLabelTop(el) {
-      var parent;
+      let parent: any;
       for (el = el.parentElement || el.parentNode; el && 'td' != toLowerString(el.tagName);) {
         el = el.parentElement || el.parentNode;
       }
@@ -402,14 +431,13 @@ function collect(document, undefined) {
       }
 
       el = parent.cells[el.cellIndex];
-      var elText = el.textContent || el.innerText;
+      let elText = el.textContent || el.innerText;
       return elText = cleanText(elText);
     }
 
     // get all the tags for a given label
-    function getLabelTag(el) {
-      var docLabel,
-        theLabels = [];
+    function getLabelTag(el: any) {
+      let docLabel: any, theLabels = [];
 
       if (el.labels && el.labels.length && 0 < el.labels.length) {
         theLabels = Array.prototype.slice.call(el.labels);
@@ -422,7 +450,7 @@ function collect(document, undefined) {
         if (el.name) {
           docLabel = queryDoc(theDoc, 'label[for=' + JSON.stringify(el.name) + ']');
 
-          for (var labelIndex = 0; labelIndex < docLabel.length; labelIndex++) {
+          for (let labelIndex = 0; labelIndex < docLabel.length; labelIndex++) {
             if (-1 === theLabels.indexOf(docLabel[labelIndex])) {
               theLabels.push(docLabel[labelIndex])
             }
@@ -455,7 +483,7 @@ function collect(document, undefined) {
     }
 
     // add property and value to the object if there is a value
-    function addProp(obj, prop, val, d) {
+    function addProp(obj: any, prop: any, val: any, d?: any) {
       if (0 !== d && d === val || null === val || void 0 === val) {
         return;
       }
@@ -470,7 +498,7 @@ function collect(document, undefined) {
 
     // query the document helper
     function queryDoc(doc, query) {
-      var els = [];
+      let els = [];
       try {
         els = doc.querySelectorAll(query);
       } catch (e) { }
@@ -478,12 +506,10 @@ function collect(document, undefined) {
     }
 
     // end helpers
-    var theView = theDoc.defaultView ? theDoc.defaultView : self,
-      passwordRegEx = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|(\\\\b|_|-)passe(\\\\b|_|-)|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
-
+    const theView = theDoc.defaultView ? theDoc.defaultView : self;
     // get all the docs
-    var theForms = Array.prototype.slice.call(queryDoc(theDoc, 'form, .form, #form')).map(function (formEl, elIndex) {
-      var op = {}, formOpId = '__form__' + elIndex;
+    const theForms = Array.prototype.slice.call(queryDoc(theDoc, 'form, .form, #form')).map(function (formEl, elIndex) {
+      let op: any = {}, formOpId = '__form__' + elIndex;
       formEl.opid = formOpId;
       op.opid = formOpId;
       if (!formEl.id) {
@@ -492,21 +518,21 @@ function collect(document, undefined) {
       addProp(op, 'htmlName', getElementAttrValue(formEl, 'name'));
       addProp(op, 'htmlID', getElementAttrValue(formEl, 'id'));
       formOpId = getElementAttrValue(formEl, 'action');
-      formOpId = new URL(formOpId, self.location.href);
-      addProp(op, 'htmlAction', formOpId ? formOpId.href : null);
+      const formOpIdObj: any = new URL(formOpId, self.location.href);
+      addProp(op, 'htmlAction', formOpIdObj ? formOpIdObj.href : null);
       addProp(op, 'htmlMethod', getElementAttrValue(formEl, 'method'));
 
       return op;
     });
 
     // get all the form fields
-    var theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
+    const theFields = Array.prototype.slice.call(getFormElements(theDoc, 50)).map(function (el, elIndex) {
       const lockerId = `locker-id-${elIndex}`
       el.setAttribute("locker-id", lockerId);
       if (!el.id) {
         el.id = lockerId;
       }
-      var field = {},
+      let field: any = {},
         opId = '__' + elIndex,
         elMaxLen = -1 == el.maxLength ? 999 : el.maxLength;
       if (!elMaxLen || 'number' === typeof elMaxLen && isNaN(elMaxLen)) {
@@ -529,7 +555,7 @@ function collect(document, undefined) {
       // START MODIFICATION
       addProp(field, 'userEdited', !!el.dataset['com.browser.browser.userEdited']);
 
-      var elTagName = el.tagName.toLowerCase();
+      const elTagName = el.tagName.toLowerCase();
       addProp(field, 'tagName', elTagName);
 
       if (elTagName === 'span') {
@@ -542,8 +568,8 @@ function collect(document, undefined) {
         addProp(field, 'label-data', getElementAttrValue(el, 'data-label'));
         addProp(field, 'label-aria', getElementAttrValue(el, 'aria-label'));
         addProp(field, 'label-top', getLabelTop(el));
-        var labelArr = [];
-        for (var sib = el; sib && sib.nextSibling;) {
+        let labelArr: any[] = [];
+        for (let sib = el; sib && sib.nextSibling;) {
           sib = sib.nextSibling;
           if (isKnownTag(sib)) {
             break;
@@ -553,8 +579,8 @@ function collect(document, undefined) {
         addProp(field, 'label-right', labelArr.join(''));
         labelArr = [];
         shiftForLeftLabel(el, labelArr);
-        labelArr = labelArr.reverse().join('');
-        addProp(field, 'label-left', labelArr);
+        const labelArrStr = labelArr.reverse().join('');
+        addProp(field, 'label-left', labelArrStr);
         addProp(field, 'placeholder', getElementAttrValue(el, 'placeholder'));
       }
 
@@ -592,7 +618,7 @@ function collect(document, undefined) {
       var el = theDoc.elementsByOPID[f.opid];
       el.getBoundingClientRect();
 
-      var originalValue = el.value;
+      const originalValue = el.value;
       // click it
       // !el || el && 'function' !== typeof el.click || el.click();
       focusElement(el, false);
@@ -608,10 +634,9 @@ function collect(document, undefined) {
       f.postFakeTestViewable = isElementViewable(el);
       f.postFakeTestType = el.type;
 
-      var elValue = el.value;
+      const elValue = el.value;
 
-      var event1 = el.ownerDocument.createEvent('HTMLEvents'),
-        event2 = el.ownerDocument.createEvent('HTMLEvents');
+      const event1 = el.ownerDocument.createEvent('HTMLEvents'), event2 = el.ownerDocument.createEvent('HTMLEvents');
       el.dispatchEvent(doEventOnElement(el, 'keydown'));
       el.dispatchEvent(doEventOnElement(el, 'keypress'));
       el.dispatchEvent(doEventOnElement(el, 'keyup'));
@@ -625,14 +650,15 @@ function collect(document, undefined) {
     });
 
     // build out the page details object. this is the final result
-    var pageDetails = {
+    const pageDetails = {
       documentUUID: oneShotId,
       title: theDoc.title,
       url: theView.location.href,
       documentUrl: theDoc.location.href,
       tabUrl: theView.location.href,
+      displayTitle: '',
       forms: function (forms) {
-        var formObj = {};
+        const formObj = {};
         forms.forEach(function (f) {
           formObj[f.opid] = f;
         });
@@ -643,8 +669,8 @@ function collect(document, undefined) {
     };
 
     // get proper page title. maybe they are using the special meta tag?
-    var theTitle = document.querySelector('[data-onepassword-title]')
-    if (theTitle && theTitle.dataset[DISPLAY_TITLE_ATTRIBUE]) {
+    const theTitle: any = document.querySelector('[data-onepassword-title]')
+    if (theTitle) {
       pageDetails.displayTitle = theTitle.dataset.onepasswordTitle;
     }
     return pageDetails;
@@ -653,7 +679,7 @@ function collect(document, undefined) {
   document.elementForOPID = getElementForOPID;
 
   function doEventOnElement(kedol, fonor) {
-    var quebo;
+    let quebo: any;
     isFirefox ? (quebo = document.createEvent('KeyboardEvent'), quebo.initKeyEvent(fonor, true, false, null, false, false, false, false, 0, 0)) : (quebo = kedol.ownerDocument.createEvent('Events'),
       quebo.initEvent(fonor, true, false), quebo.charCode = 0, quebo.keyCode = 0, quebo.which = 0,
       quebo.srcElement = kedol, quebo.target = kedol);
@@ -661,25 +687,25 @@ function collect(document, undefined) {
   }
 
   // clean up the text
-  function cleanText(s) {
-    var sVal = null;
+  function cleanText(s: any) {
+    let sVal = null;
     s && (sVal = s.replace(/^\\s+|\\s+$|\\r?\\n.*$/gm, ''), sVal = 0 < sVal.length ? sVal : null);
     return sVal;
   }
 
   // check the node type and adjust the array accordingly
   function checkNodeType(arr, el) {
-    var theText = '';
+    let theText = '';
     3 === el.nodeType ? theText = el.nodeValue : 1 === el.nodeType && (theText = el.textContent || el.innerText);
     (theText = cleanText(theText)) && arr.push(theText);
   }
 
   function isKnownTag(el) {
     if (el && void 0 !== el) {
-      var tags = 'select option input form textarea button table iframe body head script'.split(' ');
+      const tags = 'select option input form textarea button table iframe body head script'.split(' ');
 
       if (el) {
-        var elTag = el ? (el.tagName || '').toLowerCase() : '';
+        const elTag = el ? (el.tagName || '').toLowerCase() : '';
         return tags.constructor == Array ? 0 <= tags.indexOf(elTag) : elTag === tags;
       }
       else {
@@ -691,8 +717,8 @@ function collect(document, undefined) {
     }
   }
 
-  function shiftForLeftLabel(el, arr, steps) {
-    var sib;
+  function shiftForLeftLabel(el: any, arr: any, steps?: any) {
+    let sib: any;
     for (steps || (steps = 0); el && el.previousSibling;) {
       el = el.previousSibling;
       if (isKnownTag(el)) {
@@ -723,7 +749,7 @@ function collect(document, undefined) {
     el = (el = el.ownerDocument) ? el.defaultView : {};
 
     // walk the dom tree
-    for (var elStyle; theEl && theEl !== document;) {
+    for (let elStyle: any; theEl && theEl !== document;) {
       elStyle = el.getComputedStyle ? el.getComputedStyle(theEl, null) : theEl.style;
       if (!elStyle) {
         return true;
@@ -742,24 +768,26 @@ function collect(document, undefined) {
 
   // is a dom element "viewable" on screen?
   function isElementViewable(el) {
-    var theDoc = el.ownerDocument.documentElement,
+    const theDocElement = el.ownerDocument.documentElement;
+    const
       rect = el.getBoundingClientRect(),
-      docScrollWidth = theDoc.scrollWidth,
-      docScrollHeight = theDoc.scrollHeight,
-      leftOffset = rect.left - theDoc.clientLeft,
-      topOffset = rect.top - theDoc.clientTop,
-      theRect;
+      docScrollWidth = theDocElement.scrollWidth,
+      docScrollHeight = theDocElement.scrollHeight,
+      leftOffset = rect.left - theDocElement.clientLeft,
+      topOffset = rect.top - theDocElement.clientTop;
+
+    let theRect: any;
 
     if (!isElementVisible(el) || !el.offsetParent || 10 > el.clientWidth || 10 > el.clientHeight) {
       return false;
     }
 
-    var rects = el.getClientRects();
+    const rects = el.getClientRects();
     if (0 === rects.length) {
       return false;
     }
 
-    for (var i = 0; i < rects.length; i++) {
+    for (let i = 0; i < rects.length; i++) {
       if (theRect = rects[i], theRect.left > docScrollWidth || 0 > theRect.right) {
         return false;
       }
@@ -770,7 +798,8 @@ function collect(document, undefined) {
     }
 
     // walk the tree
-    for (var pointEl = el.ownerDocument.elementFromPoint(leftOffset + (rect.right > self.innerWidth ? (self.innerWidth - leftOffset) / 2 : rect.width / 2), topOffset + (rect.bottom > self.innerHeight ? (self.innerHeight - topOffset) / 2 : rect.height / 2)); pointEl && pointEl !== el && pointEl !== document;) {
+    let pointEl: any;
+    for (pointEl = el.ownerDocument.elementFromPoint(leftOffset + (rect.right > self.innerWidth ? (self.innerWidth - leftOffset) / 2 : rect.width / 2), topOffset + (rect.bottom > self.innerHeight ? (self.innerHeight - topOffset) / 2 : rect.height / 2)); pointEl && pointEl !== el && pointEl !== document;) {
       if (pointEl.tagName && 'string' === typeof pointEl.tagName && 'label' === pointEl.tagName.toLowerCase()
         && el.labels && 0 < el.labels.length) {
         return 0 <= Array.prototype.slice.call(el.labels).indexOf(pointEl);
@@ -784,21 +813,21 @@ function collect(document, undefined) {
   }
 
   function getElementForOPID(opId) {
-    var theEl;
+    let theEl: any;
     if (void 0 === opId || null === opId) {
       return null;
     }
 
     try {
-      var formEls = Array.prototype.slice.call(getFormElements(document));
-      var filteredFormEls = formEls.filter(function (el) {
+      const formEls = Array.prototype.slice.call(getFormElements(document));
+      const filteredFormEls = formEls.filter(function (el) {
         return el.opid == opId;
       });
 
       if (0 < filteredFormEls.length) {
         theEl = filteredFormEls[0], 1 < filteredFormEls.length && console.warn('More than one element found with opid ' + opId);
       } else {
-        var theIndex = parseInt(opId.split('__')[1], 10);
+        const theIndex = parseInt(opId.split('__')[1], 10);
         isNaN(theIndex) || (theEl = formEls[theIndex]);
       }
     } catch (e) {
@@ -809,9 +838,9 @@ function collect(document, undefined) {
   }
 
   // get all the form elements that we care about
-  function getFormElements(theDoc, limit) {
+  function getFormElements(theDoc: any, limit?: any) {
     // START MODIFICATION
-    var els = [];
+    let els = [];
     try {
       const elsList = theDoc.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="reset"])' +
         ':not([type="button"]):not([type="image"]):not([type="file"]):not([data-bwignore]), select, ' +
@@ -824,15 +853,15 @@ function collect(document, undefined) {
     }
 
     // non-checkboxes/radios have higher priority
-    var returnEls = [];
-    var unimportantEls = [];
-    for (var i = 0; i < els.length; i++) {
+    let returnEls = [];
+    const unimportantEls = [];
+    for (let i = 0; i < els.length; i++) {
       if (returnEls.length >= limit) {
         break;
       }
 
-      var el = els[i];
-      var type = el.type ? el.type.toLowerCase() : el.type;
+      const el = els[i];
+      const type = el.type ? el.type.toLowerCase() : el.type;
       if (type === 'checkbox' || type === 'radio') {
         unimportantEls.push(el);
       }
@@ -841,7 +870,7 @@ function collect(document, undefined) {
       }
     }
 
-    var unimportantElsToAdd = limit - returnEls.length;
+    const unimportantElsToAdd = limit - returnEls.length;
     if (unimportantElsToAdd > 0) {
       returnEls = returnEls.concat(unimportantEls.slice(0, unimportantElsToAdd));
     }
@@ -853,7 +882,7 @@ function collect(document, undefined) {
   // focus the element and optionally restore its original value
   function focusElement(el, setVal) {
     if (setVal) {
-      var initialValue = el.value;
+      const initialValue = el.value;
       el.focus();
 
       if (el.value !== initialValue) {
@@ -867,31 +896,30 @@ function collect(document, undefined) {
   return JSON.stringify(getPageDetails(document, 'oneshotUUID'));
 }
 
-function fill(document, fillScript, undefined) {
-  var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1 || navigator.userAgent.indexOf('Gecko/') !== -1;
-
-  var markTheFilling = true,
-    animateTheFilling = true;
+function fill(document: any, fillScript: any, undefined?: any) {
+  let markTheFilling = true, animateTheFilling = true;
 
   // Check if URL is not secure when the original saved one was
-  function urlNotSecure(savedURL) {
-    var passwordInputs = null;
+  function urlNotSecure(savedURL: any) {
+    let passwordInputs = null;
     if (!savedURL) {
       return false;
     }
 
-    return 0 === savedURL.indexOf('https://') && 'http:' === document.location.protocol && (passwordInputs = document.querySelectorAll('input[type=password]'),
-      0 < passwordInputs.length && (confirmResult = confirm('Warning: This is an unsecured HTTP page, and any information you submit can potentially be seen and changed by others. This Login was originally saved on a secure (HTTPS) page.\\n\\nDo you still wish to fill this login?'),
-        0 == confirmResult)) ? true : false;
+    return 0 === savedURL.indexOf('https://')
+      && 'http:' === document.location.protocol
+      && (passwordInputs = document.querySelectorAll('input[type=password]'), 0 < passwordInputs.length)
+    ? true : false;
   }
 
-  function doFill(fillScript) {
-    var fillScriptOps,
+  function doFill(fillScript: any) {
+    let fillScriptOps: any,
       theOpIds = [],
       fillScriptProperties = fillScript.properties,
       operationDelayMs = 1,
       doOperation,
-      operationsToDo = [];
+      operationsToDo = [],
+      autosubmit: any = null;
 
     fillScriptProperties &&
       fillScriptProperties.delay_between_operations &&
@@ -902,7 +930,7 @@ function fill(document, fillScript, undefined) {
     }
 
     doOperation = function (ops, theOperation) {
-      var op = ops[0];
+      let op = ops[0];
       if (void 0 === op) {
         theOperation();
       } else {
@@ -911,7 +939,7 @@ function fill(document, fillScript, undefined) {
           operationDelayMs = op.parameters ? op.parameters[0] : op[1];
         } else {
           if (op = normalizeOp(op)) {
-            for (var opIndex = 0; opIndex < op.length; opIndex++) {
+            for (let opIndex = 0; opIndex < op.length; opIndex++) {
               -1 === operationsToDo.indexOf(op[opIndex]) && operationsToDo.push(op[opIndex]);
             }
           }
@@ -940,31 +968,12 @@ function fill(document, fillScript, undefined) {
     // custom fill script
     fillScriptOps = fillScript.script;
     doOperation(fillScriptOps, function () {
-      // Done now
-      // Do we have anything to autosubmit?
-      if (fillScript.hasOwnProperty('autosubmit') && 'function' == typeof autosubmit) {
-        fillScript.itemType && 'fillLogin' !== fillScript.itemType || (0 < operationsToDo.length ? setTimeout(function () {
-          autosubmit(fillScript.autosubmit, fillScriptProperties.allow_clicky_autosubmit, operationsToDo);
-        }, AUTOSUBMIT_DELAY) : DEBUG_AUTOSUBMIT)
-      }
-
-      // handle protectedGlobalPage
-      if ('object' == typeof protectedGlobalPage) {
-        protectedGlobalPage.b('fillItemResults', {
-          documentUUID: documentUUID,
-          fillContextIdentifier: fillScript.fillContextIdentifier,
-          usedOpids: theOpIds
-        }, function () {
-          fillingItemType = null;
-        })
-      }
     });
   }
 
   // fill for reference
-  var thisFill = {
+  const thisFill = {
     fill_by_id: doFillById,
-    fill_by_opid: doFillByOpId,
     fill_by_opid: doFillByOpId,
     fill_by_query: doFillByQuery,
     click_on_opid: doClickByOpId,
@@ -977,7 +986,7 @@ function fill(document, fillScript, undefined) {
 
   // normalize the op versus the reference
   function normalizeOp(op) {
-    var thisOperation;
+    let thisOperation: any;
     if (op.hasOwnProperty('operation') && op.hasOwnProperty('parameters')) {
       thisOperation = op.operation, op = op.parameters;
     } else {
@@ -993,30 +1002,30 @@ function fill(document, fillScript, undefined) {
 
   // do a fill by id operation
   function doFillById(id, op) {
-    var el = document.getElementById(id);
+    const el = document.getElementById(id);
     return el ? (fillTheElement(el, op, animateTheFilling, markTheFilling), [el]) : null;
   }
 
   // do a fill by opid operation
   function doFillByOpId(opId, op) {
-    var el = getElementByOpId(opId);
+    const el = getElementByOpId(opId);
     return el ? (fillTheElement(el, op, animateTheFilling, markTheFilling), [el]) : null;
   }
 
   // do a fill by query operation
   function doFillByQuery(query, op) {
-    var elements = selectAllFromDoc(query);
-    return Array.prototype.map.call(Array.prototype.slice.call(elements), function (el) {
+    const elements = selectAllFromDoc(query);
+    return Array.prototype.map.call(Array.prototype.slice.call(elements), function (el: any) {
       fillTheElement(el, op, animateTheFilling, markTheFilling);
       return el;
     }, this);
   }
 
   // do a simple set value by query
-  function doSimpleSetByQuery(query, valueToSet) {
-    var elements = selectAllFromDoc(query),
+  function doSimpleSetByQuery(query: any, valueToSet: any) {
+    const elements = selectAllFromDoc(query),
       arr = [];
-    Array.prototype.forEach.call(Array.prototype.slice.call(elements), function (el) {
+    Array.prototype.forEach.call(Array.prototype.slice.call(elements), function (el: any) {
       el.disabled || el.a || el.readOnly || void 0 === el.value || (el.value = valueToSet, arr.push(el));
     });
     return arr;
@@ -1024,15 +1033,15 @@ function fill(document, fillScript, undefined) {
 
   // focus by opid
   function doFocusByOpId(opId) {
-    var el = getElementByOpId(opId)
+    const el = getElementByOpId(opId)
     if (el) {
       'function' === typeof el.focus && doFocusElement(el, true);
     }
     return null;
   }
 
-  function doClickByOpId(opId) {
-    var el = getElementByOpId(opId);
+  function doClickByOpId(opId: string) {
+    const el = getElementByOpId(opId);
     return el ? clickElement(el) ? [el] : null : null;
   }
 
@@ -1063,7 +1072,7 @@ function fill(document, fillScript, undefined) {
 
   // get all fields we care about
   function getAllFields() {
-    var r = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|passe|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
+    const r = RegExp('((\\\\b|_|-)pin(\\\\b|_|-)|password|passwort|kennwort|passe|contraseña|senha|密码|adgangskode|hasło|wachtwoord)', 'i');
     return Array.prototype.slice.call(selectAllFromDoc("input[type='text']")).filter(function (el) {
       return el.value && r.test(el.value);
     }, this);
@@ -1079,23 +1088,22 @@ function fill(document, fillScript, undefined) {
 
   // find the element for this operation
   function getElementByOpId(theOpId) {
-    var theElement;
+    let theElement: any;
     if (void 0 === theOpId || null === theOpId) {
       return null;
     }
     try {
       // START MODIFICATION
-      var elements = Array.prototype.slice.call(selectAllFromDoc('input, select, button, ' +
-        'span[data-bwautofill]'));
+      const elements = Array.prototype.slice.call(selectAllFromDoc('input, select, button, ' + 'span[data-bwautofill]'));
       // END MODIFICATION
-      var filteredElements = elements.filter(function (o) {
+      const filteredElements = elements.filter(function (o: any) {
         return o.opid == theOpId;
       });
       if (0 < filteredElements.length) {
         theElement = filteredElements[0],
           1 < filteredElements.length && console.warn('More than one element found with opid ' + theOpId);
       } else {
-        var elIndex = parseInt(theOpId.split('__')[1], 10);
+        const elIndex = parseInt(theOpId.split('__')[1], 10);
         isNaN(elIndex) || (theElement = elements[elIndex]);
       }
     } catch (e) {
@@ -1106,10 +1114,10 @@ function fill(document, fillScript, undefined) {
   }
 
   // helper for doc.querySelectorAll
-  function selectAllFromDoc(theSelector) {
-    var d = document, elements = [];
+  function selectAllFromDoc(theSelector: any) {
+    let elements = [];
     try {
-      elements = d.querySelectorAll(theSelector);
+      elements = document.querySelectorAll(theSelector);
     } catch (e) { }
     return elements;
   }
@@ -1531,30 +1539,3 @@ function readAndAddQRCode(document, msg) {
     });
   }
 }
-
-document.addEventListener('DOMContentLoaded', event => {
-  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
-  if (hideDomains && hideDomains.includes(self.location.hostname)) {
-    return;
-  }
-})
-
-chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-  if (msg.command === 'collectPageDetails') {
-    collectPageDetailsResponse(msg)
-  } else if (msg.command === 'fillForm') {
-    fill(document, msg.fillScript);
-  } else if (msg.command === 'fillOTPForm') {
-    fillOTPForm(msg)
-  } else if (msg.command === 'scanQRCodeInit') {
-    scanQRCodeInit(document, msg.tab, msg.isPasswordOTP);
-  } else if (msg.command === 'capturedImage') {
-    readAndAddQRCode(document, msg);
-  } else if (msg.command === 'addedOTP') {
-    addedOTP(msg)
-  } else if (msg.command === 'alert') {
-    alertMessage(msg)
-  }
-  sendResponse();
-  return true;
-});

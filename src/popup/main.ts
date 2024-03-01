@@ -518,11 +518,14 @@ Vue.mixin({
     },
     async fillCipher(cipher) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
+      const autofillOption = await this.$storageService.get('autofillOption');
+      const checkIframe = !autofillOption || autofillOption == 'autofill_page';
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
         tab: tab,
         sender: 'autofillItem',
-        cipher: cipher
+        cipher: cipher,
+        checkIframe: checkIframe
       });
       this.closeMenu()
     },

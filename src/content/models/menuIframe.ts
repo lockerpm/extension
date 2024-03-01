@@ -1,11 +1,11 @@
-import AutoSaveBarIframeElement from "@/content/bar";
+import AutofillMenuIframeElement from "@/content/models/menu";
 
 const defaultStyles = {
-  top: '10px',
-  right: '10px',
-  position: 'fixed',
-  width: "400px",
+  position: 'absolute',
+  minWidth: "300px",
+  minHeight: "300px",
   border: "0px",
+  padding: "0",
   visibility: "visible",
   boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 16px",
   zIndex: "2147483647",
@@ -22,14 +22,14 @@ const defaultStyles = {
   opacity: "1",
 }
 
-export class AutoSaveBarIframe extends AutoSaveBarIframeElement {
+export class AutofillMenuListIframe extends AutofillMenuIframeElement {
   constructor(
   ) {
     super(
-      "bar.html",
-      "locker-bar-port",
+      "menu.html",
+      "locker-menu-port",
       defaultStyles,
-      "locker_bar"
+      "locker_menu"
     );
   }
 }

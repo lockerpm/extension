@@ -5,10 +5,10 @@ import ChangePasswordRuntimeMessage from 'src/background/models/changePasswordRu
 import { generateRandomCustomElementName, setElementStyles } from '@/utils';
 import {
   AutofillMenuListIframe,
-} from './menuIframe';
+} from './models/menuIframe';
 import {
   AutoSaveBarIframe,
-} from './barIframe';
+} from './models/barIframe';
 import { CipherType } from "jslib-common/enums/cipherType";
 
 import {
@@ -20,12 +20,10 @@ import {
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
 } from '@/config/constants'
 
-const documents = [];
-
 const menuIconTagName = generateRandomCustomElementName();
 
-let currentMessage: any = null
 const formData: any[] = [];
+let currentMessage: any = null
 let pageHref: string = null;
 let observer: MutationObserver = null;
 let domObservationCollectTimeout: number = null;
@@ -33,7 +31,8 @@ let collectIfNeededTimeout: number = null;
 let observeDomTimeout: number = null;
 let disabledAddLoginNotification = false;
 let disabledChangedPasswordNotification = false;
-let isSignUp = false
+let isSignUp = false;
+let isDomLoaded = false;
 const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
 const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
 const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -47,6 +46,7 @@ let barElement: HTMLElement;
 
 let selectedInput: any;
 let showMenuOption: any;
+let isIframe: Boolean = self.location.ancestorOrigins.length > 0;
 
 const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
   all: "initial",
@@ -65,6 +65,30 @@ let barElementsMutationObserver: MutationObserver = new MutationObserver(
   handleOverlayElementMutationObserverUpdate,
 );
 
+document.addEventListener('DOMContentLoaded', (e) => {
+  if (!isDomLoaded) {
+    chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+      disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+      chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+        disabledChangedPasswordNotification = disChangedObj != null &&
+          disChangedObj.disableChangedPasswordNotification === true;
+        if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+          collectIfNeededWithTimeout();
+        }
+      });
+    });
+    
+    chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+      if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+        return;
+      }
+      currentMessage = msg;
+      processMessages(msg, sendResponse);
+    });
+  }
+  isDomLoaded = true;
+})
+
 document.addEventListener('click', (event: any) => {
   if (menuElement && menuIconElement && selectedInput) {
     if (!menuElement.contains(event.target) && !menuIconElement.contains(event.target) && !selectedInput.contains(event.target)) {
@@ -76,33 +100,6 @@ document.addEventListener('click', (event: any) => {
     }
   }
 })
-
-document.addEventListener('DOMContentLoaded', event => {
-  documents.push(document)
-  const hideDomains = process.env.VUE_APP_HIDE_DOMAINS
-  if (hideDomains && hideDomains.includes(self.location.hostname)) {
-    return;
-  }
-});
-
-chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-  disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-  chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-    disabledChangedPasswordNotification = disChangedObj != null &&
-      disChangedObj.disableChangedPasswordNotification === true;
-    if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-      collectIfNeededWithTimeout();
-    }
-  });
-});
-
-chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
-  if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
-    return;
-  }
-  currentMessage = msg;
-  processMessages(msg, sendResponse);
-});
 
 async function processMessages(msg: any, sendResponse: Function) {
   if (msg.command === 'openNotificationBar') {
@@ -120,6 +117,8 @@ async function processMessages(msg: any, sendResponse: Function) {
   } else if (msg.command === 'resizeInformMenu') {
     resizeInformMenu(msg)
   } else if (msg.command === 'updateCipher') {
+    sendPlatformMessage(msg)
+  } else if (msg.command === 'createCipher') {
     sendPlatformMessage(msg)
   } else if (msg.command === 'useCipher') {
     sendPlatformMessage(msg)
@@ -276,16 +275,16 @@ function initMenuIcon(inputEl: HTMLElement, type = 'password', isLocked = false,
   }, 200)
 }
 
-function setFillLogo(el: any, type = 'password', isLocked = false, isOver = false) {
+function setFillLogo(el: any, type = 'password', isLocked = false, isOver = false, checkIframe = false) {
   const inputEl : any = document.querySelector(`[locker-id="${el.lockerId}"]`)
   const activeElement = document.activeElement;
-  if (activeElement && inputEl && activeElement.id == inputEl.id) {
+  if (activeElement && inputEl && activeElement.id == inputEl.id && (!isIframe || !checkIframe)) {
     initMenuIcon(inputEl, type, isLocked, isOver)
     if (showMenuOption === 'field_selected') {
       openInformMenu(inputEl, type, isOver)
     }
   }
-  if (inputEl && getComputedStyle(inputEl).display !== 'none') {
+  if (inputEl && getComputedStyle(inputEl).display !== 'none' && (!isIframe || !checkIframe)) {
     inputEl.addEventListener("focus", (event) => {
       initMenuIcon(inputEl, type, isLocked, isOver);
       if (showMenuOption === 'field_selected') {
@@ -781,11 +780,10 @@ async function checkingAutofill(msg: any) {
   if (showMenuOption === 'off') {
     return
   }
-
   for (let i = 0; i < msg.data.passwordFields.length; i++) {
     if (msg.data.passwordFields[i]) {
       try {
-        setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked)
+        setFillLogo(msg.data.passwordFields[i], "password", msg.data.isLocked, false, msg.checkIframe)
       } catch (error) {
       }
     }
@@ -793,7 +791,7 @@ async function checkingAutofill(msg: any) {
   for (let i = 0; i < msg.data.usernameFields.length; i++) {
     if (msg.data.usernameFields[i]) {
       try {
-        setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked)
+        setFillLogo(msg.data.usernameFields[i], "username", msg.data.isLocked, false, msg.checkIframe)
       } catch (error) {
       }
     }
@@ -801,9 +799,9 @@ async function checkingAutofill(msg: any) {
   for (let i = 0; i < msg.data.forms.length; i++) {
     const form = msg.data.forms[i];
     if (form.otps?.length === 1) {
-      setFillLogo(form.otps[0], "otp", msg.data.isLocked)
+      setFillLogo(form.otps[0], "otp", msg.data.isLocked, false, msg.checkIframe)
     } else if (form.otps.length === 6) {
-      setFillLogo(form.otps[5], "otp", msg.data.isLocked, true)
+      setFillLogo(form.otps[5], "otp", msg.data.isLocked, true, msg.checkIframe)
     }
   }
 }

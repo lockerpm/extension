@@ -170,7 +170,7 @@ Vue.mixin({
           command: 'collectPageDetails',
           tab: tab,
           sender: 'autofillItem',
-          cipher: cipher
+          cipher: cipher,
         });
       }
       this.closeMenu()

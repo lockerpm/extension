@@ -199,6 +199,9 @@ export default class AutofillService implements AutofillServiceInterface {
   }
 
   async doAutoFill(options: any) {
+    if (options.isIframe && options.checkIframe) {
+      return;
+    }
     let totpPromise: Promise<string> = null;
     const tab = await this.getActiveTab();
     
