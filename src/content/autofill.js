@@ -102,11 +102,18 @@ function alertMessage(msg) {
           : "Username and Password are added!"
       );
       break;
-    case 'password_add_error':
+    case 'cipher_add_error':
       self.alert(
         self.navigator.language === "vi"
-          ? "Lỗi! Không thể thêm mới tài khoản."
-          : "Error! Can't add Username and Password."
+          ? "Lỗi! Không thể thêm mới."
+          : "Error! Can't add."
+      );
+      break;
+    case 'cipher_update_error':
+      self.alert(
+        self.navigator.language === "vi"
+          ? "Lỗi! Không thể cập nhật."
+          : "Error! Can't update."
       );
       break;
     case 'qr_invalid':
@@ -156,6 +163,13 @@ function alertMessage(msg) {
         self.navigator.language === "vi"
           ? "Item đã được cập nhật thành công!"
           : "The item have been updated!"
+      );
+      break;
+    case 'created_cipher':
+      self.alert(
+        self.navigator.language === "vi"
+          ? "Item đã được thêm mới thành công!"
+          : "The item have been added!"
       );
       break;
     default:

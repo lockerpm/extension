@@ -2,11 +2,10 @@ import { CipherService } from 'jslib-common/abstractions/cipher.service';
 import { BrowserApi } from '@/browser/browserApi';
 import RequestBackground from './request.background';
 
-const menuPortName = 'locker-menu-port'
+const barPortName = 'locker-bar-port'
 
-export default class MenuBackground {
-  private readonly openPopout = () => {};
-  private menuPort: chrome.runtime.Port;
+export default class BarBackground {
+  private barPort: chrome.runtime.Port;
   private initData: any;
   constructor(
     private cipherService: CipherService,
@@ -17,7 +16,7 @@ export default class MenuBackground {
   }
 
   private setupExtensionMessageListeners() {
-    BrowserApi.messageListener("menu.background", this.handleExtensionMessage);
+    BrowserApi.messageListener("bar.background", this.handleExtensionMessage);
     chrome.runtime.onMessageExternal.addListener(this.handleExtensionMessage);
     BrowserApi.addListener(chrome.runtime.onConnect, this.handlePortOnConnect);
   }
@@ -27,31 +26,27 @@ export default class MenuBackground {
     sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void,
   ) => {
-    if (message.command === 'initInformMenu') {
+    if (message.command === 'initAutoSaveBar') {
       this.initData = message.data
-    } else if (message.command === 'resizeInformMenu') {
-      this.resizeInformMenu(message)
-    } else if (message.command === 'useCipher') {
-      this.useCipher(message)
-    }
+    };
     sendResponse();
     return true;
   };
 
   private handlePortOnConnect = async (port: chrome.runtime.Port) => {
-    const isMenuPort = port.name === menuPortName;
-    if (!isMenuPort) {
+    const isBarPort = port.name === barPortName;
+    if (!isBarPort) {
       return;
     }
 
-    if (isMenuPort) {
-      this.menuPort = port;
+    if (isBarPort) {
+      this.barPort = port;
     }
 
     port.onMessage.addListener(this.handleOverlayElementPortMessage);
     port.postMessage({
-      command: 'initAutofillMenuList',
-      isConnected: isMenuPort,
+      command: 'initAutoSaveBar',
+      isConnected: isBarPort,
       initData: this.initData
     });
   };
@@ -61,20 +56,8 @@ export default class MenuBackground {
     port: chrome.runtime.Port,
   ) => {
     const command = message?.command;
-    if (port.name === menuPortName) {
+    if (port.name === barPortName) {
       // check event
     }
   };
-
-  private resizeInformMenu = (message: any) => {
-    this.menuPort.postMessage({
-      command: 'updateIframePosition',
-      styles: message.data.styles
-    });
-  }
-
-  private useCipher = async (message: any) => {
-    const { cipherId, payload } = message.data;
-    await this.requestService.use_cipher(cipherId, payload);
-  }
 }

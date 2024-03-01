@@ -19,7 +19,7 @@ import { BrowserApi } from '../browser/browserApi';
 import { PopupUtilsService } from '../services/popup-utils.service';
 
 import MainBackground from './main.background';
-import Requestground from './request.background';
+import RequestBackground from './request.background';
 
 import { Utils } from 'jslib-common/misc/utils';
 
@@ -45,7 +45,7 @@ export default class NotificationBackground {
     private folderService: FolderService,
     private userService: UserService,
     private totpService: TotpService,
-    private request: Requestground,
+    private request: RequestBackground,
     private passwordRepromptService: PasswordRepromptService,
     private popupUtilsService: PopupUtilsService,
     private platformUtilsService: PlatformUtilsService
@@ -91,6 +91,18 @@ export default class NotificationBackground {
         break;
       case 'saveNewQRCode':
         await this.handleSaveQrCode(msg);
+        break;
+      case 'addExcludeDomain':
+        this.addExcludeDomain(msg);
+        break;
+      case 'removeExcludeDomain':
+        this.removeExcludeDomain(msg);
+        break;
+      case 'updateCipher':
+        this.updateCipher(msg);
+        break;
+      case 'createCipher':
+        this.createCipher(msg);
         break;
       default:
         break;
@@ -446,6 +458,53 @@ export default class NotificationBackground {
 
   private async allowPersonalOwnership(): Promise<boolean> {
     return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
+  }
+
+  private async getExcludeDomains() {
+    const { results } = await this.request.exclude_domains();
+    await this.cipherService.saveNeverDomains(results)
+  }
+
+  private async addExcludeDomain(message: any) {
+    const payload = message.data;
+    await this.request.add_exclude_domain(payload);
+    await this.getExcludeDomains()
+    await this.notificationAlert('added_exclude_domain');
+  }
+
+  private async removeExcludeDomain(message: any) {
+    const { excludeId } = message.data;
+    await this.request.delete_exclude_domain(excludeId);
+    await this.getExcludeDomains()
+    await this.notificationAlert('removed_exclude_domain');
+  }
+
+  private async updateCipher (message: any) {
+    const { cipherId, payload } = message.data;
+    try {
+      await this.request.update_cipher(cipherId, payload);
+      await this.notificationAlert('updated_cipher');
+    } catch (error) {
+      await this.notificationAlert('cipher_update_error');
+    }
+  }
+
+  private async createCipher(message: any) {
+    const { payload } = message.data;
+    try {
+      await this.request.create_ciphers_vault(payload);
+      await this.notificationAlert('created_cipher');
+    } catch (e) {
+      if (payload.type == CipherType.Login) {
+        if (e.response && e.response.data && e.response.data.code === '5002') {
+          this.notificationAlert('password_limited')
+        } else {
+          this.notificationAlert('password_add_error')
+        }
+      } else {
+        this.notificationAlert('cipher_add_error')
+      }
+    }
   }
 
   private async notificationAlert(type: string) {

@@ -6,7 +6,9 @@ import { generateRandomCustomElementName, setElementStyles } from '@/utils';
 import {
   AutofillMenuListIframe,
 } from './menuIframe';
-
+import {
+  AutoSaveBarIframe,
+} from './barIframe';
 import { CipherType } from "jslib-common/enums/cipherType";
 
 import {
@@ -41,6 +43,7 @@ const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAIN
 
 let menuElement: HTMLElement;
 let menuIconElement: HTMLElement;
+let barElement: HTMLElement;
 
 let selectedInput: any;
 let showMenuOption: any;
@@ -54,7 +57,13 @@ const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
 
 let menuElementsMutationObserver: MutationObserver = new MutationObserver(
   handleOverlayElementMutationObserverUpdate,
-);;
+);
+let menuIconElementsMutationObserver: MutationObserver = new MutationObserver(
+  handleOverlayElementMutationObserverUpdate,
+);
+let barElementsMutationObserver: MutationObserver = new MutationObserver(
+  handleOverlayElementMutationObserverUpdate,
+);
 
 document.addEventListener('click', (event: any) => {
   if (menuElement && menuIconElement && selectedInput) {
@@ -616,46 +625,35 @@ function processedForm(form: HTMLFormElement) {
 }
 
 function closeExistingAndOpenBar(type: string, loginInfo: any) {
-  let barPage = 'bar.html';
-  switch (type) {
-    case 'add':
-      barPage = barPage + '?id=' + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.password) + '&uri=' + encodeURIComponent(loginInfo.uri) + '&domain=' + encodeURIComponent(loginInfo.domain);;
-      break;
-    case 'change':
-      barPage = barPage + '?id=' + encodeURIComponent(loginInfo.cipherId) + '&username=' + encodeURIComponent(loginInfo.username) + '&password=' + encodeURIComponent(loginInfo.newPassword) + '&uri=' + encodeURIComponent(loginInfo.domain);
-      break;
-    default:
-      break;
-  }
   closeBar();
-  setTimeout(() => {
-    openBar(type, barPage);
-  }, 500);
-}
-
-function openBar(type: string, barPage: string) {
-  if (document.body == null) {
-    return;
+  const initData = {
+    data: {
+      id: loginInfo.cipherId,
+      username: loginInfo.username,
+      domain: loginInfo.domain,
+      uri: loginInfo.uri,
+      password: loginInfo.password || loginInfo.newPassword
+    },
+    styles: {
+      height: `${type === 'add' ? '338' : '258'}px`,
+    }
   }
-  const barPageUrl: string = chrome.runtime.getURL(barPage);
-  const iframe = document.createElement('iframe');
-  iframe.className = 'cs-notification-bar-iframe';
-  iframe.style.cssText = `
-    height: ${type === 'add' ? '338' : '278'}px !important;
-  `;
-  iframe.id = '';
-  iframe.src = barPageUrl;
-  document.body.appendChild(iframe);
-
-  (iframe.contentWindow.location as any) = barPageUrl;
+  sendPlatformMessage({
+    command: 'initAutoSaveBar',
+    data: initData
+  });
+  const barElTagName = generateRandomCustomElementName();
+  globalThis.customElements?.define(barElTagName, AutoSaveBarIframe);
+  barElement = globalThis.document.createElement(barElTagName);
+  updateCustomElementDefaultStyles(barElement);
+  globalThis.document.body?.appendChild(barElement);
 }
 
 function closeBar(explicitClose: boolean = false) {
-  const iframeEls = document.querySelectorAll('.cs-notification-bar-iframe');
-  for (let i = 0; i < iframeEls.length; i++) {
-    iframeEls[i].parentElement.removeChild(iframeEls[i]);
+  if (barElement && barElement.parentElement) {
+    barElement.parentElement.removeChild(barElement);
   }
-
+  barElement = null;
   if (explicitClose) {
     sendPlatformMessage({
       command: 'bgCloseNotificationBar',
@@ -676,11 +674,23 @@ function sendPlatformMessage(msg: any) {
 
 function unobserveCustomElements() {
   menuElementsMutationObserver?.disconnect();
+  menuIconElementsMutationObserver?.disconnect();
+  barElementsMutationObserver?.disconnect();
 }
 
 function observeCustomElements() {
   if (menuElement) {
     menuElementsMutationObserver?.observe(menuElement, {
+      attributes: true,
+    });
+  }
+  if (menuIconElement) {
+    menuIconElementsMutationObserver?.observe(menuIconElement, {
+      attributes: true,
+    });
+  }
+  if (barElement) {
+    barElementsMutationObserver?.observe(barElement, {
       attributes: true,
     });
   }

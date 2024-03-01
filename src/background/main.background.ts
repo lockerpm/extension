@@ -83,6 +83,7 @@ import WindowsBackground from './windows.background';
 import WebRequestBackground from './webRequest.background';
 import RequestBackground from './request.background';
 import MenuBackground from './menu.background';
+import BarBackground from './bar.background';
 
 import { PopupUtilsService } from '../services/popup-utils.service';
 import AutofillService from '../services/autofill.service';
@@ -150,7 +151,8 @@ export default class MainBackground {
   private windowsBackground: WindowsBackground;
   private webRequestBackground: WebRequestBackground;
   private requestBackground: RequestBackground;
-  private menuBackgroud: MenuBackground;
+  private menuBackground: MenuBackground;
+  private barBackground: BarBackground;
 
   private sidebarAction: any;
   private buildingContextMenu: boolean;
@@ -476,7 +478,11 @@ export default class MainBackground {
       this.vaultTimeoutService,
       this.logService
     );
-    this.menuBackgroud = new MenuBackground(
+    this.menuBackground = new MenuBackground(
+      this.cipherService,
+      this.requestBackground
+    )
+    this.barBackground = new BarBackground(
       this.cipherService,
       this.requestBackground
     )
@@ -499,7 +505,8 @@ export default class MainBackground {
     
     await this.tabsBackground.init();
     await this.windowsBackground.init();
-    await this.menuBackgroud.init();
+    await this.menuBackground.init();
+    await this.barBackground.init();
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();

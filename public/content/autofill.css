@@ -31,18 +31,6 @@
     -webkit-animation: lockerfill 200ms ease-in-out 0ms 1;
 }
 
-.cs-notification-bar-iframe {
-  width: 400px;
-  border: 0;
-  min-height: initial;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
-  border-radius: 4px;
-  opacity: 1 !important;
-  position: fixed;
-  z-index: 2147483647 !important;
-}
-
-
 .cs-menu-icon {
   height: 20px;
   width: 20px;

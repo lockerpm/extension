@@ -7,10 +7,20 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     language: 'vi',
+    initData: {
+      cipherId: null,
+      username: '',
+      password: '',
+      newPassword: '',
+      domain: '',
+    }
   },
   mutations: {
     SET_LANG (state, language) {
       state.language = language
+    },
+    UPDATE_INIT_DATA (state, value) {
+      state.initData = value
     },
   },
   actions: {

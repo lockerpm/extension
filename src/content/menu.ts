@@ -11,12 +11,12 @@ class AutofillMenuIframeElement extends HTMLElement {
     super();
 
     const shadow: ShadowRoot = this.attachShadow({ mode: "closed" });
-    const autofillOverlayIframeService = new AutofillMenuIframeService(
+    const autofillMenuIframeService = new AutofillMenuIframeService(
       iframePath,
       portName,
       shadow,
     );
-    autofillOverlayIframeService.initMenuIframe(initStyles, iframeTitle, ariaAlert);
+    autofillMenuIframeService.initMenuIframe(initStyles, iframeTitle, ariaAlert);
   }
 }
 

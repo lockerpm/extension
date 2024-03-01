@@ -11,14 +11,16 @@ import VueMomentJS from "vue-momentjs";
 
 import App from '@/bar/App.vue'
 import router from '@/router/bar'
-import storePromise from '@/store'
+import store from '@/store/bar'
 
+import JSLib from '@/services'
 import i18n from '@/locales/i18n'
 import cystackPlatformAPI from '@/api/cystack_platform'
 
 Vue.config.productionTip = false;
 
 Vue.use(AsyncComputed)
+Vue.use(JSLib)
 Vue.use(Clipboard)
 Vue.use(Element, { locale })
 Vue.use(VueMomentJS, moment);
@@ -44,17 +46,6 @@ Vue.mixin({
         this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
       })
     },
-    sanitizeUrl(connectionUrl) {
-      if (connectionUrl.startsWith('//')) {
-        const scheme = self.location.protocol === 'https:' ? 'wss' : 'ws'
-        connectionUrl = `${scheme}:${connectionUrl}`
-      }
-
-      return connectionUrl
-    },
-    async reconnectDesktopAppSocket () {
-      //
-    },
     async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
       try {
         await cystackPlatformAPI.add_exclude_domain({ domain: url })
@@ -72,13 +63,11 @@ Vue.mixin({
   }
 })
 
-storePromise().then((store) => {
-  store.commit('SET_LANG', store.state.language)
-  i18n.locale = store.state.language
-  new Vue({
-    router,
-    store,
-    i18n,
-    render: h => h(App)
-  }).$mount('#bar-app')
-})
+store.commit('SET_LANG', store.state.language)
+i18n.locale = store.state.language
+new Vue({
+  router,
+  store,
+  i18n,
+  render: h => h(App)
+}).$mount('#bar-app')
