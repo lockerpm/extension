@@ -15,7 +15,6 @@ import store from '@/store/bar'
 
 import JSLib from '@/services'
 import i18n from '@/locales/i18n'
-import cystackPlatformAPI from '@/api/cystack_platform'
 
 Vue.config.productionTip = false;
 
@@ -37,29 +36,6 @@ Vue.mixin({
   computed: {
   },
   methods: {
-    async getExcludeDomains() {
-      await cystackPlatformAPI.exclude_domains().then(response => {
-        this.$cipherService.saveNeverDomains(response.results)
-        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
-      }).catch(() => {
-        this.$cipherService.saveNeverDomains([])
-        this.$store.commit("UPDATE_EXCLUDE_DOMAINS");
-      })
-    },
-    async addExcludeDomain(url: string, callback = () => ({}), isNotification = true) {
-      try {
-        await cystackPlatformAPI.add_exclude_domain({ domain: url })
-        await this.getExcludeDomains();
-        callback()
-        if (isNotification) {
-          this.notify(this.$tc('data.notifications.added_excluded_domain'), 'success')
-        }
-      } catch (e) {
-        if (isNotification) {
-          this.notify(this.$tc('data.notifications.cannot_add_excluded_domain'), 'error')
-        }
-      }
-    },
   }
 })
 

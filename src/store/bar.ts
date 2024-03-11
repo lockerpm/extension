@@ -6,7 +6,7 @@ Vue.use(Vuex)
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const store = new Vuex.Store({
   state: {
-    language: 'vi',
+    language: 'en',
     initData: {
       cipherId: null,
       username: '',

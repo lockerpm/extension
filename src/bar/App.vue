@@ -19,11 +19,15 @@ export default Vue.extend({
   computed: {
   },
   async created () {
-    self.addEventListener('message', (event: any) => {
+    self.addEventListener('message', async (event: any) => {
       if (event.target?.location.href === self.location.href) {
         if (event.data.isConnected) {
           this.isPortConnected = true;
-          this.$store.commit('UPDATE_INIT_DATA', event.data.initData)
+          this.$store.commit('UPDATE_INIT_DATA', event.data.initData);
+          const storeData = await this.$storageService.get('cs_store');
+          if (storeData && storeData.language) {
+            this.$i18n.locale = storeData.language || 'en'
+          }
         }
       }
     })
