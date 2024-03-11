@@ -207,4 +207,52 @@ export class BrowserApi {
       chrome.runtime.getPlatformInfo(resolve);
     });
   }
+
+  static isBackgroundPage(window: Window & typeof globalThis): boolean {
+    return typeof window !== "undefined" && window === BrowserApi.getBackgroundPage();
+  }
+
+  private static trackedChromeEventListeners: [
+    event: chrome.events.Event<(...args: unknown[]) => unknown>,
+    callback: (...args: unknown[]) => unknown,
+  ][] = [];
+
+  static addListener<T extends (...args: readonly unknown[]) => unknown>(
+    event: chrome.events.Event<T>,
+    callback: T,
+  ) {
+    event.addListener(callback);
+
+    if (BrowserApi.isSafariApi && !BrowserApi.isBackgroundPage(window)) {
+      BrowserApi.trackedChromeEventListeners.push([event, callback]);
+      BrowserApi.setupUnloadListeners();
+    }
+  }
+
+  static removeListener<T extends (...args: readonly unknown[]) => unknown>(
+    event: chrome.events.Event<T>,
+    callback: T,
+  ) {
+    event.removeListener(callback);
+
+    if (BrowserApi.isSafariApi && !BrowserApi.isBackgroundPage(window)) {
+      const index = BrowserApi.trackedChromeEventListeners.findIndex(([_event, eventListener]) => {
+        return eventListener == callback;
+      });
+      if (index !== -1) {
+        BrowserApi.trackedChromeEventListeners.splice(index, 1);
+      }
+    }
+  }
+
+    // Setup the event to destroy all the listeners when the popup gets unloaded in Safari, otherwise we get a memory leak
+    private static setupUnloadListeners() {
+      // The MDN recommend using 'visibilitychange' but that event is fired any time the popup window is obscured as well
+      // 'pagehide' works just like 'unload' but is compatible with the back/forward cache, so we prefer using that one
+      window.onpagehide = () => {
+        for (const [event, callback] of BrowserApi.trackedChromeEventListeners) {
+          event.removeListener(callback);
+        }
+      };
+    }
 }

@@ -21,7 +21,6 @@ self.addEventListener('message', event => {
 const forwardCommands = [
   'promptForLogin',
   'addToLockedVaultPendingNotifications',
-  'unlockCompleted',
   'addToLockedVaultPendingInformMenu'
 ];
 

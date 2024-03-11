@@ -286,14 +286,6 @@ async function update_cipher(id, data = {}) {
   });
 }
 
-async function use_cipher(id, data = {}) {
-  return await request({
-    url: ENDPOINT.CYSTACK_PLATFORM_CIPHER_USE.replace(':id', id),
-    method: "put",
-    data
-  });
-}
-
 async function share_cipher(id, data = {}) {
   return await request({
     url: ENDPOINT.CYSTACK_PLATFORM_CIPHER_SHARE.replace(':id', id),
@@ -584,7 +576,6 @@ export default {
   ciphers_vaults,
   create_ciphers_vault,
   update_cipher,
-  use_cipher,
   share_cipher,
   ciphers_permanent_delete,
   ciphers_delete,

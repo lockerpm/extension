@@ -15,9 +15,8 @@ import router from '@/router/popup'
 import storePromise from '@/store'
 
 import i18n from '@/locales/i18n'
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 import { CipherType } from "jslib-common/enums/cipherType";
-import { SyncResponse } from "jslib-common/models/response/syncResponse";
 import { WALLET_APP_LIST } from "@/utils/crypto/applist/index";
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherView } from "jslib-common/models/view/cipherView";
@@ -39,28 +38,21 @@ Vue.use(VueNativeSock, "ws://192.168.0.186:8000", {
   connectManually: true
 });
 
-import '@fortawesome/fontawesome-free/css/all.min.css'
-import '@/assets/buildtw.css'
-import '@/assets/tailwind.css'
-import '@/assets/app.scss'
-import '@/assets/flags/flags.css'
 import find from "lodash/find";
 import { nanoid } from 'nanoid'
 import { Avatar } from "element-ui";
 import extractDomain from "extract-domain";
 
-import middleware from '../middleware';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '@/assets/css/index.scss';
+import '@/assets/css/app.scss';
+
+import middleware from './middleware';
 
 Vue.mixin({
   data() {
     return {
-      totpCode: "",
-      totpTimeout: null,
-      loadedTimeout: null,
-      pageDetails: null,
-      selectedCipher: null,
       pageSize: 150,
-
       folders: [],
       strategies: [
         { key: "google", name: "Google", color: "#4284f4" },
@@ -88,11 +80,8 @@ Vue.mixin({
       }
     },
     language() { return this.$store.state.user.language },
-    currentUser() { return this.$store.state.user?.email ? this.$store.state.user : this.$store.state.preloginData },
-    currentUserPw() { return this.$store.state.userPw },
-    environment() { return this.$store.state.environment },
+    currentUser() { return this.$store.state.user && this.$store.state.user.email ? this.$store.state.user : (this.$store.state.preloginData || {}) },
     isLoggedIn() { return this.$store.state.isLoggedIn },
-    isAllPage() { return this.$route.name === 'vault' },
     searchText() { return this.$store.state.searchText },
     teams() { return this.$store.state.teams || [] },
     currentOrg() { return find(this.teams, team => team.id === this.$route.params.teamId) || {} },
@@ -103,12 +92,6 @@ Vue.mixin({
     showFolders() {
       return this.$store.state.showFolders
     },
-    enableAutofill() {
-      return this.$store.state.enableAutofill
-    },
-  },
-  destroyed() {
-    self.clearTimeout(this.loadedTimeout);
   },
   methods: {
     changeLang(value) {
@@ -184,27 +167,16 @@ Vue.mixin({
         dangerouslyUseHTMLString: html
       })
     },
-    async genKey(masterPassword, email) {
-      try {
-        const key = await this.$cryptoService.makeKey(masterPassword, email, 0, 100000)
-        const hashedPassword = await this.$cryptoService.hashPassword(masterPassword, key)
-        return hashedPassword
-      } catch (e) {
-        return ''
-      }
-    },
     async login(isPwl = false, decryptData: any) {
       this.$store.commit('UPDATE_CALLING_API', true)
       await this.$passService.clearGeneratePassword()
-      const [deviceId, hideIcons, showFolders, enableAutofill] = await Promise.all([
+      const [deviceId, hideIcons, showFolders] = await Promise.all([
         this.$storageService.get("device_id"),
         this.$storageService.get("hideIcons"),
         this.$storageService.get("showFolders"),
-        this.$storageService.get("enableAutofill"),
       ]);
       this.$store.commit('UPDATE_HIDE_ICONS', hideIcons)
       this.$store.commit("UPDATE_SHOW_FOLDERS", showFolders);
-      this.$store.commit("UPDATE_ENABLE_AUTOFILL", enableAutofill);
       try {
         await this.$cryptoService.clearKeys();
         if (!isPwl) {
@@ -265,8 +237,11 @@ Vue.mixin({
         }
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
+        this.$storageService.sessionSave('lastActive', now)
+
       } catch (e) {
-        this.notify(this.$t("errors.invalid_master_password"), "error");
+        const message = e && e.response && e.response.data ? e.response.data.message : ''
+        this.notify(message || this.$t("errors.invalid_master_password"), "error");
         this.$store.commit('UPDATE_CALLING_API', false)
       }
       setTimeout(() => {
@@ -398,14 +373,14 @@ Vue.mixin({
       if (team.id) {
         return [0, 1].includes(team.type);
       }
-      return true
+      return !item.organizationId
     },
     canManageFolder(teams, item) {
       const team = this.getTeam(teams, item.organizationId)
       if (team.organization_id) {
         return ['owner', 'admin'].includes(team.role)
       }
-      return true
+      return !item.organizationId
     },
     openNewTab(link) {
       if (!link.match(/^https?:\/\//i)) {
@@ -541,19 +516,16 @@ Vue.mixin({
         }
       })
     },
-    async fillCipher(cipher, enableUpdate = false) {
-      if (cipher.id && enableUpdate) {
-        await cystackPlatformAPI.use_cipher(
-          cipher.id,
-          { use: true, favorite: cipher.favorite },
-        )
-      }
+    async fillCipher(cipher) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
+      const autofillOption = await this.$storageService.get('autofillOption');
+      const checkIframe = !autofillOption || autofillOption == 'autofill_page';
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
         tab: tab,
         sender: 'autofillItem',
-        cipher: cipher
+        cipher: cipher,
+        checkIframe: checkIframe
       });
       this.closeMenu()
     },
@@ -571,7 +543,7 @@ Vue.mixin({
         }
       }
     },
-    async removeDomain(domain: any, isNotification = true) {
+    async removeExcludeDomain(domain: any, isNotification = true) {
       cystackPlatformAPI.delete_exclude_domain(domain.id).then(async () => {
         await this.getExcludeDomains()
         if (isNotification) {
@@ -616,7 +588,7 @@ Vue.mixin({
       const tab = await BrowserApi.getTabFromCurrentWindow();
       if (tab) {
         BrowserApi.tabSendMessage(tab, {
-          command: "firstScanQRCode",
+          command: "scanQRCodeInit",
           tab: tab,
           isPasswordOTP: isPasswordOTP
         });  

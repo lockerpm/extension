@@ -13,7 +13,7 @@ export default Vue.extend ({
   computed: {
   },
   beforeMount() {
-    if (!this.$route.params?.id) {
+    if (!this.$route.params?.id && this.$route.name !== 'vault') {
       this.$router.push({ name: 'vault' })
     }
   }

@@ -5,16 +5,26 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const os = require('os');
 module.exports = {
   pages: {
+    offscreen: {
+      template: 'public/offscreen.html',
+      entry: './src/offscreen.js',
+      title: 'Offscreen'
+    },
     popup: {
       template: 'public/index.html',
       entry: './src/popup/main.ts',
       title: 'Popup'
     },
-    offscreen: {
-      template: 'public/offscreen.html',
-      entry: './src/offscreen.js',
-      title: 'Offscreen'
-    }
+    bar: {
+      template: 'public/bar.html',
+      entry: './src/bar/main.ts',
+      title: 'Bar'
+    },
+    menu: {
+      template: 'public/menu.html',
+      entry: './src/menu/main.ts',
+      title: 'Menu'
+    },
   },
   pluginOptions: {
     browserExtension: {
@@ -24,7 +34,7 @@ module.exports = {
         },
         contentScripts: {
           entries: {
-            'content/autofill': 'src/content/autofill.js',
+            'content/autofill': 'src/content/autofill.ts',
             'content/autofiller': 'src/content/autofiller.ts',
             'content/notificationBar': 'src/content/notificationBar.ts',
             'content/contextMenuHandler': 'src/content/contextMenuHandler.ts',

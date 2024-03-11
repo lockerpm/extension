@@ -68,11 +68,13 @@ export default Vue.extend({
           null
         )) || [];
         try {
-          results = await this.$folderService.getAllDecrypted() || [];
+          const folders = await this.$folderService.getAllDecrypted() || [];
+          const allCollections = await this.$collectionService.getAllDecrypted() || [];
+          results = [...folders, ...allCollections.map((c) => ({ ...c, isCollection: true }))]
         } catch (error) {
           results = []
         }
-        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => c.folderId === f.id)}));
+        results = results.filter((f) => f.id).map((f) => ({ ...f, items: allCiphers.filter((c) => f.isCollection ? c.collectionIds?.includes(f.id) : (c.folderId === f.id))}));
         results = orderBy(results, [c => this.orderField === 'name' ? (c.name && c.name.toLowerCase()) : c.revisionDate], [this.orderDirection]) || []
         return results;
       },

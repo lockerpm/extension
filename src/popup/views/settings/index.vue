@@ -97,13 +97,13 @@
 
 <script>
 import Vue from "vue";
-import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 import i18n from '@/locales/i18n';
-import { VAULT_TIMEOUTS } from '@/config/constants'
-const enableAutofillKey = 'enableAutofill'
-const showFoldersKey = 'showFolders'
-const hideIconsKey = 'hideIcons'
-const accountInfoKey = 'accountInfoKey'
+import { VAULT_TIMEOUTS } from '@/config/constants';
+import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
+
+const showFoldersKey = 'showFolders';
+const hideIconsKey = 'hideIcons';
+const accountInfoKey = 'accountInfoKey';
 
 export default Vue.extend({
   name: "Settings",
@@ -112,20 +112,17 @@ export default Vue.extend({
   },
   async mounted() {
     const res = await Promise.all([
-      this.$storageService.get(enableAutofillKey),
       this.$storageService.get(showFoldersKey),
       this.$storageService.get(hideIconsKey),
     ])
-    this.storage.enableAutofill = res[0] == null ? true : res[0]
-    this.storage.showFolders = res[1] == null ? true : res[1]
-    this.storage.hideIcons = res[2] == null ? false : res[2]
+    this.storage.showFolders = res[0] == null ? true : res[0]
+    this.storage.hideIcons = res[1] == null ? false : res[1]
   },
   data() {
     return {
       loading: false,
       fingerprintDialog: false,
       storage: {
-        enableAutofill: true,
         showFolders: true,
         hideIcons: false
       }
@@ -142,8 +139,8 @@ export default Vue.extend({
           items: [
             {
               key: accountInfoKey,
-              avatar: this.currentUser.avatar,
-              email: this.currentUser.email,
+              avatar: this.currentUser?.avatar,
+              email: this.currentUser?.email,
             },
           ],
         },
@@ -151,10 +148,9 @@ export default Vue.extend({
           name: this.$t("data.settings.autofill"),
           items: [
             {
+              routeName: "settings-enable-autofill",
               name: this.$t("data.settings.enable_autofill"),
               desc: this.$t("data.settings.enable_autofill_desc"),
-              switch: true,
-              key: enableAutofillKey,
             },
             {
               routeName: "settings-excluded-domains",
@@ -240,16 +236,10 @@ export default Vue.extend({
       if(key === showFoldersKey){
         this.$store.commit('UPDATE_SHOW_FOLDERS', this.storage[showFoldersKey])
       }
-      if(key === enableAutofillKey){
-        this.$store.commit('UPDATE_ENABLE_AUTOFILL', this.storage[enableAutofillKey])
-      }
       await this.$storageService.save(
         key,
         this.storage[key]
       )
-      if (key === enableAutofillKey) {
-        await this.setupFillPage()
-      }
     }
   },
 });

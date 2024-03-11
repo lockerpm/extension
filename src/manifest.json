@@ -100,7 +100,7 @@
       "resources": [
         "bar.html",
         "menu.html",
-        "popup.html"
+        "icons/*"
       ],
       "matches": [
         "*://*/*"
@@ -110,12 +110,11 @@
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'",
-    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
+    "sandbox": "sandbox allow-scripts allow-forms; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
   },
   "externally_connectable": {
     "matches": [
-      "https://*.demo.cystack.net:3011/*",
-      "https://*.locker.io/*"
+      "*://*/*"
     ]
   },
   "sidebar_action": {

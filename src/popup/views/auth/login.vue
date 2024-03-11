@@ -116,10 +116,10 @@ export default Vue.extend({
                 ...response,
               }
             })
+            await this.$store.dispatch("LoadCurrentUserPw");
             if (response.login_method === 'passwordless' || response.require_passwordless) {
               this.$router.push({ name: 'pwl-unlock' }).catch(() => ({}))
             } else {
-              await this.$store.dispatch("LoadCurrentUserPw");
               this.$router.push({ name: 'lock' }).catch(() => ({}))
             }
             callback()

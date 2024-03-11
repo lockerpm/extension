@@ -46,7 +46,9 @@ import cystackPlatformAPI from '@/api/cystack_platform';
 export default Vue.extend({
   data() {
     return {
-      user: {},
+      user: {
+        timeout: 0
+      },
       loading: false,
     };
   },
@@ -75,6 +77,7 @@ export default Vue.extend({
         );
         const now = (new Date()).getTime()
         this.$storageService.save('lastActive', now)
+        this.$storageService.sessionSave('lastActive', now)
       } catch (e) {
         this.notify(
           this.$t("data.notifications.update_settings_failed"),

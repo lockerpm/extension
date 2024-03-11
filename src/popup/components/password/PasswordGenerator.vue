@@ -118,14 +118,9 @@
 </template>
 
 <script>
-import PasswordStrength from './PasswordStrength'
+import PasswordStrength from '@/components/PasswordStrength.vue'
 import { BrowserApi } from "@/browser/browserApi";
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherType } from "jslib-common/enums/cipherType";
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
-
-import cystackPlatformAPI from '@/api/cystack_platform';
 
 export default {
   components: { PasswordStrength },
@@ -187,31 +182,6 @@ export default {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async savePassword () {
       this.$router.replace({ name: 'add-edit-cipher', params: { password: this.password } }).catch(() => ({}))
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    padNumber (num, width, padCharacter = '0') {
-      const numString = num.toString()
-      return numString.length >= width
-        ? numString
-        : new Array(width - numString.length + 1).join(padCharacter) + numString
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async postCipher (cipher) {
-      if (!cipher.name) { return }
-      try {
-        this.loading = true
-        this.errors = {}
-        const cipherEnc = await this.$cipherService.encrypt(cipher)
-        const data = new CipherRequest(cipherEnc)
-        data['score'] = this.passwordStrength.score
-        await cystackPlatformAPI.create_ciphers_vault(data)
-        this.notify(this.$tc('data.notifications.create_success', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'success')
-      } catch (e) {
-        this.notify(this.$tc('data.notifications.create_failed', 1, { type: this.$tc(`type.${cipher.type}`, 1) }), 'warning')
-        this.errors = (e.response && e.response.data && e.response.data.details) || {}
-      } finally {
-        this.loading = false
-      }
     },
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

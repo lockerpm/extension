@@ -1,6 +1,6 @@
 import axios from "axios";
 import { handleResponseErrorMessage } from "./response";
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 const browserStorageService = JSLib.getBgService('storageService')()
 
 const service = axios.create({
@@ -20,7 +20,7 @@ service.interceptors.request.use(async (config) => {
 
   config.headers["Content-Type"] = "application/json";
   config.headers["Authorization"] = `Bearer ${accessToken}`;
-  config.headers['device-id'] = deviceId
+  config.headers['device-id'] = deviceId;
   return config;
 },
 (error) => {

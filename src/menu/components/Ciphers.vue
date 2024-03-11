@@ -1,6 +1,6 @@
 <template>
   <div
-    class="menu-ciphers p-4"
+    class="menu-ciphers py-2 px-4"
   >
     <div v-if="shouldRenderNoCipher" class="text-center">
       {{ fillType.empty }}
@@ -16,6 +16,7 @@
           :key="item.id"
           :item="item"
           @do-fill="$emit('do-fill', item)"
+          @put-cipher="() => putCipher(item)"
         />
       </ul>
       <ul v-else class="list-ciphers">
@@ -33,8 +34,11 @@
 import Vue from 'vue'
 import CipherRow from './CipherRow.vue'
 import OTPRow from './OTPRow.vue'
+
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
+import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
+
 export default Vue.extend({
   name: 'MenuCiphers',
   components: { CipherRow, OTPRow },
@@ -48,7 +52,8 @@ export default Vue.extend({
     return {
       CipherType,
       pageSize: 10,
-      size: 10
+      size: 10,
+      ciphers: [],
     }
   },
   computed: {
@@ -93,7 +98,6 @@ export default Vue.extend({
         return result
       },
       watch: [
-        "$store.state.syncedCiphersToggle",
         "searchText",
         "fillType",
       ],
@@ -123,7 +127,20 @@ export default Vue.extend({
       setTimeout(() => {
         this.size = this.pageSize
       }, 1000);
-    }
+    },
+    async putCipher (cipher) {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      cipher.favorite = !cipher.favorite
+      const newCipher = await this.$cipherService.encrypt(cipher);
+      const data = new CipherRequest(newCipher);
+      if (tab) {
+        await BrowserApi.tabSendMessageData(tab, 'updateCipher', {
+          cipherId: cipher.id,
+          payload: data,
+        });
+      }
+      this.closeMenu();
+    },
   }
 })
 </script>

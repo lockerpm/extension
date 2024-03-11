@@ -49,8 +49,8 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     async checkVaultTimeout(): Promise<void> {
         // "is logged out check" - similar to isLocked, below
-        const authed = await this.userService.isAuthenticated();
-        if (!authed) {
+        const authenticated = await this.userService.isAuthenticated();
+        if (!authenticated) {
             return;
         }
 
@@ -60,8 +60,8 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
         const vaultTimeout = await this.getVaultTimeout();
         if (!vaultTimeout || vaultTimeout < 0) {
-          const windows = await chrome?.windows?.getAll() || null
-          if (!windows || !windows.length || windows.length === 0) {
+          const lastActive = await this.storageService.sessionGet(ConstantsService.lastActiveKey) || null
+          if (!lastActive) {
             await this.lock();
           }
           return;
