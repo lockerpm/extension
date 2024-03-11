@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <BarHeader
       :data="data"
-      @close="close"
+      @close="closeBar"
     />
     <div class="bg-white p-4">
       <BarForm
@@ -24,7 +24,6 @@ import Vue from 'vue';
 import BarHeader from './components/Header.vue';
 import BarForm from './components/Form.vue';
 import BarFooter from './components/Footer.vue';
-import cystackPlatformAPI from '@/api/cystack_platform';
 
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
@@ -32,8 +31,7 @@ import { LoginView } from 'jslib-common/models/view/loginView';
 import { LoginUriView } from 'jslib-common/models/view/loginUriView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
 import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
-import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
-import { CipherData } from 'jslib-common/models/data/cipherData';
+import { Utils } from 'jslib-common/misc/utils';
 
 export default Vue.extend({
   name: 'Bar',
@@ -44,16 +42,19 @@ export default Vue.extend({
   },
   data () {
     return {
-      data: { ...this.$route.query || {}, folderId: null },
-      callingAPI: false
+      callingAPI: false,
+      data: {},
+      browserTab: null
     }
   },
   asyncComputed: {
   },
-  computed: {
+  async mounted() {
+    this.data = this.$store.state.initData?.data;
+    this.browserTab = await BrowserApi.getTabFromCurrentWindow();
   },
   methods: {
-    async close() {
+    async closeBar() {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       if (tab) {
         BrowserApi.tabSendMessageData(tab, 'closeNotificationBar')
@@ -84,30 +85,14 @@ export default Vue.extend({
       model.type = CipherType.Login;
       model.login = loginModel;
       model.folderId = this.data.folderId
-
       const cipher = await this.$cipherService.encrypt(model);
       const data = new CipherRequest(cipher)
-      try {
-        const res = await cystackPlatformAPI.create_ciphers_vault(data);
-        const now = new Date().toISOString()
-        const cipherResponse = new CipherResponse({
-          ...data,
-          id: res ? res.id : '',
-          revisionDate: now,
-          collectionIds: []
-        })
-        const userId = await this.$userService.getUserId();
-        const cipherData = new CipherData(cipherResponse, userId)
-        await this.$cipherService.upsert(cipherData);
-        this.close()
-        this.notificationAlert('password_added')
-      } catch (e) {
-        if (e.response && e.response.data && e.response.data.code === '5002') {
-          this.notificationAlert('password_limited')
-        } else {
-          this.notificationAlert('password_add_error')
-        }
+      if (this.browserTab) {
+        await BrowserApi.tabSendMessageData(this.browserTab, 'createCipher', {
+          payload: data,
+        });
       }
+      this.closeBar();
     },
     async updateCipher() {
       let cipher = await this.$cipherService.get(this.data.id);
@@ -116,38 +101,23 @@ export default Vue.extend({
         cipher.login.password = this.data.password;
         cipher.login.username = this.data.username;
         const newCipher = await this.$cipherService.encrypt(cipher);
-        const data = new CipherRequest(newCipher)
-        try {
-          await cystackPlatformAPI.update_cipher(cipher.id, data);
-          const now = new Date().toISOString()
-          const cipherResponse = new CipherResponse({
-            ...data,
-            id: cipher.id,
-            revisionDate: now,
-          })
-          const userId = await this.$userService.getUserId();
-          const cipherData = new CipherData(cipherResponse, userId);
-          await this.$cipherService.upsert(cipherData);
-          this.close()
-          this.notificationAlert('username_password_updated');
-        } catch (e) {
-          this.notificationAlert('username_password_update_error');
+        const data = new CipherRequest(newCipher);
+        if (this.browserTab) {
+          await BrowserApi.tabSendMessageData(this.browserTab, 'updateCipher', {
+            cipherId: this.data.id,
+            payload: data,
+          });
         }
+        this.closeBar();
       }
-        
     },
     async excludeDomain() {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      await this.addExcludeDomain(tab.url);
-      this.close()
-    },
-    async notificationAlert(type) {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      BrowserApi.tabSendMessage(tab, {
-        command: 'alert',
-        tab: tab,
-        type: type,
-      });
+      if (this.browserTab) {
+        await BrowserApi.tabSendMessageData(this.browserTab, 'addExcludeDomain', {
+          domain: Utils.getDomain(this.browserTab.url),
+        });
+      }
+      this.closeBar()
     }
   }
 })

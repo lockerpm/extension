@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import JSLib from "@/popup/services/services";
+import JSLib from "@/services";
 import RuntimeBackground from '../background/runtime.background';
 import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.service';
 import { StorageService } from "jslib-common/abstractions/storage.service";
@@ -83,8 +83,6 @@ const asyncStore = async () => {
           count: 0
         },
         userIntercom: {},
-        isDev: 'dev',
-        environment: 'dev',
         loading: false,
         syncedCiphersToggle: false,
         syncedExcludeDomains: false,
@@ -95,7 +93,6 @@ const asyncStore = async () => {
         currentPlan: {},
         hideIcons: false,
         showFolders: true,
-        enableAutofill:  true,
         callingAPI: false,
         ...oldStoreParsed
       },
@@ -140,9 +137,6 @@ const asyncStore = async () => {
         UPDATE_NOTIFICATION (state, payload) {
           state.notifications = payload
         },
-        UPDATE_DEV (state, value) {
-          state.environment = value
-        },
         UPDATE_LOADING (state, loading) {
           state.loading = loading
         },
@@ -172,9 +166,6 @@ const asyncStore = async () => {
         },
         UPDATE_SHOW_FOLDERS(state, value) {
           state.showFolders = value
-        },
-        UPDATE_ENABLE_AUTOFILL(state, value) {
-          state.enableAutofill = value
         },
         UPDATE_CALLING_API(state, value) {
           state.callingAPI = value

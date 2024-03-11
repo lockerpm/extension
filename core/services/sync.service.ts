@@ -34,7 +34,7 @@ import { ProfileResponse } from '../models/response/profileResponse';
 import { SendResponse } from '../models/response/sendResponse';
 import { SyncResponse } from 'jslib-common/models/response/syncResponse';
 
-import RequestBackground from '@/background/request.backgroud';
+import RequestBackground from '@/background/request.background';
 
 const Keys = {
   lastSyncPrefix: 'lastSync_',

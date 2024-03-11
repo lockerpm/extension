@@ -35,7 +35,6 @@ export default class TabsBackground {
       if (tab) {
         const tabInfo = await BrowserApi.getTabFromCurrentWindowId();
         await this.main.collectPageDetailsForContentScript(tabInfo, 'notificationBar');
-        await this.notificationBackground.checkNotificationQueue(tabInfo);
       }
       this.main.onUpdatedRan = true;
     });

@@ -81,9 +81,11 @@ import RuntimeBackground from './runtime.background';
 import TabsBackground from './tabs.background';
 import WindowsBackground from './windows.background';
 import WebRequestBackground from './webRequest.background';
-import RequestBackground from './request.backgroud';
+import RequestBackground from './request.background';
+import MenuBackground from './menu.background';
+import BarBackground from './bar.background';
 
-import { PopupUtilsService } from '../popup/services/popup-utils.service';
+import { PopupUtilsService } from '../services/popup-utils.service';
 import AutofillService from '../services/autofill.service';
 import { BrowserCryptoService } from '../services/browserCrypto.service';
 import BrowserMessagingService from '../services/browserMessaging.service';
@@ -149,6 +151,8 @@ export default class MainBackground {
   private windowsBackground: WindowsBackground;
   private webRequestBackground: WebRequestBackground;
   private requestBackground: RequestBackground;
+  private menuBackground: MenuBackground;
+  private barBackground: BarBackground;
 
   private sidebarAction: any;
   private buildingContextMenu: boolean;
@@ -474,6 +478,14 @@ export default class MainBackground {
       this.vaultTimeoutService,
       this.logService
     );
+    this.menuBackground = new MenuBackground(
+      this.cipherService,
+      this.requestBackground
+    )
+    this.barBackground = new BarBackground(
+      this.cipherService,
+      this.requestBackground
+    )
   }
 
   async bootstrap() {
@@ -490,9 +502,11 @@ export default class MainBackground {
     await this.runtimeBackground.init();
     await this.notificationBackground.init();
     await this.commandsBackground.init();
-
+    
     await this.tabsBackground.init();
     await this.windowsBackground.init();
+    await this.menuBackground.init();
+    await this.barBackground.init();
     await this.contextMenusBackground.init();
     await this.idleBackground.init();
     await this.webRequestBackground.init();
@@ -772,6 +786,8 @@ export default class MainBackground {
         }, 1000);
         return;
       } catch { }
+    } else {
+      await this.browserActionSetBadgeText('', tabId);
     }
     await this.loadMenuAndUpdateBadgeForNoAccessState(contextMenuEnabled);
   }

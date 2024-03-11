@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import router from '@/router/popup'
-import JSLib from '@/popup/services/services'
+import JSLib from '@/services'
 const storageService = JSLib.getBgService('storageService')();
 
 import storePromise from '@/store'

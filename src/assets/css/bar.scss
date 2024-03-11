@@ -1,0 +1,16 @@
+body {
+  display: flex;
+  flex-direction: column;
+  @apply text-base;
+  @apply text-black-700;
+  @apply lg:text-base;
+  @apply md:text-base;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
+  &.body-full {
+    @apply w-full h-full;
+  }
+}

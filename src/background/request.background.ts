@@ -19,7 +19,11 @@ export default class RequestBackground {
       },
       body: JSON.stringify(config.data),
     }).then(async (response) => {
-      return await response.json()
+      try {
+        return await response.json()
+      } catch (error) {
+        return response
+      }
     }).catch((error) => {
       return Promise.reject(error);
     });
@@ -56,6 +60,22 @@ export default class RequestBackground {
     });
   }
 
+  async update_cipher(id: string, data = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_CIPHERS_DETAIL.replace(':id', id),
+      method: "put",
+      data
+    });
+  }
+
+  async use_cipher(id: string, data = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_CIPHER_USE.replace(':id', id),
+      method: "put",
+      data
+    });
+  }
+
   async sync(params = {}) {
     return await this.request({
       url: ENDPOINT.CYSTACK_PLATFORM_SYNC,
@@ -75,6 +95,28 @@ export default class RequestBackground {
     return await this.request({
       url: ENDPOINT.CYSTACK_PLATFORM_SYNC_FOLDER.replace(':id', id),
       method: "get",
+    });
+  }
+
+  async exclude_domains() {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS,
+      method: "get",
+    });
+  }
+
+  async add_exclude_domain(data = {}) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS,
+      method: "post",
+      data
+    });
+  }
+  
+  async delete_exclude_domain(id: string) {
+    return await this.request({
+      url: ENDPOINT.CYSTACK_PLATFORM_EXCLUDE_DOMAINS_DETAIL.replace(':id', id),
+      method: "delete"
     });
   }
 }

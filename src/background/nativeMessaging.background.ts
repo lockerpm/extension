@@ -220,7 +220,7 @@ export class NativeMessagingBackground {
     }
 
     private async onMessage(rawMessage: any) {
-        let message = rawMessage;
+        let message = rawMessage || {};
         if (!this.platformUtilsService.isSafari()) {
             message = JSON.parse(await this.cryptoService.decryptToUtf8(rawMessage, this.sharedSecret));
         }
@@ -266,7 +266,7 @@ export class NativeMessagingBackground {
                     break;
                 }
 
-                if (message.response === 'unlocked') {
+                if (message?.response === 'unlocked' && message?.keyB64) {
                     await this.cryptoService.setKey(new SymmetricCryptoKey(Utils.fromB64ToArray(message.keyB64).buffer));
 
                     // Verify key is correct by attempting to decrypt a secret

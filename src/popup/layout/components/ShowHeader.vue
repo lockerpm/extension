@@ -169,6 +169,11 @@ export default {
         result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.vault_timeout')
         break;
+      case 'settings-enable-autofill':
+        result.Icon = null
+        result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
+        result.title = this.$t('data.settings.autofill')
+        break;
       case 'settings-info':
         result.Icon = null
         result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))

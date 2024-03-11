@@ -25,7 +25,7 @@
           </div>
           <div
             class="cursor-pointer text-danger font-semibold"
-            @click="removeDomain(domain)"
+            @click="removeExcludeDomain(domain)"
           >
             <i class="el-icon-delete-solid"></i>
           </div>
@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import Vue from "vue";
 
 export default Vue.extend({

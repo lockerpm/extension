@@ -16,10 +16,10 @@ import { PasswordRepromptService } from 'jslib-common/abstractions/passwordRepro
 import { PlatformUtilsService } from 'jslib-common/abstractions/platformUtils.service';
 
 import { BrowserApi } from '../browser/browserApi';
-import { PopupUtilsService } from '../popup/services/popup-utils.service';
+import { PopupUtilsService } from '../services/popup-utils.service';
 
 import MainBackground from './main.background';
-import Requestground from './request.backgroud';
+import RequestBackground from './request.background';
 
 import { Utils } from 'jslib-common/misc/utils';
 
@@ -45,7 +45,7 @@ export default class NotificationBackground {
     private folderService: FolderService,
     private userService: UserService,
     private totpService: TotpService,
-    private request: Requestground,
+    private request: RequestBackground,
     private passwordRepromptService: PasswordRepromptService,
     private popupUtilsService: PopupUtilsService,
     private platformUtilsService: PlatformUtilsService
@@ -62,12 +62,6 @@ export default class NotificationBackground {
 
   async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
     switch (msg.command) {
-      case 'unlockCompleted':
-        if (msg.data.target !== 'notification.background') {
-          return;
-        }
-        await this.processMessage(msg.data.commandToRetry.msg, msg.data.commandToRetry.sender);
-        break;
       case 'bgCloseNotificationBar':
         currentLoginInfo = null;
         break;
@@ -80,172 +74,223 @@ export default class NotificationBackground {
       case 'collectPageDetailsResponse':
         switch (msg.sender) {
           case 'notificationBar':
-            const forms = this.autofillService.getFormsWithPasswordFields(msg.details);
-            let passwordFields = [];
-            let usernameFields = [];
-
-            for (const form of forms) {
-              for (const password of form.passwords) {
-                passwordFields.push(password)
-              }
-              if (form.username) {
-                usernameFields.push(form.username)
-              }
-            }
-            await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
-              details: msg.details,
-              forms: forms,
-              passwordFields: passwordFields,
-              usernameFields: usernameFields,
-              isLocked: await this.vaultTimeoutService.isLocked()
-            });
-            chrome.storage.local.get('enableAutofill', async (autofillObj: any) => {
-              if (autofillObj.enableAutofill === false) return;
-              const tab = await BrowserApi.getTabFromCurrentWindow();
-              if (!tab || !tab.url) {
-                return;
-              }
-              const excludeDomain: any = await this.cipherService.getIncludedDomainByUrl(tab.url)
-              if (!!excludeDomain) {
-                return;
-              }
-              if (await this.vaultTimeoutService.isLocked()) {
-                return
-              }
-              // check is login page
-              if (
-                passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
-                && !passwordFields.filter((f) => f.type === 'password')[0]?.value
-                && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
-              ) {
-                this.autofillFirstPage(sender.tab);
-              }
-
-              // check is otp page
-              if (forms.find((f) => f.otps.length > 0)) {
-                this.autofillOTPFirstPage(sender.tab);
-              }
-            })
-            this.main.refreshBadgeAndMenu()
+            await this.collectNotificationBar(msg, sender)
             break;
           case 'autofillItem':
-            if (
-              msg.cipher.reprompt !== CipherRepromptType.None && this.passwordRepromptService &&
-              !(await this.passwordRepromptService.showPasswordPrompt())
-            ) {
-              return;
-            }
-            const pageDetailsObj = {
-              frameId: sender.frameId,
-              tab: msg.tab,
-              details: msg.details,
-            };
-            try {
-              const totpPromise = await this.autofillService.doAutoFill({
-                cipher: msg.cipher,
-                pageDetails: [pageDetailsObj],
-                fillNewPassword: true,
-              });
-              if (totpPromise) {
-                this.storageService.save('login_totp_cipher', msg.cipher)
-                setTimeout(async () => {
-                  await this.storageService.remove('login_totp_cipher')
-                }, 60000);
-              }
-            } catch (e) {
-              BrowserApi.tabSendMessage(msg.tab, {
-                command: 'alert',
-                tab: msg.tab,
-                type: 'autofill_error',
-              });
-            }
+            await this.handleAutofillItem(msg, sender)
             break
           case 'autofillOTP':
-            let totp = '';
-            if (msg.cipher.type == CipherType.Login) {
-              totp = await this.totpService.getCode(msg.cipher.login.totp);
-            } else if (msg.cipher.type == CipherType.OTP) {
-              totp = await this.totpService.getCode(msg.cipher.notes);
-            }
-            if (totp) {
-              const otpForms = this.autofillService.getFormsWithPasswordFields(msg.details);
-              BrowserApi.tabSendMessage(msg.tab, {
-                command: 'fillOTPForm',
-                forms: otpForms.filter((f) => f.otps.length > 0),
-                totp: totp
-              });
-            }
+            await this.handleAutofillOTP(msg)
             break
           default:
             break;
         }
         break;
       case 'useImage':
-        if (chrome.tabs && chrome.tabs.captureVisibleTab) {
-          chrome.tabs.captureVisibleTab(null, {}, function (dataUri) {
-            BrowserApi.tabSendMessage(msg.tab, {
-              command: 'capturedImage',
-              tab: msg.tab,
-              sender: dataUri,
-              isPasswordOTP: msg.isPasswordOTP
-            });
-          });
-        } else {
-          this.notificationAlert('capture_not_active')
-        }
+        this.handleUserQrCodeImage(msg);
         break;
       case 'saveNewQRCode':
-        let otp = null;
-        let senderMessage = '';
-        if (msg.sender && msg.sender.data) {
-          otp = await this.totpService.getCode(msg.sender.data);
-        }
-        if (otp) {
-          if (msg.isPasswordOTP) {
-            const currentRouterString: any = await this.storageService.get('current_router')
-            const currentRouter = JSON.parse(currentRouterString);
-            await this.storageService.save('current_router', JSON.stringify({
-              ...currentRouter,
-              params: {
-                ...currentRouter.params,
-                cipherForm: {
-                  ...currentRouter.params.cipherForm,
-                  login: {
-                    ...currentRouter.params.cipherForm.login,
-                    totp: msg.sender.data
-                  }
-                }
-              },
-            }))
-            this.notificationAlert('password_otp_added')
-            senderMessage = 'removeLockerWrapper';
-          } else {
-            const name = msg.tab?.url?.split('/')[2]
-            const notes = msg.sender.data;
-            let currentOtps = await this.cipherService.getAllDecrypted();
-            currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
-            if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
-              this.notificationAlert('qr_existed')
-            } else {
-              await this.createNewOTP({ name: name, notes: notes })
-              senderMessage = 'removeLockerWrapper';
-            }
-          }
-        } else {
-          this.notificationAlert('qr_invalid')
-        }
-        BrowserApi.tabSendMessage(msg.tab, {
-          command: 'addedOTP',
-          tab: msg.tab,
-          sender: senderMessage,
-        });
+        await this.handleSaveQrCode(msg);
+        break;
+      case 'addExcludeDomain':
+        this.addExcludeDomain(msg);
+        break;
+      case 'removeExcludeDomain':
+        this.removeExcludeDomain(msg);
+        break;
+      case 'updateCipher':
+        this.updateCipher(msg);
+        break;
+      case 'createCipher':
+        this.createCipher(msg);
         break;
       default:
         break;
     }
   }
 
-  private async autofillFirstPage(tab: chrome.tabs.Tab) {
+  private async collectNotificationBar(msg: any, sender: chrome.runtime.MessageSender) {
+    const forms = this.autofillService.getFormsFields(msg.details);
+    let passwordFields = [];
+    let usernameFields = [];
+
+    for (const form of forms) {
+      for (const password of form.passwords) {
+        passwordFields.push(password)
+      }
+      if (form.username) {
+        usernameFields.push(form.username)
+      }
+    }
+    const autofillOptionData = await chrome.storage.local.get('autofillOption');
+    const checkIframe = !autofillOptionData.autofillOption || autofillOptionData.autofillOption == 'autofill_page';
+
+    await BrowserApi.tabSendMessageData(msg.tab, 'notificationBarPageDetails', {
+      details: msg.details,
+      forms: forms,
+      passwordFields: passwordFields,
+      usernameFields: usernameFields,
+      isLocked: await this.vaultTimeoutService.isLocked(),
+      checkIframe: checkIframe
+    });
+
+    if (autofillOptionData.autofillOption !== 'off') {
+      await this.handleAutofillOnPageLoad(sender, forms, passwordFields, usernameFields, checkIframe)
+    }
+
+    this.main.refreshBadgeAndMenu()
+  }
+
+  private async handleAutofillOnPageLoad(
+    sender: chrome.runtime.MessageSender,
+    forms: any[],
+    passwordFields: any[],
+    usernameFields: any[],
+    checkIframe: any
+  ) {
+
+    const tab = await BrowserApi.getTabFromCurrentWindow();
+    if (!tab || !tab.url) {
+      return;
+    }
+    const excludeDomain: any = await this.cipherService.getIncludedDomainByUrl(tab.url);
+    if (!!excludeDomain) {
+      return;
+    }
+    if (await this.vaultTimeoutService.isLocked()) {
+      return
+    }
+
+    // check is login page
+    if (
+      passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
+      && !passwordFields.filter((f) => f.type === 'password')[0]?.value
+      && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
+    ) {
+      this.autofillOnPageLoad(sender.tab, checkIframe);
+    }
+
+    // check is otp page
+    if (forms.find((f) => f.otps.length > 0)) {
+      this.autofillOTPOnPageLoad(sender.tab, checkIframe);
+    }
+  }
+
+  private async handleAutofillItem(msg: any, sender: chrome.runtime.MessageSender) {
+    if (
+      msg.cipher.reprompt !== CipherRepromptType.None && this.passwordRepromptService &&
+      !(await this.passwordRepromptService.showPasswordPrompt())
+    ) {
+      return;
+    }
+    const pageDetailsObj = {
+      frameId: sender.frameId,
+      tab: msg.tab,
+      details: msg.details,
+    };
+    try {
+      const totpPromise = await this.autofillService.doAutoFill({
+        cipher: msg.cipher,
+        pageDetails: [pageDetailsObj],
+        fillNewPassword: true,
+        isIframe: msg.isIframe,
+        checkIframe: msg.checkIframe
+      });
+      if (totpPromise) {
+        this.storageService.save('login_totp_cipher', msg.cipher)
+        setTimeout(async () => {
+          await this.storageService.remove('login_totp_cipher')
+        }, 60000);
+      }
+    } catch (e) {
+      BrowserApi.tabSendMessage(msg.tab, {
+        command: 'alert',
+        tab: msg.tab,
+        type: 'autofill_error',
+      });
+    }
+  }
+
+  private async handleAutofillOTP(msg: any) {
+    let totp = '';
+    if (msg.cipher.type == CipherType.Login) {
+      totp = await this.totpService.getCode(msg.cipher.login.totp);
+    } else if (msg.cipher.type == CipherType.OTP) {
+      totp = await this.totpService.getCode(msg.cipher.notes);
+    }
+    if (totp) {
+      const otpForms = this.autofillService.getFormsFields(msg.details);
+      BrowserApi.tabSendMessage(msg.tab, {
+        command: 'fillOTPForm',
+        forms: otpForms.filter((f) => f.otps.length > 0),
+        totp: totp
+      });
+    }
+  }
+
+  private handleUserQrCodeImage(msg: any) {
+    if (chrome.tabs && chrome.tabs.captureVisibleTab) {
+      chrome.tabs.captureVisibleTab(null, {}, function (dataUri) {
+        BrowserApi.tabSendMessage(msg.tab, {
+          command: 'capturedImage',
+          tab: msg.tab,
+          sender: dataUri,
+          isPasswordOTP: msg.isPasswordOTP
+        });
+      });
+    } else {
+      this.notificationAlert('capture_not_active')
+    }
+  }
+
+  private async handleSaveQrCode(msg: any) {
+    let otp = null;
+    let senderMessage = '';
+    if (msg.sender && msg.sender.data) {
+      otp = await this.totpService.getCode(msg.sender.data);
+    }
+    if (otp) {
+      if (msg.isPasswordOTP) {
+        const currentRouterString: any = await this.storageService.get('current_router')
+        const currentRouter = JSON.parse(currentRouterString);
+        await this.storageService.save('current_router', JSON.stringify({
+          ...currentRouter,
+          params: {
+            ...currentRouter.params,
+            cipherForm: {
+              ...currentRouter.params.cipherForm,
+              login: {
+                ...currentRouter.params.cipherForm.login,
+                totp: msg.sender.data
+              }
+            }
+          },
+        }))
+        this.notificationAlert('password_otp_added')
+        senderMessage = 'removeLockerWrapper';
+      } else {
+        const name = msg.tab?.url?.split('/')[2]
+        const notes = msg.sender.data;
+        let currentOtps = await this.cipherService.getAllDecrypted();
+        currentOtps = currentOtps.filter((c: any) => !c.deleted && c.type === CipherType.OTP)
+        if (!!currentOtps.find((o) => o.notes === notes && o.name === name)) {
+          this.notificationAlert('qr_existed')
+        } else {
+          await this.createNewOTP({ name: name, notes: notes })
+          senderMessage = 'removeLockerWrapper';
+        }
+      }
+    } else {
+      this.notificationAlert('qr_invalid')
+    }
+    BrowserApi.tabSendMessage(msg.tab, {
+      command: 'addedOTP',
+      tab: msg.tab,
+      sender: senderMessage,
+    });
+  }
+
+  private async autofillOnPageLoad(tab: chrome.tabs.Tab, checkIframe = false) {
     try {
       if (this.cipherService && tab.url) {
         const currentCiphers = await this.cipherService.getAllDecryptedForUrl(tab.url) || [];
@@ -255,7 +300,8 @@ export default class NotificationBackground {
             command: 'collectPageDetails',
             tab: tab,
             sender: 'autofillItem',
-            cipher: loginCiphers[0]
+            cipher: loginCiphers[0],
+            checkIframe: checkIframe 
           });
         }
       }
@@ -263,14 +309,15 @@ export default class NotificationBackground {
     }
   }
 
-  private async autofillOTPFirstPage(tab: chrome.tabs.Tab) {
+  private async autofillOTPOnPageLoad(tab: chrome.tabs.Tab, checkIframe = false) {
     const loginTOTPCipher: any = await this.storageService.get('login_totp_cipher') || null
     if (loginTOTPCipher && loginTOTPCipher.login?.totp) {
       BrowserApi.tabSendMessage(tab, {
         command: 'collectPageDetails',
         tab: tab,
         sender: 'autofillOTP',
-        cipher: loginTOTPCipher
+        cipher: loginTOTPCipher,
+        checkIframe: checkIframe
       });
     }
     await this.storageService.remove('login_totp_cipher')
@@ -280,9 +327,9 @@ export default class NotificationBackground {
     if (loginInfo) {
       currentLoginInfo = loginInfo
     }
-    if (currentLoginInfo) {
-      const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
-      const tabDomain = Utils.getDomain(tabInfo.url);
+    const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
+    const tabDomain = Utils.getDomain(tabInfo.url);
+    if (currentLoginInfo && currentLoginInfo.domain == tabDomain) {
       if (tabInfo && tabDomain === currentLoginInfo.domain) {
         this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
       }
@@ -389,7 +436,6 @@ export default class NotificationBackground {
   }
 
   private async pushChangePasswordToQueue(cipherId: string, loginDomain: string, newPassword: string, username: string, tab: chrome.tabs.Tab, isVaultLocked: boolean = false) {
-    console.log(11111, newPassword, username);
     await this.checkNotificationQueue(tab, {
       type: NotificationQueueMessageType.changePassword,
       cipherId: cipherId,
@@ -428,6 +474,53 @@ export default class NotificationBackground {
 
   private async allowPersonalOwnership(): Promise<boolean> {
     return !await this.policyService.policyAppliesToUser(PolicyType.PersonalOwnership);
+  }
+
+  private async getExcludeDomains() {
+    const { results } = await this.request.exclude_domains();
+    await this.cipherService.saveNeverDomains(results)
+  }
+
+  private async addExcludeDomain(message: any) {
+    const payload = message.data;
+    await this.request.add_exclude_domain(payload);
+    await this.getExcludeDomains()
+    await this.notificationAlert('added_exclude_domain');
+  }
+
+  private async removeExcludeDomain(message: any) {
+    const { excludeId } = message.data;
+    await this.request.delete_exclude_domain(excludeId);
+    await this.getExcludeDomains()
+    await this.notificationAlert('removed_exclude_domain');
+  }
+
+  private async updateCipher (message: any) {
+    const { cipherId, payload } = message.data;
+    try {
+      await this.request.update_cipher(cipherId, payload);
+      await this.notificationAlert('updated_cipher');
+    } catch (error) {
+      await this.notificationAlert('cipher_update_error');
+    }
+  }
+
+  private async createCipher(message: any) {
+    const { payload } = message.data;
+    try {
+      await this.request.create_ciphers_vault(payload);
+      await this.notificationAlert('created_cipher');
+    } catch (e) {
+      if (payload.type == CipherType.Login) {
+        if (e.response && e.response.data && e.response.data.code === '5002') {
+          this.notificationAlert('password_limited')
+        } else {
+          this.notificationAlert('password_add_error')
+        }
+      } else {
+        this.notificationAlert('cipher_add_error')
+      }
+    }
   }
 
   private async notificationAlert(type: string) {

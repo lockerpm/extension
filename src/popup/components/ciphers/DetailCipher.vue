@@ -362,7 +362,7 @@
 <script>
 import Vue from 'vue';
 import find from 'lodash/find'
-import PasswordStrength from '@/popup/components/password/PasswordStrength'
+import PasswordStrength from '@/components/PasswordStrength'
 import { CipherType } from "jslib-common/enums/cipherType";
 import TextHaveCopy from '@/popup/components/ciphers/TextHaveCopy';
 import InputSeedPhrase from '@/components/input/InputSeedPhrase';

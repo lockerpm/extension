@@ -23,7 +23,7 @@ import { VaultTimeoutService } from 'jslib-common/abstractions/vaultTimeout.serv
 import { BrowserApi } from '../browser/browserApi';
 
 import MainBackground from './main.background';
-import RequestBackground from './request.backgroud';
+import RequestBackground from './request.background';
 
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
 import LockedVaultPendingNotificationsItem from './models/lockedVaultPendingNotificationsItem';
@@ -147,7 +147,7 @@ export default class RuntimeBackground {
             this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
             await this.main.onLock();
             await this.handleGetUserInfo();
-            await this.handleOpenPopupIframe(3000)
+            await this.handleOpenPopupWindow(3000)
           }).catch(() => {
             this.storageService.save("cs_token", null);
           });
@@ -174,7 +174,7 @@ export default class RuntimeBackground {
         }
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
         await BrowserApi.updateCurrentTab(tab, this.currentLocation);
-        await this.handleOpenPopupIframe(3000)
+        await this.handleOpenPopupWindow(3000)
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
@@ -222,7 +222,7 @@ export default class RuntimeBackground {
     }
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      BrowserApi.tabSendMessageData(tab, 'closePopupIframe')
+      BrowserApi.tabSendMessageData(tab, 'closePopupWindow')
       let url = ''
       if (type === 'id-info') {
         BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);
@@ -281,23 +281,16 @@ export default class RuntimeBackground {
     await this.main.refreshBadgeAndMenu(false);
     await this.notificationsService.connectWebSocket();
     this.systemService.cancelProcessReload();
-    if (item) {
-      await BrowserApi.tabSendMessageData(
-        item.commandToRetry.sender.tab,
-        "unlockCompleted",
-        item
-      );
-    }
   }
 
-  async handleOpenPopupIframe(timeout = 0) {
+  async handleOpenPopupWindow(timeout = 0) {
     setTimeout(async () => {
       const tab = await BrowserApi.getTabFromCurrentWindow();
       if (!tab) {
         return;
       }
       BrowserApi.tabSendMessage(tab, {
-        command: 'openPopupIframe',
+        command: 'openPopupWindow',
         tab: tab,
       });
     }, timeout);

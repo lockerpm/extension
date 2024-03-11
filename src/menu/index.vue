@@ -33,7 +33,7 @@
     </div>
     <MenuExcluded
       v-else
-      @turnOn="() => removeDomain(excluded, false)"
+      @turnOn="() => removeExcludeDomain(excluded, false)"
     />
   </div>
 </template>
@@ -45,10 +45,11 @@ import MenuSearch from './components/Search.vue';
 import MenuCiphers from './components/Ciphers.vue';
 import MenuLocked from './components/Locked.vue';
 import MenuExcluded from './components/Excluded.vue';
+import PasswordGenerator from './components/Generator.vue'
 
-import PasswordGenerator from '@/popup/components/password/PasswordGenerator.vue'
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
+import { Utils } from 'jslib-common/misc/utils';
 
 export default Vue.extend({
   name: 'Menu',
@@ -63,34 +64,11 @@ export default Vue.extend({
   data () {
     return {
       CipherType,
-      tab: Number(this.$route.query?.tab || 2),
-      fillType: Number(this.$route.query?.type || 0),
-      browserTab: null
-    }
-  },
-  asyncComputed: {
-    savedDomains: {
-      async get () {
-        return await this.$storageService.get('neverDomains') || {}
-      },
-      watch: [
-        '$store.state.syncedExcludeDomains'
-      ]
-    },
-    excluded: {
-      async get () {
-        const currentUrlTab = await BrowserApi.getTabFromCurrentWindow();
-        return await this.$cipherService.getIncludedDomainByUrl(currentUrlTab.url)
-      },
-      watch: [
-        '$store.state.syncedExcludeDomains'
-      ]
-    },
-    isLocked: {
-      async get () {
-        return await this.$vaultTimeoutService.isLocked()
-      },
-      watch: []
+      tab: 2,
+      fillType: 0,
+      browserTab: null,
+      excluded: false,
+      isLocked: false,
     }
   },
   computed: {
@@ -102,7 +80,7 @@ export default Vue.extend({
           disabled: this.isOTP,
           onclick: async () => {
             if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 428 })
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `428px` })
             }
             this.tab = 1
           }
@@ -112,7 +90,7 @@ export default Vue.extend({
           name: this.$t('menu.fill_something_else'),
           onclick: async () => {
             if (this.browserTab) {
-              BrowserApi.tabSendMessageData(this.browserTab, 'resizeMenuInfo', { height: 300 })
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `300px` })
             }
             this.tab = 2
           }
@@ -120,12 +98,12 @@ export default Vue.extend({
         {
           value: 3,
           name: this.$t('menu.turn_off'),
-          class: 'text-danger',
+          class: this.isLocked ? '' : 'text-danger',
           divided: true,
           disabled: this.isLocked,
           onclick: async () => {
             if (this.browserTab) {
-              this.addExcludeDomain(this.browserTab.url, () => ({}), false)
+              this.addExcludeDomain(Utils.getDomain(this.browserTab.url), () => ({}), false)
             }
           }
         },
@@ -175,10 +153,25 @@ export default Vue.extend({
       return this.currentFillType.value === CipherType.OTP
     },
   },
+  async created () {
+    this.tab = this.$store.state.initData.tab;
+    this.fillType = this.$store.state.initData.type;
+    this.isLocked = await this.$vaultTimeoutService.isLocked();
+    setInterval(async () => {
+      this.isLocked = await this.$vaultTimeoutService.isLocked();
+    }, 5000)
+  },
   async mounted() {
     this.browserTab = await BrowserApi.getTabFromCurrentWindow();
+    await this.checkingExcludedDomain();
   },
   methods: {
+    async checkingExcludedDomain() {
+      const url = this.browserTab.url;
+      const domain = Utils.getDomain(url);
+      const neverDomains = await this.$storageService.get('neverDomains') || [];
+      this.excluded = neverDomains.find((d) => d.domain == domain);
+    }
   }
 })
 </script>
