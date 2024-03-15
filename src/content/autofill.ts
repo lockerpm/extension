@@ -12,7 +12,7 @@ const checkRadioTrueOps = {
 }
 
 document.addEventListener('DOMContentLoaded', (e) => {
-  if (!isDomLoaded) {
+  if (!isDomLoaded && !isIframe) {
     chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       if (msg.command === 'collectPageDetails') {
         collectPageDetailsResponse(msg)

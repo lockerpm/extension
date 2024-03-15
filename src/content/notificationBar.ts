@@ -66,7 +66,7 @@ let barElementsMutationObserver: MutationObserver = new MutationObserver(
 );
 
 document.addEventListener('DOMContentLoaded', (e) => {
-  if (!isDomLoaded) {
+  if (!isDomLoaded && !isIframe) {
     chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
       disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
       chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
