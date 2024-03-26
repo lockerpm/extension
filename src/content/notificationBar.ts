@@ -84,10 +84,11 @@ document.addEventListener('DOMContentLoaded', (e) => {
       }
       currentMessage = msg;
       processMessages(msg, sendResponse);
+
+
     });
   }
   isDomLoaded = true;
-  removeFillLogo();
 })
 
 document.addEventListener('click', (event: any) => {
@@ -298,6 +299,12 @@ function setFillLogo(el: any, type = 'password', isLocked = false, isOver = fals
 function removeFillLogo() {
   if (menuIconElement && menuIconElement.parentElement) {
     menuIconElement.parentElement.removeChild(menuIconElement);
+  } else {
+    const logos = document.querySelectorAll('.cs-menu-icon');
+    for (let i = 0; i < logos.length; i++) {
+      const parentNode = logos[i].parentElement
+      parentNode.parentElement.removeChild(parentNode);
+    }
   }
   selectedInput = null;
   menuIconElement = null;
@@ -411,7 +418,7 @@ function locateField(form: HTMLFormElement, fieldData: any, inputs: HTMLInputEle
 }
 
 function formSubmitted(e: Event, f?: HTMLFormElement) {
-  closeInformMenu();
+  removeFillLogo();
   let form: HTMLFormElement = null;
   if (e.type === 'click') {
     form = f || (e.target as HTMLElement).closest('form');
