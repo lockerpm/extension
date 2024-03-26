@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
     });
   }
   isDomLoaded = true;
+  removeFillLogo();
 })
 
 document.addEventListener('click', (event: any) => {
