@@ -245,14 +245,39 @@ export class BrowserApi {
     }
   }
 
-    // Setup the event to destroy all the listeners when the popup gets unloaded in Safari, otherwise we get a memory leak
-    private static setupUnloadListeners() {
-      // The MDN recommend using 'visibilitychange' but that event is fired any time the popup window is obscured as well
-      // 'pagehide' works just like 'unload' but is compatible with the back/forward cache, so we prefer using that one
-      window.onpagehide = () => {
-        for (const [event, callback] of BrowserApi.trackedChromeEventListeners) {
-          event.removeListener(callback);
-        }
-      };
+  // Setup the event to destroy all the listeners when the popup gets unloaded in Safari, otherwise we get a memory leak
+  private static setupUnloadListeners() {
+    // The MDN recommend using 'visibilitychange' but that event is fired any time the popup window is obscured as well
+    // 'pagehide' works just like 'unload' but is compatible with the back/forward cache, so we prefer using that one
+    window.onpagehide = () => {
+      for (const [event, callback] of BrowserApi.trackedChromeEventListeners) {
+        event.removeListener(callback);
+      }
+    };
+  }
+
+  static async getWindowById(windowId: number): Promise<chrome.windows.Window> {
+    return new Promise((resolve) => chrome.windows.get(windowId, { populate: true }, resolve));
+  }
+
+  static async getCurrentWindow(): Promise<chrome.windows.Window> {
+    return new Promise((resolve) => chrome.windows.getCurrent({ populate: true }, resolve));
+  }
+
+  static async getWindow(windowId?: number): Promise<chrome.windows.Window> {
+    if (!windowId) {
+      return BrowserApi.getCurrentWindow();
     }
+
+    return await BrowserApi.getWindowById(windowId);
+  }
+
+  static async createWindow(options: chrome.windows.CreateData): Promise<chrome.windows.Window> {
+    return new Promise((resolve) =>
+      chrome.windows.create(options, (window) => {
+        resolve(window);
+      }),
+    );
+  }
 }
+

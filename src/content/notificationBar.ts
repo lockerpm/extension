@@ -110,9 +110,12 @@ async function processMessages(msg: any, sendResponse: Function) {
   } else if (msg.command === "closeInformMenu") {
     closeInformMenu()
   } else if (msg.command === 'openPopupWindow') {
-    openPopupWindow()
-  } else if (msg.command === 'closePopupWindow') {
-    closePopupWindow()
+    sendPlatformMessage({
+      ...msg,
+      data: {
+        url: 'popup.html'
+      }
+    })
   } else if (msg.command === 'resizeInformMenu') {
     resizeInformMenu(msg)
   } else if (msg.command === 'updateCipher') {
@@ -222,13 +225,12 @@ function collectIfNeeded() {
 
 function watchForms(data: any) {
   formData = [];
+  loginData = null
   if (data.forms == null || data.forms.length === 0) {
     listen(null);
     loginData = data;
     return;
   }
-
-  loginData = null
   data.forms.forEach((f: any) => {
     const formId: string = f.form != null ? f.form.htmlID : null;
     let formEl: HTMLFormElement = null;
@@ -693,13 +695,6 @@ function closeBar(explicitClose: boolean = false) {
       command: 'bgCloseNotificationBar',
     })
   }
-}
-
-function closePopupWindow() {
-}
-
-function openPopupWindow() {
-  closePopupWindow()
 }
 
 function sendPlatformMessage(msg: any) {

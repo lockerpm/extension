@@ -104,6 +104,11 @@ export default class NotificationBackground {
       case 'createCipher':
         this.createCipher(msg);
         break;
+      case 'openPopupWindow':
+        this.openPopout(msg.data.url, {
+          forceCloseExistingWindows: true,
+        })
+        break;
       default:
         break;
     }
@@ -538,5 +543,43 @@ export default class NotificationBackground {
       tab: tab,
       type: type,
     });
+  }
+
+  private buildPopoutUrl(extensionUrlPath: string) {
+    const parsedUrl = new URL(chrome.runtime.getURL(extensionUrlPath));
+    parsedUrl.searchParams.set("uilocation", "popout");
+
+    return parsedUrl.toString();
+  }
+
+  private async openPopout(
+    extensionUrlPath: string,
+    options: {
+      senderWindowId?: number;
+      singleActionKey?: string;
+      forceCloseExistingWindows?: boolean;
+      windowOptions?: Partial<chrome.windows.CreateData>;
+    } = {},
+  ) {
+    const { senderWindowId, singleActionKey, forceCloseExistingWindows, windowOptions } = options;
+    const defaultPopoutWindowOptions: chrome.windows.CreateData = {
+      type: "popup",
+      focused: true,
+      width: 430,
+      height: 650,
+    };
+    const offsetRight = 15;
+    const offsetTop = 90;
+    const popupWidth = defaultPopoutWindowOptions.width;
+    const senderWindow = await BrowserApi.getWindow(senderWindowId);
+    const popoutWindowOptions = {
+      left: senderWindow.left + senderWindow.width - popupWidth - offsetRight,
+      top: senderWindow.top + offsetTop,
+      ...defaultPopoutWindowOptions,
+      ...windowOptions,
+      url: this.buildPopoutUrl(extensionUrlPath),
+    };
+
+    return await BrowserApi.createWindow(popoutWindowOptions);
   }
 }

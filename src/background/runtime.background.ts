@@ -147,7 +147,7 @@ export default class RuntimeBackground {
             this.storageService.save('current_router', JSON.stringify({ name: 'lock' }));
             await this.main.onLock();
             await this.handleGetUserInfo();
-            await this.handleOpenPopupWindow(3000)
+            await this.handleOpenPopupWindow()
           }).catch(() => {
             this.storageService.save("cs_token", null);
           });
@@ -174,7 +174,7 @@ export default class RuntimeBackground {
         }
         const tab: any = await BrowserApi.getTabFromCurrentWindow()
         await BrowserApi.updateCurrentTab(tab, this.currentLocation);
-        await this.handleOpenPopupWindow(3000)
+        await this.handleOpenPopupWindow()
         break;
       case "getClickedElementResponse":
         this.platformUtilsService.copyToClipboard(msg.identifier, {
@@ -222,7 +222,6 @@ export default class RuntimeBackground {
     }
     const tab: any = await BrowserApi.getTabFromCurrentWindow()
     if (tab) {
-      BrowserApi.tabSendMessageData(tab, 'closePopupWindow')
       let url = ''
       if (type === 'id-info') {
         BrowserApi.createNewTab(process.env.VUE_APP_ID_URL, true, true);
