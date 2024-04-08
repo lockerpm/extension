@@ -28,4 +28,9 @@ async function createOffscreen() {
 }
 
 chrome.runtime.onStartup.addListener(createOffscreen);
+
+chrome.runtime.onUpdateAvailable.addListener(() =>
+  chrome.runtime.reload()
+);
+
 createOffscreen();

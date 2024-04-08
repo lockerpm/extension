@@ -22,7 +22,7 @@ import AutofillScript from '../models/autofillScript';
 
 import { BrowserApi } from '../browser/browserApi';
 
-const UsernameFieldNames: string[] = AutoFillConstants.UsernameFieldNames;
+const UsernameFieldNamesForLogin: string[] = AutoFillConstants.UsernameFieldNames;
 const ExcludedAutofillTypes: string[] = AutoFillConstants.ExcludedAutofillTypes;
 const PasswordFieldExcludeList: string[] = AutoFillConstants.PasswordFieldExcludeList;
 
@@ -67,11 +67,21 @@ const IsoStates: { [id: string]: string; } = IdentityAutoFillConstants.IsoStates
 const IsoProvinces: { [id: string]: string; } = IdentityAutoFillConstants.IsoProvinces;
 
 export default class AutofillService implements AutofillServiceInterface {
-  constructor(private cipherService: CipherService, private userService: UserService,
-              private totpService: TotpService, private eventService: EventService) { }
+  constructor(
+    private cipherService: CipherService,
+    private userService: UserService,
+    private totpService: TotpService,
+    private eventService: EventService
+  ) { }
 
-  getPasswordsFields(pageDetails: AutofillPageDetails): any[] {
-    return this.loadPasswordFields(pageDetails, true, true, false, false);
+  getPasswordsFields(
+    pageDetails: AutofillPageDetails,
+    canBeHidden: boolean = true,
+    canBeReadOnly: boolean = true,
+    mustBeEmpty: boolean = false,
+    fillNewPassword: boolean = false,
+  ): any[] {
+    return this.loadPasswordFields(pageDetails, canBeHidden, canBeReadOnly, mustBeEmpty, fillNewPassword);
   }
   getNewPasswordsFields(pageDetails: AutofillPageDetails): any[] {
     return this.loadPasswordFields(pageDetails, true, true, false, true);
@@ -326,7 +336,7 @@ export default class AutofillService implements AutofillServiceInterface {
 
     var fillScript = new AutofillScript(pageDetails.documentUUID);
     var filledFields: { [id: string]: AutofillField; } = {};
-    const fields = options.cipher.fields;
+    const fields = options.cipher.fields || [];
 
     if (fields && fields.length) {
       const fieldNames: string[] = [];
@@ -398,20 +408,13 @@ export default class AutofillService implements AutofillServiceInterface {
 
     passwordFields.forEach(passField => {
       passwords.push(passField);
-    });
-
-    if (login.username) {
-      for (const formKey in pageDetails.forms) {
-        if (!pageDetails.forms.hasOwnProperty(formKey)) {
-          continue;
-        }
-        const password = passwordFields.find((p) => p.form === formKey)
-        const username = this.findUsernameField(pageDetails, password, false, false, false, pageDetails.forms[formKey]);
+      if (login.username) {
+        const username = this.findUsernameField(pageDetails, passField, false, false, false);
         if (username) {
-          usernames.push(username);
+          usernames.push(username)
         }
       }
-    }
+    });
 
     usernames.forEach(u => {
       if (filledFields.hasOwnProperty(u.opid)) {
@@ -974,8 +977,13 @@ export default class AutofillService implements AutofillServiceInterface {
     return arr;
   }
 
-  private loadPasswordFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
-                             mustBeEmpty: boolean, fillNewPassword: boolean) {
+  private loadPasswordFields(
+    pageDetails: AutofillPageDetails,
+    canBeHidden: boolean,
+    canBeReadOnly: boolean,
+    mustBeEmpty: boolean,
+    fillNewPassword: boolean
+  ) {
     const arr: AutofillField[] = [];
     pageDetails.fields.forEach(f => {
       if (this.forCustomFieldsOnly(f)) {
@@ -1080,7 +1088,7 @@ export default class AutofillService implements AutofillServiceInterface {
     return arr;
   }
 
-  private findUsernameField(
+  findUsernameField(
     pageDetails: AutofillPageDetails,
     passwordField: AutofillField,
     canBeHidden: boolean,
@@ -1102,7 +1110,7 @@ export default class AutofillService implements AutofillServiceInterface {
           (canBeHidden || f.viewable) &&
           (f.type === 'text' || f.type === 'email' || f.type === 'tel')
         ) {
-          if (this.findMatchingFieldIndex(f, UsernameFieldNames) > -1) {
+          if (this.findMatchingFieldIndex(f, UsernameFieldNamesForLogin) > -1) {
             usernameField = f;
             break;
           }
@@ -1121,7 +1129,10 @@ export default class AutofillService implements AutofillServiceInterface {
         (canBeHidden || f.viewable) &&
         (f.type === 'text' || f.type === 'email' || f.type === 'tel')
       ) {
-        usernameField = f;
+        if (this.findMatchingFieldIndex(f, UsernameFieldNamesForLogin) > -1) {
+          usernameField = f;
+          break;
+        }
         break;
       }
     }
@@ -1166,6 +1177,10 @@ export default class AutofillService implements AutofillServiceInterface {
       }
     }
 
+    if (this.fieldIsFuzzyMatch(field, names)) {
+      return 0
+    }
+
     return -1;
   }
 
@@ -1208,7 +1223,7 @@ export default class AutofillService implements AutofillServiceInterface {
       }
     }
 
-    return fieldVal.toLowerCase() === name;
+    return fieldVal.toLowerCase().includes(name);
   }
 
   private fieldIsFuzzyMatch(field: AutofillField, names: string[]): boolean {

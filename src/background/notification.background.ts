@@ -122,6 +122,15 @@ export default class NotificationBackground {
         usernameFields.push(form.username)
       }
     }
+    if (passwordFields.length === 0) {
+      passwordFields = this.autofillService.getPasswordsFields(msg.details, false, false, false, false);
+      passwordFields.forEach(passField => {
+        const username = this.autofillService.findUsernameField(msg.details, passField, false, false, false);
+        if (username) {
+          usernameFields.push(username)
+        }
+      });
+    }
     const autofillOptionData = await chrome.storage.local.get('autofillOption');
     const checkIframe = !autofillOptionData.autofillOption || autofillOptionData.autofillOption == 'autofill_page';
 
@@ -148,7 +157,6 @@ export default class NotificationBackground {
     usernameFields: any[],
     checkIframe: any
   ) {
-
     const tab = await BrowserApi.getTabFromCurrentWindow();
     if (!tab || !tab.url) {
       return;
@@ -329,10 +337,8 @@ export default class NotificationBackground {
     }
     const tabInfo = tab || await BrowserApi.getTabFromCurrentWindow();
     const tabDomain = Utils.getDomain(tabInfo.url);
-    if (currentLoginInfo && currentLoginInfo.domain == tabDomain) {
-      if (tabInfo && tabDomain === currentLoginInfo.domain) {
-        this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
-      }
+    if (tabInfo && currentLoginInfo && currentLoginInfo.domain == tabDomain) {
+      this.doNotificationQueueCheck(tabInfo, currentLoginInfo);
     }
   }
 
@@ -500,6 +506,7 @@ export default class NotificationBackground {
     try {
       await this.request.update_cipher(cipherId, payload);
       await this.notificationAlert('updated_cipher');
+      await this.main.refreshBadgeAndMenu();
     } catch (error) {
       await this.notificationAlert('cipher_update_error');
     }
@@ -510,6 +517,7 @@ export default class NotificationBackground {
     try {
       await this.request.create_ciphers_vault(payload);
       await this.notificationAlert('created_cipher');
+      await this.main.refreshBadgeAndMenu();
     } catch (e) {
       if (payload.type == CipherType.Login) {
         if (e.response && e.response.data && e.response.data.code === '5002') {

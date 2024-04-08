@@ -22,7 +22,8 @@ import {
 
 const menuIconTagName = generateRandomCustomElementName();
 
-const formData: any[] = [];
+let formData: any[] = [];
+let loginData: any = null;
 let currentMessage: any = null
 let pageHref: string = null;
 let observer: MutationObserver = null;
@@ -32,7 +33,6 @@ let observeDomTimeout: number = null;
 let disabledAddLoginNotification = false;
 let disabledChangedPasswordNotification = false;
 let isSignUp = false;
-let isDomLoaded = false;
 const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
 const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
 const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
@@ -66,7 +66,7 @@ let barElementsMutationObserver: MutationObserver = new MutationObserver(
 );
 
 document.addEventListener('DOMContentLoaded', (e) => {
-  if (!isDomLoaded && !isIframe) {
+  if (!isIframe) {
     chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
       disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
       chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
@@ -84,11 +84,8 @@ document.addEventListener('DOMContentLoaded', (e) => {
       }
       currentMessage = msg;
       processMessages(msg, sendResponse);
-
-
     });
   }
-  isDomLoaded = true;
 })
 
 document.addEventListener('click', (event: any) => {
@@ -223,12 +220,16 @@ function collectIfNeeded() {
   }
 }
 
-function watchForms(forms: any[]) {
-  if (forms == null || forms.length === 0) {
+function watchForms(data: any) {
+  formData = [];
+  if (data.forms == null || data.forms.length === 0) {
+    listen(null);
+    loginData = data;
     return;
   }
 
-  forms.forEach((f: any) => {
+  loginData = null
+  data.forms.forEach((f: any) => {
     const formId: string = f.form != null ? f.form.htmlID : null;
     let formEl: HTMLFormElement = null;
     if (formId != null && formId !== '') {
@@ -294,6 +295,13 @@ function setFillLogo(el: any, type = 'password', isLocked = false, isOver = fals
       }
     });
   }
+  if (inputEl) {
+    inputEl.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        removeFillLogo();
+      }
+    });
+  }
 }
 
 function removeFillLogo() {
@@ -352,8 +360,10 @@ function closeInformMenu() {
 }
 
 function listen(form: HTMLFormElement) {
-  form.removeEventListener('submit', formSubmitted, false);
-  form.addEventListener('submit', formSubmitted, false);
+  if (form) {
+    form.removeEventListener('submit', formSubmitted, false);
+    form.addEventListener('submit', formSubmitted, false);
+  }
   const submitButton = getSubmitButton(form, loginButtonNames);
   if (submitButton != null) {
     const buttonText = getButtonText(submitButton);
@@ -362,8 +372,29 @@ function listen(form: HTMLFormElement) {
     if (matches.length > 0) {
       isSignUp = true;
     }
-    submitButton.removeEventListener('click', (e) => formSubmitted(e, form), false);
-    submitButton.addEventListener('click', (e) => formSubmitted(e, form), false);
+    if (form) {
+      submitButton.removeEventListener('click', (e) => formSubmitted(e, form), false);
+      submitButton.addEventListener('click', (e) => formSubmitted(e, form), false);
+    } else {
+      const clickSubmitted = () => {
+        removeFillLogo();
+        const passwordFieldEl: any = document.querySelector(`[locker-id="${loginData.passwordFields[0]?.lockerId}"]`)
+        const usernameFieldEl: any = document.querySelector(`[locker-id="${loginData.usernameFields[0]?.lockerId}"]`)
+        if (passwordFieldEl?.value != null && usernameFieldEl?.value != null) {
+          const login: AddLoginRuntimeMessage = {
+            username: passwordFieldEl?.value,
+            password: usernameFieldEl?.value,
+            url: document.URL,
+          };
+          sendPlatformMessage({
+            command: 'bgAddLogin',
+            login: login,
+          });
+        }
+      }
+      submitButton.removeEventListener('click', (e) => clickSubmitted(), false);
+      submitButton.addEventListener('click', (e) => clickSubmitted(), false);
+    }
   }
 }
 
@@ -421,7 +452,7 @@ function formSubmitted(e: Event, f?: HTMLFormElement) {
   removeFillLogo();
   let form: HTMLFormElement = null;
   if (e.type === 'click') {
-    form = f || (e.target as HTMLElement).closest('form');
+    form = f || (e.target as HTMLElement).closest('form') || null;
     if (form == null) {
       const parentModal = (e.target as HTMLElement).closest('div.modal');
       if (parentModal != null) {
@@ -530,11 +561,14 @@ function isElementVisible(el: any) {
 }
 
 function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
-  if (wrappingEl == null) {
-    return null;
+  let wrappingElIsForm = null
+  let submitButton = null
+  let possibleSubmitButtons = []
+  if (wrappingEl) {
+    wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
+    submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], button[type="submit"]') as HTMLElement;
+    possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
   }
-  const wrappingElIsForm = wrappingEl.tagName.toLowerCase() === 'form';
-  let submitButton = wrappingEl.querySelector('input[type="submit"], input[type="image"], button[type="submit"]') as HTMLElement;
   if (submitButton == null && wrappingElIsForm) {
     const typelessButton = wrappingEl.querySelector('button:not([type])') as HTMLElement;
     if (!!typelessButton && isElementVisible(typelessButton)) {
@@ -547,8 +581,7 @@ function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
       }
     }
   }
-  if (submitButton == null) {
-    const possibleSubmitButtons = Array.from(wrappingEl.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
+  if (submitButton == null && possibleSubmitButtons.length > 0) {
     let typelessButton: HTMLElement = null;
     possibleSubmitButtons.forEach(button => {
       if (!!submitButton || !button || !button.tagName) {
@@ -576,7 +609,6 @@ function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
   
   if (submitButton == null) {
     const possibleSubmitButtons = Array.from(document.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
-    let typelessButton: HTMLElement = null;
     possibleSubmitButtons.forEach(button => {
       if (!!submitButton || !button || !button.tagName) {
         return;
@@ -584,24 +616,19 @@ function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
       const buttonText = getButtonText(button);
       if (!!buttonText) {
         if (
-          !!typelessButton
-          && button.tagName.toLowerCase() === 'button'
-          && button.getAttribute('type') == null
+          button.tagName.toLowerCase() === 'button'
           && !cancelButtonNames.has(buttonText.trim().toLowerCase())
           && isElementVisible(button)
+          && checkPageType() == buttonText.trim().toLowerCase()
+          && buttonNames.has(buttonText.trim().toLowerCase())
         ) {
-          typelessButton = button;
-        } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
           submitButton = button;
         }
       }
     });
-    if (!submitButton && !!typelessButton) {
-      submitButton = typelessButton;
-    }
   }
 
-  if (submitButton == null) {
+  if (submitButton == null && wrappingEl) {
     const parentModal = wrappingEl.closest('div.modal') as HTMLElement;
     if (parentModal != null) {
       const modalForms = parentModal.querySelectorAll('form');
@@ -782,7 +809,7 @@ function resizeInformMenu(msg: any) {
 }
 
 async function checkingAutofill(msg: any) {
-  watchForms(msg.data.forms);
+  watchForms(msg.data);
   const showMenuOptionStorage = await chrome.storage.local.get('showMenuOption');
   showMenuOption = showMenuOptionStorage.showMenuOption;
   if (showMenuOption === 'off') {
@@ -812,6 +839,10 @@ async function checkingAutofill(msg: any) {
       setFillLogo(form.otps[5], "otp", msg.data.isLocked, true, msg.checkIframe)
     }
   }
+}
+
+function checkPageType() {
+  return LOGIN_BUTTON_NAMES.find((name) => self.location.pathname?.includes(name))
 }
 
 

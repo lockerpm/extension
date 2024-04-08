@@ -5,6 +5,7 @@ export class AutoFillConstants {
     "user name",
     "email",
     "email address",
+    "your email address",
     "e-mail",
     "e-mail address",
     "userid",

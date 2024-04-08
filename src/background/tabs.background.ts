@@ -5,12 +5,13 @@ import { BrowserApi } from "@/browser/browserApi";
 export default class TabsBackground {
   constructor(private main: MainBackground, private notificationBackground: NotificationBackground) {
   }
+  
+  private tabUrl = '';
 
   async init() {
     if (!chrome.tabs) {
       return;
     }
-
     chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.TabActiveInfo) => {
       await this.main.refreshBadgeAndMenu();
       const tab = await BrowserApi.getTabFromCurrentWindowId();
@@ -24,18 +25,18 @@ export default class TabsBackground {
         return;
       }
       await this.main.refreshBadgeAndMenu();
-      await this.notificationBackground.checkNotificationQueue();
+      
       this.main.onReplacedRan = true;
     });
 
     chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-      if (this.main.onUpdatedRan) {
+      if (changeInfo?.status !== 'complete' || !tab || this.main.onUpdatedRan || this.tabUrl == tab?.url) {
         return;
       }
-      if (tab) {
-        const tabInfo = await BrowserApi.getTabFromCurrentWindowId();
-        await this.main.collectPageDetailsForContentScript(tabInfo, 'notificationBar');
-      }
+      await this.main.refreshBadgeAndMenu();
+      await this.notificationBackground.checkNotificationQueue();
+      await this.main.collectPageDetailsForContentScript(tab, 'notificationBar');
+      this.tabUrl = tab.url;
       this.main.onUpdatedRan = true;
     });
   }
