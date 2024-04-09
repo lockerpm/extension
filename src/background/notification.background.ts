@@ -32,6 +32,11 @@ import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { CipherData } from 'jslib-common/models/data/cipherData';
 import { CipherResponse } from 'jslib-common/models/response/cipherResponse';
 
+import {
+  LOGIN_PATHS,
+  REGISTER_PATHS,
+} from '@/config/constants'
+
 let currentLoginInfo = null
 
 export default class NotificationBackground {
@@ -175,10 +180,12 @@ export default class NotificationBackground {
     }
 
     // check is login page
+    const isSignPage = [...LOGIN_PATHS, ...REGISTER_PATHS].find((name) => tab.url?.includes(name))
     if (
-      passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length <= 1
+      passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length >= 1
       && !passwordFields.filter((f) => f.type === 'password')[0]?.value
-      && usernameFields.filter((f) => f.visible && f.viewable).length <= 1
+      && usernameFields.filter((f) => f.visible && f.viewable).length >= 1
+      && isSignPage
     ) {
       this.autofillOnPageLoad(sender.tab, checkIframe);
     }

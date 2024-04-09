@@ -1,8 +1,10 @@
 import i18n from "@/locales/i18n"
 export const OBSERVE_IGNORED_ELEMENTS = ['a', 'i', 'b', 'strong', 'span', 'code', 'br', 'img', 'small', 'em', 'hr']
 export const CANCEL_BUTTON_NAMES = ['cancel', 'close', 'back']
-export const LOGIN_BUTTON_NAMES = ['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'sign up', 'create', 'register', 'đăng nhập', 'tiếp tục']
-export const SIGN_UP_BUTTON_NAMES = ['sign up', 'create', 'register', 'đăng ký', 'tạo tài khoản']
+export const LOGIN_BUTTON_NAMES = ['log in', 'sign in', 'login', 'go', 'submit', 'continue', 'next', 'đăng nhập']
+export const REGISTER_BUTTON_NAMES = ['sign up', 'create', 'register', 'tiếp tục', 'đăng ký', 'tạo tài khoản']
+export const LOGIN_PATHS = ['log-in', 'log_in', 'sign-in', 'sign_in', 'login', 'dang-nhap', 'authenticate']
+export const REGISTER_PATHS = ['sign-up', 'create', 'register', 'dang-ky', 'sign_up']
 export const CHANGE_PASSWORD_BUTTON_NAMES = ['save password', 'update password', 'change password', 'change']
 export const CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES = ['pass', 'change', 'contras', 'senha']
 export const VAULT_TIMEOUTS = [

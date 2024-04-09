@@ -15,9 +15,11 @@ import {
   OBSERVE_IGNORED_ELEMENTS,
   CANCEL_BUTTON_NAMES,
   LOGIN_BUTTON_NAMES,
-  SIGN_UP_BUTTON_NAMES,
+  REGISTER_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_NAMES,
-  CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES
+  CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES,
+  LOGIN_PATHS,
+  REGISTER_PATHS
 } from '@/config/constants'
 
 const menuIconTagName = generateRandomCustomElementName();
@@ -35,10 +37,12 @@ let disabledChangedPasswordNotification = false;
 let isSignUp = false;
 const observeIgnoredElements = new Set(OBSERVE_IGNORED_ELEMENTS);
 const cancelButtonNames = new Set(CANCEL_BUTTON_NAMES);
-const loginButtonNames = new Set(LOGIN_BUTTON_NAMES);
-const signUpButtonNames = new Set(SIGN_UP_BUTTON_NAMES);
+const submitButtonNames = new Set([...LOGIN_BUTTON_NAMES, ...REGISTER_BUTTON_NAMES])
 const changePasswordButtonNames = new Set(CHANGE_PASSWORD_BUTTON_NAMES);
 const changePasswordButtonContainsNames = new Set(CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES);
+
+const isSignInPage = LOGIN_PATHS.find((name) => self.location?.pathname.includes(name));
+const isSignUpPage = REGISTER_PATHS.find((name) => self.location?.pathname.includes(name));
 
 let menuElement: HTMLElement;
 let menuIconElement: HTMLElement;
@@ -366,11 +370,10 @@ function listen(form: HTMLFormElement) {
     form.removeEventListener('submit', formSubmitted, false);
     form.addEventListener('submit', formSubmitted, false);
   }
-  const submitButton = getSubmitButton(form, loginButtonNames);
+  const submitButton = getSubmitButton(form, submitButtonNames);
   if (submitButton != null) {
     const buttonText = getButtonText(submitButton);
-    const matches = Array.from(signUpButtonNames)
-      .filter(n => buttonText.toLowerCase().indexOf(n) > -1);
+    const matches = REGISTER_BUTTON_NAMES.filter(n => buttonText.toLowerCase().indexOf(n) > -1);
     if (matches.length > 0) {
       isSignUp = true;
     }
@@ -378,22 +381,6 @@ function listen(form: HTMLFormElement) {
       submitButton.removeEventListener('click', (e) => formSubmitted(e, form), false);
       submitButton.addEventListener('click', (e) => formSubmitted(e, form), false);
     } else {
-      const clickSubmitted = () => {
-        removeFillLogo();
-        const passwordFieldEl: any = document.querySelector(`[locker-id="${loginData.passwordFields[0]?.lockerId}"]`)
-        const usernameFieldEl: any = document.querySelector(`[locker-id="${loginData.usernameFields[0]?.lockerId}"]`)
-        if (passwordFieldEl?.value != null && usernameFieldEl?.value != null) {
-          const login: AddLoginRuntimeMessage = {
-            username: passwordFieldEl?.value,
-            password: usernameFieldEl?.value,
-            url: document.URL,
-          };
-          sendPlatformMessage({
-            command: 'bgAddLogin',
-            login: login,
-          });
-        }
-      }
       submitButton.removeEventListener('click', (e) => clickSubmitted(), false);
       submitButton.addEventListener('click', (e) => clickSubmitted(), false);
     }
@@ -539,6 +526,35 @@ function formSubmitted(e: Event, f?: HTMLFormElement) {
       }
     }
   }
+  setTimeout(() => {
+    sendPlatformMessage({
+      command: 'bgCollectPageDetails',
+      sender: 'notificationBar',
+    });
+  }, 2000);
+}
+
+function clickSubmitted() {
+  removeFillLogo();
+  const passwordFieldEl: any = document.querySelector(`[locker-id="${loginData.passwordFields[0]?.lockerId}"]`)
+  const usernameFieldEl: any = document.querySelector(`[locker-id="${loginData.usernameFields[0]?.lockerId}"]`)
+  if (passwordFieldEl?.value != null && usernameFieldEl?.value != null) {
+    const login: AddLoginRuntimeMessage = {
+      username: usernameFieldEl?.value,
+      password: passwordFieldEl?.value,
+      url: document.URL,
+    };
+    sendPlatformMessage({
+      command: 'bgAddLogin',
+      login: login,
+    });
+  }
+  setTimeout(() => {
+    sendPlatformMessage({
+      command: 'bgCollectPageDetails',
+      sender: 'notificationBar',
+    });
+  }, 2000);
 }
 
 function isElementVisible(el: any) {
@@ -615,13 +631,16 @@ function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
       if (!!submitButton || !button || !button.tagName) {
         return;
       }
-      const buttonText = getButtonText(button);
+      const buttonText = getButtonText(button) || '';
       if (!!buttonText) {
+        const isSignInButton = LOGIN_BUTTON_NAMES.includes(buttonText.trim().toLowerCase());
+        const isSignUpButton = REGISTER_BUTTON_NAMES.includes(buttonText.trim().toLowerCase());
+        const isSign = (isSignInPage && isSignInButton) || (isSignUpPage && isSignUpButton)
         if (
           button.tagName.toLowerCase() === 'button'
           && !cancelButtonNames.has(buttonText.trim().toLowerCase())
           && isElementVisible(button)
-          && checkPageType() == buttonText.trim().toLowerCase()
+          && isSign
           && buttonNames.has(buttonText.trim().toLowerCase())
         ) {
           submitButton = button;
@@ -835,10 +854,5 @@ async function checkingAutofill(msg: any) {
     }
   }
 }
-
-function checkPageType() {
-  return LOGIN_BUTTON_NAMES.find((name) => self.location.pathname?.includes(name))
-}
-
 
 
