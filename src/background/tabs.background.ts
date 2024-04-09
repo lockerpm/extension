@@ -6,8 +6,6 @@ export default class TabsBackground {
   constructor(private main: MainBackground, private notificationBackground: NotificationBackground) {
   }
   
-  private tabUrl = '';
-
   async init() {
     if (!chrome.tabs) {
       return;
@@ -30,14 +28,12 @@ export default class TabsBackground {
     });
 
     chrome.tabs.onUpdated.addListener(async (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-      if (changeInfo?.status !== 'complete' || !tab || this.main.onUpdatedRan || this.tabUrl == tab?.url) {
+      if (changeInfo?.status !== 'complete' || !tab) {
         return;
       }
       await this.main.refreshBadgeAndMenu();
       await this.notificationBackground.checkNotificationQueue();
       await this.main.collectPageDetailsForContentScript(tab, 'notificationBar');
-      this.tabUrl = tab.url;
-      this.main.onUpdatedRan = true;
     });
   }
 }

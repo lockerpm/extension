@@ -24,7 +24,7 @@ import {
 
 const menuIconTagName = generateRandomCustomElementName();
 
-let formData: any[] = [];
+const formData: any[] = [];
 let loginData: any = null;
 let currentMessage: any = null
 let pageHref: string = null;
@@ -228,7 +228,6 @@ function collectIfNeeded() {
 }
 
 function watchForms(data: any) {
-  formData = [];
   loginData = null
   if (data.forms == null || data.forms.length === 0) {
     listen(null);
@@ -366,10 +365,6 @@ function closeInformMenu() {
 }
 
 function listen(form: HTMLFormElement) {
-  if (form) {
-    form.removeEventListener('submit', formSubmitted, false);
-    form.addEventListener('submit', formSubmitted, false);
-  }
   const submitButton = getSubmitButton(form, submitButtonNames);
   if (submitButton != null) {
     const buttonText = getButtonText(submitButton);
@@ -384,6 +379,9 @@ function listen(form: HTMLFormElement) {
       submitButton.removeEventListener('click', (e) => clickSubmitted(), false);
       submitButton.addEventListener('click', (e) => clickSubmitted(), false);
     }
+  } else if (form) {
+    form.removeEventListener('submit', formSubmitted, false);
+    form.addEventListener('submit', formSubmitted, false);
   }
 }
 

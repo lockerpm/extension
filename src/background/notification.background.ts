@@ -180,13 +180,18 @@ export default class NotificationBackground {
     }
 
     // check is login page
-    const isSignPage = [...LOGIN_PATHS, ...REGISTER_PATHS].find((name) => tab.url?.includes(name))
-    if (
-      passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length >= 1
-      && !passwordFields.filter((f) => f.type === 'password')[0]?.value
-      && usernameFields.filter((f) => f.visible && f.viewable).length >= 1
-      && isSignPage
-    ) {
+    const isSignPage = [...LOGIN_PATHS, ...REGISTER_PATHS].find((name) => tab.url?.includes(name));
+    const loginForms = forms.filter((f) => f.username && f.password);
+    if (isSignPage) {
+      if (
+        passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length >= 1
+        && !passwordFields.filter((f) => f.type === 'password')[0]?.value
+        && usernameFields.filter((f) => f.visible && f.viewable).length >= 1
+        && isSignPage
+      ) {
+        this.autofillOnPageLoad(sender.tab, checkIframe);
+      }
+    } else if (loginForms.length >= 1) {
       this.autofillOnPageLoad(sender.tab, checkIframe);
     }
 
