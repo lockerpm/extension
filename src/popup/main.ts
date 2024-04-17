@@ -131,7 +131,7 @@ Vue.mixin({
           }
         })
       } else {
-        this.$moment.locale('en')
+        this.$moment.locale(value)
       }
       this.$store.dispatch('SetLang', value).then(() => {
         this.$i18n.locale = value
@@ -614,7 +614,7 @@ Vue.filter('filterString', function (value) {
 
 storePromise().then((store) => {
   middleware()
-  store.commit('SET_LANG', store.state.language)
+  store.commit('SET_LANG', store.state.user.language)
   i18n.locale = store.state.language
   new Vue({
     router,

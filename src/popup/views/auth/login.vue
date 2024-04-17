@@ -17,17 +17,23 @@
           {{ loginSubtitle }}
         </div>
         <div
-          v-if="language !== 'vi'"
+          v-if="language === 'en'"
           class="cursor-pointer"
           @click="changeLang('vi')"
         >
           <span class="flag flag-us"></span>
         </div>
+        <div v-else-if="language === 'vi'"
+          class="cursor-pointer"
+          @click="changeLang('zh-cn')"
+        >
+          <span class="flag flag-vn"></span>
+        </div>
         <div v-else
           class="cursor-pointer"
           @click="changeLang('en')"
         >
-          <span class="flag flag-vn"></span>
+          <span class="flag flag-cn"></span>
         </div>
       </el-row>
     </div>

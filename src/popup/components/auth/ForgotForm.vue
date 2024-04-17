@@ -34,7 +34,7 @@ export default Vue.extend({
         username: [
           {
             required: true,
-            message: this.$t('data.login.message.required', { name: this.$t('common.username_placeholder') }),
+            message: this.$t('data.login.message.required', { name: this.$t('data.login.username_placeholder') }),
             trigger: ['change']
           },
         ],

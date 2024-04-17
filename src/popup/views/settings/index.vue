@@ -98,7 +98,6 @@
 <script>
 import Vue from "vue";
 import i18n from '@/locales/i18n';
-import { VAULT_TIMEOUTS } from '@/config/constants';
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 
 const showFoldersKey = 'showFolders';
@@ -129,9 +128,6 @@ export default Vue.extend({
     };
   },
   computed: {
-    vaultTimeouts() {
-      return VAULT_TIMEOUTS;
-    },
     menu() {
       return [
         {
@@ -162,6 +158,10 @@ export default Vue.extend({
         {
           name: this.$t("data.settings.options"),
           items: [
+            {
+              name: this.$t("data.settings.language"),
+              routeName: "settings-language",
+            },
             {
               name: this.$t("data.settings.vault_timeout"),
               desc: this.$t("data.settings.vault_timeout_desc"),
@@ -195,9 +195,6 @@ export default Vue.extend({
         },
       ];
     },
-    language () {
-      return i18n.locale
-    }
   },
   methods: {
     openRoute(item) {

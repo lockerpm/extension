@@ -423,19 +423,6 @@ module.exports = {
       payment_due: 'Payment due',
       intro: "Please enter your card details (Visa, MasterCard, American Express, Discover, etc).<br><br>We use <a class='kt-link' href='https://stripe.com/' rel='noopener' target='_blank'>Stripe</a>, one of the top payment gateways in the world, as our payment processor and do not store any of your card information on our side.",
       total: 'Total',
-      transfer_information: 'Transfer information',
-      transfer_note: 'Copy the exact content of the transaction when making the transfer. The system will automatically process your transactions.',
-      transfer_detail: 'Transfer detail',
-      transfer_bank: 'Bank name',
-      transfer_branch: 'Bank branch',
-      transfer_account: 'Account holder name',
-      transfer_account_number: 'Account number',
-      transfer_amount: 'Amount',
-      transfer_content: 'Content',
-      transfer_already: 'I have already transferred',
-      transfer_thank: 'Thank you',
-      transfer_thank_content: 'We are reviewing your transaction. Your account will be upgraded to {plan} in 5 minutes.',
-      transfer_thank_content_1: 'Wrong transaction code? Please contact us via Help Center for manual review.',
       cancel_subscription: 'Cancel Subscription',
       invoices: 'Invoices',
       cancel_at_period_end: 'Your plan will downgrade at'
@@ -568,6 +555,7 @@ module.exports = {
       language: 'Language',
       vietnamese: 'Tiếng Việt',
       english: 'English',
+      chinese: "繁體中文",
       fingerprint_dialog: 'Your account\'s fingerprint phrase',
       excluded_domains: 'Excluded Domains',
       excluded_domains_desc: 'List of exclued domains and URLs',
@@ -615,7 +603,8 @@ module.exports = {
       version: 'Version',
       term: 'Terms of use',
       privacy: 'Privacy policy',
-      a_product_of: 'A product of'
+      a_product_of: 'A product of',
+      dont_find_language: 'Don’t find your language? ->'
     },
     tools: {
       password_generator: 'Password Generator',

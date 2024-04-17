@@ -2,8 +2,11 @@ import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 import enLocale from 'element-ui/lib/locale/lang/en'
 import vnLocale from 'element-ui/lib/locale/lang/vi'
+import zhCNLocale from 'element-ui/lib/locale/lang/zh-CN'
+
 import viVee from 'vee-validate/dist/locale/vi.json'
 import enVee from 'vee-validate/dist/locale/en.json'
+import zhCNVee from 'vee-validate/dist/locale/zh_CN.json'
 
 import * as rules from 'vee-validate/dist/rules'
 import { extend, configure } from 'vee-validate'
@@ -20,11 +23,16 @@ const messages = {
     ...require('./vi.js'),
     ...vnLocale,
     ...viVee
-  }
+  },
+  'zh-cn': {
+    ...require('./zh-cn.js'),
+    ...zhCNLocale,
+    ...zhCNVee
+  },
 }
 
 const i18n = new VueI18n({
-  locale: navigator.language !== 'vi' ? 'en' : 'vi',
+  locale: 'en',
   messages,
   fallbackLocale: 'en'
 })

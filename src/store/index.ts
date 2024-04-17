@@ -58,7 +58,6 @@ const asyncStore = async () => {
     const userPw: any = storeUserPw || { is_pwd_manager: false }
 
     let oldStoreParsed = {
-      language: 'en',
       ...JSON.parse(JSON.stringify(defaultLoginInfo)),
     }
     if (typeof oldStore === 'object') {
@@ -74,7 +73,7 @@ const asyncStore = async () => {
         isLoggedIn: !!user?.email || !!oldStoreParsed?.preloginData?.email,
         user: {
           ...JSON.parse(JSON.stringify(user)),
-          language: oldStoreParsed.language,
+          language: oldStoreParsed.language || 'en'
         },
         userPw: JSON.parse(JSON.stringify(userPw)),
         notifications: {

@@ -18,7 +18,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VAULT_TIMEOUTS } from '@/config/constants'
 
 export default Vue.extend({
   data() {
@@ -28,9 +27,6 @@ export default Vue.extend({
     };
   },
   computed: {
-    vaultTimeouts() {
-      return VAULT_TIMEOUTS;
-    },
     version() {
       return chrome.runtime.getManifest().version;
     },

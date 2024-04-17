@@ -16,7 +16,7 @@
         @click="() => handleUpdateShowMenuOption(option.value)"
       >
         <div>
-          {{option.label}}
+          {{$t(option.label)}}
         </div>
         <div
           v-if="showMenuOption === option.value"
@@ -43,7 +43,7 @@
         @click="() => handleUpdateAutofillOption(option.value)"
       >
         <div>
-          {{option.label}}
+          {{$t(option.label)}}
         </div>
         <div
           v-if="autofillOption === option.value"

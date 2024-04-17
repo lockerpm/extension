@@ -423,19 +423,6 @@ module.exports = {
       payment_due: 'Thanh toán vào',
       intro: "Vui lòng nhập vào thông tin thẻ thanh toán quốc tế của bạn (Visa, MasterCard, American Express, Discover...).<br><br>Chúng tôi sử dụng <a class='kt-link' href='https://stripe.com/' rel='noopener' target='_blank'>Stripe</a>, cổng thanh toán hàng đầu thế giới hiện nay, cho quá trình giao dịch và không lưu lại thông tin của bạn.",
       total: 'Tổng cộng',
-      transfer_information: 'Thông tin thanh toán',
-      transfer_note: 'Sao chép chính xác nội dung giao dịch trên khi thực hiện chuyển khoản. Hệ thống sẽ tự động xử lý giao dịch của bạn.',
-      transfer_detail: 'Thông tin chuyển khoản',
-      transfer_bank: 'Tên ngân hàng',
-      transfer_branch: 'Chi nhánh',
-      transfer_account: 'Chủ tài khoản',
-      transfer_account_number: 'Số tài khoản',
-      transfer_amount: 'Số tiền',
-      transfer_content: 'Nội dung chuyển khoản',
-      transfer_already: 'Tôi đã chuyển khoản',
-      transfer_thank: 'Cảm ơn bạn đã thanh toán',
-      transfer_thank_content: 'Hệ thống đang kiểm tra giao dịch. Tài khoản sẽ được nâng cấp lên gói {plan} trong 5 phút tới.',
-      transfer_thank_content_1: 'Nếu bạn nhập sai nội dung chuyển khoản. Vui lòng liên hệ với chúng tôi tại mục "Hỗ trợ".',
       cancel_subscription: 'Hủy Đăng ký',
       invoices: 'Hóa đơn',
       cancel_at_period_end: 'Tài khoản hạ cấp vào'
@@ -568,6 +555,7 @@ module.exports = {
       language: 'Ngôn ngữ',
       vietnamese: 'Vietnamese',
       english: 'English',
+      chinese: '繁體中文',
       fingerprint_dialog: 'Cụm từ định danh tài khoản của bạn',
       excluded_domains: 'Không lưu mật khẩu',
       excluded_domains_desc: 'Danh sách các tên miền không gợi ý lưu mật khẩu',
@@ -615,7 +603,8 @@ module.exports = {
       version: 'Phiên bản',
       term: 'Điều khoản sử dụng',
       privacy: 'Chính sách bảo mật',
-      a_product_of: 'Một sản phẩm của'
+      a_product_of: 'Một sản phẩm của',
+      dont_find_language: 'Không tìm thấy ngôn ngữ của bạn? ->'
     },
     tools: {
       password_generator: 'Tạo mật khẩu mạnh',

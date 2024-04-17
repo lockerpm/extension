@@ -16,7 +16,7 @@
         @click="putUser(option.value)"
       >
         <div class="font-semibold">
-          {{option.label}}
+          {{$t(option.label)}}
         </div>
         <div
           v-if="user.timeout === option.value"

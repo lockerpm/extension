@@ -174,6 +174,11 @@ export default {
         result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
         result.title = this.$t('data.settings.autofill')
         break;
+      case 'settings-language':
+        result.Icon = null
+        result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
+        result.title = this.$t('data.settings.language')
+        break;
       case 'settings-info':
         result.Icon = null
         result.back = () => this.$router.push({ name: 'settings' }).catch(() => ({}))
