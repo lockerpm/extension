@@ -1,7 +1,7 @@
 import { collectDocument } from "./collect";
 
 let isReading = false;
-let isIframe: Boolean = self.location.ancestorOrigins.length > 0;
+const isIframe: Boolean = self.location.ancestorOrigins.length > 0;
 
 const checkRadioTrueOps = {
   'true': true,

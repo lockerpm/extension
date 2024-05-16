@@ -145,8 +145,8 @@ export default class MainBackground {
   private commandsBackground: CommandsBackground;
   private contextMenusBackground: ContextMenusBackground;
   private idleBackground: IdleBackground;
-  private notificationBackground: NotificationBackground;
-  private runtimeBackground: RuntimeBackground;
+  notificationBackground: NotificationBackground;
+  runtimeBackground: RuntimeBackground;
   private tabsBackground: TabsBackground;
   private windowsBackground: WindowsBackground;
   private webRequestBackground: WebRequestBackground;
@@ -583,6 +583,7 @@ export default class MainBackground {
     await this.setIcon();
     await this.refreshBadgeAndMenu();
     await this.reseedStorage();
+    await this.runtimeBackground.closeAllWindowPopups();
   }
 
   async logout(expired: boolean = false) {
@@ -619,6 +620,7 @@ export default class MainBackground {
 
     this.systemService.startProcessReload();
     await this.systemService.clearPendingClipboard();
+    await this.runtimeBackground.closeAllWindowPopups();
   }
 
   async collectPageDetailsForContentScript(tab: any, sender: string, frameId: number = null) {

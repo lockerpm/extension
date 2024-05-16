@@ -282,17 +282,20 @@ export default class RuntimeBackground {
     this.systemService.cancelProcessReload();
   }
 
-  async handleOpenPopupWindow(timeout = 0) {
-    setTimeout(async () => {
-      const tab = await BrowserApi.getTabFromCurrentWindow();
-      if (!tab) {
-        return;
-      }
-      BrowserApi.tabSendMessage(tab, {
-        command: 'openPopupWindow',
-        tab: tab,
-      });
-    }, timeout);
+  async handleOpenPopupWindow() {
+    const windows = await chrome.windows.getAll();
+    const popupWindow = windows.find((w) => w.type === 'popup');
+    if (popupWindow) {
+      setTimeout(async () => {
+        await this.updatePopout(popupWindow)
+      }, 100)
+    } else {
+      setTimeout(async () => {
+        this.openPopout('popup.html', {
+          forceCloseExistingWindows: true,
+        })
+      }, 100);
+    }
   }
 
   async handleGetUserInfo() {
@@ -316,5 +319,64 @@ export default class RuntimeBackground {
         userPw.timeout_action
       )
     ])
+  }
+
+  async closeAllWindowPopups () {
+    const windows = await chrome.windows.getAll();
+    const popupWindows = windows.filter((w) => w.type === 'popup');
+    const requests = popupWindows.map((wPopup) => {
+      return chrome.windows.remove(wPopup.id);
+    })
+    await Promise.all(requests);
+  }
+
+  buildPopoutUrl(extensionUrlPath: string) {
+    const parsedUrl = new URL(chrome.runtime.getURL(extensionUrlPath));
+    parsedUrl.searchParams.set("uilocation", "popout");
+
+    return parsedUrl.toString();
+  }
+
+  async openPopout(
+    extensionUrlPath: string,
+    options: {
+      senderWindowId?: number;
+      singleActionKey?: string;
+      forceCloseExistingWindows?: boolean;
+      windowOptions?: Partial<chrome.windows.CreateData>;
+    } = {},
+  ) {
+    const { senderWindowId, singleActionKey, forceCloseExistingWindows, windowOptions } = options;
+    const defaultPopoutWindowOptions: chrome.windows.CreateData = {
+      type: "popup",
+      focused: true,
+      width: 430,
+      height: 650,
+    };
+    const offsetRight = 15;
+    const offsetTop = 90;
+    const popupWidth = defaultPopoutWindowOptions.width;
+    const senderWindow = await BrowserApi.getWindow(senderWindowId);
+    const popoutWindowOptions = {
+      left: senderWindow.left + senderWindow.width - popupWidth - offsetRight,
+      top: senderWindow.top + offsetTop,
+      ...defaultPopoutWindowOptions,
+      ...windowOptions,
+      url: this.buildPopoutUrl(extensionUrlPath),
+    };
+
+    return await BrowserApi.createWindow(popoutWindowOptions);
+  }
+
+  async updatePopout(popupWindow: any) {
+    chrome.tabs.query({ windowId: popupWindow.id }, (tabs) => {
+      tabs.forEach((tab) => {
+        chrome.tabs.reload(tab.id, { bypassCache: true });
+      });
+    });
+    await chrome.windows.update(popupWindow.id, {
+      drawAttention: true,
+      focused: true,
+    })
   }
 }

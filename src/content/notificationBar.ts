@@ -50,7 +50,7 @@ let barElement: HTMLElement;
 
 let selectedInput: any;
 let showMenuOption: any;
-let isIframe: Boolean = self.location.ancestorOrigins.length > 0;
+const isIframe: Boolean = self.location.ancestorOrigins.length > 0;
 
 const customElementDefaultStyles: Partial<CSSStyleDeclaration> = {
   all: "initial",
@@ -113,13 +113,6 @@ async function processMessages(msg: any, sendResponse: Function) {
     await checkingAutofill(msg)
   } else if (msg.command === "closeInformMenu") {
     closeInformMenu()
-  } else if (msg.command === 'openPopupWindow') {
-    sendPlatformMessage({
-      ...msg,
-      data: {
-        url: 'popup.html'
-      }
-    })
   } else if (msg.command === 'resizeInformMenu') {
     resizeInformMenu(msg)
   } else if (msg.command === 'updateCipher') {

@@ -35,6 +35,7 @@ import { TotpService } from 'jslib-common/abstractions/totp.service';
 import AutofillService from '@/services/autofill.service';
 import MainBackground from './background/main.background';
 import RuntimeBackground from './background/runtime.background';
+import NotificationBackground from './background/notification.background';
 
 let lockerMain = chrome['lockerMain'];
 function getBgService<T>(service: string) {
@@ -87,6 +88,7 @@ export default {
     Vue.prototype.$policyService = getBgService<PolicyService>("policyService")();
     Vue.prototype.$totpService = getBgService<TotpService>('totpService')();
     Vue.prototype.$runtimeBackground = getBgService<RuntimeBackground>('runtimeBackground')();
+    Vue.prototype.$notificationBackground = getBgService<NotificationBackground>('notificationBackground')();
     Vue.prototype.$notificationsService = getBgService<NotificationsService>('notificationsService')();
 
     if (!popupUtilsService.inPopup(self)) {

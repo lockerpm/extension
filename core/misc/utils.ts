@@ -235,15 +235,14 @@ export class Utils {
                     return url.hostname;
                 }
 
-                const urlDomain = tldjs && tldjs.getDomain ? tldjs.getDomain(url.hostname) : null;
+                const urlDomain = tldjs && tldjs.parse && tldjs.parse(url.hostname) ? tldjs.parse(url.hostname).domain : null;
                 return urlDomain ? urlDomain : url.hostname;
             } catch (e) {
-                // Invalid domain, try another approach below.
             }
         }
 
         try {
-            const domain = tldjs && tldjs.getDomain ? tldjs.getDomain(uriString) : null;
+            const domain = tldjs && tldjs.parse && tldjs.parse(uriString) ? tldjs.parse(uriString).domain : null;
 
             if (domain) {
                 return domain;
