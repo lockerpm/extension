@@ -30,7 +30,6 @@ import { BrowserApi } from "@/browser/browserApi";
 import { LoginView } from 'jslib-common/models/view/loginView';
 import { LoginUriView } from 'jslib-common/models/view/loginUriView';
 import { CipherView } from 'jslib-common/models/view/cipherView';
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 import { Utils } from 'jslib-common/misc/utils';
 
 export default Vue.extend({
@@ -76,8 +75,7 @@ export default Vue.extend({
     async createCipher() {
       const loginModel = new LoginView();
       const loginUri = new LoginUriView();
-      loginUri.uri = this.data.uri;
-      loginModel.uris = [loginUri];
+      loginModel.uris = [{ ...loginUri, uri: this.data.uri }];
       loginModel.username = this.data.username;
       loginModel.password = this.data.password;
       const model = new CipherView();
@@ -85,29 +83,18 @@ export default Vue.extend({
       model.type = CipherType.Login;
       model.login = loginModel;
       model.folderId = this.data.folderId
-      const cipher = await this.$cipherService.encrypt(model);
-      const data = new CipherRequest(cipher)
       if (this.browserTab) {
         await BrowserApi.tabSendMessageData(this.browserTab, 'createCipher', {
-          payload: data,
+          payload: model,
         });
       }
       this.closeBar();
     },
     async updateCipher() {
-      let cipher = await this.$cipherService.get(this.data.id);
-      if (cipher && cipher.type === CipherType.Login) {
-        cipher = await cipher.decrypt();
-        cipher.login.password = this.data.password;
-        cipher.login.username = this.data.username;
-        const newCipher = await this.$cipherService.encrypt(cipher);
-        const data = new CipherRequest(newCipher);
-        if (this.browserTab) {
-          await BrowserApi.tabSendMessageData(this.browserTab, 'updateCipher', {
-            cipherId: this.data.id,
-            payload: data,
-          });
-        }
+      if (this.browserTab) {
+        await BrowserApi.tabSendMessageData(this.browserTab, 'updateCipher', {
+          payload: this.data,
+        });
         this.closeBar();
       }
     },

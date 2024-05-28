@@ -519,24 +519,36 @@ export default class NotificationBackground {
   }
 
   async updateCipher (message: any) {
-    const { cipherId, payload } = message.data;
-    try {
-      await this.request.update_cipher(cipherId, payload);
-      await this.notificationAlert('updated_cipher');
-      await this.main.refreshBadgeAndMenu();
-    } catch (error) {
+    const { payload } = message.data;
+    let cipher: any = await this.cipherService.get(payload.id);
+    if (cipher && cipher.type === CipherType.Login) {
+      cipher = await cipher.decrypt();
+      cipher.login.password = payload.password;
+      cipher.login.username = payload.username;
+      const newCipher = await this.cipherService.encrypt(cipher);
+      const data = new CipherRequest(newCipher);
+      try {
+        await this.request.update_cipher(payload.id, data);
+        await this.notificationAlert('updated_cipher');
+        await this.main.refreshBadgeAndMenu();
+      } catch (error) {
+        await this.notificationAlert('cipher_update_error');
+      }
+    } else {
       await this.notificationAlert('cipher_update_error');
     }
   }
 
   async createCipher(message: any) {
     const { payload } = message.data;
+    const cipher = await this.cipherService.encrypt(payload);
+    const data = new CipherRequest(cipher)
     try {
-      await this.request.create_ciphers_vault(payload);
+      await this.request.create_ciphers_vault(data);
       await this.notificationAlert('created_cipher');
       await this.main.refreshBadgeAndMenu();
     } catch (e) {
-      if (payload.type == CipherType.Login) {
+      if (data.type == CipherType.Login) {
         if (e.response && e.response.data && e.response.data.code === '5002') {
           this.notificationAlert('password_limited')
         } else {

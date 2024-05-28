@@ -235,14 +235,14 @@ export class Utils {
                     return url.hostname;
                 }
 
-                const urlDomain = tldjs && tldjs.parse && tldjs.parse(url.hostname) ? tldjs.parse(url.hostname).domain : null;
+                const urlDomain = tldjs && tldjs.parse && tldjs.parse(url.hostname) ? tldjs.parse(url.hostname).hostname : null;
                 return urlDomain ? urlDomain : url.hostname;
             } catch (e) {
             }
         }
 
         try {
-            const domain = tldjs && tldjs.parse && tldjs.parse(uriString) ? tldjs.parse(uriString).domain : null;
+            const domain = tldjs && tldjs.parse && tldjs.parse(uriString) ? tldjs.parse(uriString).hostname : null;
 
             if (domain) {
                 return domain;
