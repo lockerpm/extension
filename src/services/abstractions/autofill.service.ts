@@ -20,6 +20,13 @@ export abstract class AutofillService {
       canBeHidden?: boolean,
       canBeReadOnly?: boolean,
       mustBeEmpty?: boolean,
+      form?: any
+    ) => any;
+    loadPasswordFields: (
+      pageDetails: AutofillPageDetails,
+      canBeHidden?: boolean,
+      canBeReadOnly?: boolean,
+      mustBeEmpty?: boolean,
       fillNewPassword?: boolean
     ) => any;
 }

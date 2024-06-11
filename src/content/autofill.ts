@@ -11,29 +11,27 @@ const checkRadioTrueOps = {
   '✓': true
 }
 
-document.addEventListener('DOMContentLoaded', (e) => {
-  if (!isIframe) {
-    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-      if (msg.command === 'collectPageDetails') {
-        collectPageDetailsResponse(msg)
-      } else if (msg.command === 'fillForm') {
-        fill(document, msg.fillScript);
-      } else if (msg.command === 'fillOTPForm') {
-        fillOTPForm(msg)
-      } else if (msg.command === 'scanQRCodeInit') {
-        scanQRCodeInit(document, msg.tab, msg.isPasswordOTP);
-      } else if (msg.command === 'capturedImage') {
-        readAndAddQRCode(document, msg);
-      } else if (msg.command === 'addedOTP') {
-        addedOTP(msg)
-      } else if (msg.command === 'alert') {
-        alertMessage(msg)
-      }
-      sendResponse();
-      return true;
-    });
-  }
-})
+if (!isIframe) {
+  chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    if (msg.command === 'collectPageDetails') {
+      collectPageDetailsResponse(msg)
+    } else if (msg.command === 'fillForm') {
+      fill(document, msg.fillScript);
+    } else if (msg.command === 'fillOTPForm') {
+      fillOTPForm(msg)
+    } else if (msg.command === 'scanQRCodeInit') {
+      scanQRCodeInit(document, msg.tab, msg.isPasswordOTP);
+    } else if (msg.command === 'capturedImage') {
+      readAndAddQRCode(document, msg);
+    } else if (msg.command === 'addedOTP') {
+      addedOTP(msg)
+    } else if (msg.command === 'alert') {
+      alertMessage(msg)
+    }
+    sendResponse();
+    return true;
+  });
+}
 
 function collectPageDetailsResponse(msg: any) {
   const pageDetailsObj = JSON.parse(collectDocument(document));

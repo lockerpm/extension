@@ -70,26 +70,16 @@ let barElementsMutationObserver: MutationObserver = new MutationObserver(
 );
 
 document.addEventListener('DOMContentLoaded', (e) => {
-  if (!isIframe) {
-    chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
-      disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
-      chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-        disabledChangedPasswordNotification = disChangedObj != null &&
-          disChangedObj.disableChangedPasswordNotification === true;
-        if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
-          collectIfNeededWithTimeout();
-        }
-      });
-    });
-    
-    chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
-      if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
-        return;
+  chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
+    disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
+    chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
+      disabledChangedPasswordNotification = disChangedObj != null &&
+        disChangedObj.disableChangedPasswordNotification === true;
+      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+        collectIfNeededWithTimeout();
       }
-      currentMessage = msg;
-      processMessages(msg, sendResponse);
     });
-  }
+  });
 })
 
 document.addEventListener('click', (event: any) => {
@@ -103,6 +93,16 @@ document.addEventListener('click', (event: any) => {
     }
   }
 })
+
+if (!isIframe) {
+  chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+    if (!!currentMessage && JSON.stringify(currentMessage) === JSON.stringify(msg)) {
+      return;
+    }
+    currentMessage = msg;
+    processMessages(msg, sendResponse);
+  });
+}
 
 async function processMessages(msg: any, sendResponse: Function) {
   if (msg.command === 'openNotificationBar') {
@@ -152,19 +152,12 @@ function observeDom() {
           }
 
           const tagName = addedNode.tagName != null ? addedNode.tagName.toLowerCase() : null;
-          if (tagName != null && tagName === 'form' &&
-            (addedNode.dataset == null || !addedNode.dataset.lockerWatching)) {
-            doCollect = true;
-            break;
-          }
-
           if ((tagName != null && observeIgnoredElements.has(tagName)) ||
             addedNode.querySelectorAll == null) {
             continue;
           }
 
-          const forms = addedNode.querySelectorAll('form:not([data-locker-watching])');
-          if (forms != null && forms.length > 0) {
+          if (tagName != null && (addedNode.dataset == null || !addedNode.dataset.lockerWatching)) {
             doCollect = true;
             break;
           }
@@ -529,10 +522,10 @@ function clickSubmitted() {
   removeFillLogo();
   const passwordFieldEl: any = document.querySelector(`[locker-id="${loginData.passwordFields[0]?.lockerId}"]`)
   const usernameFieldEl: any = document.querySelector(`[locker-id="${loginData.usernameFields[0]?.lockerId}"]`)
-  if (passwordFieldEl?.value != null && usernameFieldEl?.value != null) {
+  if (passwordFieldEl?.value != null || usernameFieldEl?.value != null) {
     const login: AddLoginRuntimeMessage = {
-      username: usernameFieldEl?.value,
-      password: passwordFieldEl?.value,
+      username: usernameFieldEl?.value || '',
+      password: passwordFieldEl?.value || '',
       url: document.URL,
     };
     sendPlatformMessage({

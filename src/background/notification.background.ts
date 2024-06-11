@@ -124,23 +124,34 @@ export default class NotificationBackground {
     let passwordFields = [];
     let usernameFields = [];
 
-    for (const form of forms) {
-      for (const password of form.passwords) {
+    if (forms.length > 0) {
+      for (const form of forms) {
+        for (const password of form.passwords) {
+          passwordFields.push(password)
+        }
+        if (form.username) {
+          usernameFields.push(form.username)
+        }
+      }
+      if (usernameFields.length === 0 && passwordFields.length > 0) {
+        passwordFields.forEach(passField => {
+          const username = this.autofillService.findUsernameField(msg.details, passField, false, false, false);
+          if (username) {
+            usernameFields.push(username)
+          }
+        });
+      }
+    } else {
+      const passwords = this.autofillService.loadPasswordFields(msg.details, false, false, false, false);
+      for (const password of passwords) {
         passwordFields.push(password)
       }
-      if (form.username) {
-        usernameFields.push(form.username)
+      const username = this.autofillService.findUsernameField(msg.details, null, false, true, false);
+      if (username) {
+        usernameFields.push(username)
       }
     }
-    if (passwordFields.length === 0) {
-      passwordFields = this.autofillService.getPasswordsFields(msg.details, false, false, false, false);
-      passwordFields.forEach(passField => {
-        const username = this.autofillService.findUsernameField(msg.details, passField, false, false, false);
-        if (username) {
-          usernameFields.push(username)
-        }
-      });
-    }
+
     const autofillOptionData = await chrome.storage.local.get('autofillOption');
     const checkIframe = !autofillOptionData.autofillOption || autofillOptionData.autofillOption == 'autofill_page';
 
@@ -184,10 +195,10 @@ export default class NotificationBackground {
     const loginForms = forms.filter((f) => f.username && f.password);
     if (isSignPage) {
       if (
-        passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length >= 1
+        (passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length === 0 && usernameFields.filter((f) => f.visible && f.viewable).length === 1) || 
+        (passwordFields.filter((f) => f.type === 'password' && f.visible && f.viewable).length >= 1
         && !passwordFields.filter((f) => f.type === 'password')[0]?.value
-        && usernameFields.filter((f) => f.visible && f.viewable).length >= 1
-        && isSignPage
+        && usernameFields.filter((f) => f.visible && f.viewable).length === 1)
       ) {
         this.autofillOnPageLoad(sender.tab, checkIframe);
       }

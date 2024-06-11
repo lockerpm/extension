@@ -98,14 +98,14 @@ export default class AutofillService implements AutofillServiceInterface {
       }
       const formPasswordFields = passwordFields.filter(pf => formKey === pf.form);
       const formOTPFields = otpFields.filter(pf => formKey === pf.form);
-      let uf = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false, pageDetails.forms[formKey]);
-      if (uf == null) {
-        uf = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false, pageDetails.forms[formKey]);
+      let usernameField = this.findUsernameField(pageDetails, formPasswordFields[0], false, false, false, pageDetails.forms[formKey]);
+      if (usernameField == null) {
+        usernameField = this.findUsernameField(pageDetails, formPasswordFields[0], true, true, false, pageDetails.forms[formKey]);
       }
       formData.push({
         form: pageDetails.forms[formKey],
         password: formPasswordFields[0] || null,
-        username: uf || null,
+        username: usernameField || null,
         passwords: formPasswordFields,
         otps: formOTPFields,
       });
@@ -226,7 +226,6 @@ export default class AutofillService implements AutofillServiceInterface {
       if (pd.tab.id !== tab.id || pd.tab.url !== tab.url) {
         return;
       }
-
       var fillScript = this.generateFillScript(pd.details, {
         skipUsernameOnlyFill: options.skipUsernameOnlyFill || false,
         onlyEmptyFields: options.onlyEmptyFields || false,
@@ -234,6 +233,7 @@ export default class AutofillService implements AutofillServiceInterface {
         fillNewPassword: options.fillNewPassword || false,
         cipher: options.cipher,
       });
+
 
       if (!fillScript || !fillScript.script || !fillScript.script.length) {
         return;
@@ -406,15 +406,24 @@ export default class AutofillService implements AutofillServiceInterface {
       passwordFields = this.loadPasswordFields(pageDetails, true, true, options.onlyEmptyFields, options.fillNewPassword);
     }
 
-    passwordFields.forEach(passField => {
-      passwords.push(passField);
+    if (passwordFields.length > 0) {
+      passwordFields.forEach(passField => {
+        passwords.push(passField);
+        if (login.username) {
+          const username = this.findUsernameField(pageDetails, passField, false, false, false);
+          if (username) {
+            usernames.push(username)
+          }
+        }
+      });
+    } else {
       if (login.username) {
-        const username = this.findUsernameField(pageDetails, passField, false, false, false);
+        const username = this.findUsernameField(pageDetails, null, false, false, false);
         if (username) {
           usernames.push(username)
         }
       }
-    });
+    }
 
     usernames.forEach(u => {
       if (filledFields.hasOwnProperty(u.opid)) {
@@ -977,7 +986,7 @@ export default class AutofillService implements AutofillServiceInterface {
     return arr;
   }
 
-  private loadPasswordFields(
+  loadPasswordFields(
     pageDetails: AutofillPageDetails,
     canBeHidden: boolean,
     canBeReadOnly: boolean,
@@ -1047,7 +1056,7 @@ export default class AutofillService implements AutofillServiceInterface {
         // Removes all whitespace, _ and - characters
         const cleanedValue = value.toLowerCase().replace(/[\s_\-]/g, '');
 
-        if (cleanedValue.indexOf('otp') < 0 && cleanedValue.indexOf('code') < 0) {
+        if (cleanedValue.indexOf('otp') < 0 && cleanedValue.indexOf('code') < 0 && cleanedValue.indexOf('pin')) {
           return false;
         }
 
@@ -1106,7 +1115,7 @@ export default class AutofillService implements AutofillServiceInterface {
         if (
           !f.disabled &&
           (canBeReadOnly || !f.readonly) &&
-          (f.form === form.opid) &&
+          (!form || f.form === form?.opid) &&
           (canBeHidden || f.viewable) &&
           (f.type === 'text' || f.type === 'email' || f.type === 'tel')
         ) {
@@ -1136,7 +1145,6 @@ export default class AutofillService implements AutofillServiceInterface {
         break;
       }
     }
-
     return usernameField;
   }
 
@@ -1158,6 +1166,9 @@ export default class AutofillService implements AutofillServiceInterface {
         if (this.fieldPropertyIsPrefixMatch(field, 'placeholder', names[i], 'placeholder')) {
           return i;
         }
+        if (this.fieldPropertyIsPrefixMatch(field, 'autoCompleteType', names[i], 'autocomplete')) {
+          return i;
+        }
       }
 
       if (this.fieldPropertyIsMatch(field, 'htmlID', names[i])) {
@@ -1175,6 +1186,9 @@ export default class AutofillService implements AutofillServiceInterface {
       if (this.fieldPropertyIsMatch(field, 'placeholder', names[i])) {
         return i;
       }
+      if (this.fieldPropertyIsMatch(field, 'autoCompleteType', names[i])) {
+        return i;
+      }
     }
 
     if (this.fieldIsFuzzyMatch(field, names)) {
@@ -1184,8 +1198,13 @@ export default class AutofillService implements AutofillServiceInterface {
     return -1;
   }
 
-  private fieldPropertyIsPrefixMatch(field: any, property: string, name: string, prefix: string,
-                                     separator = '='): boolean {
+  private fieldPropertyIsPrefixMatch(
+    field: any,
+    property: string,
+    name: string,
+    prefix: string,
+    separator = '='
+  ): boolean {
     if (name.indexOf(prefix + separator) === 0) {
       const sepIndex = name.indexOf(separator);
       const val = name.substring(sepIndex + 1);
