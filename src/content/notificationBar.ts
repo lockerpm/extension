@@ -19,8 +19,11 @@ import {
   CHANGE_PASSWORD_BUTTON_NAMES,
   CHANGE_PASSWORD_BUTTON_CONTAINS_NAMES,
   LOGIN_PATHS,
-  REGISTER_PATHS
+  REGISTER_PATHS,
+  NEVER_DOMAINS_DEFAULT
 } from '@/config/constants'
+
+import { Utils } from "jslib-common/misc/utils";
 
 const menuIconTagName = generateRandomCustomElementName();
 
@@ -73,9 +76,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
   chrome.storage.local.get('disableAddLoginNotification', (disAddObj: any) => {
     disabledAddLoginNotification = disAddObj != null && disAddObj.disableAddLoginNotification === true;
     chrome.storage.local.get('disableChangedPasswordNotification', (disChangedObj: any) => {
-      disabledChangedPasswordNotification = disChangedObj != null &&
-        disChangedObj.disableChangedPasswordNotification === true;
-      if (!disabledAddLoginNotification || !disabledChangedPasswordNotification) {
+      disabledChangedPasswordNotification = disChangedObj != null && disChangedObj.disableChangedPasswordNotification === true;
+      const currentDomain: string = Utils.getDomain(document.URL);
+      if (!NEVER_DOMAINS_DEFAULT.includes(currentDomain) && (!disabledAddLoginNotification || !disabledChangedPasswordNotification)) {
         collectIfNeededWithTimeout();
       }
     });
@@ -200,6 +203,7 @@ function collectIfNeeded() {
     sendPlatformMessage({
       command: 'bgCollectPageDetails',
       sender: 'notificationBar',
+      autofill: true
     });
     if (observeDomTimeout != null) {
       self.clearTimeout(observeDomTimeout);
@@ -453,8 +457,7 @@ function formSubmitted(e: Event, f?: HTMLFormElement) {
         url: document.URL,
       };
 
-      if (login.username != null && login.username !== '' &&
-        login.password != null && login.password !== '') {
+      if (!login.username && !login.password) {
         processedForm(form);
         sendPlatformMessage({
           command: 'bgAddLogin',
@@ -528,10 +531,12 @@ function clickSubmitted() {
       password: passwordFieldEl?.value || '',
       url: document.URL,
     };
-    sendPlatformMessage({
-      command: 'bgAddLogin',
-      login: login,
-    });
+    if (!login.username && !login.password) {
+      sendPlatformMessage({
+        command: 'bgAddLogin',
+        login: login,
+      });
+    }
   }
   setTimeout(() => {
     sendPlatformMessage({

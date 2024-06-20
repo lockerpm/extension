@@ -79,7 +79,7 @@ export default class NotificationBackground {
       case 'collectPageDetailsResponse':
         switch (msg.sender) {
           case 'notificationBar':
-            await this.collectNotificationBar(msg, sender)
+            await this.collectNotificationBar(msg, sender, msg.autofill)
             break;
           case 'autofillItem':
             await this.handleAutofillItem(msg, sender)
@@ -119,7 +119,7 @@ export default class NotificationBackground {
     }
   }
 
-  private async collectNotificationBar(msg: any, sender: chrome.runtime.MessageSender) {
+  private async collectNotificationBar(msg: any, sender: chrome.runtime.MessageSender, autofill: Boolean = false) {
     const forms = this.autofillService.getFormsFields(msg.details);
     let passwordFields = [];
     let usernameFields = [];
@@ -164,7 +164,7 @@ export default class NotificationBackground {
       checkIframe: checkIframe
     });
 
-    if (autofillOptionData.autofillOption !== 'off') {
+    if (autofillOptionData.autofillOption !== 'off' && autofill) {
       await this.handleAutofillOnPageLoad(sender, forms, passwordFields, usernameFields, checkIframe)
     }
 
@@ -406,8 +406,7 @@ export default class NotificationBackground {
     }
 
     const ciphers = await this.cipherService.getAllDecryptedForUrl(loginInfo.url) || [];
-    const usernameMatches = ciphers.filter(c =>
-      c.login.username != null && c.login.username.toLowerCase() === normalizedUsername);
+    const usernameMatches = ciphers.filter(c => c.login.username != null && c.login.username.toLowerCase() === normalizedUsername);
     if (usernameMatches.length === 0) {
       const disabledAddLogin = await this.storageService.get<boolean>(
         ConstantsService.disableAddLoginNotificationKey);

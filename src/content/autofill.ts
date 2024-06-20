@@ -44,7 +44,8 @@ function collectPageDetailsResponse(msg: any) {
       sender: msg.sender,
       cipher: msg.cipher,
       isIframe: isIframe,
-      checkIframe: msg.checkIframe
+      checkIframe: msg.checkIframe,
+      autofill: msg.autofill
     });
   }
 }

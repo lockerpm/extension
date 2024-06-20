@@ -105,7 +105,8 @@ export default class RuntimeBackground {
         await this.main.collectPageDetailsForContentScript(
           sender.tab,
           msg.sender,
-          sender.frameId
+          sender.frameId,
+          msg.autofill
         );
         break;
       case "collectPageDetailsResponse":

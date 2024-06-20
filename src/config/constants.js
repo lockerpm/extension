@@ -52,3 +52,14 @@ export const EVENTS = {
   VISIBILITYCHANGE: "visibilitychange",
   FOCUSOUT: "focusout",
 };
+
+export const NEVER_DOMAINS_DEFAULT = [
+  'locker.io',
+  'id.locker.io',
+  'passwords.locker.io',
+  'secrets.locker.io',
+  'id-staging.locker.io',
+  'passwords-staging.locker.io',
+  'secrets-staging.locker.io',
+  'support.locker.io',
+]

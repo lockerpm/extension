@@ -623,7 +623,7 @@ export default class MainBackground {
     await this.runtimeBackground.closeAllWindowPopups();
   }
 
-  async collectPageDetailsForContentScript(tab: any, sender: string, frameId: number = null) {
+  async collectPageDetailsForContentScript(tab: any, sender: string, frameId: number = null, autofill?: Boolean) {
     if (!tab || !tab.id) {
       return;
     }
@@ -635,7 +635,8 @@ export default class MainBackground {
     BrowserApi.tabSendMessage(tab, {
       command: 'collectPageDetails',
       tab: tab,
-      sender: sender
+      sender: sender,
+      autofill: autofill
     }, options);
   }
 
