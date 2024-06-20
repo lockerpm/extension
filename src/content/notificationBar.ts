@@ -140,7 +140,7 @@ function observeDom() {
       if (mutations == null || mutations.length === 0 || pageHref !== self.location.href) {
         return;
       }
-
+      
       let doCollect = false;
       for (let i = 0; i < mutations.length; i++) {
         const mutation = mutations[i];
@@ -224,7 +224,7 @@ function watchForms(data: any) {
     loginData = data;
     return;
   }
-  data.forms.forEach((f: any) => {
+  data.forms.filter((f: any) => !!f.password && !!f.username).forEach((f: any) => {
     const formId: string = f.form != null ? f.form.htmlID : null;
     let formEl: HTMLFormElement = null;
     if (formId != null && formId !== '') {
@@ -244,8 +244,8 @@ function watchForms(data: any) {
         passwordEls: null,
       };
       locateFields(formDataObj);
-      formData.push(formDataObj);
       listen(formEl);
+      formData.push(formDataObj);
       formEl.dataset.lockerWatching = '1';
     }
   });
@@ -456,8 +456,7 @@ function formSubmitted(e: Event, f?: HTMLFormElement) {
         password: formData[i].passwordEl.value,
         url: document.URL,
       };
-
-      if (!login.username && !login.password) {
+      if (!!login.username && !!login.password) {
         processedForm(form);
         sendPlatformMessage({
           command: 'bgAddLogin',
@@ -531,7 +530,7 @@ function clickSubmitted() {
       password: passwordFieldEl?.value || '',
       url: document.URL,
     };
-    if (!login.username && !login.password) {
+    if (!!login.username && !!login.password) {
       sendPlatformMessage({
         command: 'bgAddLogin',
         login: login,
@@ -588,75 +587,30 @@ function getSubmitButton(wrappingEl: HTMLElement, buttonNames: Set<string>) {
       }
     }
   }
+
   if (submitButton == null && possibleSubmitButtons.length > 0) {
-    let typelessButton: HTMLElement = null;
-    possibleSubmitButtons.forEach(button => {
-      if (!!submitButton || !button || !button.tagName) {
-        return;
-      }
-      const buttonText = getButtonText(button);
-      if (!!buttonText) {
-        if (
-          !!typelessButton
-          && button.tagName.toLowerCase() === 'button'
-          && button.getAttribute('type') == null
-          && !cancelButtonNames.has(buttonText.trim().toLowerCase())
-          && isElementVisible(button)
-        ) {
-          typelessButton = button;
-        } else if (buttonNames.has(buttonText.trim().toLowerCase())) {
-          submitButton = button;
-        }
-      }
-    });
-    if (!submitButton && !!typelessButton) {
-      submitButton = typelessButton;
-    }
+    const submitButtonTexts = possibleSubmitButtons.map((b) => ({ button: b, text: getButtonText(b)}))
+    const res = submitButtonTexts.find((b) => isElementVisible(b.button) && !!b.text && b.button.getAttribute('type') == null && !cancelButtonNames.has(b.text?.trim().toLowerCase()) && buttonNames.has(b.text.trim().toLowerCase()));
+    submitButton = res?.button || null
   }
   
   if (submitButton == null) {
-    const possibleSubmitButtons = Array.from(document.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
-    possibleSubmitButtons.forEach(button => {
-      if (!!submitButton || !button || !button.tagName) {
-        return;
-      }
-      const buttonText = getButtonText(button) || '';
-      if (!!buttonText) {
-        const isSignInButton = LOGIN_BUTTON_NAMES.includes(buttonText.trim().toLowerCase());
-        const isSignUpButton = REGISTER_BUTTON_NAMES.includes(buttonText.trim().toLowerCase());
-        const isSign = (isSignInPage && isSignInButton) || (isSignUpPage && isSignUpButton)
-        if (
-          button.tagName.toLowerCase() === 'button'
-          && !cancelButtonNames.has(buttonText.trim().toLowerCase())
-          && isElementVisible(button)
-          && isSign
-          && buttonNames.has(buttonText.trim().toLowerCase())
-        ) {
-          submitButton = button;
-        }
-      }
-    });
+    const body = document.querySelector('body')
+    const possibleSubmitButtons = Array.from(body.querySelectorAll('button[type="button"], input[type="button"], button:not([type]), a')) as HTMLElement[];
+    const submitButtonTexts = possibleSubmitButtons.map((b) => ({ button: b, text: getButtonText(b)}))
+    const res = submitButtonTexts.find((b) => isElementVisible(b.button) && !!b.text && !cancelButtonNames.has(b.text?.trim().toLowerCase()) && buttonNames.has(b.text.trim().toLowerCase()));
+    submitButton = res?.button || null
   }
 
-  if (submitButton == null && wrappingEl) {
-    const parentModal = wrappingEl.closest('div.modal') as HTMLElement;
-    if (parentModal != null) {
-      const modalForms = parentModal.querySelectorAll('form');
-      if (modalForms.length === 1) {
-        submitButton = getSubmitButton(parentModal, buttonNames);
-      }
-    }
-  }
-  
   return submitButton;
 }
 
 function getButtonText(button: HTMLElement) {
   let buttonText: string = null;
-  if (button.tagName.toLowerCase() === 'input') {
-    buttonText = (button as HTMLInputElement).value;
+  if (button?.tagName?.toLowerCase() === 'input') {
+    buttonText = (button as HTMLInputElement)?.value;
   } else {
-    buttonText = button.innerText;
+    buttonText = button?.innerText;
   }
   return buttonText;
 }
