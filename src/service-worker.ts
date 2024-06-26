@@ -33,4 +33,16 @@ chrome.runtime.onUpdateAvailable.addListener(() =>
   chrome.runtime.reload()
 );
 
+chrome.runtime.onInstalled.addListener((details) => {
+  const currentVersion = chrome.runtime.getManifest().version
+  const previousVersion = details.previousVersion
+  if (currentVersion > previousVersion) {
+    chrome.runtime.reload()
+  }
+})
+
+setInterval(() => {
+  chrome.runtime.reload()
+}, 1 * 60 * 60 * 1000)
+
 createOffscreen();
