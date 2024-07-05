@@ -51,6 +51,7 @@ export default Vue.extend({
   async mounted() {
     this.data = this.$store.state.initData?.data;
     this.browserTab = await BrowserApi.getTabFromCurrentWindow();
+    await this.serviceWorkerUnlocked();
   },
   methods: {
     async closeBar() {
@@ -105,6 +106,15 @@ export default Vue.extend({
         });
       }
       this.closeBar()
+    },
+    async serviceWorkerUnlocked() {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "unlocked",
+          tab: tab,
+        });  
+      }
     }
   }
 })

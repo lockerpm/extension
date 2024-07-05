@@ -203,7 +203,7 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked');
+          await this.serviceWorkerUnlocked();
           await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
@@ -229,7 +229,7 @@ Vue.mixin({
           if (this.$vaultTimeoutService != null) {
             this.$vaultTimeoutService.biometricLocked = false
           }
-          await this.$runtimeBackground.handleUnlocked('unlocked');
+          await this.serviceWorkerUnlocked();
           await this.getSyncData()
           this.getExcludeDomains()
           this.$router.push({ name: 'vault' }).catch(() => ({}));
@@ -591,6 +591,15 @@ Vue.mixin({
           command: "scanQRCodeInit",
           tab: tab,
           isPasswordOTP: isPasswordOTP
+        });  
+      }
+    },
+    async serviceWorkerUnlocked() {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "unlocked",
+          tab: tab,
         });  
       }
     }

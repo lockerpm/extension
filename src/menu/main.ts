@@ -42,6 +42,9 @@ Vue.mixin({
     isLoggedIn: {
       async get() {
         const userPw = await this.$storageService.get('cs_user_pw')
+        if (!!userPw && userPw.email) {
+          this.serviceWorkerUnlocked();
+        }
         return !!userPw && userPw.email
       },
       watch: [
@@ -201,6 +204,15 @@ Vue.mixin({
         }
       }, 200);
     },
+    async serviceWorkerUnlocked() {
+      const tab = await BrowserApi.getTabFromCurrentWindow();
+      if (tab) {
+        BrowserApi.tabSendMessage(tab, {
+          command: "unlocked",
+          tab: tab,
+        });  
+      }
+    }
   }
 })
 

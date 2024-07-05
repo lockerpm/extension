@@ -41,8 +41,4 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
-setInterval(() => {
-  chrome.runtime.reload()
-}, 1 * 60 * 60 * 1000)
-
 createOffscreen();

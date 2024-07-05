@@ -128,6 +128,8 @@ async function processMessages(msg: any, sendResponse: Function) {
     sendPlatformMessage(msg)
   } else if (msg.command === 'removeExcludeDomain') {
     sendPlatformMessage(msg)
+  } else if (msg.command === 'unlocked') {
+    sendPlatformMessage(msg)
   }
   sendResponse();
   return true;
