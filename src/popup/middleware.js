@@ -29,7 +29,7 @@ const middleware = () => {
       if ((store.state.user.email && !!store.state.userPw) || store.state.preloginData?.email) {
         if (to.meta?.isLock) {
           const isPwl = store.state.preloginData && (store.state.preloginData.require_passwordless || store.state.preloginData.login_method === 'passwordless')
-          const isMpm = (store.state.userPw && store.state.userPw.is_pwd_manager) || store.state.preloginData?.login_method === 'password'
+          const isMpm = (store.state.userPw && store.state.userPw.is_pwd_manager) && store.state.preloginData?.login_method === 'password'
           if (!isMpm && !isPwl && !['set-master-password'].includes(to.name)) {
             router.push({ name: "set-master-password" }).catch(() => ({}))
           } else {
