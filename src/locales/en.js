@@ -745,5 +745,10 @@ module.exports = {
   bar: {
     create_title: "Should Locker remember this password for you?",
     update_title: "Do you want to update this password in Locker?"
+  },
+  hide_your_email: {
+    title: "Hide your email",
+    generate_new: "Generate new private email",
+    no_alias: "You haven't generated any private emails."
   }
 }

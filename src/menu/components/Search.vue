@@ -34,11 +34,9 @@ export default {
   props: {
     fillTypes: {
       type: Array,
-      default: () => []
     },
     fillType: {
       type: Object,
-      default: () => ({})
     },
     isOtp: {
       type: Boolean,

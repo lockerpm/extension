@@ -54,6 +54,15 @@
             :no-border="true"
             :disabled="isDeleted"
           />
+          <div
+            v-if="!isDeleted"
+            class="text-right mb-2"
+          >
+            <PrivateEmails
+              @fill="(v) => cipher.login.username = v"
+              @on-error="() => popupVisible = true"
+            />
+          </div>
           <template>
             <InputText
               v-model="cipher.login.password"
@@ -69,16 +78,16 @@
             />
             <div
               v-if="!isDeleted"
-              class="text-right"
+              class="text-right mb-2"
             >
               <el-popover
-                placement="right"
+                v-model="popoverDisabled"
+                placement="bottom"
                 width="280"
                 trigger="click"
                 popper-class="locker-pw-generator"
               >
                 <PasswordGenerator
-                  v-show="popoverDisabled"
                   @fill-password="fillPassword"
                   @toggle="(v) => popoverDisabled = v"
                 />
@@ -87,7 +96,7 @@
                   slot="reference"
                   type="text"
                   class="p-0"
-                  @click="() => popoverDisabled = true"
+                  @click="() => openPopover()"
                 >
                   {{ $t('data.ciphers.generate_random_password') }}
                 </el-button>
@@ -392,13 +401,13 @@
             class="text-right"
           >
             <el-popover
+              v-model="popoverDisabled"
               placement="right"
               width="280"
               trigger="click"
               popper-class="locker-pw-generator"
             >
               <PasswordGenerator
-                v-show="popoverDisabled"
                 @fill-password="fillPassword"
                 @toggle="(v) => popoverDisabled = v"
               />
@@ -588,6 +597,7 @@ import InputSelectCryptoNetworks from '@/components/input/InputSelectCryptoNetwo
 import InputSeedPhrase from '@/components/input/InputSeedPhrase'
 import InputCustomFields from '@/components/input/InputCustomFields.vue'
 import PasswordOTP from './PasswordOTP.vue'
+import PrivateEmails from '@/popup/components/password/PrivateEmails.vue'
 
 import { BrowserApi } from "@/browser/browserApi";
 import { WALLET_APP_LIST } from '@/utils/crypto/applist/index'
@@ -614,11 +624,12 @@ export default Vue.extend({
     InputSeedPhrase,
     InputCustomFields,
     UpgrateToPremium,
-    PasswordOTP
+    PasswordOTP,
+    PrivateEmails
   },
   props: {
     type: {
-      type: String,
+      type: Number,
       default: null
     },
     data: {
@@ -802,6 +813,11 @@ export default Vue.extend({
     }
   },
   methods: {
+    openPopover() {
+      setTimeout(() => {
+        this.popoverDisabled = true
+      }, 10);
+    },
     async handleSave () {
       if (this.cipher.id) {
         await this.putCipher()
