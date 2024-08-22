@@ -72,7 +72,7 @@
       <div class="form-group !mb-4">
         <button
           class="btn btn-primary w-full"
-          :disabled="loading"
+          :loading="loading"
           @click="setMasterPass"
         >
           {{$t('data.set_master_pass.create_btn')}}
