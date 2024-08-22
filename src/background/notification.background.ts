@@ -53,16 +53,44 @@ export default class NotificationBackground {
     private request: RequestBackground,
     private passwordRepromptService: PasswordRepromptService,
     private popupUtilsService: PopupUtilsService,
-    private platformUtilsService: PlatformUtilsService
+    private platformUtilsService: PlatformUtilsService,
   ) { }
+
+  private newCiphers: Array<any>[] = [];
+  private updateCiphers: Array<any>[] = [];
+
   async init() {
     if (chrome.runtime == null) {
       return;
     }
 
-    BrowserApi.messageListener('notification.background', async (msg: any, sender: chrome.runtime.MessageSender) => {
+    this.newCiphers = [];
+    this.updateCiphers = [];
+
+    BrowserApi.messageListener('notification.background', async (msg: 
+      any, sender: chrome.runtime.MessageSender) => {
       await this.processMessage(msg, sender);
     });
+
+    setInterval(async () => {
+      const nCiphers: any = this.newCiphers.map((c) => JSON.stringify(c));
+      this.newCiphers = [...new Set(nCiphers)].map((c: string) => JSON.parse(c));
+      while (this.newCiphers.length > 0) {
+        const payload = this.newCiphers[0];
+        this.newCiphers = this.newCiphers.filter((c, index) => index !== 0);
+        await this.createCipher(payload);
+      }
+    }, 1000);
+
+    setInterval(async () => {
+      const uCiphers: any = this.updateCiphers.map((c) => JSON.stringify(c));
+      this.updateCiphers = [...new Set(uCiphers)].map((c: string) => JSON.parse(c));
+      while (this.updateCiphers.length > 0) {
+        const payload = this.updateCiphers[0];
+        this.updateCiphers = this.updateCiphers.filter((c, index) => index !== 0);
+        await this.updateCipher(payload);
+      }
+    }, 1000);
   }
 
   async processMessage(msg: any, sender: chrome.runtime.MessageSender) {
@@ -108,11 +136,15 @@ export default class NotificationBackground {
         break;
       case 'updateCipher':
         await this.main.runtimeBackground.closeAllWindowPopups();
-        this.updateCipher(msg);
+        if (!this.updateCiphers.find((c: any) => c.id == msg.data.payload.id && c.username == msg.data.payload.username && c.password == msg.data.payload.password)) {
+          this.updateCiphers.push(msg.data.payload);
+        }
         break;
       case 'createCipher':
         await this.main.runtimeBackground.closeAllWindowPopups();
-        this.createCipher(msg);
+        if (!this.newCiphers.find((c: any) => c.name == msg.data.payload.name && c.login.username == msg.data.payload.login.username && c.login.password == msg.data.payload.login.password)) {
+          this.newCiphers.push(msg.data.payload);
+        }
         break;
       default:
         break;
@@ -493,10 +525,7 @@ export default class NotificationBackground {
     data.type = CipherType.OTP;
     try {
       const res: any = await this.request.create_ciphers_vault(data);
-      const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
-      const userId = await this.userService.getUserId();
-      const cipherData = new CipherData(cipherResponse, userId)
-      this.cipherService.upsert(cipherData);
+      await this.upsertData(data, res)
       this.notificationAlert('otp_added');
     } catch (e) {
       if (e.response && e.response.data && e.response.data.code === '5002') {
@@ -528,33 +557,35 @@ export default class NotificationBackground {
     await this.notificationAlert('removed_exclude_domain');
   }
 
-  async updateCipher (message: any) {
-    const { payload } = message.data;
-    let cipher: any = await this.cipherService.get(payload.id);
-    if (cipher && cipher.type === CipherType.Login) {
-      cipher = await cipher.decrypt();
-      cipher.login.password = payload.password;
-      cipher.login.username = payload.username;
-      const newCipher = await this.cipherService.encrypt(cipher);
-      const data = new CipherRequest(newCipher);
-      try {
-        await this.request.update_cipher(payload.id, data);
-        await this.notificationAlert('updated_cipher');
-        await this.main.refreshBadgeAndMenu();
-      } catch (error) {
+  async updateCipher (payload: any) {
+    if (payload.id) {
+      let cipher: any = await this.cipherService.get(payload.id);
+      if (cipher && cipher.type === CipherType.Login) {
+        cipher = await cipher.decrypt();
+        cipher.login.password = payload.password;
+        cipher.login.username = payload.username;
+        const newCipher = await this.cipherService.encrypt(cipher);
+        const data = new CipherRequest(newCipher);
+        try {
+          const res = await this.request.update_cipher(payload.id, data);
+          await this.upsertData(data, res)
+          await this.notificationAlert('updated_cipher');
+          await this.main.refreshBadgeAndMenu();
+        } catch (error) {
+          await this.notificationAlert('cipher_update_error');
+        }
+      } else {
         await this.notificationAlert('cipher_update_error');
       }
-    } else {
-      await this.notificationAlert('cipher_update_error');
     }
   }
 
-  async createCipher(message: any) {
-    const { payload } = message.data;
+  async createCipher(payload: any) {
     const cipher = await this.cipherService.encrypt(payload);
-    const data = new CipherRequest(cipher)
+    const data = new CipherRequest(cipher);
     try {
-      await this.request.create_ciphers_vault(data);
+      const res = await this.request.create_ciphers_vault(data);
+      await this.upsertData(data, res)
       await this.notificationAlert('created_cipher');
       await this.main.refreshBadgeAndMenu();
     } catch (e) {
@@ -568,6 +599,13 @@ export default class NotificationBackground {
         this.notificationAlert('cipher_add_error')
       }
     }
+  }
+
+  async upsertData(data: any, res: any) {
+    const cipherResponse = new CipherResponse({ ...data, id: res ? res.id : '' })
+    const userId = await this.userService.getUserId();
+    const cipherData = new CipherData(cipherResponse, userId)
+    this.cipherService.upsert(cipherData);
   }
 
   private async notificationAlert(type: string) {
