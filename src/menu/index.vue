@@ -75,6 +75,16 @@ export default Vue.extend({
     tabs() {
       return [
         {
+          value: 0,
+          name: this.$t('hide_your_email.title'),
+          onclick: async () => {
+            if (this.browserTab) {
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `300px` })
+            }
+            this.tab = 1
+          }
+        },
+        {
           value: 1,
           name: this.$t('menu.generate_password'),
           disabled: this.isOTP,
