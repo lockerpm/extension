@@ -687,7 +687,7 @@ module.exports = {
       enter_pass: 'Enter Master Password',
       confirm_pass: 'Confirm Master Password',
       hint_pass: 'Master password hint (optional)',
-      create_btn: 'Create password',
+      create_btn: 'Create Master Password',
       note: 'Note: Locker cannot view, store, or re-issue Master Password in case you forget or lose it.'
     },
     parts: {

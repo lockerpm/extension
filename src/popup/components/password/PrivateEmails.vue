@@ -21,8 +21,8 @@
             </p>
           </div>
         </div>
-        <div class="px-4 my-1">
-          <div class="w-full" style="border-top: 1px solid #A2A3A7;"></div>
+        <div class="px-4">
+          <div class="w-full" style="border-top: 1px solid rgba(230, 230, 232, 1);"></div>
         </div>
         <div class="px-4 py-2">
           <p
@@ -101,7 +101,7 @@ export default  Vue.extend({
 .private-emails {
   margin-top: -8px;
   &--list::-webkit-scrollbar {
-    display: none;
+    // display: none;
   }
 }
 </style>

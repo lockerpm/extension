@@ -687,7 +687,7 @@ module.exports = {
       enter_pass: "輸入主密碼",
       confirm_pass: "確認主密碼",
       hint_pass: "主密碼提示（可不填寫）",
-      create_btn: "建立密碼",
+      create_btn: "建立主密碼",
       note: "注意：忘記或遺失主密碼時，Locker 無法檢視、儲存、或重新發放主密碼。"
     },
     parts: {

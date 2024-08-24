@@ -687,7 +687,7 @@ module.exports = {
       enter_pass: 'Nhập Mật khẩu chính',
       confirm_pass: 'Xác nhận mật khẩu',
       hint_pass: 'Gợi ý mật khẩu (tùy chọn)',
-      create_btn: 'Tạo mật khẩu',
+      create_btn: 'Tạo mật khẩu chính',
       note: 'Lưu ý: Locker không thể xem, không thể lưu trữ, cũng như không thể cấp lại Mật khẩu chính trong trường hợp bạn quên hoặc đánh mất.'
     },
     parts: {
