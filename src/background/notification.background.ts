@@ -562,8 +562,15 @@ export default class NotificationBackground {
       let cipher: any = await this.cipherService.get(payload.id);
       if (cipher && cipher.type === CipherType.Login) {
         cipher = await cipher.decrypt();
-        cipher.login.password = payload.password;
-        cipher.login.username = payload.username;
+        if (payload.password) {
+          cipher.login.password = payload.password;
+        }
+        if (payload.username) {
+          cipher.login.username = payload.username;
+        }
+        if (payload.favorite != undefined) {
+          cipher.favorite = payload.favorite
+        }
         const newCipher = await this.cipherService.encrypt(cipher);
         const data = new CipherRequest(newCipher);
         try {

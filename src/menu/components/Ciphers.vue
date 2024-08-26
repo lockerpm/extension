@@ -15,7 +15,6 @@
           :fill-type="fillType"
           :key="item.id"
           :item="item"
-          @do-fill="$emit('do-fill', item)"
           @put-cipher="() => putCipher(item)"
         />
       </ul>
@@ -37,7 +36,6 @@ import OTPRow from './OTPRow.vue'
 
 import { BrowserApi } from "@/browser/browserApi";
 import { CipherType } from "jslib-common/enums/cipherType";
-import { CipherRequest } from 'jslib-common/models/request/cipherRequest';
 
 export default Vue.extend({
   name: 'MenuCiphers',
@@ -130,13 +128,13 @@ export default Vue.extend({
     },
     async putCipher (cipher) {
       const tab = await BrowserApi.getTabFromCurrentWindow();
-      cipher.favorite = !cipher.favorite
-      const newCipher = await this.$cipherService.encrypt(cipher);
-      const data = new CipherRequest(newCipher);
       if (tab) {
         await BrowserApi.tabSendMessageData(tab, 'updateCipher', {
           cipherId: cipher.id,
-          payload: data,
+          payload: {
+            id: cipher.id,
+            favorite: !cipher.favorite
+          },
         });
       }
       this.closeMenu();

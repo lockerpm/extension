@@ -22,7 +22,6 @@
           :key="item.id"
           :item="item"
           :folder="folder"
-          @do-fill="$emit('do-fill', item)"
         >
         </cipher-row>
       </ul>

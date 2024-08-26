@@ -234,7 +234,6 @@ export default class AutofillService implements AutofillServiceInterface {
         cipher: options.cipher,
       });
 
-
       if (!fillScript || !fillScript.script || !fillScript.script.length) {
         return;
       }
@@ -394,7 +393,7 @@ export default class AutofillService implements AutofillServiceInterface {
     const usernames: AutofillField[] = [];
     const login = options.cipher.login;
 
-    if (!login.password || login.password === '') {
+    if ((!login.password || login.password === '') && !login.username) {
       // No password for this login. Maybe they just wanted to auto-fill some custom fields?
       fillScript = this.setFillScriptForFocus(filledFields, fillScript);
       return fillScript;
@@ -440,7 +439,9 @@ export default class AutofillService implements AutofillServiceInterface {
       }
 
       filledFields[p.opid] = p;
-      this.fillByOpid(fillScript, p, login.password);
+      if (login.password) {
+        this.fillByOpid(fillScript, p, login.password);
+      }
     });
 
     fillScript = this.setFillScriptForFocus(filledFields, fillScript);

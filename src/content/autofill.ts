@@ -201,6 +201,13 @@ function alertMessage(msg: any) {
           : "The item have been added!"
       );
       break;
+    case 'create_private_email_error':
+      self.alert(
+        self.navigator.language === "vi"
+          ? "Số lượng địa chỉ chuyển tiếp đã đạt tới giới hạn"
+          : "The number of relay addresses is reached"
+      );
+      break;
     default:
       break;
   }

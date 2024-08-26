@@ -69,7 +69,7 @@ export default Vue.extend({
   },
   computed: {
     title () {
-      if (this.tab.value === 1) {
+      if (this.tab.value !== 2) {
         return this.tab.name
       }
       return this.fillType.title
