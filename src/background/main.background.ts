@@ -479,6 +479,7 @@ export default class MainBackground {
       this.logService
     );
     this.menuBackground = new MenuBackground(
+      this.storageService,
       this.cipherService,
       this.requestBackground
     )

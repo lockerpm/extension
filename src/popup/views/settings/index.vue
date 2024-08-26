@@ -97,7 +97,6 @@
 
 <script>
 import Vue from "vue";
-import i18n from '@/locales/i18n';
 import Fingerprint from "@/popup/components/setting/Fingerprint.vue";
 
 const showFoldersKey = 'showFolders';

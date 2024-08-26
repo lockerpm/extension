@@ -74,7 +74,6 @@
 
 <script>
 import { CipherType } from "jslib-common/enums/cipherType";
-import { BrowserApi } from "@/browser/browserApi";
 import AddEditFolder from '@/popup/components/folder/AddEditFolder'
 import AddEditOTP from '@/popup/components/otp/AddEditOTP.vue'
 

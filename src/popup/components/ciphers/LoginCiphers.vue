@@ -39,7 +39,6 @@
         v-for="item in (loginCiphers || [])"
         :key="item.id"
         :item="item"
-        @do-fill="$emit('do-fill', item)"
       />
     </ul>
   </div>

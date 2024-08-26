@@ -118,17 +118,15 @@ async function processMessages(msg: any, sendResponse: Function) {
     closeInformMenu()
   } else if (msg.command === 'resizeInformMenu') {
     resizeInformMenu(msg)
-  } else if (msg.command === 'updateCipher') {
-    sendPlatformMessage(msg)
-  } else if (msg.command === 'createCipher') {
-    sendPlatformMessage(msg)
-  } else if (msg.command === 'useCipher') {
-    sendPlatformMessage(msg)
-  } else if (msg.command === 'addExcludeDomain') {
-    sendPlatformMessage(msg)
-  } else if (msg.command === 'removeExcludeDomain') {
-    sendPlatformMessage(msg)
-  } else if (msg.command === 'unlocked') {
+  } else if ([
+    'updateCipher',
+    'createCipher',
+    'useCipher',
+    'addExcludeDomain',
+    'removeExcludeDomain',
+    'unlocked',
+    'createPrivateEmail'
+  ].includes(msg.command)) {
     sendPlatformMessage(msg)
   }
   sendResponse();

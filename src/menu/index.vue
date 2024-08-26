@@ -18,8 +18,11 @@
         @change="(v) => fillType = v"
       />
       <div class="menu-info" :class="{ 'is-search': tab === 2 && !isLocked}">
+        <PrivateEmails
+          v-if="tab === 0 && !isOTP && !isLocked"
+        />
         <PasswordGenerator
-          v-if="tab === 1 && !isOTP"
+          v-else-if="tab === 1 && !isOTP"
           is-over
         />
         <MenuCiphers
@@ -46,6 +49,7 @@ import MenuCiphers from './components/Ciphers.vue';
 import MenuLocked from './components/Locked.vue';
 import MenuExcluded from './components/Excluded.vue';
 import PasswordGenerator from './components/Generator.vue'
+import PrivateEmails from './components/PrivateEmails.vue';
 
 import { CipherType } from "jslib-common/enums/cipherType";
 import { BrowserApi } from "@/browser/browserApi";
@@ -59,7 +63,8 @@ export default Vue.extend({
     MenuCiphers,
     MenuLocked,
     MenuExcluded,
-    PasswordGenerator
+    PasswordGenerator,
+    PrivateEmails
   },
   data () {
     return {
@@ -74,6 +79,17 @@ export default Vue.extend({
   computed: {
     tabs() {
       return [
+        {
+          value: 0,
+          name: this.$t('hide_your_email.title'),
+          disabled: this.isLocked || this.isOTP,
+          onclick: async () => {
+            if (this.browserTab) {
+              BrowserApi.tabSendMessageData(this.browserTab, 'resizeInformMenu', { height: `300px` })
+            }
+            this.tab = 0
+          }
+        },
         {
           value: 1,
           name: this.$t('menu.generate_password'),

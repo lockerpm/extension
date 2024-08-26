@@ -119,4 +119,19 @@ export default class RequestBackground {
       method: "delete"
     });
   }
+
+  async get_addresses(params?: any) {
+    return await this.request({
+      url: ENDPOINT.ADDRESSES,
+      method: "get",
+      params
+    });
+  }
+
+  async create_address() {
+    return await this.request({
+      url: ENDPOINT.ADDRESSES,
+      method: "post",
+    });
+  }
 }

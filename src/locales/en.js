@@ -687,7 +687,7 @@ module.exports = {
       enter_pass: 'Enter Master Password',
       confirm_pass: 'Confirm Master Password',
       hint_pass: 'Master password hint (optional)',
-      create_btn: 'Create password',
+      create_btn: 'Create Master Password',
       note: 'Note: Locker cannot view, store, or re-issue Master Password in case you forget or lose it.'
     },
     parts: {
@@ -745,5 +745,10 @@ module.exports = {
   bar: {
     create_title: "Should Locker remember this password for you?",
     update_title: "Do you want to update this password in Locker?"
+  },
+  hide_your_email: {
+    title: "Hide your email",
+    generate_new: "Generate new private email",
+    no_alias: "You haven't generated any private emails."
   }
 }

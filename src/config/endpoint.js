@@ -88,5 +88,8 @@ export default {
   CYSTACK_PLATFORM_EXCLUDE_DOMAINS_DETAIL: '/cystack_platform/pm/exclude_domains/:id',
 
   // notifications
-  NOTIFICATIONS: '/notifications'
+  NOTIFICATIONS: '/notifications',
+
+  // relay
+  ADDRESSES: '/cystack_platform/relay/addresses',
 };

@@ -61,12 +61,15 @@
         </div>
         <div class="form-group !mb-8">
           <label>{{$t('data.set_master_pass.hint_pass')}}</label>
-          <input
-            v-model="masterPasswordHint"
-            class="form-control"
-            placeholder=""
-            type="text"
-          />
+          <div class="input-group" :class="[errors.masterPasswordHint ? 'is-invalid' :'']">
+            <input
+              v-model="masterPasswordHint"
+              class="form-control"
+              placeholder=""
+              type="text"
+            />
+          </div>
+          <div class="invalid-feedback">{{ $t('data.login.message.invalid', { name: $t('data.set_master_pass.hint_pass') }) }}</div>
         </div>
       </div>
       <div class="form-group !mb-4">
@@ -118,6 +121,13 @@ export default Vue.extend({
         this.errors.masterRePassword = 1
       } else {
         this.errors.masterRePassword = 0
+      }
+    },
+    masterPasswordHint (newValue) {
+      if (this.masterPassword && newValue && newValue.includes(this.masterPassword.trim())) {
+        this.errors.masterPasswordHint = 1
+      } else {
+        this.errors.masterPasswordHint = 0
       }
     }
   },
